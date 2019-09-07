@@ -76,7 +76,7 @@ build & install
 	   	 In this case the environmental variables CCC_CC and CCC_CXX can be set to tell the ccc-analyzer which compiler
 		 should actually be used to build the source (see here: http://btorpey.github.io/blog/2015/04/27/static-analysis-with-clang/).
 		 
-	   cmake .. [-DOPTION_BUILD_DOCS = OFF | ON]
+	   cmake .. [-DOPTION_BUILD_DOC = OFF | ON]
 	   	    [-DOPTION_BUILD_TESTS = ON | OFF]
 		    [-DOPTION_BUILD_EXAMPLES = OFF | ON]
 		    [-DBUILD_SHARED_LIBS = ON | OFF]
@@ -93,6 +93,8 @@ build & install
 	
 	            cmake .. -DCMAKE_BUILD_TYPE=DEBUG -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -DCMAKE_CXX_COMPILER=clang++-7 -DCMAKE_C_COMPILER=clang-7
 
+		    or
+		    
 		    cmake .. -DCMAKE_BUILD_TYPE=DEBUG -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -DCMAKE_CXX_COMPILER=g++-9 -DCMAKE_C_COMPILER=gcc-9
 
 	      b. Or, build with "perf" measurment flags
@@ -105,11 +107,11 @@ build & install
 
 	3. Build the project.
 	
-		cmake --build . -- [all|clean|test|docs]
+		cmake --build . -- [all|clean|test|doc]
 
 		or
 
-		scan-build cmake --build . -- [all|clean|test|docs]
+		scan-build cmake --build . -- [all|clean|test|doc]
 
 	4. Run the tests manually (optional)
 	       export LSAN_OPTIONS=suppressions=../suppr.txt

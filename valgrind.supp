@@ -1,0 +1,8 @@
+leak:INDI::BaseDevice::BaseDevice
+leak:INDI::BaseDevice::buildProp
+leak:INDI::BaseClient::addDevice
+leak:newLilXML
+leak:__interceptor_malloc
+leak:std::vector<INDI::Property*, std::allocator<INDI::Property*> >::_M_emplace_back_aux<INDI::Property* const&>
+leak:operator new(unsigned long)
+leak:IUSaveText

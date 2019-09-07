@@ -1,0 +1,34 @@
+reset
+
+#a=-108.842
+#b=4.5666
+#c=30008.6
+#d=-1.85132
+
+# a=55.4068
+# b=2.25756
+# c=30009.6
+# d=-0.523297
+
+
+
+set term png size 1024,768 enhanced lw 2 font "Times,18"
+set output o
+set contour
+set cntrparam levels discrete 0
+set view map
+unset surface
+set nokey
+set isosamples 1000,1000
+set autoscale x
+set yrange [-5:42]
+set xlabel "x (focus position)"
+set ylabel "y (HFD)"
+set title sprintf("H(x)=b*sqrt(1+(x-c)^2/a^2)+d, a=%.2f, b=%.2f, c=%.2f, d=%.2f", a, b, c, d)
+set style line 1 lc rgb 'red' pt 5
+
+H(x)=b*sqrt(1+(x-c)**2/a**2)+d
+g(x)=-(b/a)*(x-c)+d
+h(x)=+(b/a)*(x-c)+d
+set arrow from c,-5 to c,10 nohead lc rgb 'red'
+plot H(x),g(x),h(x),i

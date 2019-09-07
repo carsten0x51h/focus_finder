@@ -1,0 +1,67 @@
+#include "include/linear_bw_stretch_mapper_function.h"
+
+#include "include/logging.h"
+#include "include/mapper_function.h"
+
+
+LinearBWStretchMapperFunctionT::LinearBWStretchMapperFunctionT() :
+	mBlackPoint(0),
+	mWhitePoint(0),
+	mSrcFrom(0),
+	mSrcTo(0),
+	mDestFrom(0),
+	mDestTo(0)
+{
+
+}
+
+LinearBWStretchMapperFunctionT::~LinearBWStretchMapperFunctionT() {
+
+}
+
+std::string LinearBWStretchMapperFunctionT::getName() const {
+	return "LinearBWStretchMapperFunction";
+}
+
+// TODO: Maybe move to parent class
+void LinearBWStretchMapperFunctionT::setSrcRange(float from, float to) {
+	// TODO: Check that from <= to
+	LOG(debug) << "LinearBWStretchMapperFunctionT::setSrcRange... ["<< from << ", " << to << "]" << std::endl;
+
+	mSrcFrom = from;
+	mSrcTo = to;
+}
+
+// TODO: Maybe move to parent class
+void LinearBWStretchMapperFunctionT::setDestRange(float from, float to) {
+	// TODO: Check that from <= to
+	LOG(debug) << "LinearBWStretchMapperFunctionT::setDestRange... ["<< from << ", " << to << "]" << std::endl;
+
+	mDestFrom = from;
+	mDestTo = to;
+}
+
+float LinearBWStretchMapperFunctionT::f(float f) {
+	// TODO: Check that mBlackPoint <= mWhitePoint
+
+	const float factor = mDestTo / (mWhitePoint - mBlackPoint);
+	float mappedValue;
+
+	if (f <= mBlackPoint) {
+		mappedValue = mDestFrom;
+	} else if (f > mWhitePoint) {
+		mappedValue = mDestTo;
+	} else {
+		mappedValue = factor * (f - mBlackPoint);
+	}
+
+	return mappedValue;
+}
+
+void LinearBWStretchMapperFunctionT::setBlackPoint(float blackPoint) {
+	mBlackPoint = blackPoint;
+}
+
+void LinearBWStretchMapperFunctionT::setWhitePoint(float whitePoint) {
+	mWhitePoint = whitePoint;
+}

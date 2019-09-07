@@ -1,0 +1,9 @@
+reset
+set term png size 1024,768 enhanced lw 2 font "Times,18"
+set output o
+set autoscale x
+set yrange [-5:42]
+set xlabel "x (focus position)"
+set ylabel "y (HFD)"
+set title "Example V-Curve data"
+plot i

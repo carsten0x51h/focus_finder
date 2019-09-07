@@ -1,0 +1,40 @@
+TODO
+----
+
+-NEXT
+	-HfdT and FwhmT refactoring! Adapt FwhmT to new curve fitting tmpl,... etc etc etc. -> Use FwhmT instead of HfdT for simulator...
+    -Remove X11 from CMakeLists again!, image.h -> re-enamble display 0!
+	-INDI Focus GUI - progress does not stop...
+	-IndiFocus fertig anbinden -> Test
+	-Erste V-Curve aufnehmen :-)
+	-On INDI-Server disconnect (or camera disconnect, or camera device removal), stop exposure
+
+
+
+-MainWindow
+	-Selected POI should overwrite ROI?! (if both are selected?)
+	-Fully integrate FocusFinderExecutor + actual FocusFinder with events (?)
+
+-ManageDeviceProfilesDialog
+	-Implement New + edit profile -> see libreoffice document...
+		-Extend persistence of boost tree to SizeT, enums etc. 
+	-ProfileManager - Add directory listener to get notified when profile was added or removed (same as renamed). 
+	-Späääter, im cfg dialog hinter jedes Feld ein blaues Info Icon mit Mouse-over text zum Erklären der FUnktion.....?!
+	-Später: Im cfg. Dialog einige Dinge "visualisieren" - z.B. Star window mit Grafik und Stern, das sich je nach Window size verändert....
+	-Close ManageDeviceProfilesDialog if MainWindow is closed
+
+-Focus / FocusCntlPanel
+	-Idea! Also mFfl should allow registering to an event that is fired when focus finder process
+	 has started! Then this panel can be disabled (same for camera cntl panel).
+    -IDEA: In focus cntl panel - maybe indicate absolute position of focus by a line and a dot where left is minimu, right is maximum and dot is the current position... but maybe this should go to a sep panel...
+    -Add listener - when temperature has changed...
+    -FocusCntlPanel - listen for up/down arrow key -> move focus up / down 1 step (or maybe 10 steps)... page up, page down also (10x more..)
+
+-Cooler device simulator
+-Integrate into UI
+-Finish device dialog to connect devices
+-Impl. first indi device against device IF
+
+-Implement binning - dummy camera, selection in GUI, etc.
+-3D star profile - see example
+    -https://doc.qt.io/qt-5/qtdatavisualization-surface-example.html

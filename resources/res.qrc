@@ -1,0 +1,38 @@
+<RCC>
+  <qresource prefix="res">
+    <file>about.jpeg</file>
+    <file>attention_25x25.png</file>
+    <file>find_focus_64x64.png</file>
+    <file>select_star_64x64.png</file>
+    <file>style.qss</file>
+    <file>select_star_selecting_64x64.png</file>
+    <file>select_star_selected_64x64.png</file>
+    <file>subframe_64x64.png</file>
+    <file>selected_sub_frame_selected_64x64.png</file>
+    <file>wait3.gif</file>
+    <file>device_connected_64x64.png</file>
+    <file>device_disconnected_64x64.png</file>
+    <file>yellow_dot_64x64.png</file>
+    <file>red_dot_64x64.png</file>
+    <file>green_dot_64x64.png</file>
+    <file>manage_device_profiles_64x64.png</file>
+    <file>aperture_64x64.png</file>
+    <file>wait.gif</file>
+    <file>find_focus_success.ico</file>
+    <file>device.jpeg</file>
+    <file>connect_focuser_wait.ico</file>
+    <file>connect_camera_wait.ico</file>
+    <file>connect_indi_server_connected.ico</file>
+    <file>connect_indi_server.ico</file>
+    <file>find_focus_stop.ico</file>
+    <file>find_focus.ico</file>
+    <file>select_star.ico</file>
+    <file>connect_focuser_success.ico</file>
+    <file>select_star_wait.ico</file>
+    <file>connect_camera_success.ico</file>
+    <file>connect_indi_server_wait.ico</file>
+    <file>connect_focuser.ico</file>
+    <file>connect_camera.ico</file>
+    <file>scope.JPG</file>
+  </qresource>
+</RCC>

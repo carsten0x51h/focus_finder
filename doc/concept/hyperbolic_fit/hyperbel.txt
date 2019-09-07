@@ -1,0 +1,8 @@
+https://de.wikipedia.org/wiki/Hyperbel_(Mathematik)
+
+    x²/a² - y²/b² = -1
+          - y²/b² = -1 - x²/a²
+	    y²/b² =  1 + x²/a²
+	       y² = b² * (1 + x²/a²)
+	       y  = sqrt(b² * (1 + x²/a²))
+	       y  = b * sqrt(1 + x²/a²)

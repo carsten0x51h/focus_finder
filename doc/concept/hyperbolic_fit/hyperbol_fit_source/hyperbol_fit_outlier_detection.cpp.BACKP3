@@ -1,0 +1,556 @@
+#include <iostream>
+#include <array>
+#include <vector>
+#include <algorithm>
+#include <iostream>
+#include <fstream>
+#include <iterator>
+
+#include <boost/geometry.hpp>
+#include <boost/geometry/geometries/point_xy.hpp>
+
+#include <gsl/gsl_multifit_nlin.h>
+
+
+// Warning, C++11 only!
+// Boost.Range doesn't like lambdas without this:
+#define BOOST_RESULT_OF_USE_DECLTYPE
+
+#include <boost/optional.hpp>
+#include <boost/range/adaptor/filtered.hpp>
+#include <boost/range/adaptor/transformed.hpp>
+#include <boost/range/algorithm/generate.hpp> // only needed for filling the vector
+#include <boost/range/algorithm/copy.hpp> // only needed for printing
+#include <boost/range/algorithm/sort.hpp>
+#include <boost/range/adaptor/sliced.hpp>
+
+#include <boost/range.hpp>
+#include <iterator>         // for std::iterator_traits, std::distance()
+
+//#include <boost/range/algorithm.hpp> // TODO: Required?
+#include <boost/range/algorithm_ext/copy_n.hpp>
+    
+using namespace std; // TODO: remove...
+
+namespace bg = boost::geometry; // point
+
+typedef bg::model::d2::point_xy<float> DataPointT;
+
+
+/**********************************************************************
+ * Helper classes
+ **********************************************************************/
+struct GslMultiFitDataT {
+  float x;
+  float y;
+  float sigma;
+  GslMultiFitDataT(float inX, float inY, float inSigma) : x(inX), y(inY), sigma(inSigma) { };
+};
+  
+typedef std::vector<GslMultiFitDataT> GslMultiFitParmsT;
+
+
+/**********************************************************************
+ * Curve to fit to is supplied by traits.
+ **********************************************************************/
+template <class FitTraitsT>
+class CurveFitTmplT {
+public:
+  typedef typename FitTraitsT::CurveParamsT CurveParamsT;
+  
+  /**
+   * See http://en.wikipedia.org/wiki/Approximation_error for expl. of rel and abs errors.
+   *
+   * returns 0 
+   */
+  template <typename RngT>
+  static int
+  fitGslLevenbergMarquart(RngT rng, typename CurveParamsT::TypeT * outResults, double inEpsAbs, double inEpsRel, size_t inNumMaxIter = 5000) {
+
+    size_t numPoints = std::distance(rng.begin(), rng.end());
+    
+    GslMultiFitParmsT gslMultiFitParms;
+    gslMultiFitParms.reserve(numPoints);
+    
+    // Fill in the parameters
+    for (auto it = rng.begin(); it != rng.end(); ++it) {
+      gslMultiFitParms.push_back(GslMultiFitDataT(it->x(), it->y(), 0.1f));
+    }
+ 
+    // Fill in function info
+    gsl_multifit_function_fdf f;
+    f.f      = FitTraitsT::gslFx;
+    f.df     = FitTraitsT::gslDfx;
+    f.fdf    = FitTraitsT::gslFdfx;
+    f.n      = numPoints;
+    f.p      = FitTraitsT::CurveParamsT::_Count; // TODO: CurveParamsT::_Count should be sufficient...
+    f.params = & gslMultiFitParms;
+    
+ 
+    gsl_vector * guess = gsl_vector_alloc(FitTraitsT::CurveParamsT::_Count);  // Allocate the guess vector
+    
+    FitTraitsT::makeGuess(gslMultiFitParms, guess);  // Make initial guesses - here we just set all parameters to 1.0
+    
+    // Create a Levenberg-Marquardt solver with n data points and m parameters
+    gsl_multifit_fdfsolver * solver = gsl_multifit_fdfsolver_alloc(gsl_multifit_fdfsolver_lmsder,
+								   numPoints, FitTraitsT::CurveParamsT::_Count);
+    gsl_multifit_fdfsolver_set(solver, & f, guess);  // Initialize the solver
+    
+    int status, i = 0;
+    
+    // Iterate to to find a result
+    do {
+      i++;
+      status = gsl_multifit_fdfsolver_iterate(solver); // returns 0 in case of success
+      if (status) {  break; }
+      status = gsl_multifit_test_delta(solver->dx, solver->x, inEpsAbs, inEpsRel);
+    } while (status == GSL_CONTINUE && i < inNumMaxIter);
+
+    // Store the results to be returned to the user (copy from gsl_vector to result structure)
+    for (size_t i = 0; i < FitTraitsT::CurveParamsT::_Count; ++i) {
+      typename FitTraitsT::CurveParamsT::TypeE idx = static_cast<typename FitTraitsT::CurveParamsT::TypeE>(i);
+      (*outResults)[idx] = gsl_vector_get(solver->x, idx);
+    }
+ 
+    // Free GSL memory
+    gsl_multifit_fdfsolver_free(solver);
+    gsl_vector_free(guess);
+ 
+    return status;
+  }
+};
+
+
+#include <algorithm> // For std::minmax_element
+#include <tuple> // For std::tie
+#include <vector> // For std::vector
+#include <iterator> // For global begin() and end()
+
+/**********************************************************************
+ * Hyperbol fit traits
+ **********************************************************************/
+class HyperbolFitTraitsT {
+private:
+  
+public:
+  struct CurveParamsT {
+    enum TypeE { A_IDX = 0, B_IDX, C_IDX, D_IDX, _Count };
+    struct TypeT : public std::array<float, TypeE::_Count> {
+      TypeT(const gsl_vector * inVec = 0) {
+        for (size_t i = 0; i < TypeE::_Count; ++i) {
+          TypeE idx = static_cast<TypeE>(i);
+          (*this)[i] = (inVec ? gsl_vector_get(inVec, idx) : 0);
+        }
+      }
+    };
+    // TODO: Need to set default values...
+  };
+ 
+  /**
+   * All parameters with good starting values - may be improved.
+   *
+   * minmax See https://stackoverflow.com/questions/16772477/how-to-get-min-or-max-element-in-a-vector-of-structures-in-c-based-on-some-fi
+   */
+  static void makeGuess(const GslMultiFitParmsT & inData, gsl_vector * guess) {
+    // Find min HFD -> good start value for c
+    GslMultiFitParmsT::const_iterator minEl, maxEl;
+    std::tie(minEl, maxEl) = std::minmax_element(begin(inData), end(inData),
+						 [] (GslMultiFitDataT const& s1, GslMultiFitDataT const& s2)
+						 {
+						   return s1.y < s2.y;
+						 });
+    
+    gsl_vector_set(guess, CurveParamsT::A_IDX, 1.0);
+    gsl_vector_set(guess, CurveParamsT::B_IDX, 2.0);
+    gsl_vector_set(guess, CurveParamsT::C_IDX, minEl->x);
+    gsl_vector_set(guess, CurveParamsT::D_IDX, 1.0);
+  }
+
+  /**
+   * Phi() is a repeating part of the function calculation used by
+   * different derivations.
+   */
+  static float phi(float x, float a, float c) {
+    const float a2 = a * a;
+    const float diff = x - c;
+    const float diff2 = diff * diff;
+    
+    return sqrt(1.0 + (diff2 / a2));
+  }
+  
+  /* H(x) */
+  static float fx(float x, const CurveParamsT::TypeT & inParms) {
+    const float a = inParms[CurveParamsT::A_IDX];
+    const float b = inParms[CurveParamsT::B_IDX];
+    const float c = inParms[CurveParamsT::C_IDX];
+    const float d = inParms[CurveParamsT::D_IDX];
+    
+    return b * phi(x, a, c) + d;
+  }
+ 
+  /* Calculates H(x) for each data point. */
+  static int gslFx(const gsl_vector * x, void * inGslParams, gsl_vector * outResultVec) {    
+    // Store the current coefficient values
+    CurveParamsT::TypeT curveParams(x);
+    
+    // Store parameter values
+    const GslMultiFitParmsT * gslParams = ((GslMultiFitParmsT*) inGslParams); 
+    // Execute Levenberg-Marquart on f(x)
+    for(size_t i = 0; i < gslParams->size(); ++i) {
+      const GslMultiFitDataT & gslData = gslParams->at(i);
+      float yi = HyperbolFitTraitsT::fx((float) gslData.x, curveParams);
+
+      // TODO: Is this ok?
+      gsl_vector_set(outResultVec, i, (yi - gslData.y) / gslData.sigma);
+    }
+    
+    return GSL_SUCCESS;
+  }
+ 
+  /* Calculates the Jacobian (derivative) matrix  */
+  static int gslDfx(const gsl_vector * x, void * params, gsl_matrix * J) {
+    // Store parameter values
+    const GslMultiFitParmsT * gslParams = ((GslMultiFitParmsT*) params);
+    
+    // Store current coefficients
+    float a = gsl_vector_get(x, CurveParamsT::A_IDX);
+    float b = gsl_vector_get(x, CurveParamsT::B_IDX);
+    float c = gsl_vector_get(x, CurveParamsT::C_IDX);
+    
+    // Store non-changing calculations
+    const float a2 = a * a;
+    const float a3 = a * a2;
+    
+    for(size_t i = 0; i < gslParams->size(); ++i) {
+      const GslMultiFitDataT & gslData = gslParams->at(i);
+      
+      const float oneBySigma = 1.0f / gslData.sigma;
+      const float x = gslData.x;
+      const float x_minus_c = x - c;
+      
+      gsl_matrix_set(J, i, CurveParamsT::A_IDX, -oneBySigma * b * (x_minus_c * x_minus_c) / (a3 * phi(x, a, c)));
+      gsl_matrix_set(J, i, CurveParamsT::B_IDX, oneBySigma * phi(x, a, c));
+      gsl_matrix_set(J, i, CurveParamsT::C_IDX, -oneBySigma * b * x_minus_c / (a2 * phi(x, a, c)));
+      gsl_matrix_set(J, i, CurveParamsT::D_IDX, oneBySigma);
+    }
+    
+    return GSL_SUCCESS;
+  }
+  
+  /* Invokes f(x) and f'(x) */
+  static int gslFdfx(const gsl_vector * x, void * params, gsl_vector * f, gsl_matrix * J) {
+    gslFx(x, params, f);
+    gslDfx(x, params, J);
+    
+    return GSL_SUCCESS;
+  }
+};
+
+
+/**********************************************************************
+ * Calculation of asymptotes / slopes
+ **********************************************************************/
+float left_slope(float x, float a, float b, float c, float d) {
+  return -(b/a) * (x-c) + d;
+}
+float right_slope(float x, float a, float b, float c, float d) {
+  return (b/a) * (x-c) + d;
+}
+
+
+// https://stackoverflow.com/questions/11964552/finding-quartiles
+template<typename T>
+static inline double Lerp(T v0, T v1, T t)
+{
+    return (1 - t)*v0 + t*v1;
+}
+
+// TODO: Pass range...
+template<typename T, typename RngT>
+static inline std::vector<T> Quantile(const RngT & inData, const std::vector<T>& probs)
+{
+    if (inData.empty())
+    {
+        return std::vector<T>();
+    }
+
+    if (1 == inData.size())
+    {
+      //return std::vector<T>(1, inData[0]);
+      return std::vector<T>(1, *inData.begin());
+    }
+
+    //std::vector<T> data = inData;
+    std::vector<T> data;
+    std::copy(inData.begin(), inData.end(), std::back_inserter(data));
+    std::sort(data.begin(), data.end());
+
+    for (typename std::vector<T>::const_iterator it = data.begin(); it != data.end(); ++it) {
+      std::cout << "it: " << *it << std::endl;
+    }
+    
+    std::vector<T> quantiles;
+
+    for (size_t i = 0; i < probs.size(); ++i) {
+        T poi = Lerp<T>(-0.5, data.size() - 0.5, probs[i]);
+
+        size_t left = std::max(int64_t(std::floor(poi)), int64_t(0));
+        size_t right = std::min(int64_t(std::ceil(poi)), int64_t(data.size() - 1));
+
+        T datLeft = data.at(left);
+        T datRight = data.at(right);
+
+        T quantile = Lerp<T>(datLeft, datRight, poi - left);
+
+	std::cout << "Calculated q" << i << " = " << quantile << std::endl;
+	
+        quantiles.push_back(quantile);
+    }
+
+    return quantiles;
+}
+
+
+/**
+ * See https://stackoverflow.com/questions/1719070/what-is-the-right-approach-when-using-stl-container-for-median-calculation/2579393#
+ */
+template<typename T> T
+median(std::vector<T> & v) {  
+  if(v.empty()) {
+    return 0.0;
+  }
+
+  size_t numEntries = v.size();
+  bool odd = numEntries % 2;
+  
+  auto n = v.size() / 2;
+  std::nth_element(v.begin(), v.begin() + n, v.end());
+  
+  auto med = v[n];
+  
+  if(! odd) { //If the set size is even
+    auto max_it = std::max_element(v.begin(), v.begin() + n);
+    med = (*max_it + med) / 2.0;
+  }
+  
+  return med;
+}
+
+
+
+typedef CurveFitTmplT<HyperbolFitTraitsT> HyperbolMatcherT;
+typedef HyperbolMatcherT::CurveParamsT VCurveParamsT;
+
+
+/**
+ *
+ */
+class FittingStatsT {
+private:
+  //std::vector<ResidualAndDataPointT> outliers;
+  VCurveParamsT::TypeT vCurveParms;
+  
+public:
+  // const std::vector<ResidualAndDataPointT> & getOutliers() { return outliers; }
+  // void setOutliers(const std::vector<ResidualAndDataPointT> & inOutliers) { outliers = inOutliers; }
+
+  const VCurveParamsT::TypeT & getVCurveParms() const { return vCurveParms; }
+  void setVCurveParms(const VCurveParamsT::TypeT & inVCurveParms) { vCurveParms = inVCurveParms; }
+  
+  // TODO...
+};
+
+
+/**
+ *
+ */
+class VCurveFitExceptionT : public std::exception {
+private:
+  std::string description;
+  FittingStatsT fittingStats;
+  
+public:
+  VCurveFitExceptionT(const char * inDescription, const FittingStatsT & inFittingStats) : description(inDescription), fittingStats(inFittingStats) {};
+  ~VCurveFitExceptionT() throw() {};
+  const char *what() const throw() { return this->description.c_str(); };
+  const FittingStatsT & getFittingStats() const { return fittingStats; };
+};
+
+
+
+/**
+ *
+ */
+template <typename RngT>
+VCurveParamsT::TypeT fitVCurve(const RngT & inDataPointsToFit, float inMaxAcceptedOutliersPerc = 20.0f, FittingStatsT * outFittingStats = nullptr) {
+  
+  using namespace boost::adaptors;
+
+  VCurveParamsT::TypeT hyperbolCurveParms;
+
+  size_t numIterations = 0;
+  size_t numInitialDataPoints = inDataPointsToFit.size();
+  size_t numMaxAcceptedOutliers = numInitialDataPoints * inMaxAcceptedOutliersPerc / 100.0f;
+  size_t numMinRequiredDataPoints = numInitialDataPoints - numMaxAcceptedOutliers;
+  size_t numCurrOutliers, numValidDataPoints;
+  bool insufficientDataPoints;
+  
+  typedef std::vector<DataPointT> DataPointContainerT;
+  DataPointContainerT dataPointsToFit; // TODO: Improve by reserving space?!
+  
+  boost::range::copy(inDataPointsToFit, std::back_inserter(dataPointsToFit)); // Take initial copy of data
+  
+  auto residualFunction = [&](const DataPointT & p) { return fabs(p.y() - HyperbolFitTraitsT::fx(p.x(), hyperbolCurveParms)); };
+
+  do {    
+    ++numIterations;
+    
+    // Return value of fitGslLevenbergMarquart() is not evaluated here...
+    int status = HyperbolMatcherT::fitGslLevenbergMarquart(dataPointsToFit, & hyperbolCurveParms, 0.1f /*EpsAbs*/, 0.1f /*EpsRel*/);
+    
+    if (status) {
+      std::cout << "GSL ERROR: " << gsl_strerror(status) << std::endl;
+      // TODO: throw error... - or ignore?
+      // TODO: What to pass as eps abs and eps rel??
+    }    
+
+    // Sort criteria: Smallest residual first, if residual equal, greatest y first (because data points further
+    // outside V-Curve are potentially more important).
+    auto less = [&](const DataPointT & p1, const DataPointT & p2) -> bool {
+      float residual1 = residualFunction(p1);
+      float residual2 = residualFunction(p2);
+      return ((fabs(residual1 - residual2) > std::numeric_limits<float>::epsilon()) ? residual1 < residual2 : p1.y() > p2.y());
+    };
+
+    boost::sort(dataPointsToFit, less);
+        
+    // Calculate outlier boundary...
+
+
+    auto residuals = dataPointsToFit | transformed(residualFunction);
+    auto q3 = quantile<float>(residuals, 0.75);
+
+    std::cout << "Q3:" << q3 << std::endl;
+
+
+    
+    float outlierBoundary = 2.0; // TODO: Calc... 1.5 * Q3
+
+    typename DataPointContainerT::iterator itUp = std::upper_bound(dataPointsToFit.begin(),
+								   dataPointsToFit.end(),
+								   outlierBoundary,
+								   [&](float rhs, const DataPointT & p) -> bool {
+								     return residualFunction(p) > rhs;
+								   });
+    
+    numValidDataPoints     = std::distance(dataPointsToFit.begin(), itUp);
+    numCurrOutliers        = dataPointsToFit.size() - numValidDataPoints;
+    insufficientDataPoints = (numValidDataPoints < numMinRequiredDataPoints);
+    
+    size_t limitIdx = (insufficientDataPoints ? numMinRequiredDataPoints : numValidDataPoints);
+
+    // "Remove" elements behind limitIdx by simply resizing the vector
+    // https://stackoverflow.com/questions/21493414/keeping-the-first-n-elements-of-a-stdvector-and-removing-the-rest
+    dataPointsToFit.resize(limitIdx);
+
+
+    
+    // DEBUG START
+    for (typename DataPointContainerT::const_iterator it = dataPointsToFit.begin(); it != dataPointsToFit.end(); ++it) {
+      std::cout << "Residual: " << residualFunction(*it) << ", dp(x,y)=(" << it->x() << ", " << it->y() << ")" << std::endl;
+    }
+    
+    std::cout << "a" << numIterations << "=" << hyperbolCurveParms[VCurveParamsT::A_IDX] << std::endl
+	      << "b" << numIterations << "=" << hyperbolCurveParms[VCurveParamsT::B_IDX] << std::endl
+	      << "c" << numIterations << "=" << hyperbolCurveParms[VCurveParamsT::C_IDX] << " (opt. position)" << std::endl
+	      << "d" << numIterations << "=" << hyperbolCurveParms[VCurveParamsT::D_IDX] << std::endl
+	      << "status=" << status << " (=" << gsl_strerror(status) << ")" << std::endl;
+    
+    std::cout << "> numInitialDataPoints: " << numInitialDataPoints << std::endl
+	      << "> maxAcceptedOutliersPerc: " << inMaxAcceptedOutliersPerc << "% -> numMinRequiredDataPoints: " << numMinRequiredDataPoints << std::endl
+	      << "> numCurrOutliers: " << numCurrOutliers << std::endl
+	      << "> numValidDataPoints: " << numValidDataPoints << std::endl
+	      << "> numMinRequiredDataPoints: " << numMinRequiredDataPoints << std::endl
+	      << "> have sufficient data points? " << (insufficientDataPoints ? "no" : "yes") << std::endl
+	      << "> limit idx: " << limitIdx << std::endl
+	      << "> iterations: " << numIterations << std::endl
+	      << "> dataPointsToFit.size(): " << dataPointsToFit.size() << std::endl;
+    // DEBUG END
+    
+  } while(numCurrOutliers > 0 && ! insufficientDataPoints);
+
+
+  // Lambda to build fitting stats
+  auto buildFittingStats = [&]() -> FittingStatsT {
+    FittingStatsT fittingStats;
+    //fittingStats.setOutliers();
+    //fittingStats.setMatchedDataPoints(); // TODO: Residuals? -> multiset ? Or vector? or both?
+    fittingStats.setVCurveParms(hyperbolCurveParms);
+    //fittingStats.setIterations(numIterations);
+    return fittingStats;
+  };
+
+  
+  // Check if fitting was finally successful
+  if (insufficientDataPoints) {
+    std::stringstream ss;
+    ss << "Not enough data points with sufficient model accuracy. Require at least "
+       << numMinRequiredDataPoints << " datapoints but only have "
+       << dataPointsToFit.size() << " / " << numInitialDataPoints << "." << std::endl;
+    
+    VCurveFitExceptionT exc(ss.str().c_str(), buildFittingStats()); // TODO: ok? c_str(9 is tmp...?!
+    throw exc;
+  }
+
+
+  if (outFittingStats != nullptr) {
+    *outFittingStats = buildFittingStats();
+  }
+
+  
+  return hyperbolCurveParms;
+}
+
+
+/**********************************************************************
+ * Main
+ **********************************************************************/
+int main(int argc,  char** argv) {
+
+  // Check argument
+  if (argc != 2) {
+    std::cout << "Usage: hyperbol_fit <path/to/datafile>" << std::endl;
+    return -1;
+  }
+  
+  std::string filename(argv[1]);
+  
+  // Fill data container with some hyperbol shaped data
+  std::list<DataPointT> dataPointsToFit;
+
+  // Read data file
+  std::ifstream infile(filename);
+  float x, y;
+  while (infile >> x >> y) {
+    dataPointsToFit.push_back(DataPointT(x,y));
+  }
+
+  // Do the fit
+  VCurveParamsT::TypeT vCurveParms;
+  
+  try {
+    vCurveParms = fitVCurve(dataPointsToFit);
+  } catch (VCurveFitExceptionT & exc) {
+    // TODO:
+    std::cerr << "V-Curve fitting failed..." << std::endl;
+  }
+
+  
+  // Print calculated curve parameters
+  std::cout << "a=" << vCurveParms[VCurveParamsT::A_IDX] << std::endl
+	    << "b=" << vCurveParms[VCurveParamsT::B_IDX] << std::endl
+	    << "c=" << vCurveParms[VCurveParamsT::C_IDX] << " (opt. position)" << std::endl
+	    << "d=" << vCurveParms[VCurveParamsT::D_IDX] << std::endl;
+  
+  return 0;
+}

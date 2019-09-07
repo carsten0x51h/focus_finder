@@ -1,0 +1,18 @@
+.QSlider {
+   min-height: 28px;
+   max-height: 28px;
+}
+
+.QSlider::groove:horizontal {
+   border: 1px solid #CCCCCC;
+   height: 3px;
+   margin: 0 10px;
+}
+
+.QSlider::handle:horizontal {
+   background: #CCCCCC;
+   border: 3px solid #AAAAAA;
+   width: 8px;
+   height: 60px;
+   margin: -24px -12px;
+}
