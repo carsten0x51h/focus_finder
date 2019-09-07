@@ -2,7 +2,7 @@
 #include <tuple>
 #include <chrono>
 
-#include "include/focus_finder_hyperbolic.h"
+#include "include/focus_finder_fast_curve_lookup.h"
 #include "include/logging.h"
 #include "include/exception.h"
 #include "include/wait_for.h"
@@ -19,32 +19,33 @@
 #include "include/focus.h"
 #include "include/filter.h"
 
+// TODO: Move tp parent class?!
 DEF_Exception(FocusFinderCancelled);
 
-FocusFinderHyperbolicT::FocusFinderHyperbolicT() :
+FocusFinderFastCurveLookupT::FocusFinderFastCurveLookupT() :
 		mCancelled(false) {
 	LOG(debug)
-	<< "FocusFinderHyperbolicT::FocusFinderHyperbolicT..." << std::endl;
+	<< "FocusFinderFastCurveLookupT::FocusFinderFastCurveLookupT..." << std::endl;
 }
 
-std::string FocusFinderHyperbolicT::getName() const {
-	return "FocusFinderHyperbolicT";
+std::string FocusFinderFastCurveLookupT::getName() const {
+	return "FocusFinderFastCurveLookupT";
 }
 
-void FocusFinderHyperbolicT::reset() {
+void FocusFinderFastCurveLookupT::reset() {
 	// TODO
 	// TODO: What happens if called while running? -> Exception?
 	LOG(debug)
-	<< "FocusFinderHyperbolicT::reset..." << std::endl;
+	<< "FocusFinderFastCurveLookupT::reset..." << std::endl;
 }
 
-void FocusFinderHyperbolicT::checkCancelled() const {
+void FocusFinderFastCurveLookupT::checkCancelled() const {
 	if (mCancelled.load()) {
 		throw FocusFinderCancelledExceptionT("Focus finder cancelled.");
 	}
 }
 
-void FocusFinderHyperbolicT::moveFocusByBlocking(
+void FocusFinderFastCurveLookupT::moveFocusByBlocking(
 		FocusDirectionT::TypeE direction, int ticks,
 		std::chrono::milliseconds timeout) {
 
@@ -72,7 +73,7 @@ void FocusFinderHyperbolicT::moveFocusByBlocking(
 }
 
 // NOTE: Callback from camera device, registered in setCamera of base class FocusFinder
-void FocusFinderHyperbolicT::onImageReceived(RectT<unsigned int> roi,
+void FocusFinderFastCurveLookupT::onImageReceived(RectT<unsigned int> roi,
 		std::shared_ptr<const ImageT> image, bool lastFrame) {
 
 	// TODO: Store image.... roi etc...
@@ -83,7 +84,7 @@ void FocusFinderHyperbolicT::onImageReceived(RectT<unsigned int> roi,
 }
 
 // TODO: Add binning?
-void FocusFinderHyperbolicT::runExposureBlocking(
+void FocusFinderFastCurveLookupT::runExposureBlocking(
 		std::chrono::milliseconds expTime) {
 
 	using namespace std::chrono_literals;
@@ -104,16 +105,16 @@ void FocusFinderHyperbolicT::runExposureBlocking(
 	}
 }
 
-void FocusFinderHyperbolicT::checkIfStarIsThere(const ImageT & img,
+void FocusFinderFastCurveLookupT::checkIfStarIsThere(const ImageT & img,
 		float * outSnr) const {
 	float snr = SnrT::calculate(img);
 
 	LOG(debug)
-	<< "FocusFinderHyperbolicT::run - SNR: " << snr << std::endl;
+	<< "FocusFinderFastCurveLookupT::run - SNR: " << snr << std::endl;
 
 	if (snr < getFocusFinderProfile().getStarDetectionSnrBoundary()) {
 		LOG(warning)
-		<< "FocusFinderHyperbolicT::run - no valid star detected." << std::endl;
+		<< "FocusFinderFastCurveLookupT::run - no valid star detected." << std::endl;
 
 		// TODO: How to handle? Just cancel? Or repeat? For now we cancel...
 		throw FocusFinderCancelledExceptionT();
@@ -124,9 +125,9 @@ void FocusFinderHyperbolicT::checkIfStarIsThere(const ImageT & img,
 	}
 }
 
-void FocusFinderHyperbolicT::run() {
+void FocusFinderFastCurveLookupT::run() {
 	LOG(debug)
-	<< "FocusFinderHyperbolicT::run..." << std::endl;
+	<< "FocusFinderFastCurveLookupT::run..." << std::endl;
 
 	try {
 		using namespace std::chrono_literals;
@@ -142,7 +143,7 @@ void FocusFinderHyperbolicT::run() {
 		// NOTE / TODO: For some reason std::bind did not compile....
 		mCameraExposureFinishedConnection =
 				getCamera()->registerExposureCycleFinishedListener(
-						boost::bind(&FocusFinderHyperbolicT::onImageReceived,
+						boost::bind(&FocusFinderFastCurveLookupT::onImageReceived,
 								this, _1, _2, _3));
 
 		// Notify that focus finder started
@@ -151,7 +152,7 @@ void FocusFinderHyperbolicT::run() {
 		// First, only simulate a long delay....
 
 		LOG(debug)
-		<< "FocusFinderHyperbolicT::run - phase 1..." << std::endl;
+		<< "FocusFinderFastCurveLookupT::run - phase 1..." << std::endl;
 
 		// Notify about FoFi update...
 		notifyFocusFinderProgressUpdate(0.0, "Starting...");
@@ -172,7 +173,7 @@ void FocusFinderHyperbolicT::run() {
 					unsigned int>();
 
 			LOG(debug)
-			<< "FocusFinderHyperbolicT::run - focus star pos=("
+			<< "FocusFinderFastCurveLookupT::run - focus star pos=("
 					<< lastFocusStarPos.x() << ", " << lastFocusStarPos.y() << ")"
 					<< std::endl;
 
@@ -195,7 +196,7 @@ void FocusFinderHyperbolicT::run() {
 					outerWindowSize);
 
 			LOG(debug)
-			<< "FocusFinderHyperbolicT::run - calculated outer ROI=" << outerRoi
+			<< "FocusFinderFastCurveLookupT::run - calculated outer ROI=" << outerRoi
 					<< std::endl;
 
 			// Set ROI based on last focus star position
@@ -210,7 +211,7 @@ void FocusFinderHyperbolicT::run() {
 					std::ceil(mCurrentImage->height() / 2));
 
 			LOG(debug)
-			<< "FocusFinderHyperbolicT::run - centerOuterSubframe="
+			<< "FocusFinderFastCurveLookupT::run - centerOuterSubframe="
 					<< centerOuterSubframe << std::endl;
 
 			// In outer subframe (mCurrentImage) coordinates
@@ -219,7 +220,7 @@ void FocusFinderHyperbolicT::run() {
 					getFocusFinderProfile().getStarWindowSize());
 
 			LOG(debug)
-			<< "FocusFinderHyperbolicT::run - calculated inner ROI=" << innerRoi
+			<< "FocusFinderFastCurveLookupT::run - calculated inner ROI=" << innerRoi
 					<< std::endl;
 
 			// get_crop() from mCurrentImage using innerRoi
@@ -229,7 +230,7 @@ void FocusFinderHyperbolicT::run() {
 					);
 
 			LOG(debug)
-			<< "FocusFinderHyperbolicT::run - innerSubFrameImg size - w="
+			<< "FocusFinderFastCurveLookupT::run - innerSubFrameImg size - w="
 					<< innerSubFrameImg.width() << ", h="
 					<< innerSubFrameImg.height() << std::endl;
 
@@ -256,7 +257,7 @@ void FocusFinderHyperbolicT::run() {
 			int deltaY = (outerRoi.height() - innerRoi.height()) / 2;
 
 			LOG(debug)
-			<< "FocusFinderHyperbolicT::run - deltaX=" << deltaX << ", deltaY="
+			<< "FocusFinderFastCurveLookupT::run - deltaX=" << deltaX << ", deltaY="
 					<< deltaY << std::endl;
 
 			PointFT newCentroidInnerRoiCoords = *newCentroidOpt;
@@ -265,10 +266,10 @@ void FocusFinderHyperbolicT::run() {
 					newCentroidInnerRoiCoords.y() + deltaY);
 
 			LOG(debug)
-			<< "FocusFinderHyperbolicT::run - new centroid (inner frame)="
+			<< "FocusFinderFastCurveLookupT::run - new centroid (inner frame)="
 					<< newCentroidInnerRoiCoords << std::endl;
 			LOG(debug)
-			<< "FocusFinderHyperbolicT::run - new centroid (outer frame)="
+			<< "FocusFinderFastCurveLookupT::run - new centroid (outer frame)="
 					<< newCentroidOuterRoiCoords << std::endl;
 
 			// Use newly calculated center (newCentroidOuterRoiCoords) to again get sub-frame from mCurrentImage
@@ -280,7 +281,7 @@ void FocusFinderHyperbolicT::run() {
 					std::round(newCentroidOuterRoiCoords.y()));
 
 			LOG(debug)
-			<< "FocusFinderHyperbolicT::run - new centroid rounded to next int="
+			<< "FocusFinderFastCurveLookupT::run - new centroid rounded to next int="
 					<< newCentroidRoundedToNextInt << std::endl;
 
 			auto innerCorrectedRoi = RectT<unsigned int>::fromCenterPoint(
@@ -288,7 +289,7 @@ void FocusFinderHyperbolicT::run() {
 					getFocusFinderProfile().getStarWindowSize());
 
 			LOG(debug)
-			<< "FocusFinderHyperbolicT::run - calculated inner corrected ROI="
+			<< "FocusFinderFastCurveLookupT::run - calculated inner corrected ROI="
 					<< innerCorrectedRoi << std::endl;
 
 			// get_crop() from mCurrentImage using corrected innerRoi
@@ -299,7 +300,7 @@ void FocusFinderHyperbolicT::run() {
 					);
 
 			LOG(debug)
-			<< "FocusFinderHyperbolicT::run - innerCorrectedSubFrameImgsize - w="
+			<< "FocusFinderFastCurveLookupT::run - innerCorrectedSubFrameImgsize - w="
 					<< innerCorrectedSubFrameImg.width() << ", h="
 					<< innerCorrectedSubFrameImg.height() << std::endl;
 
@@ -310,7 +311,7 @@ void FocusFinderHyperbolicT::run() {
 			// TODO: Calculate HFD
 			HfdT hfd(innerCorrectedSubFrameImg);
 			LOG(debug)
-			<< "FocusFinderHyperbolicT::run - HFD: " << hfd.getValue() << std::endl;
+			<< "FocusFinderFastCurveLookupT::run - HFD: " << hfd.getValue() << std::endl;
 
 			// NOTE / TODO: This only works ifh height() is odd
 			size_t centerIdxHorz = std::floor(
@@ -329,7 +330,7 @@ void FocusFinderHyperbolicT::run() {
 							innerCorrectedSubFrameImg, centerIdxVert));
 
 			LOG(debug)
-			<< "FocusFinderHyperbolicT::run - FWHM(HORZ): " << fwhmHorz.getValue()
+			<< "FocusFinderFastCurveLookupT::run - FWHM(HORZ): " << fwhmHorz.getValue()
 					<< ", FWHM(VERT): " << fwhmVert.getValue() << std::endl;
 
 			// Convert center coordinates to frame coordinates (absolute position within image)
@@ -382,7 +383,7 @@ void FocusFinderHyperbolicT::run() {
 		notifyFocusFinderProgressUpdate(30.0, "Phase 1 finished.");
 
 		LOG(debug)
-		<< "FocusFinderHyperbolicT::run - phase 2..." << std::endl;
+		<< "FocusFinderFastCurveLookupT::run - phase 2..." << std::endl;
 
 		std::this_thread::sleep_for(2s);
 
@@ -393,7 +394,7 @@ void FocusFinderHyperbolicT::run() {
 		notifyFocusFinderProgressUpdate(60.0, "Phase 2 finished.");
 
 		LOG(debug)
-		<< "FocusFinderHyperbolicT::run - phase 3..." << std::endl;
+		<< "FocusFinderFastCurveLookupT::run - phase 3..." << std::endl;
 
 		std::this_thread::sleep_for(2s);
 
@@ -429,7 +430,7 @@ void FocusFinderHyperbolicT::run() {
 		// 		<< hyperbolCurveParms[CurveParamsT::D_IDX] << std::endl;
 
 		// LOG(debug)
-		// << "FocusFinderHyperbolicT::run - finished" << std::endl;
+		// << "FocusFinderFastCurveLookupT::run - finished" << std::endl;
 
 		// Notify about FoFi update...
 		notifyFocusFinderProgressUpdate(100.0, "Phase 3 finished.");
@@ -473,15 +474,15 @@ void FocusFinderHyperbolicT::run() {
 	}
 }
 
-void FocusFinderHyperbolicT::focusFinderCleanup() {
+void FocusFinderFastCurveLookupT::focusFinderCleanup() {
 	LOG(debug)
-	<< "FocusFinderHyperbolicT::focusFinderCleanup..." << std::endl;
+	<< "FocusFinderFastCurveLookupT::focusFinderCleanup..." << std::endl;
 
 	getCamera()->unregisterExposureCycleFinishedListener(
 			mCameraExposureFinishedConnection);
 }
 
-void FocusFinderHyperbolicT::cancel() {
+void FocusFinderFastCurveLookupT::cancel() {
 	mCancelled = true;
 
 	cv.notify_all();

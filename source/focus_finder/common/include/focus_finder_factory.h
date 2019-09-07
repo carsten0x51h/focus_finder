@@ -10,30 +10,10 @@
 
 #include <memory>
 
+#include "focus_finder_strategy.h"
 #include "enum_helper.h"
 
 class FocusFinderT;
-
-/**
- * FocusFinderStrategyT
- *
- * TODO: Move to sep header file?
- */
-struct FocusFinderStrategyT {
-  enum TypeE {
-    FAST_CURVE_LOOKUP,
-    _Count
-  };
-
-  static const char * asStr(const TypeE & inType) {
-    switch (inType) {
-    	case FAST_CURVE_LOOKUP: return "FAST_CURVE_LOOKUP";
-    	default: return "<?>";
-    }
-  }
-  MAC_AS_TYPE(Type, E, _Count);
-};
-
 
 class FocusFinderFactoryT {
 public:

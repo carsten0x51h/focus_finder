@@ -4,8 +4,8 @@
  *  Created on: Apr 12, 2019
  *      Author: devnull
  */
-#ifndef SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FOCUS_FINDER_HYPERBOLIC_H_
-#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FOCUS_FINDER_HYPERBOLIC_H_
+#ifndef SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FOCUS_FINDER_FAST_CURVE_LOOKUP_H_
+#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FOCUS_FINDER_FAST_CURVE_LOOKUP_H_
 
 #include <vector>
 #include <array>
@@ -17,12 +17,8 @@
 
 #include <boost/signals2.hpp>
 
-//#include <gsl/gsl_multifit_nlin.h>
-
 #include "focus_finder.h"
-//#include "curve_fit_tmpl.h"
 #include "curve_fit_algorithm.h"
-#//include "hyperbol_fit_traits.h"
 #include "focus.h"
 
 
@@ -41,11 +37,11 @@ public:
 	}
 };
 
-class FocusFinderHyperbolicT: public FocusFinderT {
+class FocusFinderFastCurveLookupT: public FocusFinderT {
 private:
 	// Prevent copy
-	FocusFinderHyperbolicT(const FocusFinderHyperbolicT &);
-	FocusFinderHyperbolicT & operator=(const FocusFinderHyperbolicT &);
+	FocusFinderFastCurveLookupT(const FocusFinderFastCurveLookupT &);
+	FocusFinderFastCurveLookupT & operator=(const FocusFinderFastCurveLookupT &);
 
 	void onImageReceived(RectT<unsigned int> roi,
 			std::shared_ptr<const ImageT> image, bool lastFrame);
@@ -68,7 +64,7 @@ private:
 
 
 public:
-	FocusFinderHyperbolicT();
+	FocusFinderFastCurveLookupT();
 
 	// Implement focus finder interface
 	std::string getName() const override;
@@ -78,4 +74,4 @@ public:
 	void reset() override;
 };
 
-#endif /* SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FOCUS_FINDER_HYPERBOLIC_H_ */
+#endif /* SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FOCUS_FINDER_FAST_CURVE_LOOKUP_H_ */

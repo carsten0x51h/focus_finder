@@ -152,10 +152,11 @@ set(sources
 	../common/include/focus_finder_profile.h
 	../common/focus_finder_profile.cpp
 	../common/include/focus_finder.h
-	../common/include/focus_finder_hyperbolic.h
-	../common/focus_finder_hyperbolic.cpp
+	../common/include/focus_finder_fast_curve_lookup.h
+	../common/focus_finder_fast_curve_lookup.cpp
 	../common/include/focus_finder_executor.h
 	../common/focus_finder_executor.cpp
+	../common/include/focus_finder_strategy.h
 	../common/include/focus_finder_factory.h
 	../common/focus_finder_factory.cpp
 	../common/include/profile_manager.h
