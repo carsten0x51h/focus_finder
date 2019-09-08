@@ -57,6 +57,7 @@ public:
 	virtual ~FocusFinderT() {
 	}
 
+	virtual bool isRunning() const = 0;
 	virtual void run() = 0;
 	virtual void cancel() = 0;
 	virtual void reset() = 0;

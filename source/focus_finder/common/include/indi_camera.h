@@ -93,6 +93,7 @@ private:
 	std::shared_ptr<ImageT> convertIndiBlobToCImg(IBLOB* iblob) const;
 	void newNumber(INumberVectorProperty * nvp);
 	void newBlob(IBLOB* blob);
+    void newSwitch(ISwitchVectorProperty* svp);
 
 	bool indiExposure();
 	bool delayedExposueTimer();
@@ -106,9 +107,11 @@ private:
 
 	boost::signals2::connection mNewNumberConnection;
 	boost::signals2::connection mNewBlobConnection;
+    boost::signals2::connection mNewSwitchConnection;
 
 	std::thread exposureThread;
 	std::atomic<bool> cancelExposureFlag;
+    std::atomic<bool> mIsExposureRunning;
 
 	std::atomic<LoopModeT::TypeE> mLoopMode;
 	std::chrono::milliseconds mExposureDelay; // TODO: atomic?

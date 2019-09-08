@@ -14,6 +14,7 @@
 
 #include "include/anim_menu_button.h"
 
+#include "include/focus_curve_recorder_panel.h"
 #include "include/focus_curve_view_panel.h"
 #include "include/image_viewer_panel.h"
 #include "include/focus_cntl_panel.h"
@@ -477,7 +478,10 @@ void MainWindow::onExposurePressed() {
 		return;
 	}
 
-	if (mExposureButton->isChecked()) {
+    LOG(debug)
+        << "Start exposure... isExposureRunning=" << activeCamera->isExposureRunning() << std::endl;
+
+    if (mExposureButton->isChecked()) {
 		LOG(debug)
 		<< "Button already pressed.... -> cancel exposure if running."
 				<< std::endl;
@@ -491,6 +495,7 @@ void MainWindow::onExposurePressed() {
 
 		// Extract exposure time
 		mExposureButton->startAnimation();
+
 		activeCamera->startExposure();
 	}
 
@@ -656,8 +661,6 @@ void MainWindow::createExposureButton() {
 
 	connect(mExposureButton, &QToolButton::pressed, this,
 			&MainWindow::onExposurePressed);
-	connect(mExposureButton, &QToolButton::pressed, this,
-			&MainWindow::onExposurePressed);
 
 	// Add "Loop" menu
 	mExposureButtonMenu = new QMenu;
@@ -720,6 +723,23 @@ void MainWindow::updateExposureTimeSelector() {
 
 	mExposureTimeCbx->clear();
 
+
+    auto activeProfile = mFfl.getProfileManager()->getActiveProfile();
+    auto currentCamera = mFfl.getCurrentCamera();
+    bool focusFinderRunning = mFfl.getFocusFinderExecutor()->isRunning();
+
+    bool hasActiveProfile = activeProfile.has_value();
+    bool cameraSelected = (currentCamera != nullptr);
+    bool cameraConnected =
+            (currentCamera ?
+             currentCamera->getConnector()->isConnected() : false);
+
+    bool exposureRunning = (currentCamera ? currentCamera->isExposureRunning() : false);
+    bool enableExposureTimeSelector = hasActiveProfile && cameraSelected && cameraConnected && ! exposureRunning && ! focusFinderRunning;
+
+    mExposureTimeCbx->setEnabled(enableExposureTimeSelector);
+
+
 	// Fill in exposure time values. Those depend on tne abilities of the camera.
 	// Get min possible exposure time from camera. Use this value to limit the values
 	// in the cbx.
@@ -736,8 +756,6 @@ void MainWindow::updateExposureTimeSelector() {
 		} catch (CameraExceptionT & exc) {
 			minExposureTimeMillisecs = exposureTimes.at(0);
 		}
-
-		mExposureTimeCbx->setEnabled(true);
 
 		for (auto const& t : exposureTimes) {
 			if (t >= minExposureTimeMillisecs) {
@@ -1112,6 +1130,8 @@ void MainWindow::onFocusFinderFinished() {
 	mStartFocusFinderButton->setEnabled(false);
 	mStartFocusFinderButton->setChecked(false);
 	mStartFocusFinderButton->setEnabled(true);
+
+    updateFocusFinderMainMenuBar();
 }
 
 void MainWindow::onFocusFinderCancelled() {
@@ -1124,6 +1144,8 @@ void MainWindow::onFocusFinderCancelled() {
 	mStartFocusFinderButton->setEnabled(false);
 	mStartFocusFinderButton->setChecked(false);
 	mStartFocusFinderButton->setEnabled(true);
+
+    updateFocusFinderMainMenuBar();
 }
 
 void MainWindow::onFocusFinderProgressUpdate(float progress,
@@ -1145,16 +1167,67 @@ void MainWindow::onFocusFinderProgressUpdate(float progress,
 	// TODO: Update mStartFocusFinderButton...
 }
 
+void MainWindow::onRecalibrationPressed() {
+    LOG(debug) << "MainWindow::onRecalibrationPressed..." << std::endl;
+
+    QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    sizePolicy.setHorizontalStretch(100);
+    sizePolicy.setVerticalStretch(100);
+
+    QGridLayout * gridLayout = new QGridLayout;
+
+    QDialog * containerDialog = new QDialog(this);
+    containerDialog->setLayout(gridLayout);
+    containerDialog->setSizePolicy(sizePolicy);
+    containerDialog->setWindowTitle(tr("Focus Curve Recorder"));
+    containerDialog->setModal(true);
+
+    FocusCurveRecorderPanelT * focusCurveRecorderPanel = new FocusCurveRecorderPanelT(containerDialog, mFfl);
+    containerDialog->setMinimumSize(focusCurveRecorderPanel->minimumSize());
+    gridLayout->addWidget(focusCurveRecorderPanel, 0, 0, 1, 1);
+
+    containerDialog->exec();
+
+    delete focusCurveRecorderPanel; // TODO: Will probably be deleted when containerDialog is deleted...
+    delete containerDialog;
+}
+
+void MainWindow::onEditCalibrationDataPressed() {
+    LOG(debug) << "MainWindow::onEditCalibrationDataPressed..." << std::endl;
+}
+
 void MainWindow::createStartFocusFinderButton() {
 
 	mStartFocusFinderButton = new AnimMenuButtonT;
 
 	setBtnIcon(mStartFocusFinderButton, ":/res/find_focus_64x64.png");
 
-	mStartFocusFinderButton->setCheckable(true);
-	mStartFocusFinderButton->setChecked(false);
+    // Set popup menu mode
+	mStartFocusFinderButton->setPopupMode(QToolButton::MenuButtonPopup);
+    mRecalibrationAction = new QAction(this);
+    mEditCalibrationDataAction = new QAction(this);
+    mEditCalibrationDataAction->setText(QString::fromStdString("Edit calibration data..."));
+    mEditCalibrationDataAction->setStatusTip(QString::fromStdString("Edit existing calibration data."));
 
-	connect(mStartFocusFinderButton, &QToolButton::pressed, this,
+    updateFocusFinderButtonMenuTexts();
+
+    // Add "Calibration" menu
+    mStartFocusFinderButtonMenu = new QMenu;
+    mStartFocusFinderButtonMenu->addAction(mRecalibrationAction);
+    mStartFocusFinderButtonMenu->addAction(mEditCalibrationDataAction);
+
+    mStartFocusFinderButton->setMenu(mStartFocusFinderButtonMenu);
+    mStartFocusFinderButton->setCheckable(true);
+    mStartFocusFinderButton->setChecked(false);
+
+    // Connect calibration menu items
+    connect(mRecalibrationAction, &QAction::triggered, this,
+            &MainWindow::onRecalibrationPressed);
+    connect(mEditCalibrationDataAction, &QAction::triggered, this,
+            &MainWindow::onEditCalibrationDataPressed);
+
+    // Connect actual "focus finder" button
+    connect(mStartFocusFinderButton, &QToolButton::pressed, this,
 			&MainWindow::onStartFocusFinderPressed);
 
 	// Connect focus finder executor events focus finder button
@@ -1339,6 +1412,18 @@ void MainWindow::createFocusFinderMainMenuBar() {
 	getFocusFinderMainMenuBar()->addStretch();
 }
 
+void MainWindow::updateFocusFinderButtonMenuTexts() {
+    auto activeProfile = mFfl.getProfileManager()->getActiveProfile();
+    bool hasActiveProfile = activeProfile.has_value();
+
+    bool hasCalibrationData = (hasActiveProfile ? activeProfile.value().hasCalibrationData() : false);
+
+    std::string calibrationMenuStr = (hasCalibrationData ? "Recalibrate..." : "Calibrate...");
+    std::string calibrationMenuToolTipStr = (hasCalibrationData ? "Replace the existing calibration by a new one." : "Perform an initial calibration.");
+    mRecalibrationAction->setText(QString::fromStdString(calibrationMenuStr));
+    mRecalibrationAction->setStatusTip(QString::fromStdString(calibrationMenuToolTipStr));
+}
+
 void MainWindow::updateFocusFinderMainMenuBar() {
 	LOG(debug)
 	<< "MainWindow::updateFocusFinderMainMenuBar..." << std::endl;
@@ -1357,6 +1442,10 @@ void MainWindow::updateFocusFinderMainMenuBar() {
 	bool cameraConnected =
 			(currentCamera ?
 					currentCamera->getConnector()->isConnected() : false);
+
+	bool exposureRunning = (currentCamera ? currentCamera->isExposureRunning() : false);
+
+LOG(debug) << "exposureRunning: " << exposureRunning << std::endl;
 
 	mExposureButton->setEnabled(
 			hasActiveProfile && cameraSelected && cameraConnected
@@ -1378,7 +1467,7 @@ void MainWindow::updateFocusFinderMainMenuBar() {
 
 	mSelectSubFrameButton->setEnabled(
 			hasActiveProfile && cameraSelected && !focusFinderRunning
-					&& !inPoiMode && hasImage);
+					&& !inPoiMode && hasImage && !exposureRunning);
 
 	// mSelectFocusStarButton - enable if
 	//   -"focus finder profile" is active
@@ -1392,7 +1481,7 @@ void MainWindow::updateFocusFinderMainMenuBar() {
 
 	mSelectFocusStarButton->setEnabled(
 			hasActiveProfile && cameraSelected && !focusFinderRunning
-					&& !inRoiMode && hasImage);
+					&& !inRoiMode && hasImage && !exposureRunning);
 
 	// mStartFocusFinderButton - enable when
 	//   -"focus finder profile" is active
@@ -1401,18 +1490,36 @@ void MainWindow::updateFocusFinderMainMenuBar() {
 	//	 -AND focus device is selected
 	//   -AND focus device is connected (filter only optional?!)
 	//   -AND valid focus star selected
+	//   -AND calibration data is available
+	//   -AND no exposure is currently running
 	auto currentFocus = mFfl.getCurrentFocus();
 	bool focusSelected = (currentFocus != nullptr);
 	bool focusConnected = (
 			currentFocus ? currentFocus->getConnector()->isConnected() : false);
 	bool validFocusStarSelected = mImageViewerPanel->isPoiSet();
 
-	mStartFocusFinderButton->setEnabled(
-			hasActiveProfile && cameraSelected && cameraConnected
-					&& focusSelected && focusConnected
-					&& validFocusStarSelected);
+    bool readyForCalibration = hasActiveProfile && cameraSelected && cameraConnected
+                               && focusSelected && focusConnected
+                               && validFocusStarSelected
+                               && ! exposureRunning;
 
-	// mManageDeviceProfilesButton - enabled if
+    // Disable the "focus finder" menu items in case the focus finder is running or the button itself is disabled
+    updateFocusFinderButtonMenuTexts();
+
+    bool enableRecalibrationAction = readyForCalibration && ! focusFinderRunning;
+
+    mRecalibrationAction->setEnabled(enableRecalibrationAction);
+
+    bool hasCalibrationData = (hasActiveProfile ? activeProfile.value().hasCalibrationData() : false);
+    bool enableEditCalibrationAction = hasCalibrationData && ! focusFinderRunning;
+
+    mEditCalibrationDataAction->setEnabled(enableEditCalibrationAction);
+
+    mStartFocusFinderButton->setEnabled(readyForCalibration && hasCalibrationData);
+
+
+
+    // mManageDeviceProfilesButton - enabled if
 	//   [-INDI server connected (?)]
 	//   -Focus finder not running
 	//
@@ -1475,6 +1582,10 @@ MainWindow::~MainWindow() {
 	delete mSelectSubFrameButton;
 	delete mSelectFocusStarButton;
 	delete mStartFocusFinderButton;
+
+    delete mRecalibrationAction;
+    delete mEditCalibrationDataAction;
+    delete mStartFocusFinderButtonMenu;
 
 	delete mCameraConnectionStatusLabel;
 	delete mFocusConnectionStatusLabel;

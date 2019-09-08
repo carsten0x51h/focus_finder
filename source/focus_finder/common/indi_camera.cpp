@@ -23,7 +23,7 @@
 #include "basedevice.h"
 
 IndiCameraT::IndiCameraT(INDI::BaseDevice *dp, IndiClientT * indiClient) :
-		mIndiBaseDevice(dp), mIndiClient(indiClient), cancelExposureFlag(false), mLoopMode(
+		mIndiBaseDevice(dp), mIndiClient(indiClient), cancelExposureFlag(false), mIsExposureRunning(false), mLoopMode(
 				LoopModeT::SINGLE), mExposureDelay(0s), mExposureTime(1s) {
 
 	LOG(debug) << "IndiCameraT::IndiCameraT..." << std::endl;
@@ -40,7 +40,11 @@ IndiCameraT::IndiCameraT(INDI::BaseDevice *dp, IndiClientT * indiClient) :
 	mNewBlobConnection = mIndiClient->registerNewBlobListener(
 			boost::bind(&IndiCameraT::newBlob, this, _1));
 
-	mIndiClient->setBLOBMode(B_ALSO, mIndiBaseDevice->getDeviceName(), nullptr);
+    mIndiClient->setBLOBMode(B_ALSO, mIndiBaseDevice->getDeviceName(), nullptr);
+
+    // Register switch
+    mNewSwitchConnection = mIndiClient->registerNewSwitchListener(
+            boost::bind(&IndiCameraT::newSwitch, this, _1));
 }
 
 IndiCameraT::~IndiCameraT() {
@@ -48,6 +52,7 @@ IndiCameraT::~IndiCameraT() {
 
 	mIndiClient->unregisterNewNumberListener(mNewNumberConnection);
 	mIndiClient->unregisterNewBlobListener(mNewBlobConnection);
+    mIndiClient->unregisterNewSwitchListener(mNewSwitchConnection);
 }
 
 /**
@@ -197,6 +202,31 @@ void IndiCameraT::newBlob(IBLOB* blob) {
 	}
 }
 
+void IndiCameraT::newSwitch(ISwitchVectorProperty* svp) {
+    if (strcmp(svp->device, getName().c_str()) == 0) {
+
+        LOG(debug) << "IndiCameraT::newSwitch... " << svp->name
+                   << " has changed..." << std::endl;
+
+        if (strcmp(svp->name, "CCD_ABORT_EXPOSURE") == 0) {
+
+            ISwitch * abortSwitch = IndiHelperT::getSwitch(svp, "ABORT");
+
+            if (svp->s == IPS_OK) {
+                bool exposureCancelled = (abortSwitch->s == ISS_OFF);
+
+                LOG(info) << "Exposure cancelled: " << exposureCancelled << ", status: " << IndiHelperT::propStateAsStr(svp->s) << std::endl;
+
+                cancelExposureFlag = true;
+                cv.notify_all();
+            } else {
+                // Report problem...
+                ReportingT::reportMsg(ReportingDatasetT("IndiCamera", "Aborting exposure failed.", "" /*no details*/));
+            }
+        }
+    }
+}
+
 /////////////////////////////////////////////////
 // Device
 /////////////////////////////////////////////////
@@ -339,10 +369,8 @@ void IndiCameraT::startExposure() {
 
 	if (isExposureRunning()) {
 		// TODO: Maybe better reporting? + return
-		//throw CameraExceptionT("Exposure already running.");
-		return;
+		throw CameraExceptionT("Exposure already running.");
 	}
-
 	cancelExposureFlag = false;
 
 	exposureThread = std::thread(&IndiCameraT::expose, this);
@@ -367,6 +395,9 @@ void IndiCameraT::cancelExposure() {
 		abortExposure->s = ISS_ON;
 
 		mIndiClient->sendNewSwitch(abortExposureVecProp);
+
+		// --> generates a newSwitch() event!
+
 	} catch (IndiExceptionT & exc) {
 		// Report problem...
 		ReportingT::reportMsg(ReportingDatasetT("IndiCamera", "Aborting exposure failed.", exc.what()));
@@ -374,29 +405,31 @@ void IndiCameraT::cancelExposure() {
 		// TODO!!!!!: Should this class actually use Reporting:: ? Or should it throw a CameraExceptionT and we catch it there and call ReportingT:: there..?!
 	}
 
-	// In any case set cancel flag - TODO: Is this a good diea?
-	cancelExposureFlag = true;
-
-	cv.notify_all();
+	// In any case set cancel flag - TODO: Is this a good idea?
+//	cancelExposureFlag = true;
+//
+//	cv.notify_all();
 }
 
+// TODO: This is not always reliable because of a delay between setting the proerty and it taking the effect -> use own flag!
 bool IndiCameraT::isExposureRunning() {
 
-	bool exposureRunning  = false;
-
-	try {
-		INumberVectorProperty * exposureTimeVecProp = IndiHelperT::getNumberVec(
-				mIndiBaseDevice, "CCD_EXPOSURE");
-
-		exposureRunning = (exposureTimeVecProp->s == IPS_BUSY);
-
-	} catch (IndiExceptionT & exc) {
-		exposureRunning = false;
-	}
-
-	LOG(debug) << "IndiCameraT - isExposureRunning...exposureRunning=" << exposureRunning << std::endl;
-
-	return exposureRunning;
+    return mIsExposureRunning.load();
+//	bool exposureRunning  = false;
+//
+//	try {
+//		INumberVectorProperty * exposureTimeVecProp = IndiHelperT::getNumberVec(
+//				mIndiBaseDevice, "CCD_EXPOSURE");
+//
+//		exposureRunning = (exposureTimeVecProp->s == IPS_BUSY);
+//
+//	} catch (IndiExceptionT & exc) {
+//		exposureRunning = false;
+//	}
+//
+//	LOG(debug) << "IndiCameraT - isExposureRunning...exposureRunning=" << exposureRunning << std::endl;
+//
+//	return exposureRunning;
 }
 
 std::chrono::milliseconds IndiCameraT::getExposureTime() const {
@@ -587,11 +620,15 @@ void IndiCameraT::expose() {
 	do {
 		mResultImage = std::make_shared<ImageT>();
 
-		// https://stackoverflow.com/questions/7925479/if-argument-evaluation-order
+        mIsExposureRunning = true;
+
+        // https://stackoverflow.com/questions/7925479/if-argument-evaluation-order
 		// https://stackoverflow.com/questions/18450585/what-is-the-order-of-evaluation-of-statements-in-a-if-bracket-if
 		cancelled = !delayedExposueTimer() || !indiExposure();
 
 		lastExposure = (getLoopMode() != LoopModeT::LOOP);
+
+        mIsExposureRunning = false;
 
 		if (cancelled) {
 			LOG(debug) << "Exposure cancelled." << std::endl;

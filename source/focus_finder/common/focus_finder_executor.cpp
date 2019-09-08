@@ -39,8 +39,7 @@ void FocusFinderExecutorT::cancel() {
 }
 
 bool FocusFinderExecutorT::isRunning() const {
-	// TODO
-	return false;
+    return (mAlgorithm ? mAlgorithm->isRunning() : false);
 }
 
 void FocusFinderExecutorT::reset() {

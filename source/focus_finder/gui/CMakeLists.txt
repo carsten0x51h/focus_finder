@@ -217,7 +217,7 @@ set(sources
     about_dialog.ui
     profile_settings_dialog.ui
     reporting_viewer_panel.ui
-)
+        include/focus_curve_recorder_panel.h focus_curve_recorder_panel.cpp)
 
 
 # 

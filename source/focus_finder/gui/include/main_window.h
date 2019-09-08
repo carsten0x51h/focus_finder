@@ -121,7 +121,8 @@ private:
   	void updateProfile();
   	void updateExposureTime();
   	void updateExposureTimeSelector();
-  	void updateFocusFinderMainMenuBar();
+    void updateFocusFinderButtonMenuTexts();
+    void updateFocusFinderMainMenuBar();
 
     // Business logic
     FocusFinderLogicT mFfl;
@@ -145,7 +146,7 @@ private:
     // Exposure button
 	AnimMenuButtonT * mExposureButton;
 	QAction * mExposureLoopAction;
-	QMenu* mExposureButtonMenu;
+	QMenu * mExposureButtonMenu;
 
 	// Exposure time
 	QComboBox * mExposureTimeCbx;
@@ -156,8 +157,12 @@ private:
 	// Select focus star button
 	AnimMenuButtonT * mSelectFocusStarButton;
 
-	// Start to find focus
+	// "find focus" button - calibration menu
 	AnimMenuButtonT * mStartFocusFinderButton;
+
+    QAction * mRecalibrationAction;
+    QAction * mEditCalibrationDataAction;
+    QMenu* mStartFocusFinderButtonMenu;
 
 	// Device icons in status bar
 	QLabel *mCameraConnectionStatusLabel;
@@ -205,6 +210,9 @@ private:
     void onSelectSubFramePressed();
     void onSelectFocusStarPressed();
     void onStartFocusFinderPressed();
+
+    void onRecalibrationPressed();
+    void onEditCalibrationDataPressed();
 
     void onImageConverterValueChanged();
 

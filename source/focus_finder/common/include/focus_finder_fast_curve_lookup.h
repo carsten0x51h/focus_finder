@@ -58,6 +58,7 @@ private:
 	boost::signals2::connection mCameraExposureFinishedConnection;
 
 	std::atomic<bool> mCancelled;
+    std::atomic<bool> mIsRunning;
 
 	std::condition_variable cv;
 	std::mutex cvMutex;
@@ -69,7 +70,8 @@ public:
 	// Implement focus finder interface
 	std::string getName() const override;
 
-	void run() override;
+    bool isRunning() const override;
+    void run() override;
 	void cancel() override;
 	void reset() override;
 };

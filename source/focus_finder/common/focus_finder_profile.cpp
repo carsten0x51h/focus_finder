@@ -87,6 +87,13 @@ void FocusFinderProfileT::setStarDetectionSnrBoundary(float starDetectionSnrBoun
 	mStarDetectionSnrBoundary = starDetectionSnrBoundary;
 }
 
+bool FocusFinderProfileT::hasCalibrationData() const {
+    // TODO: Implement!
+    return true;
+}
+// TODO: Implement...
+// ... getCalibrationData() const;
+//void setCalibrationData(...);
 
 
 void FocusFinderProfileT::save(const std::string & fullProfilePath, const FocusFinderProfileT & profile) {

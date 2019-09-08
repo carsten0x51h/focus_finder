@@ -23,7 +23,8 @@
 DEF_Exception(FocusFinderCancelled);
 
 FocusFinderFastCurveLookupT::FocusFinderFastCurveLookupT() :
-		mCancelled(false) {
+		mCancelled(false),
+        mIsRunning(false) {
 	LOG(debug)
 	<< "FocusFinderFastCurveLookupT::FocusFinderFastCurveLookupT..." << std::endl;
 }
@@ -125,7 +126,13 @@ void FocusFinderFastCurveLookupT::checkIfStarIsThere(const ImageT & img,
 	}
 }
 
+bool FocusFinderFastCurveLookupT::isRunning() const {
+    return mIsRunning.load();
+}
+
 void FocusFinderFastCurveLookupT::run() {
+    mIsRunning = true;
+
 	LOG(debug)
 	<< "FocusFinderFastCurveLookupT::run..." << std::endl;
 
@@ -358,7 +365,7 @@ void FocusFinderFastCurveLookupT::run() {
 
 			// Notify about FoFi update...
 			notifyFocusFinderProgressUpdate(60.0, "Phase 2 finished.", record);
-		}
+        }
 
 
 
@@ -472,6 +479,8 @@ void FocusFinderFastCurveLookupT::run() {
 		// TODO: Maybe introduce notifyFocusFinderFailed()...
 		notifyFocusFinderCancelled();
 	}
+
+    mIsRunning = false;
 }
 
 void FocusFinderFastCurveLookupT::focusFinderCleanup() {
@@ -484,8 +493,7 @@ void FocusFinderFastCurveLookupT::focusFinderCleanup() {
 
 void FocusFinderFastCurveLookupT::cancel() {
 	mCancelled = true;
-
-	cv.notify_all();
+    cv.notify_all();
 }
 
 ///**********************************************************************

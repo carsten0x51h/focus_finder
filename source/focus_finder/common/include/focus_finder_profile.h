@@ -45,6 +45,9 @@ public:
 	float getStarDetectionSnrBoundary() const;
 	void setStarDetectionSnrBoundary(float starDetectionSnrBoundary);
 
+	bool hasCalibrationData() const;
+    // ... getCalibrationData() const;
+    //void setCalibrationData(...);
 
 	static const FocusFinderProfileT & defaults();
 	static const FocusFinderProfileT sDefaultProfile;
