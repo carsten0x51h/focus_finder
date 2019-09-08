@@ -1,0 +1,8 @@
+//
+// Created by devnull on 9/8/19.
+//
+
+#ifndef FOFI_FOCUS_CURVE_RECORDER_PANEL_H
+#define FOFI_FOCUS_CURVE_RECORDER_PANEL_H
+
+#endif //FOFI_FOCUS_CURVE_RECORDER_PANEL_H
