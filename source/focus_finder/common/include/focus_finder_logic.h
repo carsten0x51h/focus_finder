@@ -10,6 +10,7 @@
 #include "rect.h"
 #include "frame.h"
 #include "size.h"
+#include "task_executor.h"
 
 class CameraT;
 class FocusT;
@@ -18,7 +19,7 @@ class DeviceManagerT;
 class ProfileManagerT;
 class MapperFunctionT;
 class ImageConverter16To8T;
-class FocusFinderExecutorT;
+class FocusFinderT;
 
 class FocusFinderLogicT
 {
@@ -49,7 +50,7 @@ public:
 
 	std::shared_ptr<ImageConverter16To8T> getImageConverter16To8() const;
 
-	std::shared_ptr<FocusFinderExecutorT> getFocusFinderExecutor() const;
+	std::shared_ptr<TaskExecutorT<FocusFinderT> > getFocusFinderExecutor() const;
 
 	std::optional<PointT<float> > getLastFocusStarPos() const;
 
@@ -77,7 +78,7 @@ private:
 
 	std::shared_ptr<ImageConverter16To8T> mImageConverter16To8;
 
-	std::shared_ptr<FocusFinderExecutorT> mFocusFinderExecutor;
+	std::shared_ptr<TaskExecutorT<FocusFinderT> > mFocusFinderExecutor;
 
 	std::optional<PointT<float> > mLastFocusStarPos;
 };

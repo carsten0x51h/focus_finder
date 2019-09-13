@@ -40,11 +40,21 @@ endif()
 # 
 
 set(sources
-	../common/include/quantile.h
+  ../common/include/quantile.h
+  ../common/include/otsu_thresholding_algorithm.h
+  ../common/otsu_thresholding_algorithm.cpp  
+  ../common/include/star_cluster_algorithm.h
+  ../common/star_cluster_algorithm.cpp  
 	../common/include/focus_finder_record.h
 	../common/focus_finder_record.cpp
 	../common/include/focus_curve.h
 	../common/focus_curve.cpp
+	../common/include/focus_curve_recorder.h
+	../common/include/default_focus_curve_recorder.h
+	../common/default_focus_curve_recorder.cpp
+	../common/include/focus_curve_recorder_type.h
+	../common/include/focus_curve_recorder_factory.h
+	../common/focus_curve_recorder_factory.cpp
 	../common/include/image_slicer.h
 	../common/include/wait_for.h
 	../common/include/indi_driver_info.h
@@ -154,8 +164,7 @@ set(sources
 	../common/include/focus_finder.h
 	../common/include/focus_finder_fast_curve_lookup.h
 	../common/focus_finder_fast_curve_lookup.cpp
-	../common/include/focus_finder_executor.h
-	../common/focus_finder_executor.cpp
+	../common/include/task_executor.h
 	../common/include/focus_finder_strategy.h
 	../common/include/focus_finder_factory.h
 	../common/focus_finder_factory.cpp

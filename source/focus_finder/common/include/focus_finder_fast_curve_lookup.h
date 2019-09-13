@@ -26,6 +26,7 @@
 // Custom data structure + accessor
 ///////////////////////////////////////////////////////////////////////
 // TODO: Rename... My....
+// TODO: Is this actually needed any more? + my DataAccessorT?
 typedef std::pair<float, float> MyDataPointT;
 typedef std::vector<MyDataPointT> MyDataContainerT;
 

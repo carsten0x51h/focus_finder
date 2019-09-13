@@ -18,7 +18,8 @@
 #include "include/linear_bw_stretch_mapper_function.h"
 #include "include/spline_curve_mapper_function.h"
 #include "include/image_converter_16to8.h"
-#include "include/focus_finder_executor.h"
+#include "include/focus_finder.h"
+#include "include/task_executor.h"
 
 FocusFinderLogicT::FocusFinderLogicT() :
 	mCameraDevice(nullptr)
@@ -89,7 +90,7 @@ FocusFinderLogicT::FocusFinderLogicT() :
 			getMapperFunctionByName("LinearBWStretchMapperFunction"));
 
 	// Init the foocus finder executor
-	mFocusFinderExecutor = std::make_shared<FocusFinderExecutorT>();
+	mFocusFinderExecutor = std::make_shared<TaskExecutorT<FocusFinderT> >();
 }
 
 FocusFinderLogicT::~FocusFinderLogicT() {
@@ -383,6 +384,6 @@ std::shared_ptr<ImageConverter16To8T> FocusFinderLogicT::getImageConverter16To8(
 	return mImageConverter16To8;
 }
 
-std::shared_ptr<FocusFinderExecutorT> FocusFinderLogicT::getFocusFinderExecutor() const {
+std::shared_ptr<TaskExecutorT<FocusFinderT> > FocusFinderLogicT::getFocusFinderExecutor() const {
 	return mFocusFinderExecutor;
 }

@@ -39,7 +39,7 @@
 #include "../common/include/dummy_device_manager.h"
 #include "../common/include/focus_finder.h"
 #include "../common/include/focus_finder_record.h"
-#include "../common/include/focus_finder_executor.h"
+#include "../common/include/task_executor.h"
 #include "../common/include/focus_finder_factory.h"
 #include "../common/include/profile_manager.h"
 #include "../common/include/image_converter_16to8.h"
@@ -180,7 +180,7 @@ void MainWindow::onStartFocusFinderPressed() {
 			emit focusFinderCancelledSignal();
 		});
 
-		ffExec->setAlgorithm(focusFinder);
+		ffExec->setTask(focusFinder);
 
 		LOG(debug)
 		<< "Starting '" << focusFinder->getName() << "'..." << std::endl;

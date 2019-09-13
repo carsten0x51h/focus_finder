@@ -93,9 +93,9 @@ std::shared_ptr<DeviceT> IndiDeviceManagerT::getDevice(
 			<< deviceName << std::endl;
 
 	// DEBUG BEGIN
-	LOG(debug) << "DeviceMap" << std::endl;
+	LOG(trace) << "DeviceMap" << std::endl;
 	for (const auto & e : mDeviceMap) {
-		LOG(debug) << "  -> DeviceName: " << e.first << " -> device: "
+		LOG(trace) << "  -> DeviceName: " << e.first << " -> device: "
 				<< e.second << std::endl;
 	}
 	// DEBUG END
