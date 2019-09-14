@@ -34,6 +34,7 @@
 //Image8T
 //Image16T
 //ImageFT
+// TODO: Introduce bit depth? -> probelmatic for float type...
 using ImageT = cimg_library::CImg<float>;
 
 

@@ -55,6 +55,7 @@ public:
 	std::optional<PointT<float> > getLastFocusStarPos() const;
 
 private:
+  size_t calcNumStarsInRegion(const ImageT & inImg) const;
 	void initImageMappers();
 	void updateProfile();
 

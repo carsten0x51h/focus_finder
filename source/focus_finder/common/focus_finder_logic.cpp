@@ -14,6 +14,8 @@
 #include "include/logging.h"
 #include "include/snr.h"
 #include "include/centroid.h"
+#include "include/otsu_thresholding_algorithm.h"
+#include "include/star_cluster_algorithm.h"
 
 #include "include/linear_bw_stretch_mapper_function.h"
 #include "include/spline_curve_mapper_function.h"
@@ -195,6 +197,26 @@ RectT<unsigned int> FocusFinderLogicT::getSelectedRoi() const {
 	return mSelectedRoi;
 }
 
+size_t FocusFinderLogicT::calcNumStarsInRegion(const ImageT & inImg) const {
+  float th = OtsuThresholdingAlgorithmT::calc(inImg, 16 /*bit depth - TODO: Do not hardcode - but where to query??*/);
+
+  LOG(debug) << "FocusFinderLogicT::calcNumStarsInRegion - threshold: " << th << std::endl; 
+
+  // DEBUG
+  //inImg.save("inImg.fits");
+
+  ImageT binaryImg = inImg.get_threshold(th);
+
+  // DEBUG
+  //binaryImg.save("binaryImg.fits");
+
+  std::list<StarClusterT> clusters = StarClusterAlgorithmT::cluster(binaryImg);
+
+  LOG(debug) << "FocusFinderLogicT::calcNumStarsInRegion - Found " << clusters.size() << " stars..." << std::endl; 
+
+  return clusters.size();
+}
+
 // TODO: PointT<float> & poi -> PointT<int> & poi ??
 std::optional<PointT<float> > FocusFinderLogicT::findFocusStar(
 		const PointT<float> & poiFloat) {
@@ -299,6 +321,18 @@ std::optional<PointT<float> > FocusFinderLogicT::findFocusStar(
 		return std::nullopt;
 	}
 
+
+	// Check that there is only a single star in the selected region
+	size_t numStarsInRegion = calcNumStarsInRegion(searchWindowImg);
+
+	if (numStarsInRegion != 1) {
+		LOG(warning)
+		<< "FocusFinderLogicT::findFocusStar... none or multiple stars in region detected."
+				<< std::endl;
+		return std::nullopt;
+	}
+
+	
 	// Try to calculate the centroid of the star image
 	//
 	// TODO: In addition we may want to configure
