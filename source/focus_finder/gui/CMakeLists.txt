@@ -43,7 +43,9 @@ set(sources
   ../common/include/floating_point_equality.h
   ../common/include/quantile.h
   ../common/include/otsu_thresholding_algorithm.h
-  ../common/otsu_thresholding_algorithm.cpp  
+  ../common/otsu_thresholding_algorithm.cpp
+  ../common/include/max_entropy_thresholding_algorithm.h
+  ../common/max_entropy_thresholding_algorithm.cpp
   ../common/include/star_cluster_algorithm.h
   ../common/star_cluster_algorithm.cpp  
 	../common/include/focus_finder_record.h

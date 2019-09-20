@@ -14,7 +14,8 @@
 #include "include/logging.h"
 #include "include/snr.h"
 #include "include/centroid.h"
-#include "include/otsu_thresholding_algorithm.h"
+//#include "include/otsu_thresholding_algorithm.h"
+#include "include/max_entropy_thresholding_algorithm.h"
 #include "include/star_cluster_algorithm.h"
 
 #include "include/linear_bw_stretch_mapper_function.h"
@@ -198,15 +199,24 @@ RectT<unsigned int> FocusFinderLogicT::getSelectedRoi() const {
 }
 
 size_t FocusFinderLogicT::calcNumStarsInRegion(const ImageT & inImg) const {
-  float th = OtsuThresholdingAlgorithmT::calc(inImg, 16 /*bit depth - TODO: Do not hardcode - but where to query??*/);
 
-  LOG(debug) << "FocusFinderLogicT::calcNumStarsInRegion - threshold: " << th << std::endl; 
+  inImg.save("/home/devnull/orig_test.fits");
+  
+  //float th = OtsuThresholdingAlgorithmT::calc(inImg, 16 /*bit depth - TODO: Do not hardcode - but where to query??*/);
+  float th = MaxEntropyThresholdingAlgorithmT::calc(inImg, 16 /*bit depth - TODO: Do not hardcode - but where to query??*/);
+
+  int thUp = std::ceil(th);
+  
+  LOG(debug) << "FocusFinderLogicT::calcNumStarsInRegion - threshold: " << th << ", thUp: " << thUp << std::endl; 
 
   // DEBUG
   //inImg.save("inImg.fits");
 
-  ImageT binaryImg = inImg.get_threshold(th);
+  ImageT binaryImg = inImg.get_threshold(thUp + 1 /*HACK!*/); // Threshold function somehow uses >=
 
+  binaryImg.save("/home/devnull/bin_test.fits");
+
+  
   // DEBUG
   //binaryImg.save("binaryImg.fits");
 

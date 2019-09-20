@@ -4,12 +4,22 @@ void
 StarClusterAlgorithmT::getAndRemoveNeighbours(PixelPosT inCurPixelPos, PixelPosSetT * inoutWhitePixels, 
 					      StarClusterT * inoutPixelsToBeProcessed,
 					      StarClusterT * outPixelCluster)
-{
-  const size_t _numPixels = 8, _x = 0, _y = 1;
-  const int offsets[_numPixels][2] = { { -1, -1 }, { 0, -1 }, { 1, -1 },
-				       { -1, 0 },              { 1, 0 },
-				       { -1, 1 }, { 0, 1 }, { 1, 1 } };
 
+// TODO: Generalize on NxN mask! Supply to constructor / template...
+{
+  //const size_t _numPixels = 8, _x = 0, _y = 1;
+  // const int offsets[_numPixels][2] = { { -1, -1 }, { 0, -1 }, { 1, -1 },
+  // 				       { -1, 0 },              { 1, 0 },
+  // 				       { -1, 1 }, { 0, 1 }, { 1, 1 } };
+
+  const size_t _numPixels = 24, _x = 0, _y = 1;
+  const int offsets[_numPixels][2] = { { -2, -2 }, { -1, -2 }, { 0, -2 }, { 1, -2 }, { 2, -2 },
+				       { -2, -1 }, { -1, -1 }, { 0, -1 }, { 1, -1 }, { 2, -1 },
+				       { -2, 0 },  { -1, 0 },             { 1,  0 }, { 2,  0 },
+				       { -2, 1 },  { -1, 1 },   { 0, 1 }, { 1,  1 }, { 2,  1 },
+				       { -2, 2 },  { -1, 2 },   { 0, 2 }, { 1,  2 }, { 2,  2 } };
+
+  
   for (size_t p = 0; p < _numPixels; ++p) {
     PixelPosT curPixPos(std::get<0>(inCurPixelPos) + offsets[p][_x], std::get<1>(inCurPixelPos) + offsets[p][_y]);
     PixelPosSetT::iterator itPixPos = inoutWhitePixels->find(curPixPos);
