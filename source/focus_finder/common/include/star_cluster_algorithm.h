@@ -1,4 +1,5 @@
 #include <list>
+#include <vector>
 #include <set>
 #include <algorithm>
 
@@ -18,16 +19,25 @@ typedef std::list<PixelPosT> StarClusterT;
  */
 class StarClusterAlgorithmT {
 private:
+  std::vector<PixelPosT> mOffsets;
+
+  /**
+   *
+   */
+  void initOffsetPattern(int n);
+
   /**
    * Removes all white neighbours arond pixel from whitePixels
    * if they exist and adds them to pixelsToBeProcessed and to
    * pixelsinCluster.
    */
-  static void
-  getAndRemoveNeighbours(PixelPosT inCurPixelPos, PixelPosSetT * inoutWhitePixels, 
+  void
+  getAndRemoveNeighbours(const PixelPosT & inCurPixelPos, PixelPosSetT * inoutWhitePixels, 
 			 StarClusterT * inoutPixelsToBeProcessed,
 			 StarClusterT * outPixelCluster);
   
 public:
-  static std::list<StarClusterT> cluster(const ImageT & inImg);
+  StarClusterAlgorithmT(size_t clusterRadius);
+  
+  std::list<StarClusterT> cluster(const ImageT & inImg);
 };

@@ -2,7 +2,9 @@
 #include "include/otsu_thresholding_algorithm.h"
 #include "include/floating_point_equality.h"
 
-float OtsuThresholdingAlgorithmT::calc(const ImageT & inImg, long bitDepth) {
+std::string OtsuThresholdingAlgorithmT::getName() const { return "OtsuThresholdingAlgorithmT"; };
+
+float OtsuThresholdingAlgorithmT::calc(const ImageT & inImg, long bitDepth) const {
 
   LOG(debug) << "OtsuThresholdingAlgorithmT::calc..." << std::endl;
 

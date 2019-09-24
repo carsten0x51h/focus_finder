@@ -7,7 +7,9 @@
 #include "include/max_entropy_thresholding_algorithm.h"
 #include "include/floating_point_equality.h"
 
-float MaxEntropyThresholdingAlgorithmT::calc(const ImageT & img, long bitDepth) {
+std::string MaxEntropyThresholdingAlgorithmT::getName() const { return "MaxEntropyThresholdingAlgorithmT"; }
+
+float MaxEntropyThresholdingAlgorithmT::calc(const ImageT & img, long bitDepth) const {
 
   LOG(debug) << "MaxEntropyThresholdingAlgorithmT::calc..." << std::endl;
 
