@@ -12,8 +12,8 @@
 #include "include/hfd.h"
 #include "include/fwhm.h"
 #include "include/image_slicer.h"
-#include "include/focus_finder_record.h"
-#include "include/focus_finder_record_builder.h"
+#include "include/focus_curve_record.h"
+#include "include/focus_curve_record_builder.h"
 
 #include "include/camera.h"
 #include "include/focus.h"
@@ -351,7 +351,7 @@ void FocusFinderFastCurveLookupT::run() {
 					newCentroidAbsRoiCoords.y() - lastFocusStarPos.y());
 
 			// Fill all so far collected data into the "FoFi Result Structure"
-			auto record = FocusFinderRecordBuilderT()
+			auto record = FocusCurveRecordBuilderT()
 					.setAbsoluteFocusPos(currentFocusPos)
 					.setDrift(drift)
 					.setSnr(snr)

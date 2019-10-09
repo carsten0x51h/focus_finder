@@ -35,11 +35,38 @@ void FocusCurveViewWidgetT::paintEvent(QPaintEvent * event) {
 
 	QPainter p(this);
 
+	// Min / max focus positions
+	int minFocusPos = 0; // TODO...
+	int maxFocusPos = 80000; // TODO...
+	int deltaFocusPos = maxFocusPos - minFocusPos;
+
+	float minFocusMeasure = 0; // TODO
+	float maxFocusMeasure = 20; // TODO
+	float deltaFocusMeasure = maxFocusMeasure - minFocusMeasure;
+
+	// TODO: Make the view widget to allow multiple "curves"? HFD, FWHN etc...
+
+	
 	// HACK... TODO: Just for test
-	QPointF center(10.0, 10.0);
-	p.setPen(QPen(QBrush(QColor(0, 255, 0, 255)), 1, Qt::SolidLine));
-	p.setBrush(QBrush(QColor(255, 255, 255, 0)));
-	p.drawEllipse(center, 5 /*radius*/, 5 /*radius*/);
+	for (FocusCurveT::const_iterator it = mFocusCurve.begin(); it != mFocusCurve.end(); ++it) {
+
+	  auto fcr = *it;
+
+	  float focusPos = fcr->getCurrentAbsoluteFocusPos();
+	  float focusMeasure = fcr->getFwhmHorz().getValue(); // TODO...
+	    
+	  // Transform coordinates
+	  float xpos = (focusPos / (float) deltaFocusPos) * width();
+	  float ypos = (1.0f - (focusMeasure / deltaFocusMeasure)) * height();
+
+	  LOG(debug) << "FocusCurveViewWidgetT::paintEvent... focusPos=" << focusPos << ", width=" << width() << ", draw point (x, y)=" << xpos << ", " << ypos << ")." << std::endl;
+	  
+	  QPointF center(xpos, ypos);
+	  p.setPen(QPen(QBrush(QColor(0, 255, 0, 255)), 1, Qt::SolidLine));
+	  p.setBrush(QBrush(QColor(255, 255, 255, 0)));
+	  p.drawEllipse(center, 5 /*radius*/, 5 /*radius*/);
+	}
+	
 
 //	if (mHfd.valid()) {
 //
@@ -86,7 +113,7 @@ void FocusCurveViewWidgetT::paintEvent(QPaintEvent * event) {
 }
 
 void FocusCurveViewWidgetT::reset() {
-	//TODO: mFocusCurve.reset();
+  mFocusCurve.clear();
 
     repaint();
 }
@@ -99,6 +126,15 @@ void FocusCurveViewWidgetT::setFocusCurve(const FocusCurveT & focusCurve) {
 	// TODO
 
     repaint();
+}
+
+void FocusCurveViewWidgetT::addFocusCurveRecord(std::shared_ptr<FocusCurveRecordT> focusCurveRecord) {
+
+  LOG(debug) << "FocusCurveViewWidgetT::addFocusCurveRecord..." << std::endl;
+  
+  mFocusCurve.push_back(focusCurveRecord);
+
+  repaint();
 }
 
 

@@ -1,5 +1,4 @@
 #include <thread> // TODO: Remove - only temporary
-#include <tuple>
 #include <chrono>
 
 #include "include/default_focus_curve_recorder.h"
@@ -12,8 +11,9 @@
 #include "include/hfd.h"
 #include "include/fwhm.h"
 #include "include/image_slicer.h"
-#include "include/focus_finder_record.h"
-#include "include/focus_finder_record_builder.h"
+#include "include/focus_curve_record.h"
+#include "include/focus_curve_record_builder.h"
+#include "include/focus_curve.h"
 
 #include "include/camera.h"
 #include "include/focus.h"
@@ -21,7 +21,10 @@
 
 DefaultFocusCurveRecorderT::DefaultFocusCurveRecorderT() :
   mCancelled(false),
-  mIsRunning(false) {
+  mIsRunning(false),
+  mInitialFocusPos(0),
+  mStepSize(1000),
+  mFocusMeasureLimit(12.0F) {
   LOG(debug)
     << "DefaultFocusCurveRecorderT::DefaultFocusCurveRecorderT..." << std::endl;
 }
@@ -31,97 +34,502 @@ std::string DefaultFocusCurveRecorderT::getName() const {
 }
 
 void DefaultFocusCurveRecorderT::reset() {
-	// TODO
+  
 	// TODO: What happens if called while running? -> Exception?
 	LOG(debug)
 	<< "DefaultFocusCurveRecorderT::reset..." << std::endl;
+
+	mInitialFocusPos = getFocus()->getCurrentPos(); // TODO: Ok? What if no focus set?
 }
 
-// void DefaultFocusCurveRecorderT::checkCancelled() const {
-// 	if (mCancelled.load()) {
-// 		throw FocusFinderCancelledExceptionT("Focus finder cancelled.");
-// 	}
-// }
+void DefaultFocusCurveRecorderT::checkCancelled() const {
+  if (mCancelled.load()) {
+    throw FocusCurveRecorderCancelledExceptionT("Focus curve recorder cancelled.");
+  }
+}
 
-// void DefaultFocusCurveRecorderT::moveFocusByBlocking(
-// 		FocusDirectionT::TypeE direction, int ticks,
-// 		std::chrono::milliseconds timeout) {
+void DefaultFocusCurveRecorderT::waitForFocus(std::chrono::milliseconds timeout) const {
+  auto isFocusPositionReachedOrCancelledLambda = [=, this]() -> bool {
+						   LOG(debug) << "current pos=" << getFocus()->getCurrentPos()
+							      << ", target pos=" << getFocus()->getTargetPos()
+							      << ", isMoving? " << getFocus()->isMoving()
+							      << std::endl;
 
-// 	auto isFocusPositionReachedOrCancelledLambda = [=]() -> bool {
-// 		LOG(debug) << "current pos=" << getFocus()->getCurrentPos()
-// 		<< ", target pos=" << getFocus()->getTargetPos()
-// 		<< ", isMoving? " << getFocus()->isMoving()
-// 		<< std::endl;
+						   // TODO: focus->getTargetPos() currently is not implemented..
+						   //       not sure if target and/or current position are maintained by INDI focus driver...
+						   //return (focus->getCurrentPos() == focus->getTargetPos() && ! focus->isMoving());
+						   return (! getFocus()->isMoving() || mCancelled.load());
+						 };
+  wait_for(isFocusPositionReachedOrCancelledLambda, timeout);
+}
 
-// 		// TODO: focus->getTargetPos() currently is not implemented..
-// 		//       not sure if target and/or current position are maintained by INDI focus driver...
-// 		//return (focus->getCurrentPos() == focus->getTargetPos() && ! focus->isMoving());
-// 			return (! getFocus()->isMoving() || mCancelled.load());
-// 		};
+void DefaultFocusCurveRecorderT::moveFocusToBlocking(int absPos, std::chrono::milliseconds timeout) {
 
-// 	// Set the target position (rel)
-// 	getFocus()->setTargetPos(ticks, direction);
+  if (getFocus() == nullptr) {
+    throw FocusCurveRecorderFailedExceptionT("No focus device set.");
+  }
+  
+  // Set the target position (abs)
+  getFocus()->setTargetPos(absPos);
 
-// 	wait_for(isFocusPositionReachedOrCancelledLambda, timeout);
+  waitForFocus(timeout);
 
-// 	// If it was cancelled, throw cancel exception
-// 	if (mCancelled) {
-// 		throw FocusFinderCancelledExceptionT();
-// 	}
-// }
+  // If it was cancelled, throw cancel exception
+  if (mCancelled) {
+    throw FocusCurveRecorderCancelledExceptionT();
+  }
+}
+
+void DefaultFocusCurveRecorderT::moveFocusByBlocking(
+		FocusDirectionT::TypeE direction, int ticks,
+		std::chrono::milliseconds timeout) {
+
+	// Set the target position (rel)
+	getFocus()->setTargetPos(ticks, direction);
+
+	waitForFocus(timeout);
+
+	// If it was cancelled, throw cancel exception
+	if (mCancelled) {
+		throw FocusCurveRecorderCancelledExceptionT();
+	}
+}
+
+// TODO: Do not just return the one float but all data HfdT, vertical ahnd horizontal FwhmT etc. in a data structure...
+std::shared_ptr<FocusCurveRecordT> DefaultFocusCurveRecorderT::measureFocus() {
+  using namespace std::chrono_literals;
+  
+  PointT<unsigned int> lastFocusStarPos = getLastFocusStarPos().to<unsigned int>();
+
+  LOG(debug)
+    << "DefaultFocusCurveRecorderT::run - focus star pos=("
+    << lastFocusStarPos.x() << ", " << lastFocusStarPos.y() << ")"
+    << std::endl;
+
+  // Calc "extended ROI (we want some more space around the actual star window size -> factor).
+  // TODO: Simplify: Overload operator=* -> multiply scalar with size.
+  // NOTE: +1 to make the result odd...
+  unsigned int factor = 2;
+  SizeT<unsigned int> windowSize =
+    getFocusFinderProfile().getStarWindowSize();
+
+  // NOTE: In case factor is evenm we need to add +1 to make the result odd.
+  int oddMaker = (factor % 2 == 0 ? +1 : 0);
+
+  SizeT<unsigned int> outerWindowSize(
+				      windowSize.width() * factor + oddMaker,
+				      windowSize.height() * factor + oddMaker);
+
+  // NOTE: This is in frame coordinates
+  auto outerRoi = RectT<unsigned int>::fromCenterPoint(lastFocusStarPos,
+						       outerWindowSize);
+
+  LOG(debug)
+    << "DefaultFocusCurveRecorderT::run - calculated outer ROI=" << outerRoi
+    << std::endl;
+
+  // Set ROI based on last focus star position
+  getCamera()->setRoi(outerRoi);
+  
+  // TODO: Use exposure time set by the user...
+  LOG(debug) << "DefaultFocusCurveRecorderT::measureFocus... starting exposure..." << std::endl;
+
+  runExposureBlocking(1000ms);
+ 
+  LOG(debug) << "DefaultFocusCurveRecorderT::measureFocus... exposure finished." << std::endl;
+
+
+  // Calc center of subframe
+  PointT<unsigned int> centerOuterSubframe(
+					   std::ceil(mCurrentImage->width() / 2),
+					   std::ceil(mCurrentImage->height() / 2));
+
+  LOG(debug)
+    << "DefaultFocusCurveRecorderT::run - centerOuterSubframe="
+    << centerOuterSubframe << std::endl;
+
+  // In outer subframe (mCurrentImage) coordinates
+  auto innerRoi = RectT<unsigned int>::fromCenterPoint(
+						       centerOuterSubframe,
+						       getFocusFinderProfile().getStarWindowSize());
+
+  LOG(debug)
+    << "DefaultFocusCurveRecorderT::run - calculated inner ROI=" << innerRoi
+    << std::endl;
+
+  // get_crop() from mCurrentImage using innerRoi
+  ImageT innerSubFrameImg = mCurrentImage->get_crop(innerRoi.x() /*x0*/,
+						    innerRoi.y() /*y0*/, innerRoi.x() + innerRoi.width() - 1/*x1*/,
+						    innerRoi.y() + innerRoi.height() - 1/*y1*/
+						    );
+
+  LOG(debug)
+    << "DefaultFocusCurveRecorderT::run - innerSubFrameImg size - w="
+    << innerSubFrameImg.width() << ", h="
+    << innerSubFrameImg.height() << std::endl;
+
+  // Determine SNR of recorded area to check if there could be astar around.
+  checkIfStarIsThere(innerSubFrameImg);
+
+  // TODO: Do not hardcode IWC, do not hardcode "sub mean"
+  ImageT newCenterImage;
+
+  auto newCentroidOpt = CentroidT::calculate(innerSubFrameImg,
+					     CentroidTypeT::IWC, true /*sub mean*/, &newCenterImage);
+
+  if (!newCentroidOpt) {
+    // TODO: Improve logging? ReportingT?
+    LOG(error)
+      << "Unable to determine new centroid." << std::endl;
+
+    // TODO: Retry? Or just cancel? For now we cancel...
+    throw FocusCurveRecorderCancelledExceptionT();
+  }
+
+  // NOTE: Those coordinates are in coordinates of the inner subframe! We need them in "outer sub frame" coordinates!
+  int deltaX = (outerRoi.width() - innerRoi.width()) / 2;
+  int deltaY = (outerRoi.height() - innerRoi.height()) / 2;
+
+  LOG(debug)
+    << "DefaultFocusCurveRecorderT::run - deltaX=" << deltaX << ", deltaY="
+    << deltaY << std::endl;
+
+  PointFT newCentroidInnerRoiCoords = *newCentroidOpt;
+  PointFT newCentroidOuterRoiCoords(
+				    newCentroidInnerRoiCoords.x() + deltaX,
+				    newCentroidInnerRoiCoords.y() + deltaY);
+
+  LOG(debug)
+    << "DefaultFocusCurveRecorderT::run - new centroid (inner frame)="
+    << newCentroidInnerRoiCoords << std::endl;
+  LOG(debug)
+    << "DefaultFocusCurveRecorderT::run - new centroid (outer frame)="
+    << newCentroidOuterRoiCoords << std::endl;
+
+  // Use newly calculated center (newCentroidOuterRoiCoords) to again get sub-frame from mCurrentImage
+  // TODO: Currently we just round() the float position to the closest int. This may be
+  //       improved by introducing sub-pixel accurracy...
+  // TODO: We may introduce a round() function for conversion from PointTF to PointT...?
+  PointT<unsigned int> newCentroidRoundedToNextInt(
+						   std::round(newCentroidOuterRoiCoords.x()),
+						   std::round(newCentroidOuterRoiCoords.y()));
+
+  LOG(debug)
+    << "DefaultFocusCurveRecorderT::run - new centroid rounded to next int="
+    << newCentroidRoundedToNextInt << std::endl;
+
+  auto innerCorrectedRoi = RectT<unsigned int>::fromCenterPoint(
+								newCentroidRoundedToNextInt,
+								getFocusFinderProfile().getStarWindowSize());
+
+  LOG(debug)
+    << "DefaultFocusCurveRecorderT::run - calculated inner corrected ROI="
+    << innerCorrectedRoi << std::endl;
+
+  // get_crop() from mCurrentImage using corrected innerRoi
+  ImageT innerCorrectedSubFrameImg = mCurrentImage->get_crop(
+							     innerCorrectedRoi.x() /*x0*/, innerCorrectedRoi.y() /*y0*/,
+							     innerCorrectedRoi.x() + innerCorrectedRoi.width() - 1/*x1*/,
+							     innerCorrectedRoi.y() + innerCorrectedRoi.height() - 1/*y1*/
+							     );
+
+  LOG(debug)
+    << "DefaultFocusCurveRecorderT::run - innerCorrectedSubFrameImgsize - w="
+    << innerCorrectedSubFrameImg.width() << ", h="
+    << innerCorrectedSubFrameImg.height() << std::endl;
+
+  // Determine SNR of recorded area to check if there could be a star around.
+  float snr;
+  checkIfStarIsThere(innerCorrectedSubFrameImg, &snr);
+
+  // TODO: Calculate HFD
+  HfdT hfd(innerCorrectedSubFrameImg);
+  LOG(debug)
+    << "DefaultFocusCurveRecorderT::run - HFD: " << hfd.getValue() << std::endl;
+
+
+  LOG(debug) << "DefaultFocusCurveRecorderT::measureFocus... focus measure calculated: " << hfd.getValue() << std::endl;
+
+
+
+
+  // NOTE / TODO: This only works ifh height() is odd
+  size_t centerIdxHorz = std::floor(
+				    innerCorrectedSubFrameImg.height() / 2);
+
+  FwhmT fwhmHorz(
+		 ImageSlicerT::slice<SliceDirectionT::HORZ>(
+							    innerCorrectedSubFrameImg, centerIdxHorz));
+
+  // NOTE / TODO: This only works if width() is odd
+  size_t centerIdxVert = std::floor(
+				    innerCorrectedSubFrameImg.width() / 2);
+
+  FwhmT fwhmVert(
+		 ImageSlicerT::slice<SliceDirectionT::VERT>(
+							    innerCorrectedSubFrameImg, centerIdxVert));
+
+  LOG(debug)
+    << "DefaultFocusCurveRecorderT::run - FWHM(HORZ): " << fwhmHorz.getValue()
+    << ", FWHM(VERT): " << fwhmVert.getValue() << std::endl;
+
+  // Convert center coordinates to frame coordinates (absolute position within image)
+  PointFT newCentroidAbsRoiCoords(
+				  newCentroidOuterRoiCoords.x() + outerRoi.x(),
+				  newCentroidOuterRoiCoords.y() + outerRoi.y());
+
+  // Calculate "drift" (movement of center position since last picture
+  std::tuple<float, float> drift(
+				 newCentroidAbsRoiCoords.x() - lastFocusStarPos.x(),
+				 newCentroidAbsRoiCoords.y() - lastFocusStarPos.y());
+
+  // Fill all so far collected data into the "FoFi Result Structure"
+  auto record = FocusCurveRecordBuilderT()
+    .setAbsoluteFocusPos(getFocus()->getCurrentPos())
+    .setDrift(drift)
+    .setSnr(snr)
+    .setHorzFwhm(fwhmHorz)
+    .setVertFwhm(fwhmVert)
+    .setHfd(hfd)
+    .setRoiImage(*mCurrentImage) // Take a copy
+    .setCorrectedStarImage(innerCorrectedSubFrameImg)
+    .setAbsStarCenterPos(newCentroidAbsRoiCoords)
+    .build();
+
+  return record;
+}
+
+
+SelfOrientationResultT DefaultFocusCurveRecorderT::performSelfOrientation() {
+  using namespace std::chrono_literals;
+
+  SelfOrientationResultT selfOrientationResult;
+  
+  selfOrientationResult.record1 = measureFocus();
+  //Notify about FocusCurve recorder update...
+  //notifyFocusCurveRecorderProgressUpdate(60.0, "Phase 2 finished.", record);
+  notifyFocusCurveRecorderProgressUpdate(".", selfOrientationResult.record1);
+
+  // TODO: Should this be configurable?
+  const float STEP_FACTOR = 3.0F;
+  
+  moveFocusByBlocking(FocusDirectionT::INWARD, STEP_FACTOR * mStepSize, 30000ms);
+    
+  selfOrientationResult.record2 = measureFocus();
+  //Notify about FocusCurve recorder update...
+  //notifyFocusCurveRecorderProgressUpdate(60.0, "Phase 2 finished.", record);
+  notifyFocusCurveRecorderProgressUpdate(".", selfOrientationResult.record2);
+
+  float focusMeasure1 = selfOrientationResult.record1->getHfd().getValue();
+  float focusMeasure2 = selfOrientationResult.record2->getHfd().getValue();
+  
+  // TODO: Should a minimum difference be required?
+  bool aboveFocusMeasureLimit = (focusMeasure2 > mFocusMeasureLimit);
+
+  if (focusMeasure2 > focusMeasure1) {
+    // We are on the "left" half of the curve
+    selfOrientationResult.curveHalf = LeftHalf;
+    selfOrientationResult.focusDirectionToLimit = (aboveFocusMeasureLimit ? FocusDirectionT::OUTWARD : FocusDirectionT::INWARD);
+  }
+  else if (focusMeasure2 < focusMeasure1) {
+    // We are on the "right" half of the curve
+    selfOrientationResult.curveHalf = RightHalf;
+    selfOrientationResult.focusDirectionToLimit = (aboveFocusMeasureLimit ? FocusDirectionT::INWARD : FocusDirectionT::OUTWARD);
+  }
+  else {
+    // No change detected - unable to determine target focus direction - something is probably wrong...
+    // Wrong step size? Invalid focus star? Maybe a hotpixel?
+    LOG(error)
+      << "DefaultFocusCurveRecorderT::determineTargetFocusDirection... Unable to determine target focus direction. No difference in focus measure detected." << std::endl;
+    
+    // TODO: reporting?
+    throw FocusCurveRecorderCancelledExceptionT("Unable to determine target focus direction. No difference in focus measure detected.");
+  }
+  
+  return selfOrientationResult;
+}
+
+
+// TODO: binary search?!
+void DefaultFocusCurveRecorderT::moveUntilFocusMeasureLimitReached(const SelfOrientationResultT & selfOrientationResult, float stepSize, float focusMeasureLimit) {
+  using namespace std::chrono_literals;
+
+  LOG(debug)
+    << "DefaultFocusCurveRecorderT::moveUntilFocusMeasureLimitReached..." << std::endl;
+
+  FocusDirectionT::TypeE limitFocusDirection = selfOrientationResult.focusDirectionToLimit;
+  auto curveRecord = selfOrientationResult.record2;
+  //Notify about FocusCurve recorder update...
+  //notifyFocusCurveRecorderProgressUpdate(60.0, "Phase 2 finished.", record);
+  //notifyFocusCurveRecorderProgressUpdate(".", curveRecord);
+
+  bool limitCrossed = false;
+  float focusMeasure = curveRecord->getHfd().getValue();
+  bool initiallyBelow = (focusMeasure < focusMeasureLimit);
+  
+  while(! limitCrossed) {
+
+    LOG(debug)
+      << "DefaultFocusCurveRecorderT::moveUntilFocusMeasureLimitReached..."
+      << "limit " << focusMeasureLimit
+      << " in direction " << FocusDirectionT::asStr(limitFocusDirection)
+      << " not yet reached - (focusMeasure=" << focusMeasure << ")"
+      << ", focus position=" << getFocus()->getCurrentPos() << "..."
+      << ", moving on..." << std::endl;
+
+    moveFocusByBlocking(limitFocusDirection, stepSize, 30000ms);
+
+    curveRecord = measureFocus();
+    focusMeasure = curveRecord->getHfd().getValue();
+    
+    //Notify about FocusCurve recorder update...
+    //notifyFocusCurveRecorderProgressUpdate(60.0, "Phase 2 finished.", record);
+    notifyFocusCurveRecorderProgressUpdate(".", curveRecord);
+
+    limitCrossed = (initiallyBelow ? focusMeasure >= focusMeasureLimit : focusMeasure <= focusMeasureLimit);
+    
+    checkCancelled();
+  }
+  
+  LOG(info)
+    << "DefaultFocusCurveRecorderT::moveUntilFocusMeasureLimitReached..."
+    << "limit " << focusMeasureLimit
+    << " in direction " << FocusDirectionT::asStr(limitFocusDirection)
+    << " reached - (focusMeasure=" << focusMeasure << ")"
+    << ", focus position=" << getFocus()->getCurrentPos() << std::endl;
+}
+
+
+CurveHalfE DefaultFocusCurveRecorderT::locateStartingPosition() {
+  LOG(debug)
+    << "DefaultFocusCurveRecorderT::locateStartingPosition..." << std::endl;
+
+  SelfOrientationResultT selfOrientationResult = performSelfOrientation();
+  
+  // Move close to the limiting focus measure (into the determined direction, in steps of size mStepSize)
+  moveUntilFocusMeasureLimitReached(selfOrientationResult, mStepSize, mFocusMeasureLimit);
+
+  return selfOrientationResult.curveHalf;
+}
+
+
+
+void DefaultFocusCurveRecorderT::recordFocusCurve(CurveHalfE curveHalf) {
+  using namespace std::chrono_literals;
+  
+  LOG(debug)
+    << "DefaultFocusCurveRecorderT::recordFocusCurve..." << std::endl;
+
+  FocusCurveT focusCurve;
+
+  FocusDirectionT::TypeE recordingDirection = (curveHalf == LeftHalf ? FocusDirectionT::OUTWARD : FocusDirectionT::INWARD);
+  
+  LOG(debug) << "We are on the " << (curveHalf == LeftHalf ? "LEFT" : "RIGHT") << " half... -> recording direction=" << FocusDirectionT::asStr(recordingDirection) << std::endl;
+
+  auto curveRecord = measureFocus();
+
+  focusCurve.push_back(curveRecord);
+    
+    
+  do {
+    moveFocusByBlocking(recordingDirection, mStepSize, 30000ms);
+
+    curveRecord = measureFocus();
+    
+    //Notify about FocusCurve recorder update...
+    notifyFocusCurveRecorderProgressUpdate(".", curveRecord);
+
+    focusCurve.push_back(curveRecord);
+    
+    checkCancelled();
+
+    // Just avoid a stop for the first 2 measurements in case the focus measure limit condition may not be true because of noise. 
+  } while(focusCurve.size() < 3 || curveRecord->getHfd().getValue() < mFocusMeasureLimit);
+
+
+  // DEBUG START
+  LOG(debug) << "--- FocusCurve (#" << focusCurve.size() << " data points) ---" << std::endl;
+  
+  for (FocusCurveT::const_iterator it = focusCurve.begin(); it != focusCurve.end(); ++it) {
+    const FocusCurveRecordT & fcr = **it;
+    
+    LOG(debug) << "POS=" << fcr.getCurrentAbsoluteFocusPos()
+	       << ", SNR=" << fcr.getSnr()
+	       << ", HFD=" << fcr.getHfd().getValue()
+	       << ", FWHM(H)=" << fcr.getFwhmHorz().getValue()
+	       << ", FWHM(V)=" << fcr.getFwhmVert().getValue()
+	       << ", STAR DRIFT(dx,dy)=(" << std::get<0>(fcr.getDrift()) << ", " << std::get<1>(fcr.getDrift()) << ")"
+	       << std::endl;
+  }
+  // DEBUG END
+}
+
 
 // NOTE: Callback from camera device, registered in setCamera of base class FocusFinder
-// void DefaultFocusCurveRecorderT::onImageReceived(RectT<unsigned int> roi,
-// 		std::shared_ptr<const ImageT> image, bool lastFrame) {
+void DefaultFocusCurveRecorderT::onImageReceived(RectT<unsigned int> roi,
+		std::shared_ptr<const ImageT> image, bool lastFrame) {
 
-// 	// TODO: Store image.... roi etc...
-// 	mCurrentImage = image;
+  // TODO: Store image.... roi etc...
+  mCurrentImage = image;
 
-// 	cv.notify_all();
-
-// }
+  cv.notify_all();
+}
 
 // TODO: Add binning?
-// void DefaultFocusCurveRecorderT::runExposureBlocking(
-// 		std::chrono::milliseconds expTime) {
+void DefaultFocusCurveRecorderT::runExposureBlocking(
+						     std::chrono::milliseconds expTime) {
 
-// 	using namespace std::chrono_literals;
+  // TODO: Check if getCamera() is set...
+  
+  using namespace std::chrono_literals;
 
-// //	TODO: try catch?
+  // Start exposure
+  getCamera()->setExposureTime(expTime);
+  getCamera()->startExposure();
 
-// 	// Start exposure
-// 	getCamera()->setExposureTime(1000ms);
-// 	getCamera()->startExposure();
+  // Use condition variable to wait for finished exposure.
+  std::unique_lock<std::mutex> lk(cvMutex);
+  cv.wait(lk);
 
-// 	// Use condition variable to wait for finished exposure.
-// 	std::unique_lock<std::mutex> lk(cvMutex);
-// 	cv.wait(lk);
+  // If it was cancelled, throw cancel exception
+  if (mCancelled) {
+    throw FocusCurveRecorderCancelledExceptionT();
+  }
+}
 
-// 	// If it was cancelled, throw cancel exception
-// 	if (mCancelled) {
-// 		throw FocusFinderCancelledExceptionT();
-// 	}
-// }
+void DefaultFocusCurveRecorderT::checkIfStarIsThere(const ImageT & img,
+		float * outSnr) const {
+	float snr = SnrT::calculate(img);
 
-// void DefaultFocusCurveRecorderT::checkIfStarIsThere(const ImageT & img,
-// 		float * outSnr) const {
-// 	float snr = SnrT::calculate(img);
+	LOG(debug)
+	<< "DefaultFocusCurveRecorderT::run - SNR: " << snr << std::endl;
 
-// 	LOG(debug)
-// 	<< "DefaultFocusCurveRecorderT::run - SNR: " << snr << std::endl;
+	if (snr < getFocusFinderProfile().getStarDetectionSnrBoundary()) {
+		LOG(warning)
+		<< "DefaultFocusCurveRecorderT::run - no valid star detected." << std::endl;
 
-// 	if (snr < getFocusFinderProfile().getStarDetectionSnrBoundary()) {
-// 		LOG(warning)
-// 		<< "DefaultFocusCurveRecorderT::run - no valid star detected." << std::endl;
+		// TODO: How to handle? Just cancel? Or repeat? For now we cancel...
+		throw FocusCurveRecorderCancelledExceptionT();
+	}
 
-// 		// TODO: How to handle? Just cancel? Or repeat? For now we cancel...
-// 		throw FocusFinderCancelledExceptionT();
-// 	}
+	if (outSnr != nullptr) {
+		*outSnr = snr;
+	}
+}
 
-// 	if (outSnr != nullptr) {
-// 		*outSnr = snr;
-// 	}
-// }
+void DefaultFocusCurveRecorderT::devicesAvailabilityCheck() {
+  // Check that camera is there
+  if(getCamera() == nullptr) {
+    LOG(error) << "No camera set." << std::endl;
+    throw FocusCurveRecorderFailedExceptionT("No camera set.");
+  }
+  
+  // Check that focus is there
+  if (getFocus() == nullptr) {
+    LOG(error) << "No focus set." << std::endl;
+    throw FocusCurveRecorderFailedExceptionT("No focus set.");
+  }
+}
 
 bool DefaultFocusCurveRecorderT::isRunning() const {
     return mIsRunning.load();
@@ -132,6 +540,7 @@ void DefaultFocusCurveRecorderT::run() {
 
   LOG(debug)
     << "DefaultFocusCurveRecorderT::run..." << std::endl;
+  
 
   try {
   // 	using namespace std::chrono_literals;
@@ -139,20 +548,35 @@ void DefaultFocusCurveRecorderT::run() {
   // 	// TODO: Check that device manager is set
 
   // 	// TODO: filter...
+    
+    // Register on camera
+    // NOTE / TODO: For some reason std::bind did not compile....
+    mCameraExposureFinishedConnection =
+      getCamera()->registerExposureCycleFinishedListener(
+							 boost::bind(&DefaultFocusCurveRecorderT::onImageReceived,
+								     this, _1, _2, _3));
 
-  // 	// TODO: Check that camera is there
-  // 	// TODO: Check that focus is there
-
-  // 	// Register on camera
-  // 	// NOTE / TODO: For some reason std::bind did not compile....
-  // 	mCameraExposureFinishedConnection =
-  // 			getCamera()->registerExposureCycleFinishedListener(
-  // 					boost::bind(&DefaultFocusCurveRecorderT::onImageReceived,
-  // 							this, _1, _2, _3));
-
-  // 	// Notify that focus finder started
+  // Notify that focus finder started
   notifyFocusCurveRecorderStarted();
 
+  devicesAvailabilityCheck();
+
+  
+  mInitialFocusPos = getFocus()->getCurrentPos();
+
+  CurveHalfE curveHalf = locateStartingPosition();
+
+  recordFocusCurve(curveHalf);
+
+  
+  
+
+
+
+
+
+
+  
   // 	// First, only simulate a long delay....
 
   // 	LOG(debug)
@@ -444,17 +868,33 @@ void DefaultFocusCurveRecorderT::run() {
   // 	// Notify that FoFi was finished...
     notifyFocusCurveRecorderFinished(true /*last curve*/);
 
-  // 	focusFinderCleanup();
+    
+    cleanup();
 
-  } catch (FocusCurveRecorderCancelledExceptionT & exc) {
-    //focusFinderCleanup();
 
-  	// TODO: Improve error handling... -> ReportingT?
-  	LOG(warning)
-  	<< "Focus curve recorder was cancelled." << std::endl;
+  } catch (FocusCurveRecorderFailedExceptionT & exc) {
+    // TODO: Improve error handling... -> ReportingT?
+    LOG(warning)
+      << "Focus curve recorder failed." << std::endl;
 
-  	// Notify that FoFi was cancelled...
-  	notifyFocusCurveRecorderCancelled();
+    // TODO: Problem... cleanup also can take time since focus position may be changed... -> introduce additional state "cancelling"?
+    cleanup();
+    
+    // Notify that FocusCurveRecorder was cancelled...
+    // TODO: Introduce notifyFocusCurveRecorderFailed()....
+    notifyFocusCurveRecorderCancelled();    
+  }
+  catch (FocusCurveRecorderCancelledExceptionT & exc) {
+
+    // TODO: Improve error handling... -> ReportingT?
+    LOG(warning)
+      << "Focus curve recorder was cancelled." << std::endl;
+
+    // TODO: Problem... cleanup also can take time since focus position may be changed... -> introduce additional state "cancelling"?
+    cleanup();
+    
+    // Notify that FocusCurveRecorder was cancelled...
+    notifyFocusCurveRecorderCancelled();
   }
     // catch (FocusExceptionT & exc) {
   // 	// TODO: MAybe write one common exception handler for the FoFi here since code repeats!
@@ -469,13 +909,13 @@ void DefaultFocusCurveRecorderT::run() {
   // 	notifyFocusFinderCancelled();
   //}
   catch (TimeoutExceptionT & exc) {
-  // 	focusFinderCleanup();
-
   	// TODO: Improve error handling... -> ReportingT?
   	LOG(error)
   	<< "Hit timeout, unable tu finish curve recording." << std::endl;
 
-  	// Notify that FoFi was cancelled...
+	cleanup();
+
+  	// Notify that curve recorder was cancelled...
   	// TODO: Maybe introduce notifyFocusFinderFailed()...
   	notifyFocusCurveRecorderCancelled();
   }
@@ -483,13 +923,21 @@ void DefaultFocusCurveRecorderT::run() {
   mIsRunning = false;
 }
 
-// void DefaultFocusCurveRecorderT::focusFinderCleanup() {
-// 	LOG(debug)
-// 	<< "DefaultFocusCurveRecorderT::focusFinderCleanup..." << std::endl;
+void DefaultFocusCurveRecorderT::cleanup() {
+  using namespace std::chrono_literals;
 
-// 	getCamera()->unregisterExposureCycleFinishedListener(
-// 			mCameraExposureFinishedConnection);
-// }
+  LOG(debug)
+    << "DefaultFocusCurveRecorderT::cleanup..." << std::endl;
+
+  // In any case move the focus to the initial position (if focus device is still available)
+  try {
+    moveFocusToBlocking(mInitialFocusPos, 30000ms /*timeout*/);
+  } catch (FocusCurveRecorderFailedExceptionT & exc) {
+    LOG(error) << "DefaultFocusCurveRecorderT::cleanup... no focus device set!" << std::endl;
+  }
+
+  getCamera()->unregisterExposureCycleFinishedListener(mCameraExposureFinishedConnection);
+}
 
 void DefaultFocusCurveRecorderT::cancel() {
   mCancelled = true;

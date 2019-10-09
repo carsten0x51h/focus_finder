@@ -3,13 +3,14 @@
 
 // TODO: Inherrit from std::vector????! Or add() ?
 
-FocusCurveT::FocusCurveT() {
+// FocusCurveT::FocusCurveT() {
 
-}
+// }
 
-FocusCurveT::~FocusCurveT() {
+// FocusCurveT::~FocusCurveT() {
 
-}
+// }
+
 
 std::ostream & operator<<(std::ostream & os, const FocusCurveT & focusCurve) {
 	return focusCurve.print(os);

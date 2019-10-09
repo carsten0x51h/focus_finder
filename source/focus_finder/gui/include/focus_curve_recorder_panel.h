@@ -19,6 +19,8 @@
 #include "../../common/include/focus_finder_logic.h"
 #include "../../common/include/focus_curve_recorder.h"
 
+class FocusCurveViewPanelT;
+
 namespace Ui {
     class FocusCurveRecorderPanel;
 }
@@ -47,6 +49,7 @@ public:
 
     signals:
   void focusCurveRecorderStartedSignal();
+  void focusCurveRecorderProgressUpdateSignal(float progress, const QString & msg, std::shared_ptr<FocusCurveRecordT> focusCurveRecord);
   void focusCurveRecorderFinishedSignal(bool lastCurve);
   void focusCurveRecorderCancelledSignal();
 
@@ -67,6 +70,7 @@ private:
 
 
   void onFocusCurveRecorderStarted();
+  void onFocusCurveRecorderProgressUpdate(float progress, const QString & msg, std::shared_ptr<FocusCurveRecordT> focusCurveRecord);
   void onFocusCurveRecorderCancelled();
   void onFocusCurveRecorderFinished(bool isLastCurve);
 
@@ -78,6 +82,8 @@ private:
   std::shared_ptr<TaskExecutorT<FocusCurveRecorderT> > mRecorderExec;
   
   FocusFinderLogicT & mFfl;
+
+  FocusCurveViewPanelT * mFocusCurveViewPanel;
 };
 
 #endif /*SOURCE_FOCUS_FINDER_GUI_INCLUDE_FOCUS_CURVE_RECORDER_PANEL_H_*/

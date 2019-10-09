@@ -10,11 +10,16 @@
 #include "focus.h"
 #include "filter.h"
 
+#include "focus_finder_profile.h"
+
+DEF_Exception(FocusCurveRecorderFailed);
 DEF_Exception(FocusCurveRecorderCancelled);
+
+class FocusCurveRecordT;
 
 class FocusCurveRecorderT {
 private:
-  // Prevent copy of FocusFinder
+  // Prevent copy of FocusCurveRecorder
   FocusCurveRecorderT(const FocusCurveRecorderT &);
   FocusCurveRecorderT & operator=(const FocusCurveRecorderT &);
 
@@ -28,9 +33,16 @@ private:
   typedef boost::signals2::signal<void()> FocusCurveRecorderCancelledListenersT;
   FocusCurveRecorderCancelledListenersT mFocusCurveRecorderCancelledListeners;
 
+  typedef boost::signals2::signal<void(float, std::string, std::shared_ptr<FocusCurveRecordT>)> FocusCurveRecorderProgressUpdateListenersT;
+  FocusCurveRecorderProgressUpdateListenersT mFocusCurveRecorderProgressUpdateListeners;
+  
   std::shared_ptr<CameraT> mCamera;
   std::shared_ptr<FocusT> mFocus;
   std::shared_ptr<FilterT> mFilter;
+
+  PointT<float> mLastFocusStarPos;
+
+  FocusFinderProfileT mFocusFinderProfile;
 
 public:
   FocusCurveRecorderT() :
@@ -69,7 +81,20 @@ public:
     mFilter = filter;
   }
 
+  // TODO: Maybe we find a better name?!
+  void setLastFocusStarPos(PointT<float> lastFocusStarPos) {
+    mLastFocusStarPos = lastFocusStarPos;
+  }
+  PointT<float> getLastFocusStarPos() const {
+    return mLastFocusStarPos;
+  }
 
+  void setFocusFinderProfile(const FocusFinderProfileT & profile) {
+    mFocusFinderProfile = profile;
+  }
+  const FocusFinderProfileT & getFocusFinderProfile() const {
+    return mFocusFinderProfile;
+  }
 
   boost::signals2::connection registerFocusCurveRecorderStartedListener(
 									const FocusCurveRecorderStartedListenersT::slot_type & inCallBack) {
@@ -100,6 +125,16 @@ public:
     inCallBack.disconnect();
   }
 
+  boost::signals2::connection registerFocusCurveRecorderProgressUpdateListener(
+									       const FocusCurveRecorderProgressUpdateListenersT::slot_type & inCallBack) {
+    return mFocusCurveRecorderProgressUpdateListeners.connect(inCallBack);
+  }
+  template<class T> void unregisterFocusCurveRecorderProgressUpdateListener(
+									    const T & inCallBack) {
+    inCallBack.disconnect();
+  }
+
+  
 protected:
   void notifyFocusCurveRecorderStarted() const {
     mFocusCurveRecorderStartedListeners();
@@ -109,6 +144,18 @@ protected:
   }
   void notifyFocusCurveRecorderCancelled() const {
     mFocusCurveRecorderCancelledListeners();
+  }
+
+  
+  void notifyFocusCurveRecorderProgressUpdate(float progress,
+				       const std::string & msg, std::shared_ptr<FocusCurveRecordT> focusCurveRecord = nullptr) const {
+    mFocusCurveRecorderProgressUpdateListeners(progress, msg, focusCurveRecord);
+  }
+  void notifyFocusCurveRecorderProgressUpdate(const std::string & msg, std::shared_ptr<FocusCurveRecordT> focusCurveRecord = nullptr) const {
+    mFocusCurveRecorderProgressUpdateListeners(-1.0F, msg, focusCurveRecord);
+  }
+  void notifyFocusCurveRecorderProgressUpdate(std::shared_ptr<FocusCurveRecordT> focusCurveRecord = nullptr) const {
+    mFocusCurveRecorderProgressUpdateListeners(-1.0F, "", focusCurveRecord);
   }
 
   // TODO: Add update...

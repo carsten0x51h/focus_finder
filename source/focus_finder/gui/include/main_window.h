@@ -20,7 +20,7 @@
 #include "../../common/include/focus_finder_logic.h"
 #include "../../common/include/device_manager.h"
 #include "../../common/include/image.h"
-#include "../../common/include/focus_finder_record.h"
+#include "../../common/include/focus_curve_record.h"
 
 class CameraT;
 class FocusT;
@@ -75,7 +75,7 @@ protected slots:
     void onFocusFinderStarted();
     void onFocusFinderFinished();
     void onFocusFinderCancelled();
-    void onFocusFinderProgressUpdate(float progress, const QString & msg, std::shared_ptr<FocusFinderRecordT> record);
+    void onFocusFinderProgressUpdate(float progress, const QString & msg, std::shared_ptr<FocusCurveRecordT> record);
 
 
 protected:
@@ -267,7 +267,7 @@ signals:
 
 	// Focus finder
 	void focusFinderStartedSignal();
-	void focusFinderProgressUpdateSignal(float progress, const QString & msg, std::shared_ptr<FocusFinderRecordT> record);
+	void focusFinderProgressUpdateSignal(float progress, const QString & msg, std::shared_ptr<FocusCurveRecordT> record);
 	void focusFinderFinishedSignal();
 	void focusFinderCancelledSignal();
 };

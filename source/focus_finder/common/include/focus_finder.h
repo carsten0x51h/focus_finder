@@ -16,7 +16,7 @@
 #include "filter.h"
 #include "focus_finder_profile.h"
 
-class FocusFinderRecordT;
+class FocusCurveRecordT;
 
 // TODO: Question is, if FocusFinder should have a callback for "exposure finished"... actually it should be implemented in sub class....
 //       But problem is, that registering/unregistering the callback needs to be repeated when mCamera changes - setCamera()
@@ -31,7 +31,7 @@ private:
 	typedef boost::signals2::signal<void()> FocusFinderStartedListenersT;
 	FocusFinderStartedListenersT mFocusFinderStartedListeners;
 
-	typedef boost::signals2::signal<void(float, std::string, std::shared_ptr<FocusFinderRecordT>)> FocusFinderProgressUpdateListenersT;
+	typedef boost::signals2::signal<void(float, std::string, std::shared_ptr<FocusCurveRecordT>)> FocusFinderProgressUpdateListenersT;
 	FocusFinderProgressUpdateListenersT mFocusFinderProgressUpdateListeners;
 
 	typedef boost::signals2::signal<void()> FocusFinderFinishedListenersT;
@@ -144,8 +144,8 @@ protected:
 		mFocusFinderStartedListeners();
 	}
 	void notifyFocusFinderProgressUpdate(float progress,
-			const std::string & msg, std::shared_ptr<FocusFinderRecordT> focusFinderRecord = nullptr) const {
-		mFocusFinderProgressUpdateListeners(progress, msg, focusFinderRecord);
+			const std::string & msg, std::shared_ptr<FocusCurveRecordT> focusCurveRecord = nullptr) const {
+		mFocusFinderProgressUpdateListeners(progress, msg, focusCurveRecord);
 	}
 	void notifyFocusFinderFinished() const {
 		mFocusFinderFinishedListeners();

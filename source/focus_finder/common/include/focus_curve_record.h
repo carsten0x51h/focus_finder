@@ -6,7 +6,7 @@
 #include "image.h"
 #include "point.h"
 
-class FocusFinderRecordT {
+class FocusCurveRecordT {
 private:
 	int mCurrentAbsoluteFocusPos;
 	float mSnr;
@@ -19,7 +19,7 @@ private:
 	std::tuple<float, float> mDrift;
 
 public:
-	FocusFinderRecordT(int currentAbsoluteFocusPos, float snr,
+	FocusCurveRecordT(int currentAbsoluteFocusPos, float snr,
 			const FwhmT & fwhmHorz, const FwhmT & fwhmVert, const HfdT & hfd,
 			const ImageT & roiImage, const ImageT & correctedStarImage, const PointFT & absStarCenterPos, const std::tuple<float,float> & drift);
 
@@ -34,7 +34,7 @@ public:
 	const std::tuple<float, float> & getDrift() const;
 
 	std::ostream & print(std::ostream & os) const;
-	friend std::ostream & operator<<(std::ostream & os, const FocusFinderRecordT & record);
+	friend std::ostream & operator<<(std::ostream & os, const FocusCurveRecordT & record);
 };
 
 #endif /*SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FOCUS_FINDER_RECORD_H_*/

@@ -38,7 +38,7 @@
 #include "../common/include/dummy_filter.h"
 #include "../common/include/dummy_device_manager.h"
 #include "../common/include/focus_finder.h"
-#include "../common/include/focus_finder_record.h"
+#include "../common/include/focus_curve_record.h"
 #include "../common/include/task_executor.h"
 #include "../common/include/focus_finder_factory.h"
 #include "../common/include/profile_manager.h"
@@ -51,7 +51,7 @@
 
 
 Q_DECLARE_METATYPE(std::chrono::milliseconds)
-Q_DECLARE_METATYPE(std::shared_ptr<FocusFinderRecordT>)
+Q_DECLARE_METATYPE(std::shared_ptr<FocusCurveRecordT>)
 
 using namespace std::chrono_literals;
 
@@ -161,12 +161,12 @@ void MainWindow::onStartFocusFinderPressed() {
 			emit focusFinderStartedSignal();
 		});
 
-		qRegisterMetaType < std::shared_ptr<FocusFinderRecordT> > ("FocusFinderRecordPtrT");
+		qRegisterMetaType < std::shared_ptr<FocusCurveRecordT> > ("FocusCurveRecordPtrT");
 
 
 		// FoFi running / status update
 		focusFinder->registerFocusFinderProgressUpdateListener(
-				[&](float progress, const std::string & msg, std::shared_ptr<FocusFinderRecordT> record) {
+				[&](float progress, const std::string & msg, std::shared_ptr<FocusCurveRecordT> record) {
 					emit focusFinderProgressUpdateSignal(progress, QString::fromStdString(msg), record);
 				});
 
@@ -1149,7 +1149,7 @@ void MainWindow::onFocusFinderCancelled() {
 }
 
 void MainWindow::onFocusFinderProgressUpdate(float progress,
-		const QString & msg, std::shared_ptr<FocusFinderRecordT> record) {
+		const QString & msg, std::shared_ptr<FocusCurveRecordT> record) {
 
 	LOG(debug)
 			<< "MainWindow::onFocusFinderProgressUpdate(progress=" << progress

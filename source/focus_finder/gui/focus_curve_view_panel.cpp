@@ -56,3 +56,8 @@ void FocusCurveViewPanelT::setFocusCurve(const FocusCurveT & focusCurve) {
 //
 //	m_ui->lblHfdValue->setText(QString::fromStdString(text));
 }
+
+void FocusCurveViewPanelT::addFocusCurveRecord(std::shared_ptr<FocusCurveRecordT> focusCurveRecord) {
+  mFocusCurveWidget->addFocusCurveRecord(focusCurveRecord);
+}
+

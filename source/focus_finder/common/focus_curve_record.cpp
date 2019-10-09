@@ -1,10 +1,10 @@
-#include "include/focus_finder_record.h"
+#include "include/focus_curve_record.h"
 #include "include/fwhm.h"
 #include "include/hfd.h"
 #include "include/image.h"
 #include "include/point.h"
 
-FocusFinderRecordT::FocusFinderRecordT(int currentAbsoluteFocusPos, float snr,
+FocusCurveRecordT::FocusCurveRecordT(int currentAbsoluteFocusPos, float snr,
 		const FwhmT & fwhmHorz, const FwhmT & fwhmVert, const HfdT & hfd,
 		const ImageT & roiImage, const ImageT & correctedStarImage,
 		const PointFT & absStarCenterPos, const std::tuple<float,float> & drift) :
@@ -13,36 +13,36 @@ FocusFinderRecordT::FocusFinderRecordT(int currentAbsoluteFocusPos, float snr,
 				correctedStarImage), mAbsStarCenterPos(absStarCenterPos), mDrift(drift) {
 }
 
-int FocusFinderRecordT::getCurrentAbsoluteFocusPos() const {
+int FocusCurveRecordT::getCurrentAbsoluteFocusPos() const {
 	return mCurrentAbsoluteFocusPos;
 }
-float FocusFinderRecordT::getSnr() const {
+float FocusCurveRecordT::getSnr() const {
 	return mSnr;
 }
-const FwhmT & FocusFinderRecordT::getFwhmHorz() const {
+const FwhmT & FocusCurveRecordT::getFwhmHorz() const {
 	return mFwhmHorz;
 }
-const FwhmT & FocusFinderRecordT::getFwhmVert() const {
+const FwhmT & FocusCurveRecordT::getFwhmVert() const {
 	return mFwhmVert;
 }
-const HfdT & FocusFinderRecordT::getHfd() const {
+const HfdT & FocusCurveRecordT::getHfd() const {
 	return mHfd;
 }
-const ImageT & FocusFinderRecordT::getRoiImage() const {
+const ImageT & FocusCurveRecordT::getRoiImage() const {
 	return mRoiImage;
 }
-const ImageT & FocusFinderRecordT::getCorrectedStarImage() const {
+const ImageT & FocusCurveRecordT::getCorrectedStarImage() const {
 	return mCorrectedStarImage;
 }
-const PointFT & FocusFinderRecordT::getAbsStarCenterPos() const {
+const PointFT & FocusCurveRecordT::getAbsStarCenterPos() const {
 	return mAbsStarCenterPos;
 }
-const std::tuple<float, float> & FocusFinderRecordT::getDrift() const {
+const std::tuple<float, float> & FocusCurveRecordT::getDrift() const {
 	return mDrift;
 }
 
 std::ostream &
-FocusFinderRecordT::print(std::ostream & os) const {
+FocusCurveRecordT::print(std::ostream & os) const {
 	os << "Abs focus pos: " << mCurrentAbsoluteFocusPos
 			<< ", SNR: " << mSnr
 			<< ", Drift: " << mDrift << std::endl
@@ -54,6 +54,6 @@ FocusFinderRecordT::print(std::ostream & os) const {
 }
 
 std::ostream & operator<<(std::ostream & os,
-		const FocusFinderRecordT & record) {
+		const FocusCurveRecordT & record) {
 	return record.print(os);
 }

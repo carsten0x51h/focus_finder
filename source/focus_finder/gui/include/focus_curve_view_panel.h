@@ -39,6 +39,7 @@ FocusCurveViewPanelT(QWidget * parent, FocusFinderLogicT & ffl);
 	void reset();
 	void setFocusCurve(const FocusCurveT & focusCurve);
 
+  void addFocusCurveRecord(std::shared_ptr<FocusCurveRecordT> focusCurveRecord);
 signals:
 
 protected slots:

@@ -12,6 +12,7 @@
 #include "../../common/include/focus_curve.h"
 #include "../../common/include/image.h"
 
+class FocusCurveRecordT;
 
 /**
 *  @brief
@@ -35,6 +36,7 @@ public:
 
 	void reset();
 	void setFocusCurve(const FocusCurveT & focusCurve);
+  void addFocusCurveRecord(std::shared_ptr<FocusCurveRecordT> focusCurveRecord);
 
 	void paintEvent(QPaintEvent * event) override;
 
