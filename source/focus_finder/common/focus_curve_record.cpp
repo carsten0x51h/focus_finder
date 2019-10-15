@@ -41,6 +41,27 @@ const std::tuple<float, float> & FocusCurveRecordT::getDrift() const {
 	return mDrift;
 }
 
+float FocusCurveRecordT::getFocusMeasure(std::shared_ptr<FocusCurveRecordT> focusCurveRecord, FocusMeasureTypeT::TypeE focusMeasureType) {
+  float focusMeasure;
+  
+  switch (focusMeasureType) {
+  case FocusMeasureTypeT::HFD:    
+    return focusCurveRecord->getHfd().getValue();
+  case FocusMeasureTypeT::FWHM_VERT:
+    return focusCurveRecord->getFwhmVert().getValue();
+  case FocusMeasureTypeT::FWHM_HORZ:
+    return focusCurveRecord->getFwhmHorz().getValue();
+  default:
+    throw FocusCurveRecordExceptionT("Invalid focus measure type.");
+  }
+  return 0.0;
+}
+
+float FocusCurveRecordT::getFocusMeasure(FocusMeasureTypeT::TypeE focusMeasureType) {
+  return getFocusMeasure(shared_from_this(), focusMeasureType);
+}
+
+
 std::ostream &
 FocusCurveRecordT::print(std::ostream & os) const {
 	os << "Abs focus pos: " << mCurrentAbsoluteFocusPos

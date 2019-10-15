@@ -1,6 +1,7 @@
 #ifndef SOURCE_FOCUS_FINDER_COMMON_INCLUDE_DEFAULT_FOCUS_CURVE_RECORDER_H_
 #define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_DEFAULT_FOCUS_CURVE_RECORDER_H_
 
+#include <list>
 #include <atomic>
 
 #include <thread>
@@ -9,6 +10,8 @@
 #include <boost/signals2.hpp>
 
 #include "focus_curve_recorder.h"
+#include "focus_curve_record_set.h"
+#include "focus_measure_type.h"
 
 
 // TODO / IDEA: Maybe HfdT and FwhmT should both implement a generic inteface "FocusMeasureT" which just hast "float getValue()".
@@ -29,12 +32,12 @@ struct SelfOrientationResultT {
 };
 
 
+
 class DefaultFocusCurveRecorderT: public FocusCurveRecorderT {
 private:
 	// Prevent copy
 	DefaultFocusCurveRecorderT(const DefaultFocusCurveRecorderT &);
 	DefaultFocusCurveRecorderT & operator=(const DefaultFocusCurveRecorderT &);
-
 
   void devicesAvailabilityCheck();
   void cleanup();
@@ -46,9 +49,7 @@ private:
   void moveUntilFocusMeasureLimitReached(const SelfOrientationResultT & selfOrientationResult, float stepSize, float focusMeasureLimit);
   CurveHalfE locateStartingPosition();
   std::shared_ptr<FocusCurveRecordT> measureFocus();
-  void recordFocusCurve(CurveHalfE curveHalf);
-
-  
+  std::shared_ptr<FocusCurveRecordSetT> recordFocusCurveRecordSet(CurveHalfE curveHalf);
   void onImageReceived(RectT<unsigned int> roi,
 		       std::shared_ptr<const ImageT> image, bool lastFrame);
 
@@ -69,17 +70,27 @@ private:
   int mInitialFocusPos;
   int mStepSize;
   float mFocusMeasureLimit;
-  
+
+  std::shared_ptr<FocusCurveRecordSetContainerT> mFocusCurveRecordSets;
+
 public:
 	DefaultFocusCurveRecorderT();
 
+  FocusMeasureTypeT::TypeE getFocusMeasureType() const override;
+  void setFocusMeasureType(FocusMeasureTypeT::TypeE focusMeasureType) override;
+  
 	// Implement focus curve recorder interface
 	std::string getName() const override;
 
     bool isRunning() const override;
     void run() override;
-	void cancel() override;
-	void reset() override;
+  void cancel() override;
+  void reset() override;
+
+  std::shared_ptr<const FocusCurveRecordSetContainerT> getFocusCurveRecordSets() const override;
+
+
+  FocusMeasureTypeT::TypeE mFocusMeasureType;
 };
 
 #endif /*SOURCE_FOCUS_FINDER_COMMON_INCLUDE_DEFAULT_FOCUS_CURVE_RECORDER_H_*/

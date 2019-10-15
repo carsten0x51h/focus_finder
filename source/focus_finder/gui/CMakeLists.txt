@@ -51,9 +51,14 @@ set(sources
   ../common/include/thresholding_algorithm_factory.h
   ../common/thresholding_algorithm_factory.cpp
   ../common/include/star_cluster_algorithm.h
-  ../common/star_cluster_algorithm.cpp  
+  ../common/star_cluster_algorithm.cpp
+  ../common/include/focus_measure_type.h
 	../common/include/focus_curve_record.h
 	../common/focus_curve_record.cpp
+	../common/include/focus_curve_record_set.h
+	../common/focus_curve_record_set.cpp
+	../common/include/focus_curve_recorder_logic.h
+	../common/focus_curve_recorder_logic.cpp
 	../common/include/focus_curve.h
 	../common/focus_curve.cpp
 	../common/include/focus_curve_recorder.h

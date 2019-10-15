@@ -3,6 +3,7 @@
 #include "include/throw_if.h"
 #include "include/lm_fitting_curve_hyperbolic.h"
 #include "include/lm_curve_matcher.h"
+#include "include/math_functions.h"
 
 std::string LmFittingCurveHyperbolicT::getName() const {
 	return "LmFittingCurveHyperbolicT";
@@ -52,7 +53,7 @@ float LmFittingCurveHyperbolicT::fx(float x, const gsl_vector * curveParms) cons
 	float c = gsl_vector_get(curveParms, IdxT::C_IDX);
 	float d = gsl_vector_get(curveParms, IdxT::D_IDX);
 
-	return b * phi(x, a, c) + d;
+	return MathFunctionsT::hyperbolic(x, a, b, c, d);
 }
 
 /* Calculates fitting funtion for H(x) for each data point. */

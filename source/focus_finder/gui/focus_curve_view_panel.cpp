@@ -11,23 +11,21 @@
 
 #include "ui_focus_curve_view_panel.h"
 
-//TODO: Next step: Add in mai_window...
 
-FocusCurveViewPanelT::FocusCurveViewPanelT(QWidget * parent, FocusFinderLogicT & ffl) : QWidget(parent),
-	m_ui(new Ui::FocusCurveViewPanel),
-	mFfl(ffl)
+FocusCurveViewPanelT::FocusCurveViewPanelT(QWidget * parent, std::shared_ptr<FocusCurveRecorderLogicT> focusCurveRecorderLogic) : QWidget(parent),
+							       m_ui(new Ui::FocusCurveViewPanel), mFocusCurveRecorderLogic(focusCurveRecorderLogic)
 {
     // Setup UI
     m_ui->setupUi(this);
 
-	QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-	sizePolicy.setHorizontalStretch(100);
-	sizePolicy.setVerticalStretch(100);
+    QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    sizePolicy.setHorizontalStretch(100);
+    sizePolicy.setVerticalStretch(100);
 
-	mFocusCurveWidget = new FocusCurveViewWidgetT(m_ui->widget);
-	mFocusCurveWidget->setSizePolicy(sizePolicy);
-	m_ui->layFocusCurveViewWidget->addWidget(mFocusCurveWidget, 0/*row*/, 0/*col*/, 1/*rowspan*/, 1/*colspan*/);
-
+    mFocusCurveWidget = new FocusCurveViewWidgetT(m_ui->widget, mFocusCurveRecorderLogic);
+    mFocusCurveWidget->setSizePolicy(sizePolicy);
+    m_ui->layFocusCurveViewWidget->addWidget(mFocusCurveWidget, 0/*row*/, 0/*col*/, 1/*rowspan*/, 1/*colspan*/);
+    
     reset();
 }
 
@@ -38,26 +36,34 @@ FocusCurveViewPanelT::~FocusCurveViewPanelT()
 }
 
 void FocusCurveViewPanelT::reset() {
-	mFocusCurveWidget->reset();
+  mFocusCurveWidget->reset();
 }
 
-void FocusCurveViewPanelT::setFocusCurve(const FocusCurveT & focusCurve) {
-	LOG(debug) << "FocusCurveViewPanelT::setFocusCurve..." << std::endl;
-
-	mFocusCurveWidget->setFocusCurve(focusCurve);
-
-//	std::string text = "-";
-//	if (hfd.valid()) {
-//		std::ostringstream oss;
-//		oss.precision(4);
-//		oss << hfd.getValue();
-//		text = oss.str();
-//	}
-//
-//	m_ui->lblHfdValue->setText(QString::fromStdString(text));
+void FocusCurveViewPanelT::update() {
+  mFocusCurveWidget->update();
 }
 
-void FocusCurveViewPanelT::addFocusCurveRecord(std::shared_ptr<FocusCurveRecordT> focusCurveRecord) {
-  mFocusCurveWidget->addFocusCurveRecord(focusCurveRecord);
+FocusMeasureTypeT::TypeE FocusCurveViewPanelT::getFocusMeasureType() const {
+  return mFocusCurveWidget->getFocusMeasureType();
 }
+
+void FocusCurveViewPanelT::setFocusMeasureType(FocusMeasureTypeT::TypeE focusMeasureType) {
+  mFocusCurveWidget->setFocusMeasureType(focusMeasureType);
+}
+
+// void FocusCurveViewPanelT::setFocusCurve(std::shared_ptr<const FocusCurveT> focusCurve) {
+// 	LOG(debug) << "FocusCurveViewPanelT::setFocusCurve..." << std::endl;
+
+// 	mFocusCurveWidget->setFocusCurve(focusCurve);
+
+// //	std::string text = "-";
+// //	if (hfd.valid()) {
+// //		std::ostringstream oss;
+// //		oss.precision(4);
+// //		oss << hfd.getValue();
+// //		text = oss.str();
+// //	}
+// //
+// //	m_ui->lblHfdValue->setText(QString::fromStdString(text));
+// }
 

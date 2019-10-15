@@ -20,6 +20,7 @@ class ProfileManagerT;
 class MapperFunctionT;
 class ImageConverter16To8T;
 class FocusFinderT;
+class FocusCurveRecorderLogicT;
 
 class FocusFinderLogicT
 {
@@ -54,6 +55,9 @@ public:
 
 	std::optional<PointT<float> > getLastFocusStarPos() const;
 
+  std::shared_ptr<FocusCurveRecorderLogicT> getFocusCurveRecorderLogic();
+
+  
 private:
   size_t calcNumStarsInRegion(const ImageT & inImg) const;
 	void initImageMappers();
@@ -82,6 +86,8 @@ private:
 	std::shared_ptr<TaskExecutorT<FocusFinderT> > mFocusFinderExecutor;
 
 	std::optional<PointT<float> > mLastFocusStarPos;
+
+  std::shared_ptr<FocusCurveRecorderLogicT> mFocusCurveRecorderLogic;
 };
 
 #endif /* SOURCE_FOCUS_FINDER_COMMON_FOCUS_FINDER_LOGIC_H_ */

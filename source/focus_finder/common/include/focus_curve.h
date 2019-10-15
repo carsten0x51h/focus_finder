@@ -1,17 +1,10 @@
 #ifndef SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FOCUS_CURVE_H_
 #define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FOCUS_CURVE_H_
 
-#include <memory>
 #include <fstream>
-#include <vector>
 
-#include "focus_curve_record.h"
-#include "image.h"
-#include "point.h"
-
-class FocusCurveT : public std::vector< std::shared_ptr<FocusCurveRecordT> > {
+class FocusCurveT {
 private:
-  //	std::vector< std::shared_ptr<FocusCurveRecordT> > mFocusCheckpoints;
 
 public:
   //	FocusCurveT();

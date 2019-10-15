@@ -2,17 +2,21 @@
 #define SOURCE_FOCUS_FINDER_GUI_INCLUDE_FOCUS_CURVE_VIEW_WIDGET_H_
 
 // std includes
+#include <memory>
 
 // Qt includes
-#include <QWidget>
+//#include <QWidget>
 #include <QPixmap>
 #include <QLabel>
+#include <QPoint>
 #include <QPaintEvent>
 
-#include "../../common/include/focus_curve.h"
 #include "../../common/include/image.h"
+#include "../../common/include/focus_measure_type.h"
 
 class FocusCurveRecordT;
+class FocusCurveRecordSetT;
+class FocusCurveRecorderLogicT;
 
 /**
 *  @brief
@@ -26,7 +30,7 @@ public:
     *  @brief
     *    Constructor
     */
-	FocusCurveViewWidgetT(QWidget * parent);
+	FocusCurveViewWidgetT(QWidget * parent, std::shared_ptr<FocusCurveRecorderLogicT> focusCurveRecorderLogic);
 
     /**
     *  @brief
@@ -34,12 +38,18 @@ public:
     */
     virtual ~FocusCurveViewWidgetT();
 
-	void reset();
-	void setFocusCurve(const FocusCurveT & focusCurve);
-  void addFocusCurveRecord(std::shared_ptr<FocusCurveRecordT> focusCurveRecord);
+  void reset();
+  //void setFocusCurve(std::shared_ptr<const FocusCurveT> focusCurve);
+  void update();
 
-	void paintEvent(QPaintEvent * event) override;
+  FocusMeasureTypeT::TypeE getFocusMeasureType() const;
+  void setFocusMeasureType(FocusMeasureTypeT::TypeE focusMeasureType);
+  
+  void paintEvent(QPaintEvent * event) override;
+  void mouseMoveEvent(QMouseEvent * event);
 
+
+  
 signals:
 
 protected slots:
@@ -47,7 +57,13 @@ protected slots:
 protected:
 
 private:
-	FocusCurveT mFocusCurve;
+  void drawFocusCurveRecordSet(QPainter * p, std::shared_ptr<FocusCurveRecordSetT> focusCurveRecordSet);
+  void drawFocusCurveRecordSets(QPainter * p);
+
+  std::shared_ptr<FocusCurveRecorderLogicT> mFocusCurveRecorderLogic;
+  
+  QPoint mLastMousePos;
+  FocusMeasureTypeT::TypeE mFocusMeasureType;
 };
 
 #endif /*SOURCE_FOCUS_FINDER_GUI_INCLUDE_FOCUS_CURVE_VIEW_WIDGET_H_*/

@@ -23,6 +23,7 @@
 #include "include/image_converter_16to8.h"
 #include "include/focus_finder.h"
 #include "include/task_executor.h"
+#include "include/focus_curve_recorder_logic.h"
 
 FocusFinderLogicT::FocusFinderLogicT() :
 	mCameraDevice(nullptr)
@@ -94,6 +95,9 @@ FocusFinderLogicT::FocusFinderLogicT() :
 
 	// Init the foocus finder executor
 	mFocusFinderExecutor = std::make_shared<TaskExecutorT<FocusFinderT> >();
+
+	// Create the FocusCurveRecorderLogic
+	mFocusCurveRecorderLogic = std::make_shared<FocusCurveRecorderLogicT>(*this);
 }
 
 FocusFinderLogicT::~FocusFinderLogicT() {
@@ -359,6 +363,10 @@ std::optional<PointT<float> > FocusFinderLogicT::findFocusStar(
 
 std::optional<PointT<float> > FocusFinderLogicT::getLastFocusStarPos() const {
 	return mLastFocusStarPos;
+}
+
+std::shared_ptr<FocusCurveRecorderLogicT> FocusFinderLogicT::getFocusCurveRecorderLogic() {
+  return mFocusCurveRecorderLogic;
 }
 
 const FrameT & FocusFinderLogicT::getLastFrame() const {

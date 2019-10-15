@@ -1,5 +1,6 @@
-#include <thread> // TODO: Remove - only temporary
 #include <chrono>
+
+#include <boost/bind.hpp>
 
 #include "include/default_focus_curve_recorder.h"
 #include "include/logging.h"
@@ -11,13 +12,19 @@
 #include "include/hfd.h"
 #include "include/fwhm.h"
 #include "include/image_slicer.h"
+#include "include/focus_measure_type.h"
 #include "include/focus_curve_record.h"
 #include "include/focus_curve_record_builder.h"
-#include "include/focus_curve.h"
+#include "include/focus_curve_record_set.h"
+#include "include/curve_fit_algorithm.h"
+#include "include/curve_parms.h"
+#include "include/point.h"
+#include "include/point_with_residual.h"
 
 #include "include/camera.h"
 #include "include/focus.h"
 #include "include/filter.h"
+
 
 DefaultFocusCurveRecorderT::DefaultFocusCurveRecorderT() :
   mCancelled(false),
@@ -27,6 +34,22 @@ DefaultFocusCurveRecorderT::DefaultFocusCurveRecorderT() :
   mFocusMeasureLimit(12.0F) {
   LOG(debug)
     << "DefaultFocusCurveRecorderT::DefaultFocusCurveRecorderT..." << std::endl;
+
+  mFocusCurveRecordSets = std::make_shared<FocusCurveRecordSetContainerT>();
+}
+
+
+FocusMeasureTypeT::TypeE DefaultFocusCurveRecorderT::getFocusMeasureType() const {
+  return mFocusMeasureType;
+}
+
+void DefaultFocusCurveRecorderT::setFocusMeasureType(FocusMeasureTypeT::TypeE focusMeasureType) {
+  // Do no allow to set this while it is running
+  if (mIsRunning.load()) {
+    throw FocusCurveRecorderExceptionT("Unable to set focus measure type while recording.");
+  }
+  
+  mFocusMeasureType = focusMeasureType;
 }
 
 std::string DefaultFocusCurveRecorderT::getName() const {
@@ -38,6 +61,8 @@ void DefaultFocusCurveRecorderT::reset() {
 	// TODO: What happens if called while running? -> Exception?
 	LOG(debug)
 	<< "DefaultFocusCurveRecorderT::reset..." << std::endl;
+
+	mFocusCurveRecordSets->clear();
 
 	mInitialFocusPos = getFocus()->getCurrentPos(); // TODO: Ok? What if no focus set?
 }
@@ -308,7 +333,7 @@ SelfOrientationResultT DefaultFocusCurveRecorderT::performSelfOrientation() {
   selfOrientationResult.record1 = measureFocus();
   //Notify about FocusCurve recorder update...
   //notifyFocusCurveRecorderProgressUpdate(60.0, "Phase 2 finished.", record);
-  notifyFocusCurveRecorderProgressUpdate(".", selfOrientationResult.record1);
+  notifyFocusCurveRecorderNewRecord(selfOrientationResult.record1);
 
   // TODO: Should this be configurable?
   const float STEP_FACTOR = 3.0F;
@@ -318,10 +343,13 @@ SelfOrientationResultT DefaultFocusCurveRecorderT::performSelfOrientation() {
   selfOrientationResult.record2 = measureFocus();
   //Notify about FocusCurve recorder update...
   //notifyFocusCurveRecorderProgressUpdate(60.0, "Phase 2 finished.", record);
-  notifyFocusCurveRecorderProgressUpdate(".", selfOrientationResult.record2);
+  notifyFocusCurveRecorderNewRecord(selfOrientationResult.record2);
 
-  float focusMeasure1 = selfOrientationResult.record1->getHfd().getValue();
-  float focusMeasure2 = selfOrientationResult.record2->getHfd().getValue();
+  
+  
+  
+  float focusMeasure1 = selfOrientationResult.record1->getFocusMeasure(mFocusMeasureType);
+  float focusMeasure2 = selfOrientationResult.record2->getFocusMeasure(mFocusMeasureType);
   
   // TODO: Should a minimum difference be required?
   bool aboveFocusMeasureLimit = (focusMeasure2 > mFocusMeasureLimit);
@@ -364,7 +392,7 @@ void DefaultFocusCurveRecorderT::moveUntilFocusMeasureLimitReached(const SelfOri
   //notifyFocusCurveRecorderProgressUpdate(".", curveRecord);
 
   bool limitCrossed = false;
-  float focusMeasure = curveRecord->getHfd().getValue();
+  float focusMeasure = curveRecord->getFocusMeasure(mFocusMeasureType);
   bool initiallyBelow = (focusMeasure < focusMeasureLimit);
   
   while(! limitCrossed) {
@@ -380,11 +408,11 @@ void DefaultFocusCurveRecorderT::moveUntilFocusMeasureLimitReached(const SelfOri
     moveFocusByBlocking(limitFocusDirection, stepSize, 30000ms);
 
     curveRecord = measureFocus();
-    focusMeasure = curveRecord->getHfd().getValue();
+    focusMeasure = curveRecord->getFocusMeasure(mFocusMeasureType);
     
     //Notify about FocusCurve recorder update...
     //notifyFocusCurveRecorderProgressUpdate(60.0, "Phase 2 finished.", record);
-    notifyFocusCurveRecorderProgressUpdate(".", curveRecord);
+    notifyFocusCurveRecorderNewRecord(curveRecord);
 
     limitCrossed = (initiallyBelow ? focusMeasure >= focusMeasureLimit : focusMeasure <= focusMeasureLimit);
     
@@ -414,54 +442,46 @@ CurveHalfE DefaultFocusCurveRecorderT::locateStartingPosition() {
 
 
 
-void DefaultFocusCurveRecorderT::recordFocusCurve(CurveHalfE curveHalf) {
+std::shared_ptr<FocusCurveRecordSetT> DefaultFocusCurveRecorderT::recordFocusCurveRecordSet(CurveHalfE curveHalf) {
   using namespace std::chrono_literals;
   
   LOG(debug)
-    << "DefaultFocusCurveRecorderT::recordFocusCurve..." << std::endl;
+    << "DefaultFocusCurveRecorderT::recordFocusCheckpoints..." << std::endl;
 
-  FocusCurveT focusCurve;
+  auto focusCurveRecordSet = std::make_shared<FocusCurveRecordSetT>();
 
+  // Store recorded focus curve record set
+  mFocusCurveRecordSets->push_back(focusCurveRecordSet);
+
+  
   FocusDirectionT::TypeE recordingDirection = (curveHalf == LeftHalf ? FocusDirectionT::OUTWARD : FocusDirectionT::INWARD);
   
   LOG(debug) << "We are on the " << (curveHalf == LeftHalf ? "LEFT" : "RIGHT") << " half... -> recording direction=" << FocusDirectionT::asStr(recordingDirection) << std::endl;
 
   auto curveRecord = measureFocus();
 
-  focusCurve.push_back(curveRecord);
+  focusCurveRecordSet->push_back(curveRecord);
     
-    
+    // Notify about FocusCurve recorder update...
+    notifyFocusCurveRecorderRecordSetUpdate(focusCurveRecordSet);
   do {
     moveFocusByBlocking(recordingDirection, mStepSize, 30000ms);
 
     curveRecord = measureFocus();
     
-    //Notify about FocusCurve recorder update...
-    notifyFocusCurveRecorderProgressUpdate(".", curveRecord);
+    focusCurveRecordSet->push_back(curveRecord);
 
-    focusCurve.push_back(curveRecord);
-    
+    // Notify about FocusCurve recorder update...
+    notifyFocusCurveRecorderRecordSetUpdate(focusCurveRecordSet);
+
     checkCancelled();
 
     // Just avoid a stop for the first 2 measurements in case the focus measure limit condition may not be true because of noise. 
-  } while(focusCurve.size() < 3 || curveRecord->getHfd().getValue() < mFocusMeasureLimit);
+  } while(focusCurveRecordSet->size() < 3 || curveRecord->getFocusMeasure(mFocusMeasureType) < mFocusMeasureLimit);
 
+  LOG(debug) << *focusCurveRecordSet << std::endl;
 
-  // DEBUG START
-  LOG(debug) << "--- FocusCurve (#" << focusCurve.size() << " data points) ---" << std::endl;
-  
-  for (FocusCurveT::const_iterator it = focusCurve.begin(); it != focusCurve.end(); ++it) {
-    const FocusCurveRecordT & fcr = **it;
-    
-    LOG(debug) << "POS=" << fcr.getCurrentAbsoluteFocusPos()
-	       << ", SNR=" << fcr.getSnr()
-	       << ", HFD=" << fcr.getHfd().getValue()
-	       << ", FWHM(H)=" << fcr.getFwhmHorz().getValue()
-	       << ", FWHM(V)=" << fcr.getFwhmVert().getValue()
-	       << ", STAR DRIFT(dx,dy)=(" << std::get<0>(fcr.getDrift()) << ", " << std::get<1>(fcr.getDrift()) << ")"
-	       << std::endl;
-  }
-  // DEBUG END
+  return focusCurveRecordSet;
 }
 
 
@@ -517,6 +537,7 @@ void DefaultFocusCurveRecorderT::checkIfStarIsThere(const ImageT & img,
 	}
 }
 
+
 void DefaultFocusCurveRecorderT::devicesAvailabilityCheck() {
   // Check that camera is there
   if(getCamera() == nullptr) {
@@ -566,14 +587,13 @@ void DefaultFocusCurveRecorderT::run() {
 
   CurveHalfE curveHalf = locateStartingPosition();
 
-  recordFocusCurve(curveHalf);
-
-  
-  
-
+// while() {
+  // TODO: Need loop to record multiple focus curve record sets...
+  auto focusCurveRecordSet = recordFocusCurveRecordSet(curveHalf); // std::shared_ptr<FocusCurveRecordSetT>
 
 
-
+  notifyFocusCurveRecorderRecordSetFinished(focusCurveRecordSet);
+//}
 
 
   
@@ -791,12 +811,6 @@ void DefaultFocusCurveRecorderT::run() {
 
 
 
-    using namespace std::chrono_literals;
-    std::this_thread::sleep_for(2s);
-
-
-
-
 
 
 
@@ -865,8 +879,8 @@ void DefaultFocusCurveRecorderT::run() {
   // 	// Notify about FoFi update...
   // 	notifyFocusFinderProgressUpdate(100.0, "Phase 3 finished.");
 
-  // 	// Notify that FoFi was finished...
-    notifyFocusCurveRecorderFinished(true /*last curve*/);
+  // 	// Notify that curve recorder is finished...
+  notifyFocusCurveRecorderFinished(mFocusCurveRecordSets);
 
     
     cleanup();
@@ -919,6 +933,13 @@ void DefaultFocusCurveRecorderT::run() {
   	// TODO: Maybe introduce notifyFocusFinderFailed()...
   	notifyFocusCurveRecorderCancelled();
   }
+  catch(CurveFitExceptionT & exc) {
+    // TODO: This should be catched already earlier and should not cancel the entire FocusCurveRecorder
+    LOG(warning)
+      << "Matching the focus curve failed." << std::endl;
+    
+    cleanup();
+  }
 	
   mIsRunning = false;
 }
@@ -944,3 +965,6 @@ void DefaultFocusCurveRecorderT::cancel() {
   cv.notify_all();
 }
 
+std::shared_ptr<const FocusCurveRecordSetContainerT> DefaultFocusCurveRecorderT::getFocusCurveRecordSets() const {
+  return mFocusCurveRecordSets;
+}

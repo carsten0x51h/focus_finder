@@ -4,6 +4,7 @@
 #include "include/throw_if.h"
 #include "include/lm_fitting_curve_parabolic.h"
 #include "include/lm_curve_matcher.h"
+#include "include/math_functions.h"
 
 std::string LmFittingCurveParabolicT::getName() const {
 	return "LmFittingCurveParabolicT";
@@ -66,8 +67,8 @@ float LmFittingCurveParabolicT::fx(float x, const gsl_vector * curveParms) const
 	float a = gsl_vector_get(curveParms, IdxT::A_IDX);
 	float b = gsl_vector_get(curveParms, IdxT::B_IDX);
 	float c = gsl_vector_get(curveParms, IdxT::C_IDX);
-	float x2 = x * x;
-	return (a * x2 + b * x + c);
+
+	return MathFunctionsT::parabolic(x, a, b, c);
 }
 
 /* Calculates f(x) = a*x^2 + b*x + c for each data point */

@@ -35,8 +35,6 @@ class ManageDeviceProfilesDialogT;
 class AboutDialogT;
 class ReportingViewerPanelT;
 
-class FocusCurveViewPanelT;
-
 namespace Ui {
     class MainWindow;
 }
@@ -112,7 +110,6 @@ private:
 	void createFwhmViewPanels();
     void createFocusFinderMainMenuBar();
   	void createStatusBar();
-  	void createFocusCurveViewPanel();
   	void createAboutDialog();
 
   	void updateCameraDevice();
@@ -175,8 +172,6 @@ private:
 	HfdViewPanelT * mHfdViewPanel;
 	FwhmViewPanelT * mFwhmHorzViewPanel;
 	FwhmViewPanelT * mFwhmVertViewPanel;
-
-	FocusCurveViewPanelT * mFocusCurveViewPanel;
 
 	AboutDialogT * mAboutDialog;
 

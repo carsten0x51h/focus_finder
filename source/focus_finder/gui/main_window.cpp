@@ -39,6 +39,7 @@
 #include "../common/include/dummy_device_manager.h"
 #include "../common/include/focus_finder.h"
 #include "../common/include/focus_curve_record.h"
+#include "../common/include/focus_curve_record_set.h" // TODO: Required?
 #include "../common/include/task_executor.h"
 #include "../common/include/focus_finder_factory.h"
 #include "../common/include/profile_manager.h"
@@ -52,6 +53,7 @@
 
 Q_DECLARE_METATYPE(std::chrono::milliseconds)
 Q_DECLARE_METATYPE(std::shared_ptr<FocusCurveRecordT>)
+Q_DECLARE_METATYPE(std::shared_ptr<const FocusCurveRecordSetContainerT>)
 
 using namespace std::chrono_literals;
 
@@ -162,6 +164,11 @@ void MainWindow::onStartFocusFinderPressed() {
 		});
 
 		qRegisterMetaType < std::shared_ptr<FocusCurveRecordT> > ("FocusCurveRecordPtrT");
+
+		// HACK: Move up!?
+		// qRegisterMetaType < std::shared_ptr<FocusCurveRecordSetT> > ("FocusCurveRecordSetPtrT");
+		// TODO / FIXME: For some reason the following line is required HERE - it is not sufficient to use the MACRO above. Furthermore it is not sufficient to register this type in the focus_curve_recorder_panel...
+    qRegisterMetaType < std::shared_ptr<const FocusCurveRecordSetContainerT> > ("FocusCurveRecordSetContainerPtrT");
 
 
 		// FoFi running / status update
@@ -338,22 +345,6 @@ void MainWindow::createFwhmViewPanels() {
 		addDockWidget(Qt::RightDockWidgetArea, dock);
 		m_ui->viewMenu->addAction(dock->toggleViewAction());
 	}
-}
-
-// TODO: The FocusCurveViewPanel will be removed from MainWindow, probably - it is just here for test purposes...
-void MainWindow::createFocusCurveViewPanel() {
-	QDockWidget *dock = new QDockWidget(tr("Focus Curve View"), this); // TODO: Cleanup
-	dock->setAllowedAreas(Qt::RightDockWidgetArea);
-
-	mFocusCurveViewPanel = new FocusCurveViewPanelT(dock, mFfl);
-
-	// See https://www.qtcentre.org/threads/64634-Add-QWidget-to-QDockWidget
-	dock->setWidget(mFocusCurveViewPanel);
-
-	dock->setMinimumSize(mFocusCurveViewPanel->minimumSize());
-
-	addDockWidget(Qt::RightDockWidgetArea, dock);
-	m_ui->viewMenu->addAction(dock->toggleViewAction());
 }
 
 
@@ -1182,7 +1173,7 @@ void MainWindow::onRecalibrationPressed() {
     containerDialog->setWindowTitle(tr("Focus Curve Recorder"));
     containerDialog->setModal(true);
 
-    FocusCurveRecorderPanelT * focusCurveRecorderPanel = new FocusCurveRecorderPanelT(containerDialog, mFfl);
+    FocusCurveRecorderPanelT * focusCurveRecorderPanel = new FocusCurveRecorderPanelT(containerDialog, mFfl.getFocusCurveRecorderLogic());
     containerDialog->setMinimumSize(focusCurveRecorderPanel->minimumSize());
     gridLayout->addWidget(focusCurveRecorderPanel, 0, 0, 1, 1);
 
@@ -1566,8 +1557,6 @@ MainWindow::MainWindow() :
 	createStatusBar();
 	createAboutDialog();
 
-	createFocusCurveViewPanel();
-
 	updateProfile();
 }
 
@@ -1594,8 +1583,6 @@ MainWindow::~MainWindow() {
 	delete mImageViewerPanel;
 	delete mImageConverterPanel;
 	delete mReportingViewerPanel;
-
-	delete mFocusCurveViewPanel;
 
 	delete mAboutDialog;
 }

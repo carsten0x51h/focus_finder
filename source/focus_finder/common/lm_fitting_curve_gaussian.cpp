@@ -1,6 +1,7 @@
 #include <vector>
 #include <math.h>
 
+#include "include/math_functions.h"
 #include "include/throw_if.h"
 #include "include/logging.h"
 #include "include/lm_fitting_curve_gaussian.h"
@@ -52,9 +53,8 @@ float LmFittingCurveGaussianT::fx(float x, const gsl_vector * curveParms) const 
 	float p = gsl_vector_get(curveParms, IdxT::P_IDX);
 	float c = gsl_vector_get(curveParms, IdxT::C_IDX);
 	float w = gsl_vector_get(curveParms, IdxT::W_IDX);
-	float t = ((x - c) / w);
-	t *= t;
-	return (b + p * exp(-0.5f * t));
+
+	return MathFunctionsT::gaussian(x, b, p, c, w);
 }
 
 

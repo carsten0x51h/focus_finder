@@ -12,60 +12,100 @@
 
 #include "../common/include/logging.h"
 #include "../common/include/image.h"
+#include "../common/include/focus_curve_record_set.h"
+#include "../common/include/focus_curve_recorder_logic.h"
+#include "../common/include/focus_measure_type.h"
 
-
-FocusCurveViewWidgetT::FocusCurveViewWidgetT(QWidget * parent) : QLabel(parent)
+FocusCurveViewWidgetT::FocusCurveViewWidgetT(QWidget * parent, std::shared_ptr<FocusCurveRecorderLogicT> focusCurveRecorderLogic) : QLabel(parent), mFocusCurveRecorderLogic(focusCurveRecorderLogic), mFocusMeasureType(FocusMeasureTypeT::HFD)
 {
-
-	QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-	sizePolicy.setHorizontalStretch(100);
-	sizePolicy.setVerticalStretch(100);
-
-	setSizePolicy(sizePolicy);
-
-    reset();
+  QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+  sizePolicy.setHorizontalStretch(100);
+  sizePolicy.setVerticalStretch(100);
+  
+  setSizePolicy(sizePolicy);
+  
+  setMouseTracking(true);
+  
+  reset();
 }
 
 FocusCurveViewWidgetT::~FocusCurveViewWidgetT()
 {
 }
+void FocusCurveViewWidgetT::drawFocusCurveRecordSet(QPainter * p, std::shared_ptr<FocusCurveRecordSetT> focusCurveRecordSet) {
 
-void FocusCurveViewWidgetT::paintEvent(QPaintEvent * event) {
-	LOG(debug) << "FocusCurveViewWidgetT::paintEvent..." << std::endl;
+  // Min / max focus positions
+  int minFocusPos = 0; // TODO...
+  int maxFocusPos = 80000; // TODO...
+  int deltaFocusPos = maxFocusPos - minFocusPos;
 
-	QPainter p(this);
-
-	// Min / max focus positions
-	int minFocusPos = 0; // TODO...
-	int maxFocusPos = 80000; // TODO...
-	int deltaFocusPos = maxFocusPos - minFocusPos;
-
-	float minFocusMeasure = 0; // TODO
-	float maxFocusMeasure = 20; // TODO
-	float deltaFocusMeasure = maxFocusMeasure - minFocusMeasure;
-
-	// TODO: Make the view widget to allow multiple "curves"? HFD, FWHN etc...
-
-	
-	// HACK... TODO: Just for test
-	for (FocusCurveT::const_iterator it = mFocusCurve.begin(); it != mFocusCurve.end(); ++it) {
+  float minFocusMeasure = 0; // TODO
+  float maxFocusMeasure = 20; // TODO
+  float deltaFocusMeasure = maxFocusMeasure - minFocusMeasure;
+  
+  for (FocusCurveRecordSetT::const_iterator it = focusCurveRecordSet->begin(); it != focusCurveRecordSet->end(); ++it) {
 
 	  auto fcr = *it;
 
 	  float focusPos = fcr->getCurrentAbsoluteFocusPos();
-	  float focusMeasure = fcr->getFwhmHorz().getValue(); // TODO...
+	  float focusMeasure = fcr->getFocusMeasure(mFocusMeasureType);
 	    
 	  // Transform coordinates
 	  float xpos = (focusPos / (float) deltaFocusPos) * width();
 	  float ypos = (1.0f - (focusMeasure / deltaFocusMeasure)) * height();
 
-	  LOG(debug) << "FocusCurveViewWidgetT::paintEvent... focusPos=" << focusPos << ", width=" << width() << ", draw point (x, y)=" << xpos << ", " << ypos << ")." << std::endl;
+	  LOG(debug) << "FocusCurveViewWidgetT::drawFocusCurveRecordSet... focusPos=" << focusPos << ", width=" << width() << ", draw point (x, y)=" << xpos << ", " << ypos << ")." << std::endl;
 	  
 	  QPointF center(xpos, ypos);
-	  p.setPen(QPen(QBrush(QColor(0, 255, 0, 255)), 1, Qt::SolidLine));
-	  p.setBrush(QBrush(QColor(255, 255, 255, 0)));
-	  p.drawEllipse(center, 5 /*radius*/, 5 /*radius*/);
+	  p->setPen(QPen(QBrush(QColor(0, 255, 0, 255)), 1, Qt::SolidLine));
+	  p->setBrush(QBrush(QColor(255, 255, 255, 0)));
+	  p->drawEllipse(center, 5 /*radius*/, 5 /*radius*/);
 	}
+  
+}
+
+void FocusCurveViewWidgetT::drawFocusCurveRecordSets(QPainter * p) {
+  auto focusCurveRecorder = mFocusCurveRecorderLogic->getFocusCurveRecorder();
+
+
+  
+  if (focusCurveRecorder != nullptr) {
+    auto focusCurveRecordSets = focusCurveRecorder->getFocusCurveRecordSets();
+    FocusMeasureTypeT::TypeE focusMeasureType = focusCurveRecorder->getFocusMeasureType();
+
+    
+    LOG(debug) << "FocusCurveViewWidgetT::drawFocusCurveRecordSets...focusCurveRecordSets.size(): " << focusCurveRecordSets->size() << std::endl;
+
+    
+    for (const auto & recordSet : *focusCurveRecordSets) {
+      // TODO: Draw each in a different color...?!
+      drawFocusCurveRecordSet(p, recordSet);
+    }	  
+  } else {
+    LOG(debug) << "FocusCurveViewWidgetT::drawFocusCurveRecordSets... nothing to draw... no focus curve recorder." << std::endl;
+  }
+}
+
+FocusMeasureTypeT::TypeE FocusCurveViewWidgetT::getFocusMeasureType() const {
+  return mFocusMeasureType;
+}
+
+void FocusCurveViewWidgetT::setFocusMeasureType(FocusMeasureTypeT::TypeE focusMeasureType) {
+  mFocusMeasureType = focusMeasureType;
+}
+
+
+void FocusCurveViewWidgetT::update() {
+  repaint();
+}
+
+void FocusCurveViewWidgetT::paintEvent(QPaintEvent * event) {
+
+	QPainter p(this);
+
+	// TODO: Make the view widget to allow multiple "curves"? HFD, FWHN etc...	
+
+	drawFocusCurveRecordSets(& p);
 	
 
 //	if (mHfd.valid()) {
@@ -109,32 +149,33 @@ void FocusCurveViewWidgetT::paintEvent(QPaintEvent * event) {
 //		p.drawLine(QPointF(center.x() - halfCrossLength, center.y()), QPointF(center.x() + halfCrossLength, center.y()));
 //	}
 
+	// Draw cross
+	p.setPen(QPen(QBrush(QColor(255, 255, 0, 255)), 2, Qt::SolidLine));
+	p.setBrush(QBrush(QColor(255, 255, 255, 0)));
+	p.drawLine(QPointF(mLastMousePos.x(), 0), QPointF(mLastMousePos.x(), height()));
+	p.drawLine(QPointF(0, mLastMousePos.y()), QPointF(width(), mLastMousePos.y()));
+	
+	
 	Q_UNUSED(event);
 }
 
 void FocusCurveViewWidgetT::reset() {
-  mFocusCurve.clear();
+  //mFocusCurve.clear();
 
     repaint();
 }
 
-void FocusCurveViewWidgetT::setFocusCurve(const FocusCurveT & focusCurve) {
-	mFocusCurve = focusCurve;
+// void FocusCurveViewWidgetT::setFocusCurve(std::shared_ptr<const FocusCurveT> focusCurve) {
+// 	mFocusCurve = focusCurve;
 
-	LOG(debug) << "FocusCurveViewWidgetT::setFocusCurve..." << std::endl;
+// 	LOG(debug) << "FocusCurveViewWidgetT::setFocusCurve..." << std::endl;
 
-	// TODO
+// 	// TODO
 
-    repaint();
-}
+//     repaint();
+// }
 
-void FocusCurveViewWidgetT::addFocusCurveRecord(std::shared_ptr<FocusCurveRecordT> focusCurveRecord) {
-
-  LOG(debug) << "FocusCurveViewWidgetT::addFocusCurveRecord..." << std::endl;
-  
-  mFocusCurve.push_back(focusCurveRecord);
-
+void FocusCurveViewWidgetT::mouseMoveEvent(QMouseEvent * event) {
+  mLastMousePos = event->pos(); // NOTE: Requires mouse tracking
   repaint();
 }
-
-

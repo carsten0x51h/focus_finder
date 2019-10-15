@@ -37,7 +37,7 @@ public:
     *  @brief
     *    Constructor
     */
-    FocusCurveRecorderPanelT(QWidget * parent, FocusFinderLogicT & ffl);
+    FocusCurveRecorderPanelT(QWidget * parent, std::shared_ptr<FocusCurveRecorderLogicT> focusCurveRecorderLogic);
 
     /**
     *  @brief
@@ -49,8 +49,11 @@ public:
 
     signals:
   void focusCurveRecorderStartedSignal();
+  void focusCurveRecorderNewRecordSignal(std::shared_ptr<FocusCurveRecordT> focusCurveRecord);
+  void focusCurveRecorderRecordSetUpdateSignal(std::shared_ptr<FocusCurveRecordSetT> focusCurveRecordSet);
   void focusCurveRecorderProgressUpdateSignal(float progress, const QString & msg, std::shared_ptr<FocusCurveRecordT> focusCurveRecord);
-  void focusCurveRecorderFinishedSignal(bool lastCurve);
+  void focusCurveRecorderRecordSetFinishedSignal(std::shared_ptr<FocusCurveRecordSetT> focusCurveRecordSet);
+  void focusCurveRecorderFinishedSignal(std::shared_ptr<const FocusCurveRecordSetContainerT> focusCurveRecordSetContainer);
   void focusCurveRecorderCancelledSignal();
 
 protected slots:
@@ -70,10 +73,12 @@ private:
 
 
   void onFocusCurveRecorderStarted();
+  void onFocusCurveRecorderNewRecord(std::shared_ptr<FocusCurveRecordT> focusCurveRecord);
+  void onFocusCurveRecorderRecordSetUpdate(std::shared_ptr<FocusCurveRecordSetT> focusCurveRecordSet);
   void onFocusCurveRecorderProgressUpdate(float progress, const QString & msg, std::shared_ptr<FocusCurveRecordT> focusCurveRecord);
   void onFocusCurveRecorderCancelled();
-  void onFocusCurveRecorderFinished(bool isLastCurve);
-
+  void onFocusCurveRecorderRecordSetFinished(std::shared_ptr<FocusCurveRecordSetT> focusCurveRecordSet);
+  void onFocusCurveRecorderFinished(std::shared_ptr<const FocusCurveRecordSetContainerT> focusCurveRecordSetContainer);
   void onFocusCurveRecordPressed(bool isChecked);
 
   AnimMenuButtonT * mFocusCurveRecordButton;
@@ -81,8 +86,7 @@ private:
   // TODO: Is it ok that all those instances are local to this GUI window?
   std::shared_ptr<TaskExecutorT<FocusCurveRecorderT> > mRecorderExec;
   
-  FocusFinderLogicT & mFfl;
-
+  std::shared_ptr<FocusCurveRecorderLogicT> mFocusCurveRecorderLogic;
   FocusCurveViewPanelT * mFocusCurveViewPanel;
 };
 

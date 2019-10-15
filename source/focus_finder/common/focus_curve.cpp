@@ -18,7 +18,8 @@ std::ostream & operator<<(std::ostream & os, const FocusCurveT & focusCurve) {
 
 std::ostream &
 FocusCurveT::print(std::ostream & os) const {
-	os << "FocusCurveT...TODO" << std::endl;
+  // TODO
+  os << "FocusCurveT..." << std::endl;
 	return os;
 }
 

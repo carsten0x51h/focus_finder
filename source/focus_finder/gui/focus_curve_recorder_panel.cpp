@@ -15,9 +15,13 @@
 #include "../common/include/focus_curve_record.h"
 #include "../common/include/focus_curve_recorder_type.h"
 #include "../common/include/focus_curve_recorder_factory.h"
+#include "../common/include/focus_curve_recorder_logic.h"
+#include "../common/include/focus_curve_record_set.h"
+
 
 #include "ui_focus_curve_recorder_panel.h"
 
+Q_DECLARE_METATYPE(std::shared_ptr<FocusCurveRecordSetT>)
 
 // TODO: Actually this is duplicated code - see main_window.cpp...
 void FocusCurveRecorderPanelT::setBtnIcon(QAbstractButton * btn,
@@ -32,9 +36,9 @@ void FocusCurveRecorderPanelT::setBtnIcon(QAbstractButton * btn,
 	btn->setIconSize(QSize(48, 48));
 }
 
-FocusCurveRecorderPanelT::FocusCurveRecorderPanelT(QWidget * parent, FocusFinderLogicT & ffl) : QWidget(parent),
+FocusCurveRecorderPanelT::FocusCurveRecorderPanelT(QWidget * parent, std::shared_ptr<FocusCurveRecorderLogicT> focusCurveRecorderLogic) : QWidget(parent),
                                                                                         m_ui(new Ui::FocusCurveRecorderPanel),
-                                                                                        mFfl(ffl)
+                                                                                        mFocusCurveRecorderLogic(focusCurveRecorderLogic)
 {
     // Setup UI
     m_ui->setupUi(this);
@@ -49,15 +53,14 @@ FocusCurveRecorderPanelT::FocusCurveRecorderPanelT(QWidget * parent, FocusFinder
 //    m_ui->layFocusCurveViewWidget->addWidget(mFocusCurveWidget, 0/*row*/, 0/*col*/, 1/*rowspan*/, 1/*colspan*/);
 
     // TODO: Move to reset?
-    mRecorderExec = std::make_shared<TaskExecutorT<FocusCurveRecorderT> > (); // WAS: mFfl.getFocusFinderExecutor();
-
+    mRecorderExec = std::make_shared<TaskExecutorT<FocusCurveRecorderT> > ();
 
     // Add the focus curve viewer panel
     QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     sizePolicy.setHorizontalStretch(100);
     sizePolicy.setVerticalStretch(100);
 
-    mFocusCurveViewPanel = new FocusCurveViewPanelT(m_ui->widget, mFfl);
+    mFocusCurveViewPanel = new FocusCurveViewPanelT(m_ui->widget, mFocusCurveRecorderLogic);
     mFocusCurveViewPanel->setSizePolicy(sizePolicy);
     m_ui->layFocusCurveViewPanel->addWidget(mFocusCurveViewPanel, 0/*row*/, 0/*col*/, 1/*rowspan*/, 1/*colspan*/);
     
@@ -74,31 +77,13 @@ void FocusCurveRecorderPanelT::reset() {
 
 }
 
-// TODO: Maybe this should be done inside the FocusCurveRecorderT?
-bool FocusCurveRecorderPanelT::deviceCheck() const {
-  auto activeCamera = mFfl.getCurrentCamera();
-  auto activeFocuser = mFfl.getCurrentCamera();
-  
-  if (!activeCamera) {
-    LOG(warning)
-      << "No camera set!" << std::endl;
-    return false;
-  }
-  
-  if (!activeFocuser) {
-    LOG(warning)
-      << "No focuser set!" << std::endl;
-    return false;
-  }
-  return true;
-}
 
 void FocusCurveRecorderPanelT::onFocusCurveRecordPressed(bool isChecked) {
   LOG(debug) << "FocusCurveRecorderPanelT::onFocusCurveRecordPressed... mFocusCurveRecordButton->isChecked(): " << isChecked << std::endl;
 
   if (isChecked) {
 
-    if (!deviceCheck()) {
+    if (!mFocusCurveRecorderLogic->checkDevices()) {
       // TODO: Log error / warning...
       return;
     }
@@ -114,37 +99,16 @@ void FocusCurveRecorderPanelT::onFocusCurveRecordPressed(bool isChecked) {
     // HACK / TODO: For now we create always a new instance...
     // TODO: Do not create here?! -> Factory?
 
-    auto focusCurveRecorder = FocusCurveRecorderFactoryT::getInstance(
-							FocusCurveRecorderTypeT::DEFAULT);
-
-    // Set devices
-    focusCurveRecorder->setCamera(mFfl.getCurrentCamera());
-    focusCurveRecorder->setFocus(mFfl.getCurrentFocus());
-    focusCurveRecorder->setFilter(mFfl.getCurrentFilter());
-
-    auto lastFocusStarPosOpt = mFfl.getLastFocusStarPos();
-
-    //if (!lastFocusStarPosOpt) {
-    // TODO: Handle case where no focus star is set / available
-    //}
-		
-    focusCurveRecorder->setLastFocusStarPos(lastFocusStarPosOpt.value());
-
-    auto activeProfileOpt = mFfl.getProfileManager()->getActiveProfile();
+    mFocusCurveRecorderLogic->resetFocusCurveRecorder(FocusCurveRecorderTypeT::DEFAULT);
     
-    //if (!activeProfileOpt) {
-    // TODO: Make sure that activeProfile is set...
-    //}
-    focusCurveRecorder->setFocusFinderProfile(activeProfileOpt.value());
+    auto focusCurveRecorder = mFocusCurveRecorderLogic->getFocusCurveRecorder();
 
-    
-    //auto activeProfileOpt = mFfl.getProfileManager()->getActiveProfile();
+    // TODO: Get value from UI
+    focusCurveRecorder->setFocusMeasureType(FocusMeasureTypeT::HFD);
 
-    // TODO: Make sure that activeProfile is set...
-    //		if (!activeProfileOpt) {
-    //		}
-    // TODO: Implement
-    //focusCurveRecorder->setFocusFinderProfile(activeProfileOpt.value());
+    // TODO: Can FocusCurveViewPanelT extract this info from "focusCurveRecorder" instead?
+    mFocusCurveViewPanel->setFocusMeasureType(FocusMeasureTypeT::HFD);
+
 
     
     // Register FocusCurveRecorder UI listeners
@@ -153,19 +117,42 @@ void FocusCurveRecorderPanelT::onFocusCurveRecordPressed(bool isChecked) {
     						      emit focusCurveRecorderStartedSignal();
     						    });
 
-    // FoFi running / status update
+    // Register listener to get notified when there is a new record available
     qRegisterMetaType < std::shared_ptr<FocusCurveRecordT> > ("FocusCurveRecordPtrT");
 
+    focusCurveRecorder->registerFocusCurveRecorderNewRecordListener(
+								    [&](std::shared_ptr<FocusCurveRecordT> record) {
+								      emit focusCurveRecorderNewRecordSignal(record);
+    							   });
+
+    // Register listener to get notified when the focus curve record set was updated (new data point for curve recorded)
+    qRegisterMetaType < std::shared_ptr<FocusCurveRecordSetT> > ("FocusCurveRecordSetPtrT");
+
+    focusCurveRecorder->registerFocusCurveRecorderRecordSetUpdateListener(
+								    [&](std::shared_ptr<FocusCurveRecordSetT> recordSet) {
+								      emit focusCurveRecorderRecordSetUpdateSignal(recordSet);
+    							   });
+
+    
+    // Register progress listener
     focusCurveRecorder->registerFocusCurveRecorderProgressUpdateListener(
 									 [&](float progress, const std::string & msg, std::shared_ptr<FocusCurveRecordT> record) {
     							     emit focusCurveRecorderProgressUpdateSignal(progress, QString::fromStdString(msg), record);
     							   });
 
-    // FocusCurveRecorder finished
-    focusCurveRecorder->registerFocusCurveRecorderFinishedListener([&](bool lastCurve) {
-    						       emit focusCurveRecorderFinishedSignal(lastCurve);
+    
+    // FocusCurveRecorder new focus curve record set finished
+    focusCurveRecorder->registerFocusCurveRecorderRecordSetFinishedListener([&](std::shared_ptr<FocusCurveRecordSetT> focusCurveRecordSet) {
+    						       emit focusCurveRecorderRecordSetFinishedSignal(focusCurveRecordSet);
     						     });
 
+    // FocusCurveRecorder finished
+    qRegisterMetaType < std::shared_ptr<const FocusCurveRecordSetContainerT> > ("FocusCurveRecordSetContainerPtrT");
+
+    focusCurveRecorder->registerFocusCurveRecorderFinishedListener([&](std::shared_ptr<const FocusCurveRecordSetContainerT> focusCurveRecordSetContainer) {
+    						       emit focusCurveRecorderFinishedSignal(focusCurveRecordSetContainer);
+    						     });
+    
     // FocusCurveRecorder cancel
     focusCurveRecorder->registerFocusCurveRecorderCancelledListener([&]() {
     							emit focusCurveRecorderCancelledSignal();
@@ -236,35 +223,56 @@ void FocusCurveRecorderPanelT::onFocusCurveRecordPressed(bool isChecked) {
 // 		setBtnIcon(mFocusCurveRecordButton, ":/res/record_focus_curve_64x64.png");
 // 	}
 // }
-
-void FocusCurveRecorderPanelT::onFocusCurveRecorderFinished(bool isLastCurve) {
+void FocusCurveRecorderPanelT::onFocusCurveRecorderRecordSetFinished(std::shared_ptr<FocusCurveRecordSetT> focusCurveRecordSet) {
 	LOG(debug)
-	<< "FocusCurveRecorderPanelT::onFocusCurveRecorderFinished...lastCurve=" << isLastCurve
-			<< std::endl;
-
-	if (isLastCurve) {
-	  mFocusCurveRecordButton->stopAnimation();
-
-	  // NOTE: setChecked(false) does not work for some reason...
-	  mFocusCurveRecordButton->setEnabled(false);
-	  mFocusCurveRecordButton->setChecked(false);
-	  mFocusCurveRecordButton->setEnabled(true);
-	}
-	//    updateFocusFinderMainMenuBar();
+	<< "FocusCurveRecorderPanelT::onFocusCurveRecorderRecordSetFinished..." << std::endl;
+	
+	// TODO...
+	mFocusCurveViewPanel->update();
 }
 
-void FocusCurveRecorderPanelT::onFocusCurveRecorderProgressUpdate(float progress, const QString & msg, std::shared_ptr<FocusCurveRecordT> focusCurveRecord) {
+void FocusCurveRecorderPanelT::onFocusCurveRecorderFinished(std::shared_ptr<const FocusCurveRecordSetContainerT> focusCurveRecordSetContainer) {
 	LOG(debug)
-	<< "FocusCurveRecorderPanelT::onFocusCurveRecorderProgressUpdate..."
-	<< "progress=" << progress
-	<< ", msg=" << msg.toStdString()
-	<< ", pos=" << focusCurveRecord->getCurrentAbsoluteFocusPos()
-	<< ", HFD=" << focusCurveRecord->getHfd().getValue()
-	<< ", FWHM(H)=" << focusCurveRecord->getFwhmHorz().getValue()
-	<< ", FWHM(V)=" << focusCurveRecord->getFwhmVert().getValue()
-	<< std::endl;
+	<< "FocusCurveRecorderPanelT::onFocusCurveRecorderFinished..." << std::endl;
 
-	mFocusCurveViewPanel->addFocusCurveRecord(focusCurveRecord);
+	mFocusCurveRecordButton->stopAnimation();
+
+	// NOTE: setChecked(false) does not work for some reason...
+	mFocusCurveRecordButton->setEnabled(false);
+	mFocusCurveRecordButton->setChecked(false);
+	mFocusCurveRecordButton->setEnabled(true);
+	
+	//    updateFocusFinderMainMenuBar();
+
+
+	// TODO: Call code below from panel instead..?!!
+	//mFocusRecorder->fitFocusCurve(focusCurveRecordSet);
+	
+	mFocusCurveViewPanel->update();
+}
+
+void FocusCurveRecorderPanelT::onFocusCurveRecorderNewRecord(std::shared_ptr<FocusCurveRecordT> focusCurveRecord) {
+	LOG(debug)
+	  << "FocusCurveRecorderPanelT::onFocusCurveRecorderNewRecord..." << std::endl;
+	
+	//mFocusCurveViewPanel->update();
+}
+
+void FocusCurveRecorderPanelT::onFocusCurveRecorderRecordSetUpdate(std::shared_ptr<FocusCurveRecordSetT> focusCurveRecordSet) {
+	LOG(debug)
+	  << "FocusCurveRecorderPanelT::onFocusCurveRecorderRecordSetUpdate..." << std::endl;
+
+	// TODO: Refactor...
+	//mFocusCurveViewPanel->setFocusCurve(focusCurveRecordSet);
+	mFocusCurveViewPanel->update();
+}
+
+
+void FocusCurveRecorderPanelT::onFocusCurveRecorderProgressUpdate(float progress, const QString & msg, std::shared_ptr<FocusCurveRecordT> focusCurveRecord) {
+  LOG(debug) << focusCurveRecord << std::endl;
+
+  // TODO: Somewhere else...
+  //mFocusCurveViewPanel->setFocusCurve(focusCurveRecord);
 }
 
 void FocusCurveRecorderPanelT::onFocusCurveRecorderCancelled() {
@@ -294,7 +302,7 @@ void FocusCurveRecorderPanelT::createFocusCurveRecordButton() {
   setBtnIcon(mFocusCurveRecordButton, ":/res/record_focus_curve_64x64.png");
 
   connect(mFocusCurveRecordButton, &QToolButton::clicked, this,
-			&FocusCurveRecorderPanelT::onFocusCurveRecordPressed);
+	  &FocusCurveRecorderPanelT::onFocusCurveRecordPressed);
   
   getMainToolBar()->addWidget(mFocusCurveRecordButton);
 
@@ -304,15 +312,24 @@ void FocusCurveRecorderPanelT::createFocusCurveRecordButton() {
   connect(this, &FocusCurveRecorderPanelT::focusCurveRecorderStartedSignal, this,
 	  &FocusCurveRecorderPanelT::onFocusCurveRecorderStarted);
 
+  connect(this, &FocusCurveRecorderPanelT::focusCurveRecorderNewRecordSignal, this,
+	  &FocusCurveRecorderPanelT::onFocusCurveRecorderNewRecord);
+
+  connect(this, &FocusCurveRecorderPanelT::focusCurveRecorderRecordSetUpdateSignal, this,
+	  &FocusCurveRecorderPanelT::onFocusCurveRecorderRecordSetUpdate);
+  
   connect(this, &FocusCurveRecorderPanelT::focusCurveRecorderProgressUpdateSignal, this,
 	  &FocusCurveRecorderPanelT::onFocusCurveRecorderProgressUpdate);
   
+  connect(this, &FocusCurveRecorderPanelT::focusCurveRecorderRecordSetFinishedSignal, this,
+	  &FocusCurveRecorderPanelT::onFocusCurveRecorderRecordSetFinished);
+ 
   connect(this, &FocusCurveRecorderPanelT::focusCurveRecorderFinishedSignal, this,
 	  &FocusCurveRecorderPanelT::onFocusCurveRecorderFinished);
   
   connect(this, &FocusCurveRecorderPanelT::focusCurveRecorderCancelledSignal, this,
 	  &FocusCurveRecorderPanelT::onFocusCurveRecorderCancelled);
-
+  
   
   // TODO: Handle camera disconnect (see main_window...)
 }

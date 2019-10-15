@@ -58,7 +58,7 @@
           </sizepolicy>
          </property>
          <property name="styleSheet">
-          <string notr="true">background-color: blue;</string>
+          <string notr="true">background-color: black;</string>
          </property>
         </widget>
        </item>

@@ -5,8 +5,12 @@
 #include "hfd.h"
 #include "image.h"
 #include "point.h"
+#include "focus_measure_type.h"
+#include "exception.h"
 
-class FocusCurveRecordT {
+DEF_Exception(FocusCurveRecord);
+
+class FocusCurveRecordT : public std::enable_shared_from_this<FocusCurveRecordT> {
 private:
 	int mCurrentAbsoluteFocusPos;
 	float mSnr;
@@ -33,6 +37,9 @@ public:
 	const PointFT & getAbsStarCenterPos() const;
 	const std::tuple<float, float> & getDrift() const;
 
+  static float getFocusMeasure(std::shared_ptr<FocusCurveRecordT> focusCurveRecord, FocusMeasureTypeT::TypeE focusMeasureType);
+  float getFocusMeasure(FocusMeasureTypeT::TypeE focusMeasureType);
+  
 	std::ostream & print(std::ostream & os) const;
 	friend std::ostream & operator<<(std::ostream & os, const FocusCurveRecordT & record);
 };
