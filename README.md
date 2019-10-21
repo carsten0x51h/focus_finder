@@ -55,6 +55,13 @@ Development & Build & Install
 github:  TODO: clone...
 
 
+Dependencies
+
+For compiling
+-libqgis-dev
+-TODO: indi...
+-TODO: Add libqgis to cmake...
+
 build & install
 ---------------
 

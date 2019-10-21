@@ -53,6 +53,16 @@ set(sources
   ../common/include/star_cluster_algorithm.h
   ../common/star_cluster_algorithm.cpp
   ../common/include/focus_measure_type.h
+  ../common/include/curve_function.h
+  ../common/curve_function.cpp
+  ../common/include/curve_function_hyperbolic.h
+  ../common/curve_function_hyperbolic.cpp
+  ../common/include/curve_function_parabolic.h
+  ../common/curve_function_parabolic.cpp
+  ../common/include/curve_function_gaussian.h
+  ../common/curve_function_gaussian.cpp
+  ../common/include/curve_function_factory.h
+  ../common/curve_function_factory.cpp
 	../common/include/focus_curve_record.h
 	../common/focus_curve_record.cpp
 	../common/include/focus_curve_record_set.h
@@ -238,7 +248,9 @@ set(sources
     about_dialog.ui
     profile_settings_dialog.ui
     reporting_viewer_panel.ui
-        include/focus_curve_recorder_panel.h focus_curve_recorder_panel.cpp)
+    include/focus_curve_recorder_panel.h
+    focus_curve_recorder_panel.cpp
+    focus_curve_recorder_panel.ui)
 
 
 # 
@@ -279,6 +291,7 @@ target_include_directories(${target}
     ${INDI_INCLUDE_DIR}
     ${DEFAULT_INCLUDE_DIRECTORIES}
     ${CMAKE_CURRENT_BINARY_DIR}
+    ${QGIS_INCLUDE_DIR}
     ${PROJECT_BINARY_DIR}/source/include
 )
 
@@ -286,6 +299,7 @@ target_include_directories(${target}
 # 
 # Libraries
 # 
+#
 
 # Add the fllowing to the section below to add further libs
 #    ${META_PROJECT_NAME}::libindiclientpp
@@ -295,6 +309,7 @@ target_link_libraries(${target}
     Qt5::Core
     Qt5::Gui
     Qt5::Widgets
+    ${QGIS_GUI_LIBRARY}
     ${Boost_LOG_LIBRARY}
     ${Boost_LOG_SETUP_LIBRARY}
     ${Boost_THREAD_LIBRARY}

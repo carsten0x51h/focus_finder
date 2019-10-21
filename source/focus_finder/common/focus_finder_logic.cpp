@@ -157,8 +157,8 @@ void FocusFinderLogicT::updateProfile() {
 		mExposureCycleFinishedConnection = newCameraDevice->registerExposureCycleFinishedListener(
 				[&](RectT<unsigned int> roiRect, std::shared_ptr<const ImageT> resultImage, bool lastExposure) {
 					// TODO: "mLastFrame" needs mutex guard!!!-> or atomic?
-					mLastFrame.setImage(resultImage);// null if no image
-					mLastFrame.setRoi(roiRect);// "empty" - i.e. 0,0,0,0 if not set
+					mLastFrame.setImage(resultImage);  // null if no image
+					mLastFrame.setRoi(roiRect);        // "empty" - i.e. 0,0,0,0 if not set
 				}
 		);
 	}

@@ -30,12 +30,12 @@ float HfdT::calc(const ImageT & inImage, unsigned int inOuterDiameter,
 	// Noise reduction
 	// AD noise reduction --> In: Loaded image, Out: Noise reduced image
 	// http://cimg.sourceforge.net/reference/structcimg__library_1_1CImg.html
-	ImageT aiImg = inImage.get_blur_anisotropic(130.0f, /*amplitude*/
-	0.7f, /*sharpness*/
-	0.3f, /*anisotropy*/
-	0.6f, /*alpha*/
-	1.1f, /*sigma*/
-	0.8f, /*dl*/
+	ImageT aiImg = inImage.get_blur_anisotropic(130.0F, /*amplitude*/
+	0.7F, /*sharpness*/
+	0.3F, /*anisotropy*/
+	0.6F, /*alpha*/
+	1.1F, /*sigma*/
+	0.8F, /*dl*/
 	30, /*da*/
 	2, /*gauss_prec*/
 	0, /*interpolation_type*/
@@ -56,7 +56,8 @@ float HfdT::calc(const ImageT & inImage, unsigned int inOuterDiameter,
 
 	// Sum up all pixel values in whole circle
 	float outerRadius = (float) inOuterDiameter / 2.0;
-	float sum = 0, sumDist = 0;
+	float sum = 0;
+	float sumDist = 0;
 
 	cimg_forXY(aiImg, x, y)
 	{
@@ -65,9 +66,9 @@ float HfdT::calc(const ImageT & inImage, unsigned int inOuterDiameter,
 			sum += aiImg(x, y);
 			sumDist += aiImg(x, y)
 					* std::sqrt(
-							std::pow((float) x - outerRadius /*centerX*/, 2.0f)
+							std::pow((float) x - outerRadius /*centerX*/, 2.0F)
 									+ pow((float) y - outerRadius /*centerX*/,
-											2.0f));
+											2.0F));
 		}
 	}
 

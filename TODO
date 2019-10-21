@@ -2,10 +2,12 @@ TODO
 ----
 
 -NEXT
+	-Recorder should listen to position events from focuser -> draw a line of current position...
+	-Should Hfd, Fwhm vert, Fwhm horz all be calculated right after recording (during the recording process), or just the one which is needed??
+	-Match the recorded data points and draw the curve!
+
 	-HfdT and FwhmT refactoring! Adapt FwhmT to new curve fitting tmpl,... etc etc etc. -> Use FwhmT instead of HfdT for simulator...
     -Remove X11 from CMakeLists again!, image.h -> re-enamble display 0!
-	-INDI Focus GUI - progress does not stop...
-	-IndiFocus fertig anbinden -> Test
 	-Erste V-Curve aufnehmen :-)
 	-On INDI-Server disconnect (or camera disconnect, or camera device removal), stop exposure
 

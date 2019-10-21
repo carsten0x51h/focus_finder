@@ -4,8 +4,8 @@
 
 // TODO: Does it make sense to define default values for epsrel and absrel? What are common values?
 CurveFitParmsT::CurveFitParmsT(float epsrel, float epsabs,
-			       std::size_t numMaxIterations = 100, float outlierBoundaryFactor = 1.5f,
-		float maxAcceptedOutliersPerc = 10.0f) :
+			       std::size_t numMaxIterations = 100, float outlierBoundaryFactor = 1.5F,
+		float maxAcceptedOutliersPerc = 10.0F) :
 
 		epsrel(epsrel), epsabs(epsabs), numMaxIterations(numMaxIterations), outlierBoundaryFactor(
 				outlierBoundaryFactor), maxAcceptedOutliersPerc(
@@ -16,7 +16,7 @@ CurveFitParmsT::CurveFitParmsT(float epsrel, float epsabs,
 CurveFitParmsT::CurveFitParmsT(float epsrel, float epsabs,
 		std::size_t numMaxIterations = 100) :
 		CurveFitParmsT(epsrel, epsabs, numMaxIterations,
-				-1 /*disable outlier detection*/, 0.0f) {
+				-1 /*disable outlier detection*/, 0.0F) {
 
 }
 

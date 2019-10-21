@@ -76,9 +76,6 @@ private:
 public:
 	DefaultFocusCurveRecorderT();
 
-  FocusMeasureTypeT::TypeE getFocusMeasureType() const override;
-  void setFocusMeasureType(FocusMeasureTypeT::TypeE focusMeasureType) override;
-  
 	// Implement focus curve recorder interface
 	std::string getName() const override;
 
@@ -88,9 +85,6 @@ public:
   void reset() override;
 
   std::shared_ptr<const FocusCurveRecordSetContainerT> getFocusCurveRecordSets() const override;
-
-
-  FocusMeasureTypeT::TypeE mFocusMeasureType;
 };
 
 #endif /*SOURCE_FOCUS_FINDER_COMMON_INCLUDE_DEFAULT_FOCUS_CURVE_RECORDER_H_*/

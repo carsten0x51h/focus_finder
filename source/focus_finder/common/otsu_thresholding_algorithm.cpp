@@ -2,18 +2,20 @@
 #include "include/otsu_thresholding_algorithm.h"
 #include "include/floating_point_equality.h"
 
-std::string OtsuThresholdingAlgorithmT::getName() const { return "OtsuThresholdingAlgorithmT"; };
+std::string OtsuThresholdingAlgorithmT::getName() const { return "OtsuThresholdingAlgorithmT"; }
 
 float OtsuThresholdingAlgorithmT::calc(const ImageT & inImg, long bitDepth) const {
 
   LOG(debug) << "OtsuThresholdingAlgorithmT::calc..." << std::endl;
 
   size_t numBuckets = pow(2.0, bitDepth);
-  std::vector<float> hist(numBuckets, 0.0f);
+  std::vector<float> hist(numBuckets, 0.0F);
  
   float numPixels = inImg.width() * inImg.height();
-  float sumB = 0, wB = 0, max = 0.0;
-  float threshold1 = 0.0, threshold2 = 0.0;
+  float sumB = 0.0F;
+  float wB = 0.0F;
+  float max = 0.0F;
+  float threshold1 = 0.0F, threshold2 = 0.0F;
 
   LOG(debug) << "OtsuThresholdingAlgorithmT::calc - numBuckets: " << numBuckets << ", numPixels: " << numPixels << std::endl;
 
@@ -32,11 +34,11 @@ float OtsuThresholdingAlgorithmT::calc(const ImageT & inImg, long bitDepth) cons
   for (int i = 0; i < numBuckets; ++i) {
     wB += hist[i];
 
-    if (isAlmostEqual(wB, 0.0f)) { continue; }
+    if (isAlmostEqual(wB, 0.0F)) { continue; }
  
     float wF = numPixels - wB;
     
-    if (isAlmostEqual(wF, 0.0f)) { break; }
+    if (isAlmostEqual(wF, 0.0F)) { break; }
     
     sumB += i * hist[i];
  

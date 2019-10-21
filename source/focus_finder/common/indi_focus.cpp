@@ -100,7 +100,8 @@ float IndiFocusT::getTemperature() const {
  */
 bool IndiFocusT::isMoving() const {
 
-	bool isRelPosBusy, isAbsPosBusy;
+  bool isRelPosBusy;
+  bool isAbsPosBusy;
 
 	try {
 		INumberVectorProperty * relPosVecProp = IndiHelperT::getNumberVec(

@@ -95,7 +95,7 @@ int LmFittingCurveGaussianT::gslDfx(const gsl_vector * x, const GslMultiFitParms
 	for (size_t i = 0; i < gslParms->size(); ++i) {
 		const GslMultiFitDataT & gslData = gslParms->at(i);
 		float x_minus_c = (gslData.pt.x() - c);
-		float e = exp(-0.5f * (x_minus_c / w) * (x_minus_c / w));
+		float e = exp(-0.5F * (x_minus_c / w) * (x_minus_c / w));
 
 		gsl_matrix_set(J, i, IdxT::B_IDX, 1 / gslData.sigma);
 		gsl_matrix_set(J, i, IdxT::P_IDX, e / gslData.sigma);

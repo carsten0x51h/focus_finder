@@ -4,10 +4,10 @@
 #include <string>
 
 CurveParmT::CurveParmT() :
-  mName(""), mValue(0.0f) {
+  mName(""), mValue(0.0F) {
 }
 
-CurveParmT::CurveParmT(const std::string & name, float value = 0.0f) :
+CurveParmT::CurveParmT(const std::string & name, float value = 0.0F) :
 		mName(name), mValue(value) {
 }
 

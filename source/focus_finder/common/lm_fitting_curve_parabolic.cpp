@@ -102,7 +102,7 @@ int LmFittingCurveParabolicT::gslDfx(const gsl_vector * x, const GslMultiFitParm
 
 	for (size_t i = 0; i < gslParms->size(); ++i) {
 		const GslMultiFitDataT & gslData = gslParms->at(i);
-		const float oneBySigma = 1.0f / gslData.sigma;
+		const float oneBySigma = 1.0F / gslData.sigma;
 		const float x = gslData.pt.x();
 
 		gsl_matrix_set(J, i, IdxT::A_IDX, oneBySigma * x * x);

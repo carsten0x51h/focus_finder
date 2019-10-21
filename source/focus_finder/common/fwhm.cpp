@@ -77,8 +77,8 @@ CurveParmsT FwhmT::fitValues(const std::vector<PointFT> & imgValues, double inEp
 				inEpsRel, /*epsrel*/
 				inEpsAbs, /*epsabs*/
 				10000, /*maxnumiter*/
-				1.5f, /*outlier boundary factor*/
-				20.0f /* max. accepted outliers perc. */
+				1.5F, /*outlier boundary factor*/
+				20.0F /* max. accepted outliers perc. */
 		);
 
 		curveParms = CurveFitAlgorithmT::fitCurve(FittingCurveTypeT::GAUSSIAN, imgValues,
@@ -126,7 +126,7 @@ const std::vector<PointWithResidualT> & FwhmT::getOutlierValues() const {
  */
 float FwhmT::getStandardDeviation() const {
 
-	float mse = 0.0f;
+	float mse = 0.0F;
 	
 	for (const auto & v : mFitValues) {
 		float yFit = v.y();

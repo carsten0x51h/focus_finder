@@ -119,6 +119,11 @@ include(cmake/FindINDI.cmake)
 # This line finds the boost lib and headers. 
 set(Boost_NO_BOOST_CMAKE ON) #  Don't do a find_package in config mode before searching for a regular boost install.
 
+#
+# Look for QGIS (Geograhic Information System extension for QT - see https://qgis.org/de/site/)
+#
+include(cmake/FindQGIS.cmake)
+
 #find_package (Threads REQUIRED)
 #find_package (X11 REQUIRED)
 #find_package (ZLIB REQUIRED)

@@ -45,11 +45,9 @@
 #include "../common/include/profile_manager.h"
 #include "../common/include/image_converter_16to8.h"
 #include "../common/include/tuple_printer.h"
-
 #include "../common/include/linear_bw_stretch_mapper_function.h" // TODO: Dependency is to be removed
 
 #include "ui_main_window.h"
-
 
 Q_DECLARE_METATYPE(std::chrono::milliseconds)
 Q_DECLARE_METATYPE(std::shared_ptr<FocusCurveRecordT>)

@@ -17,11 +17,16 @@
 #include "../common/include/focus_curve_recorder_factory.h"
 #include "../common/include/focus_curve_recorder_logic.h"
 #include "../common/include/focus_curve_record_set.h"
-
+#include "../common/include/focus_measure_type.h"
+#include "../common/include/fitting_curve_type.h"
 
 #include "ui_focus_curve_recorder_panel.h"
 
+Q_DECLARE_METATYPE(FocusMeasureTypeT::TypeE)
+Q_DECLARE_METATYPE(FittingCurveTypeT::TypeE)
 Q_DECLARE_METATYPE(std::shared_ptr<FocusCurveRecordSetT>)
+
+
 
 // TODO: Actually this is duplicated code - see main_window.cpp...
 void FocusCurveRecorderPanelT::setBtnIcon(QAbstractButton * btn,
@@ -64,8 +69,72 @@ FocusCurveRecorderPanelT::FocusCurveRecorderPanelT(QWidget * parent, std::shared
     mFocusCurveViewPanel->setSizePolicy(sizePolicy);
     m_ui->layFocusCurveViewPanel->addWidget(mFocusCurveViewPanel, 0/*row*/, 0/*col*/, 1/*rowspan*/, 1/*colspan*/);
     
+
+    // Configure setting elements
+    /////////////////////////////
+
+    initFocusMeasureCombobox();
+    initFocusCurveTypeCombobox();
     
     reset();
+}
+
+void FocusCurveRecorderPanelT::initFocusMeasureCombobox() {
+
+  for (size_t i = 0; i < FocusMeasureTypeT::_Count; ++i) {
+
+    FocusMeasureTypeT::TypeE idx = static_cast<FocusMeasureTypeT::TypeE>(i);
+
+    QVariant data;
+    data.setValue(idx);
+
+    m_ui->cbxFocusMeasure->addItem(
+         QString::fromStdString(FocusMeasureTypeT::asStr(idx)),
+	 data
+    );
+  }
+  
+  connect(m_ui->cbxFocusMeasure, QOverload<int>::of(&QComboBox::currentIndexChanged),
+    		this, &FocusCurveRecorderPanelT::onFocusMeasureSelectionChanged);
+}
+
+
+void FocusCurveRecorderPanelT::addFocusCurveType(FittingCurveTypeT::TypeE focusCurveType) {
+  QVariant data;
+  data.setValue(focusCurveType);
+  
+  m_ui->cbxFocusCurveType->addItem(
+				   QString::fromStdString(FittingCurveTypeT::asStr(focusCurveType)),
+				   data
+				   );
+}
+
+void FocusCurveRecorderPanelT::initFocusCurveTypeCombobox() {
+
+  addFocusCurveType(FittingCurveTypeT::HYPERBOLIC);
+  addFocusCurveType(FittingCurveTypeT::PARABOLIC);
+  
+  connect(m_ui->cbxFocusCurveType, QOverload<int>::of(&QComboBox::currentIndexChanged),
+    		this, &FocusCurveRecorderPanelT::onFocusCurveTypeSelectionChanged);
+}
+
+void FocusCurveRecorderPanelT::onFocusCurveTypeSelectionChanged() {
+  QVariant cbxData = m_ui->cbxFocusCurveType->currentData();
+  auto focusCurveType = cbxData.value<FittingCurveTypeT::TypeE>();
+
+  LOG(debug) << "FocusCurveRecorderPanelT::onFocusCurveTypeSelectionChanged...focusCurveType=" << FittingCurveTypeT::asStr(focusCurveType) << std::endl;
+
+  // TODO...
+}
+
+void FocusCurveRecorderPanelT::onFocusMeasureSelectionChanged() {
+
+  QVariant cbxData = m_ui->cbxFocusMeasure->currentData();
+  auto focusMeasureType = cbxData.value<FocusMeasureTypeT::TypeE>();
+
+  LOG(debug) << "FocusCurveRecorderPanelT::onFocusMeasureChanged...focusMeasureType=" << FocusMeasureTypeT::asStr(focusMeasureType) << std::endl;
+
+  // TODO...
 }
 
 FocusCurveRecorderPanelT::~FocusCurveRecorderPanelT()
@@ -88,6 +157,21 @@ void FocusCurveRecorderPanelT::onFocusCurveRecordPressed(bool isChecked) {
       return;
     }
 
+    // Read properties from UI
+    // Reading
+    //int idx = cbxFocusMeasure->currentIndex()
+    //m_ui->cbxFocusMeasure->itemData(cbxFocusMeasure->currentIndex());
+    //m_ui->spinFocusMeasureLimit;
+    //m_ui->spinFocuserStepSize;
+
+    // Matching
+    //m_ui->cbxFocusCurveType;
+    //m_ui->spinEpsRel;
+    //m_ui->spinEpsAbs;
+    //m_ui->spinMaxIterations;
+    //m_ui->spinOutlierBoundaryFactor;
+    //m_ui->spinMaxAcceptedOutliers;
+    
     
     // TODO: Check that ffExec it is not yet running?
 
@@ -96,18 +180,20 @@ void FocusCurveRecorderPanelT::onFocusCurveRecordPressed(bool isChecked) {
     // TODO: Always create a new focus finder instance? Otherwise.. where to store?
     //       -> depends on selection... -> FocusFinder profile...
 
+    // TODO: Get value from UI and set it here...
+    mFocusCurveRecorderLogic->setFocusMeasureType(FocusMeasureTypeT::HFD);
+
     // HACK / TODO: For now we create always a new instance...
     // TODO: Do not create here?! -> Factory?
-
     mFocusCurveRecorderLogic->resetFocusCurveRecorder(FocusCurveRecorderTypeT::DEFAULT);
     
     auto focusCurveRecorder = mFocusCurveRecorderLogic->getFocusCurveRecorder();
 
     // TODO: Get value from UI
-    focusCurveRecorder->setFocusMeasureType(FocusMeasureTypeT::HFD);
+    focusCurveRecorder->setFocusMeasureType(FocusMeasureTypeT::FWHM_VERT);
 
     // TODO: Can FocusCurveViewPanelT extract this info from "focusCurveRecorder" instead?
-    mFocusCurveViewPanel->setFocusMeasureType(FocusMeasureTypeT::HFD);
+    mFocusCurveViewPanel->setFocusMeasureType(FocusMeasureTypeT::FWHM_VERT);
 
 
     
@@ -226,6 +312,18 @@ void FocusCurveRecorderPanelT::onFocusCurveRecordPressed(bool isChecked) {
 void FocusCurveRecorderPanelT::onFocusCurveRecorderRecordSetFinished(std::shared_ptr<FocusCurveRecordSetT> focusCurveRecordSet) {
 	LOG(debug)
 	<< "FocusCurveRecorderPanelT::onFocusCurveRecorderRecordSetFinished..." << std::endl;
+	
+	// Match the curve...
+	auto focusCurve = std::make_shared<FocusCurveT>(focusCurveRecordSet, mFocusCurveRecorderLogic->getFocusCurveType());
+	//TODO: What happens to focusCurve?? -> needs to be drawn......
+	  
+	// TODO: Currently we do not cache the calculatef FocusCurve.
+	//       We will find out if this will be required....
+	//       If it needs to be stored, we store it on the
+	//       FocusCurveRecoderLogic class.
+	// TODO:  Store focusCurve in RecorderLogic? Connection to RecordSet? Triggered by this listener? Guess Logic class should have own listener!.. and then calculate the curve? Because "RecorderLogic" is "all", but "FocusCurveRecorderT" really just is the "recorder" an nothing else.
+
+	
 	
 	// TODO...
 	mFocusCurveViewPanel->update();

@@ -13,6 +13,7 @@
 
 #include "focus_finder_profile.h"
 #include "focus_curve_record_set.h"
+#include "focus_measure_type.h"
 
 DEF_Exception(FocusCurveRecorder);
 DEF_Exception(FocusCurveRecorderFailed);
@@ -57,29 +58,36 @@ private:
   PointT<float> mLastFocusStarPos;
 
   FocusFinderProfileT mFocusFinderProfile;
+  FocusMeasureTypeT::TypeE mFocusMeasureType;
 
 public:
   FocusCurveRecorderT() :
-    mCamera(nullptr), mFocus(nullptr), mFilter(nullptr) {
+    mCamera(nullptr), mFocus(nullptr), mFilter(nullptr), mFocusMeasureType(FocusMeasureTypeT::_Count) {
   }
 
   virtual std::string getName() const = 0;
   virtual ~FocusCurveRecorderT() {
   }
-
-  virtual FocusMeasureTypeT::TypeE getFocusMeasureType() const = 0;
-  virtual void setFocusMeasureType(FocusMeasureTypeT::TypeE focusMeasureType) = 0;
-
+  
   virtual bool isRunning() const = 0;
   virtual void run() = 0;
   virtual void cancel() = 0;
   virtual void reset() = 0;
   virtual std::shared_ptr<const FocusCurveRecordSetContainerT> getFocusCurveRecordSets() const = 0;
+
+  FocusMeasureTypeT::TypeE getFocusMeasureType() const {
+    return mFocusMeasureType;
+  }
+  
+  void setFocusMeasureType(FocusMeasureTypeT::TypeE focusMeasureType) {
+    mFocusMeasureType = focusMeasureType;
+  }
+
   
   std::shared_ptr<CameraT> getCamera() const {
     return mCamera;
   }
-
+  
   void setCamera(std::shared_ptr<CameraT> camera) {
     mCamera = camera;
   }

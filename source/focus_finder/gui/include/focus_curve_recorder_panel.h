@@ -60,9 +60,17 @@ protected slots:
 
 protected:
     const QScopedPointer<Ui::FocusCurveRecorderPanel> m_ui;
+protected slots:
+  // Setting elements
+  void onFocusMeasureSelectionChanged();
+  void onFocusCurveTypeSelectionChanged();
 
 private:
   QHBoxLayout * getMainToolBar();
+
+  void addFocusCurveType(FittingCurveTypeT::TypeE focusCurveType);
+  void initFocusMeasureCombobox();
+  void initFocusCurveTypeCombobox();
   
   void setBtnIcon(QAbstractButton * btn, const std::string & filename);
   bool deviceCheck() const;
@@ -81,6 +89,8 @@ private:
   void onFocusCurveRecorderFinished(std::shared_ptr<const FocusCurveRecordSetContainerT> focusCurveRecordSetContainer);
   void onFocusCurveRecordPressed(bool isChecked);
 
+  
+  
   AnimMenuButtonT * mFocusCurveRecordButton;
 
   // TODO: Is it ok that all those instances are local to this GUI window?

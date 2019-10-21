@@ -52,7 +52,7 @@ void FocusCurveViewWidgetT::drawFocusCurveRecordSet(QPainter * p, std::shared_pt
 	    
 	  // Transform coordinates
 	  float xpos = (focusPos / (float) deltaFocusPos) * width();
-	  float ypos = (1.0f - (focusMeasure / deltaFocusMeasure)) * height();
+	  float ypos = (1.0F - (focusMeasure / deltaFocusMeasure)) * height();
 
 	  LOG(debug) << "FocusCurveViewWidgetT::drawFocusCurveRecordSet... focusPos=" << focusPos << ", width=" << width() << ", draw point (x, y)=" << xpos << ", " << ypos << ")." << std::endl;
 	  
@@ -71,7 +71,7 @@ void FocusCurveViewWidgetT::drawFocusCurveRecordSets(QPainter * p) {
   
   if (focusCurveRecorder != nullptr) {
     auto focusCurveRecordSets = focusCurveRecorder->getFocusCurveRecordSets();
-    FocusMeasureTypeT::TypeE focusMeasureType = focusCurveRecorder->getFocusMeasureType();
+    // FocusMeasureTypeT::TypeE focusMeasureType = focusCurveRecorder->getFocusMeasureType();
 
     
     LOG(debug) << "FocusCurveViewWidgetT::drawFocusCurveRecordSets...focusCurveRecordSets.size(): " << focusCurveRecordSets->size() << std::endl;

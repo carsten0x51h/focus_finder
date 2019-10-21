@@ -50,7 +50,7 @@ void FocusFinderFastCurveLookupT::moveFocusByBlocking(
 		FocusDirectionT::TypeE direction, int ticks,
 		std::chrono::milliseconds timeout) {
 
-	auto isFocusPositionReachedOrCancelledLambda = [=]() -> bool {
+	auto isFocusPositionReachedOrCancelledLambda = [this]() -> bool {
 		LOG(debug) << "current pos=" << getFocus()->getCurrentPos()
 		<< ", target pos=" << getFocus()->getTargetPos()
 		<< ", isMoving? " << getFocus()->isMoving()

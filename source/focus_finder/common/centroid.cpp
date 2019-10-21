@@ -424,12 +424,12 @@ std::optional<PointT<float> > CentroidT::calculate(const ImageT & inImg,
 	// AD noise reduction --> In: Loaded image, Out: Noise reduced image
 	// http://cimg.sourceforge.net/reference/structcimg__library_1_1CImg.html
 	// NOTE: Can throw CImgArgumentException
-	ImageT aiImg = inImg.get_blur_anisotropic(130.0f, /*amplitude*/
-	0.7f, /*sharpness*/
-	0.3f, /*anisotropy*/
-	0.6f, /*alpha*/
-	1.1f, /*sigma*/
-	0.8f, /*dl*/
+	ImageT aiImg = inImg.get_blur_anisotropic(130.0F, /*amplitude*/
+	0.7F, /*sharpness*/
+	0.3F, /*anisotropy*/
+	0.6F, /*alpha*/
+	1.1F, /*sigma*/
+	0.8F, /*dl*/
 	30, /*da*/
 	2, /*gauss_prec*/
 	0, /*interpolation_type*/

@@ -8,7 +8,7 @@ struct FittingCurveTypeT {
   enum TypeE {
     HYPERBOLIC,
     PARABOLIC,
-	GAUSSIAN,
+    GAUSSIAN,
     LINEAR_SLOPE,
     _Count
   };
