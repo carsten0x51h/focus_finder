@@ -97,11 +97,11 @@ build & install
 	   Examples:
 
 	      a. Build with debug flags displaying make commands. Furthermore use clang++-7 as C++ compiler and clang-7 as C compiler:
-	
+
 	            cmake .. -DCMAKE_BUILD_TYPE=DEBUG -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -DCMAKE_CXX_COMPILER=clang++-7 -DCMAKE_C_COMPILER=clang-7
 
 		    or
-		    
+
 		    cmake .. -DCMAKE_BUILD_TYPE=DEBUG -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -DCMAKE_CXX_COMPILER=g++-9 -DCMAKE_C_COMPILER=gcc-9
 
 	      b. Or, build with "perf" measurment flags
@@ -113,7 +113,7 @@ build & install
 		    cmake .. -DCMAKE_BUILD_TYPE=DEBUG -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -DOPTION_BUILD_EXAMPLES=ON -DCMAKE_CXX_COMPILER=g++ -DCMAKE_C_COMPILER=gcc
 
 	3. Build the project.
-	
+
 		cmake --build . -- [all|clean|test|doc]
 
 		or
@@ -123,10 +123,10 @@ build & install
 	4. Run the tests manually (optional)
 	       export LSAN_OPTIONS=suppressions=../suppr.txt
 	       export ASAN_SYMBOLIZER_PATH=/usr/bin/llvm-symbolizer
-	       
+
 	       cd build
 	       cmake --build . -- test
-	       
+
 	       TODO: Add LSAN_OPTIONS=suppressions=../suppr.txt somehow to CMakeLists.txt.....
 	       
 

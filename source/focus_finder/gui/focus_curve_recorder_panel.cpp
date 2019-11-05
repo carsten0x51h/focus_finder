@@ -73,29 +73,9 @@ FocusCurveRecorderPanelT::FocusCurveRecorderPanelT(QWidget * parent, std::shared
     // Configure setting elements
     /////////////////////////////
 
-    initFocusMeasureCombobox();
     initFocusCurveTypeCombobox();
     
     reset();
-}
-
-void FocusCurveRecorderPanelT::initFocusMeasureCombobox() {
-
-  for (size_t i = 0; i < FocusMeasureTypeT::_Count; ++i) {
-
-    FocusMeasureTypeT::TypeE idx = static_cast<FocusMeasureTypeT::TypeE>(i);
-
-    QVariant data;
-    data.setValue(idx);
-
-    m_ui->cbxFocusMeasure->addItem(
-         QString::fromStdString(FocusMeasureTypeT::asStr(idx)),
-	 data
-    );
-  }
-  
-  connect(m_ui->cbxFocusMeasure, QOverload<int>::of(&QComboBox::currentIndexChanged),
-    		this, &FocusCurveRecorderPanelT::onFocusMeasureSelectionChanged);
 }
 
 
@@ -127,15 +107,6 @@ void FocusCurveRecorderPanelT::onFocusCurveTypeSelectionChanged() {
   // TODO...
 }
 
-void FocusCurveRecorderPanelT::onFocusMeasureSelectionChanged() {
-
-  QVariant cbxData = m_ui->cbxFocusMeasure->currentData();
-  auto focusMeasureType = cbxData.value<FocusMeasureTypeT::TypeE>();
-
-  LOG(debug) << "FocusCurveRecorderPanelT::onFocusMeasureChanged...focusMeasureType=" << FocusMeasureTypeT::asStr(focusMeasureType) << std::endl;
-
-  // TODO...
-}
 
 FocusCurveRecorderPanelT::~FocusCurveRecorderPanelT()
 {

@@ -62,7 +62,6 @@ protected:
     const QScopedPointer<Ui::FocusCurveRecorderPanel> m_ui;
 protected slots:
   // Setting elements
-  void onFocusMeasureSelectionChanged();
   void onFocusCurveTypeSelectionChanged();
 
 private:

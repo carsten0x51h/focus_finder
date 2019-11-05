@@ -33,14 +33,17 @@ public:
 signals:
 
 protected slots:
-	void onAcceptedSlot();
-	void onRejectedSlot();
+  void onAcceptedSlot();
+  void onRejectedSlot();
+  void onFocusMeasureSelectionChanged();
 
 protected:
     const QScopedPointer<Ui::ProfileSettingsDialog> m_ui;
 
 private:
-    FocusFinderLogicT & mFfl;
+  void initFocusMeasureCombobox();
+  
+  FocusFinderLogicT & mFfl;
 };
 
 #endif /*SOURCE_FOCUS_FINDER_GUI_INCLUDE_PROFILE_SETTINGS_DIALOG_H_*/
