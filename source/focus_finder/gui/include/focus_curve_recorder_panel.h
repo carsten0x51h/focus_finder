@@ -16,10 +16,15 @@
 #include "anim_menu_button.h"
 
 #include "../include/focus_curve_recorder_panel.h"
+
 #include "../../common/include/focus_finder_logic.h"
 #include "../../common/include/focus_curve_recorder.h"
 
 class FocusCurveViewPanelT;
+class FocusCurveRecorderProgressDetailsPanelT;
+class FocusCurveRecorderCurveDetailsPanelT;
+class FocusCurveRecorderPointDetailsPanelT;
+class FocusCurveRecorderSummaryDetailsPanelT;
 
 namespace Ui {
     class FocusCurveRecorderPanel;
@@ -57,6 +62,7 @@ public:
   void focusCurveRecorderCancelledSignal();
 
 protected slots:
+	void onPushButtonPressed();
 
 protected:
     const QScopedPointer<Ui::FocusCurveRecorderPanel> m_ui;
@@ -97,6 +103,10 @@ private:
   
   std::shared_ptr<FocusCurveRecorderLogicT> mFocusCurveRecorderLogic;
   FocusCurveViewPanelT * mFocusCurveViewPanel;
+  FocusCurveRecorderProgressDetailsPanelT * mFocusCurveRecorderProgressDetailsPanel;
+  FocusCurveRecorderCurveDetailsPanelT * mFocusCurveRecorderCurveDetailsPanel; 
+  FocusCurveRecorderPointDetailsPanelT * mFocusCurveRecorderPointDetailsPanel;
+  FocusCurveRecorderSummaryDetailsPanelT * mFocusCurveRecorderSummaryDetailsPanel;
 };
 
 #endif /*SOURCE_FOCUS_FINDER_GUI_INCLUDE_FOCUS_CURVE_RECORDER_PANEL_H_*/

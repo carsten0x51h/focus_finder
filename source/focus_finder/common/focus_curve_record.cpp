@@ -1,3 +1,5 @@
+#include <ctime>
+
 #include "include/focus_curve_record.h"
 #include "include/fwhm.h"
 #include "include/hfd.h"
@@ -11,6 +13,7 @@ FocusCurveRecordT::FocusCurveRecordT(int currentAbsoluteFocusPos, float snr,
 		mCurrentAbsoluteFocusPos(currentAbsoluteFocusPos), mSnr(snr), mFwhmHorz(
 				fwhmHorz), mFwhmVert(fwhmVert), mHfd(hfd), mRoiImage(roiImage), mCorrectedStarImage(
 				correctedStarImage), mAbsStarCenterPos(absStarCenterPos), mDrift(drift) {
+  mDateTime = std::time(nullptr);
 }
 
 int FocusCurveRecordT::getCurrentAbsoluteFocusPos() const {
@@ -39,6 +42,10 @@ const PointFT & FocusCurveRecordT::getAbsStarCenterPos() const {
 }
 const std::tuple<float, float> & FocusCurveRecordT::getDrift() const {
 	return mDrift;
+}
+
+std::time_t FocusCurveRecordT::getDateTime() const {
+  return mDateTime;
 }
 
 float FocusCurveRecordT::getFocusMeasure(std::shared_ptr<FocusCurveRecordT> focusCurveRecord, FocusMeasureTypeT::TypeE focusMeasureType) {

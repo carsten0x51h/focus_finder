@@ -13,6 +13,7 @@
 #include <QHBoxLayout>
 
 class FocusCurveRecorderLogicT;
+class FocusCurveRecordT;
 
 namespace Ui {
     class FocusCurveRecorderPointDetailsPanel;
@@ -32,6 +33,8 @@ public:
    */
   FocusCurveRecorderPointDetailsPanelT(QWidget * parent, std::shared_ptr<FocusCurveRecorderLogicT> focusCurveRecorderLogic);
 
+  void setPointDetails(std::shared_ptr<FocusCurveRecordT> focusCurveRecord);
+  
   /**
    *  @brief
    *    Destructor

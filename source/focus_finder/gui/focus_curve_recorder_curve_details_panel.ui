@@ -69,10 +69,34 @@
               </property>
              </widget>
             </item>
-            <item row="2" column="0">
-             <widget class="QLabel" name="label_3">
+            <item row="3" column="0">
+             <widget class="QLabel" name="label_4">
               <property name="text">
-               <string>Curve shape:</string>
+               <string>#Matched points:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QLabel" name="lblDateTime">
+              <property name="text">
+               <string>TextLabel</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item row="5" column="0">
+             <widget class="QLabel" name="label_5">
+              <property name="text">
+               <string>Std. dev.:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="6" column="0">
+             <widget class="QLabel" name="label_6">
+              <property name="text">
+               <string>Best focus pos:</string>
               </property>
              </widget>
             </item>
@@ -83,39 +107,8 @@
               </property>
              </widget>
             </item>
-            <item row="5" column="0">
-             <widget class="QLabel" name="label_6">
-              <property name="text">
-               <string>Best focus pos:</string>
-              </property>
-             </widget>
-            </item>
-            <item row="3" column="0">
-             <widget class="QLabel" name="label_4">
-              <property name="text">
-               <string>#Data points:</string>
-              </property>
-             </widget>
-            </item>
-            <item row="4" column="0">
-             <widget class="QLabel" name="label_5">
-              <property name="text">
-               <string>Std. dev.:</string>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="1">
-             <widget class="QLabel" name="label_7">
-              <property name="text">
-               <string>TextLabel</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-              </property>
-             </widget>
-            </item>
             <item row="1" column="1">
-             <widget class="QLabel" name="label_8">
+             <widget class="QLabel" name="lblFocusMeasure">
               <property name="text">
                <string>TextLabel</string>
               </property>
@@ -125,7 +118,7 @@
              </widget>
             </item>
             <item row="2" column="1">
-             <widget class="QLabel" name="label_9">
+             <widget class="QLabel" name="lblCurveShape">
               <property name="text">
                <string>TextLabel</string>
               </property>
@@ -135,7 +128,7 @@
              </widget>
             </item>
             <item row="3" column="1">
-             <widget class="QLabel" name="label_10">
+             <widget class="QLabel" name="lblNumMatchedDataPoints">
               <property name="text">
                <string>TextLabel</string>
               </property>
@@ -144,18 +137,42 @@
               </property>
              </widget>
             </item>
-            <item row="4" column="1">
-             <widget class="QLabel" name="label_11">
+            <item row="2" column="0">
+             <widget class="QLabel" name="label_3">
               <property name="text">
-               <string>TextLabel</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               <string>Curve shape:</string>
               </property>
              </widget>
             </item>
             <item row="5" column="1">
-             <widget class="QLabel" name="label_12">
+             <widget class="QLabel" name="lblStdDev">
+              <property name="text">
+               <string>TextLabel</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item row="6" column="1">
+             <widget class="QLabel" name="lblBestFocusPos">
+              <property name="text">
+               <string>TextLabel</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item row="4" column="0">
+             <widget class="QLabel" name="label_7">
+              <property name="text">
+               <string>#Outliers:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="4" column="1">
+             <widget class="QLabel" name="lblNumOutliers">
               <property name="text">
                <string>TextLabel</string>
               </property>
@@ -185,6 +202,15 @@
               <property name="title">
                <string>Curve parameters</string>
               </property>
+              <layout class="QGridLayout" name="gridLayout_8">
+               <item row="0" column="0">
+                <layout class="QGridLayout" name="gridLayout_7">
+                 <item row="0" column="0">
+                  <widget class="QTableWidget" name="tableWidget"/>
+                 </item>
+                </layout>
+               </item>
+              </layout>
              </widget>
             </item>
            </layout>

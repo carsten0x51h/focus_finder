@@ -40,6 +40,19 @@ public:
 
   void reset();
 
+  void setIteration(size_t currentIteration, size_t numTotalIterations);
+  void setCurrentIterationProgress(int progressPerc);
+  void setCurrentIterationProgressText(const std::string & currentProgressText);
+  void setTotalProgress(int progressPerc);
+  void setTotalProgressText(const std::string & totalProgressText);
+
+  void startAnimation();
+  void stopAnimation();
+  
+public slots:
+  // member function that catches the frameChanged signal of the QMovie
+  void setButtonIcon(int frame);
+								  
 protected slots:
 
 protected:
@@ -47,6 +60,7 @@ protected:
 
 private:
   std::shared_ptr<FocusCurveRecorderLogicT> mFocusCurveRecorderLogic;
+   QMovie * mMovie;
 };
 
 #endif /*SOURCE_FOCUS_FINDER_GUI_INCLUDE_FOCUS_CURVE_RECORDER_PROGRESS_DETAILS_PANEL_H_*/

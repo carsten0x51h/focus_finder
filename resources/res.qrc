@@ -1,5 +1,6 @@
 <RCC>
   <qresource prefix="res">
+    <file>telescope_focusing.gif</file>
     <file>mIconExpand.svg</file>
     <file>mIconCollapse.svg</file>
     <file>record_focus_curve_64x64.png</file>

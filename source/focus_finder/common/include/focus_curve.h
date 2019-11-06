@@ -3,11 +3,14 @@
 
 #include <fstream>
 #include <memory>
+#include <ctime>
 
 #include "fitting_curve_type.h"
 #include "focus_measure_type.h"
 #include "curve_parms.h"
 #include "curve_function.h"
+#include "curve_fit_summary.h"
+
 // TODO: need further includes...
 
 class FocusCurveRecordSetT;
@@ -16,12 +19,16 @@ class FocusCurveT {
 private:
   FittingCurveTypeT::TypeE mFocusCurveType;   // < Curve type used to match the focus curve - e.g. HYPERBOLIC
   CurveParmsT mCurveParms;                    // < The resulting curve parameters from the match
+  CurveFitSummaryT mCurveFitSummary;
+
   FocusMeasureTypeT::TypeE mFocusMeasureType; // < Focus measure type used to record the data points - e.g. HFD
 
   float mLowerFocusPos; // TODO: Required?
   float mUpperFocusPos; // TODO: Required?
   float mFocusMeasureLimit;
 
+  std::time_t mDateTime;
+  
   // TODO: Should CurveFitSummaryT be part of this class?
   //CurveFitSummaryT mCurveFitSummary;          // < Contains details about the curve fit (success, outlier boundary, outliers, matched data points, ...)
 
@@ -44,6 +51,11 @@ public:
   
   float calcFocusMeasureByFocusPosition(float focusPosition) const;
   float calcFocusPositionByFocusMeasure(float focusMeasure) const;
+
+  std::time_t getDateTime() const;
+  FocusMeasureTypeT::TypeE getFocusMeasureType() const;
+  FittingCurveTypeT::TypeE getFocusCurveType() const;
+  const CurveFitSummaryT & getCurveFitSummary() const;
 
   std::ostream & print(std::ostream & os) const;
   

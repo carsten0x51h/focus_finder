@@ -66,7 +66,7 @@
                 </widget>
                </item>
                <item row="4" column="0">
-                <widget class="QLabel" name="label_6">
+                <widget class="QLabel" name="lblTotalProgressText">
                  <property name="text">
                   <string>Status text...</string>
                  </property>
@@ -101,9 +101,9 @@
                 </spacer>
                </item>
                <item row="1" column="0">
-                <widget class="QProgressBar" name="progressBar_2">
+                <widget class="QProgressBar" name="pgbTotalProgress">
                  <property name="value">
-                  <number>24</number>
+                  <number>0</number>
                  </property>
                 </widget>
                </item>
@@ -113,17 +113,20 @@
            </widget>
           </item>
           <item row="2" column="0">
-           <widget class="QLabel" name="label_7">
+           <widget class="QLabel" name="lblFocusingAnimation">
             <property name="styleSheet">
-             <string notr="true">background-color: black;</string>
+             <string notr="true">background-color: #f6f9f6;</string>
             </property>
             <property name="text">
-             <string>Animation</string>
+             <string/>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
             </property>
            </widget>
           </item>
           <item row="0" column="0">
-           <widget class="QGroupBox" name="groupBox_2">
+           <widget class="QGroupBox" name="grpProgressIteration">
             <property name="title">
              <string>Progress iteration n/N</string>
             </property>
@@ -134,16 +137,16 @@
                 <number>0</number>
                </property>
                <item row="4" column="0">
-                <widget class="QLabel" name="label_3">
+                <widget class="QLabel" name="lblCurrentIterationProgressText">
                  <property name="text">
                   <string>Status text ...</string>
                  </property>
                 </widget>
                </item>
                <item row="1" column="0">
-                <widget class="QProgressBar" name="progressBar">
+                <widget class="QProgressBar" name="pgbCurrentIterationProgress">
                  <property name="value">
-                  <number>24</number>
+                  <number>0</number>
                  </property>
                 </widget>
                </item>
@@ -204,6 +207,8 @@
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="../../../resources/res.qrc"/>
+ </resources>
  <connections/>
 </ui>

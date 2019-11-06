@@ -6,6 +6,10 @@
 
 #include "include/focus_curve_recorder_panel.h"
 #include "include/focus_curve_view_panel.h"
+#include "include/focus_curve_recorder_progress_details_panel.h"
+#include "include/focus_curve_recorder_curve_details_panel.h"
+#include "include/focus_curve_recorder_point_details_panel.h"
+#include "include/focus_curve_recorder_summary_details_panel.h"
 
 #include "../common/include/logging.h"
 #include "../common/include/profile_manager.h"
@@ -74,8 +78,68 @@ FocusCurveRecorderPanelT::FocusCurveRecorderPanelT(QWidget * parent, std::shared
     /////////////////////////////
 
     initFocusCurveTypeCombobox();
+
+    // Add progress details panel
+    mFocusCurveRecorderSummaryDetailsPanel = new FocusCurveRecorderSummaryDetailsPanelT(m_ui->wgtDetailsWidget, focusCurveRecorderLogic);
+    m_ui->layDetailsWidget->addWidget(mFocusCurveRecorderSummaryDetailsPanel, 0/*row*/, 0/*col*/, 1/*rowspan*/, 1/*colspan*/);
+
+    mFocusCurveRecorderProgressDetailsPanel = new FocusCurveRecorderProgressDetailsPanelT(m_ui->wgtDetailsWidget, focusCurveRecorderLogic);
+    m_ui->layDetailsWidget->addWidget(mFocusCurveRecorderProgressDetailsPanel, 0/*row*/, 0/*col*/, 1/*rowspan*/, 1/*colspan*/);
+    mFocusCurveRecorderProgressDetailsPanel->setVisible(false);
+    
+    mFocusCurveRecorderCurveDetailsPanel = new FocusCurveRecorderCurveDetailsPanelT(m_ui->wgtDetailsWidget, focusCurveRecorderLogic);
+    m_ui->layDetailsWidget->addWidget(mFocusCurveRecorderCurveDetailsPanel, 0/*row*/, 0/*col*/, 1/*rowspan*/, 1/*colspan*/);
+    mFocusCurveRecorderCurveDetailsPanel->setVisible(false);
+    
+    mFocusCurveRecorderPointDetailsPanel = new FocusCurveRecorderPointDetailsPanelT(m_ui->wgtDetailsWidget, focusCurveRecorderLogic);
+    m_ui->layDetailsWidget->addWidget(mFocusCurveRecorderPointDetailsPanel, 0/*row*/, 0/*col*/, 1/*rowspan*/, 1/*colspan*/);
+    mFocusCurveRecorderPointDetailsPanel->setVisible(false);
+    
+    //mFocusCurveRecorderProgressDetailsPanel->setParent(m_ui->wgtDetailsWidget);
+    //mFocusCurveRecorderCurveDetailsPanel->setParent(m_ui->wgtDetailsWidget);
+    //mFocusCurveRecorderProgressDetailsPanel->startAnimation();
+
+
+    
+    // HACK - REMOVE LATER!
+    connect(m_ui->pushButton, & QPushButton::pressed, this, & FocusCurveRecorderPanelT::onPushButtonPressed);
+
     
     reset();
+}
+void FocusCurveRecorderPanelT::onPushButtonPressed()
+{
+  static int idx = 0;
+  
+  idx = (++idx) % 4;
+  
+  LOG(debug) << "FocusCurveRecorderPanelT::onPushButtonPressed... idx=" << idx << std::endl;
+
+  if (idx == 0) {
+    mFocusCurveRecorderSummaryDetailsPanel->setVisible(true);
+    mFocusCurveRecorderProgressDetailsPanel->setVisible(false);
+    mFocusCurveRecorderCurveDetailsPanel->setVisible(false);
+    mFocusCurveRecorderPointDetailsPanel->setVisible(false);
+  }
+  else if (idx == 1) {
+    mFocusCurveRecorderSummaryDetailsPanel->setVisible(false);
+    mFocusCurveRecorderProgressDetailsPanel->setVisible(true);
+    mFocusCurveRecorderCurveDetailsPanel->setVisible(false);
+    mFocusCurveRecorderPointDetailsPanel->setVisible(false);
+  }
+  else if (idx == 2) {
+    mFocusCurveRecorderSummaryDetailsPanel->setVisible(false);
+    mFocusCurveRecorderProgressDetailsPanel->setVisible(false);
+    mFocusCurveRecorderCurveDetailsPanel->setVisible(true);
+    mFocusCurveRecorderPointDetailsPanel->setVisible(false);
+  }
+  else if (idx == 3) {
+    mFocusCurveRecorderSummaryDetailsPanel->setVisible(false);
+    mFocusCurveRecorderProgressDetailsPanel->setVisible(false);
+    mFocusCurveRecorderCurveDetailsPanel->setVisible(false);
+    mFocusCurveRecorderPointDetailsPanel->setVisible(true);
+  }
+  
 }
 
 

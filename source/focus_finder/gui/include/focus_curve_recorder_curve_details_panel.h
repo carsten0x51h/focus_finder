@@ -6,11 +6,14 @@
 #define SOURCE_FOCUS_FINDER_GUI_INCLUDE_FOCUS_CURVE_RECORDER_CURVE_DETAILS_PANEL_H_
 
 // std includes
+#include <memory>
 
 // Qt includes
 #include <QWidget>
 #include <QPixmap>
 #include <QHBoxLayout>
+
+#include "../../common/include/focus_curve.h"
 
 class FocusCurveRecorderLogicT;
 
@@ -39,6 +42,7 @@ public:
   virtual ~FocusCurveRecorderCurveDetailsPanelT();
 
   void reset();
+  void setCurveDetails(std::shared_ptr<const FocusCurveT> focusCurve);
 
 protected slots:
 

@@ -44,3 +44,47 @@ FocusCurveRecorderCurveDetailsPanelT::~FocusCurveRecorderCurveDetailsPanelT()
 void FocusCurveRecorderCurveDetailsPanelT::reset()
 {
 }
+
+void FocusCurveRecorderCurveDetailsPanelT::setCurveDetails(std::shared_ptr<const FocusCurveT> focusCurve)
+{
+  std::stringstream ss;
+
+
+  std::time_t t = focusCurve->getDateTime();
+  char mbstr[100];
+  std::strftime(mbstr, sizeof(mbstr), "%A %c", std::localtime(& t));
+  m_ui->lblDateTime->setText(QString::fromStdString(std::string(mbstr)));
+  ss.str(std::string());
+
+  
+  ss << std::fixed << FocusMeasureTypeT::asStr(focusCurve->getFocusMeasureType());
+  m_ui->lblFocusMeasure->setText(QString::fromStdString(ss.str()));
+  ss.str(std::string());
+
+
+  ss << std::fixed << FittingCurveTypeT::asStr(focusCurve->getFocusCurveType());
+  m_ui->lblCurveShape->setText(QString::fromStdString(ss.str()));
+  ss.str(std::string());
+
+  
+  ss << std::fixed << focusCurve->getCurveFitSummary().matchedDataPoints.size();
+  m_ui->lblNumMatchedDataPoints->setText(QString::fromStdString(ss.str()));
+  ss.str(std::string());
+
+
+  ss << std::fixed << focusCurve->getCurveFitSummary().outliers.size();
+  m_ui->lblNumOutliers->setText(QString::fromStdString(ss.str()));
+  ss.str(std::string());
+  
+
+  // // TODO: FocusCurveT needs to support this...
+  // ss << std::fixed << focusCurve->getStdDev();
+  // m_ui->lblStdDev->setText(QString::fromStdString(ss.str()));
+  // ss.str(std::string());
+
+
+  // // TODO: FocusCurveT needs to support this...
+  // ss << std::fixed << focusCurve->getBestFocusPos();
+  // m_ui->lblBestFocusPos->setText(QString::fromStdString(ss.str()));
+  // ss.str(std::string());
+}

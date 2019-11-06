@@ -260,6 +260,9 @@ set(sources
   include/focus_curve_recorder_curve_details_panel.h
   focus_curve_recorder_curve_details_panel.cpp
   focus_curve_recorder_curve_details_panel.ui
+  include/focus_curve_recorder_summary_details_panel.h
+  focus_curve_recorder_summary_details_panel.cpp
+  focus_curve_recorder_summary_details_panel.ui
 )
 
 

@@ -23,7 +23,6 @@ FocusCurveT::FocusCurveT(std::shared_ptr<const FocusCurveRecordSetT> focusCurveR
   
   
   CurveParmsT curveParms;
-  CurveFitSummaryT curveFitSummary;
 
   std::vector<PointFT> fitValues;
   std::vector<PointWithResidualT> outlierValues;
@@ -45,7 +44,7 @@ FocusCurveT::FocusCurveT(std::shared_ptr<const FocusCurveRecordSetT> focusCurveR
   mCurveParms = CurveFitAlgorithmT::fitCurve(curveType,
 					     dataPoints,
 					     curveFitParms,
-					     & curveFitSummary);
+					     & mCurveFitSummary);
   
 
   // TODO: Also store curveFitSummary in FocusCurveT ??
@@ -58,6 +57,8 @@ FocusCurveT::FocusCurveT(std::shared_ptr<const FocusCurveRecordSetT> focusCurveR
   // TODO: Need factory to create a "generic" "FocusCurveFunctionT"(?) which takes CurveParmsT, mFocusCurveType...
   // MathFunctionsT::hyperbolic(x, a, b, c, d);
   mFocusCurveFunction = CurveFunctionFactoryT::getInstance(mFocusCurveType, mCurveParms);
+
+  mDateTime = std::time(nullptr);
 }
 
 FocusCurveT::~FocusCurveT() {
@@ -81,6 +82,22 @@ float FocusCurveT::calcFocusMeasureByFocusPosition(float focusPosition) const {
 float FocusCurveT::calcFocusPositionByFocusMeasure(float focusMeasure) const {
   // TODO: IMPLEMENT
     return 0.0;
+}
+
+std::time_t FocusCurveT::getDateTime() const {
+  return mDateTime;
+}
+
+FocusMeasureTypeT::TypeE FocusCurveT::getFocusMeasureType() const {
+  return mFocusMeasureType;
+}
+
+FittingCurveTypeT::TypeE FocusCurveT::getFocusCurveType() const {
+  return mFocusCurveType;
+}
+
+const CurveFitSummaryT & FocusCurveT::getCurveFitSummary() const {
+  return mCurveFitSummary;
 }
 
 std::ostream &

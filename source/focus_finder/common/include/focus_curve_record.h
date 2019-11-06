@@ -1,6 +1,8 @@
 #ifndef SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FOCUS_FINDER_RECORD_H_
 #define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FOCUS_FINDER_RECORD_H_
 
+#include <ctime>
+
 #include "fwhm.h"
 #include "hfd.h"
 #include "image.h"
@@ -21,6 +23,7 @@ private:
 	ImageT mCorrectedStarImage;
 	PointFT mAbsStarCenterPos;
 	std::tuple<float, float> mDrift;
+  std::time_t mDateTime;
 
 public:
 	FocusCurveRecordT(int currentAbsoluteFocusPos, float snr,
@@ -36,6 +39,7 @@ public:
 	const ImageT & getCorrectedStarImage() const;
 	const PointFT & getAbsStarCenterPos() const;
 	const std::tuple<float, float> & getDrift() const;
+  std::time_t getDateTime() const;
 
   static float getFocusMeasure(std::shared_ptr<FocusCurveRecordT> focusCurveRecord, FocusMeasureTypeT::TypeE focusMeasureType);
   float getFocusMeasure(FocusMeasureTypeT::TypeE focusMeasureType);
