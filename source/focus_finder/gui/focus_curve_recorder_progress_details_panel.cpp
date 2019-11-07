@@ -70,25 +70,38 @@ void FocusCurveRecorderProgressDetailsPanelT::setIteration(size_t currentIterati
   m_ui->grpProgressIteration->setTitle(QString::fromStdString(ss.str()));
 }
 
+void FocusCurveRecorderProgressDetailsPanelT::setProgress(QProgressBar * progressBar, int progressPerc) {
+  if (progressPerc == -1) {
+    // If there is no progress info, just display a "busy" animation
+    // See: https://forum.qt.io/topic/53791/stoping-qprogressbar-animation/2
+    progressBar->setMinimum(0);
+    progressBar->setMaximum(0);
+    progressBar->setValue(0);
+  } else {
+    progressBar->setMinimum(0);
+    progressBar->setMaximum(100);
+    progressBar->setValue(progressPerc);
+  }
+}
 
 void FocusCurveRecorderProgressDetailsPanelT::setCurrentIterationProgress(int progressPerc)
 {
-  m_ui->pgbCurrentIterationProgress->setValue(progressPerc);
+  setProgress(m_ui->pgbCurrentIterationProgress, progressPerc);
 }
 
-void FocusCurveRecorderProgressDetailsPanelT::setCurrentIterationProgressText(const std::string & currentProgressText)
+void FocusCurveRecorderProgressDetailsPanelT::setCurrentIterationProgressText(const QString & currentProgressText)
 {
-  m_ui->lblCurrentIterationProgressText->setText(QString::fromStdString(currentProgressText));
+  m_ui->lblCurrentIterationProgressText->setText(currentProgressText);
 }
 
 void FocusCurveRecorderProgressDetailsPanelT::setTotalProgress(int progressPerc)
 {
-  m_ui->pgbTotalProgress->setValue(progressPerc);
+  setProgress(m_ui->pgbTotalProgress, progressPerc);
 }
 
-void FocusCurveRecorderProgressDetailsPanelT::setTotalProgressText(const std::string & totalProgressText)
+void FocusCurveRecorderProgressDetailsPanelT::setTotalProgressText(const QString & totalProgressText)
 {
-  m_ui->lblTotalProgressText->setText(QString::fromStdString(totalProgressText));
+  m_ui->lblTotalProgressText->setText(totalProgressText);
 }
 
 

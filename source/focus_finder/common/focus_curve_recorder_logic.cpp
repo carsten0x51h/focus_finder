@@ -11,7 +11,7 @@
 
 class FocusCurveRecordSetT;
 
-FocusCurveRecorderLogicT::FocusCurveRecorderLogicT(FocusFinderLogicT & ffl) : mFfl(ffl), mFocusCurveRecorder(nullptr), mFocusMeasureType(FocusMeasureTypeT::HFD), mFocusCurveType(FittingCurveTypeT::HYPERBOLIC) {
+FocusCurveRecorderLogicT::FocusCurveRecorderLogicT(FocusFinderLogicT & ffl) : mFfl(ffl), mFocusCurveRecorder(nullptr), mFocusCurveType(FittingCurveTypeT::HYPERBOLIC) {
 }
 
 std::shared_ptr<FocusCurveRecorderT> FocusCurveRecorderLogicT::getFocusCurveRecorder() {
@@ -28,9 +28,7 @@ void FocusCurveRecorderLogicT::resetFocusCurveRecorder(FocusCurveRecorderTypeT::
     focusCurveRecorder->setFocus(mFfl.getCurrentFocus());
     focusCurveRecorder->setFilter(mFfl.getCurrentFilter());
 
-    focusCurveRecorder->setFocusMeasureType(mFocusMeasureType);
-    
-      
+
     auto lastFocusStarPosOpt = mFfl.getLastFocusStarPos();
 
     //if (!lastFocusStarPosOpt) {
@@ -77,13 +75,14 @@ bool FocusCurveRecorderLogicT::checkDevices() const {
   return true;
 }
 
-FocusMeasureTypeT::TypeE FocusCurveRecorderLogicT::getFocusMeasureType() const {
-  return mFocusMeasureType;
-}
+// FocusMeasureTypeT::TypeE FocusCurveRecorderLogicT::getFocusMeasureType() const {
+//   //return mFocusMeasureType;
+//   // TODO: Read from profile...
+// }
 
-void FocusCurveRecorderLogicT::setFocusMeasureType(FocusMeasureTypeT::TypeE focusMeasureType) {
-  mFocusMeasureType = focusMeasureType;
-}
+// // void FocusCurveRecorderLogicT::setFocusMeasureType(FocusMeasureTypeT::TypeE focusMeasureType) {
+// //   mFocusMeasureType = focusMeasureType;
+// // }
 
 FittingCurveTypeT::TypeE FocusCurveRecorderLogicT::getFocusCurveType() const {
   return mFocusCurveType;

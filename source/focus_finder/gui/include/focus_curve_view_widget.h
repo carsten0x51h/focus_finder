@@ -16,6 +16,7 @@
 
 class FocusCurveRecordT;
 class FocusCurveRecordSetT;
+class FocusCurveRecorderT;
 class FocusCurveRecorderLogicT;
 
 /**
@@ -42,8 +43,8 @@ public:
   //void setFocusCurve(std::shared_ptr<const FocusCurveT> focusCurve);
   void update();
 
-  FocusMeasureTypeT::TypeE getFocusMeasureType() const;
-  void setFocusMeasureType(FocusMeasureTypeT::TypeE focusMeasureType);
+  // FocusMeasureTypeT::TypeE getFocusMeasureType() const;
+  // void setFocusMeasureType(FocusMeasureTypeT::TypeE focusMeasureType);
   
   void paintEvent(QPaintEvent * event) override;
   void mouseMoveEvent(QMouseEvent * event);
@@ -57,13 +58,13 @@ protected slots:
 protected:
 
 private:
-  void drawFocusCurveRecordSet(QPainter * p, std::shared_ptr<FocusCurveRecordSetT> focusCurveRecordSet);
+  void drawFocusCurveRecordSet(QPainter * p, std::shared_ptr<FocusCurveRecordSetT> focusCurveRecordSet, std::shared_ptr<FocusCurveRecorderT> focusCurveRecorder);
   void drawFocusCurveRecordSets(QPainter * p);
 
   std::shared_ptr<FocusCurveRecorderLogicT> mFocusCurveRecorderLogic;
   
   QPoint mLastMousePos;
-  FocusMeasureTypeT::TypeE mFocusMeasureType;
+  //  FocusMeasureTypeT::TypeE mFocusMeasureType;
 };
 
 #endif /*SOURCE_FOCUS_FINDER_GUI_INCLUDE_FOCUS_CURVE_VIEW_WIDGET_H_*/

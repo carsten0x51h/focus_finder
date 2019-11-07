@@ -8,6 +8,7 @@ struct FocusMeasureTypeT {
 	      HFD,
 	      FWHM_VERT,
 	      FWHM_HORZ,
+	      FWHM_AVERAGE,
 	      _Count
   };
   
@@ -19,6 +20,8 @@ struct FocusMeasureTypeT {
 			  return "FWHM_VERT";
 			case FWHM_HORZ:
 			  return "FWHM_HORZ";
+			case FWHM_AVERAGE:
+			  return "FWHM_AVERAGE";
 			default:
 			  return "<?>";
 		}

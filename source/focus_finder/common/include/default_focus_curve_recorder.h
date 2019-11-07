@@ -39,6 +39,8 @@ private:
 	DefaultFocusCurveRecorderT(const DefaultFocusCurveRecorderT &);
 	DefaultFocusCurveRecorderT & operator=(const DefaultFocusCurveRecorderT &);
 
+  FocusMeasureTypeT::TypeE getLimitFocusMeasureType() const;
+  FocusMeasureTypeT::TypeE getCurveFocusMeasureType() const;
   void devicesAvailabilityCheck();
   void cleanup();
   void checkCancelled() const;

@@ -43,13 +43,13 @@ void FocusCurveViewPanelT::update() {
   mFocusCurveWidget->update();
 }
 
-FocusMeasureTypeT::TypeE FocusCurveViewPanelT::getFocusMeasureType() const {
-  return mFocusCurveWidget->getFocusMeasureType();
-}
+// FocusMeasureTypeT::TypeE FocusCurveViewPanelT::getFocusMeasureType() const {
+//   return mFocusCurveWidget->getFocusMeasureType();
+// }
 
-void FocusCurveViewPanelT::setFocusMeasureType(FocusMeasureTypeT::TypeE focusMeasureType) {
-  mFocusCurveWidget->setFocusMeasureType(focusMeasureType);
-}
+// void FocusCurveViewPanelT::setFocusMeasureType(FocusMeasureTypeT::TypeE focusMeasureType) {
+//   mFocusCurveWidget->setFocusMeasureType(focusMeasureType);
+// }
 
 // void FocusCurveViewPanelT::setFocusCurve(std::shared_ptr<const FocusCurveT> focusCurve) {
 // 	LOG(debug) << "FocusCurveViewPanelT::setFocusCurve..." << std::endl;

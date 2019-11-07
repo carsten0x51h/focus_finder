@@ -27,13 +27,14 @@ class FocusCurveRecorderLogicT {
   std::shared_ptr<FocusCurveRecorderT> getFocusCurveRecorder();
   void resetFocusCurveRecorder(FocusCurveRecorderTypeT::TypeE focusCurveRecorderType);
 
-  FocusMeasureTypeT::TypeE getFocusMeasureType() const;
-  void setFocusMeasureType(FocusMeasureTypeT::TypeE focusMeasureType);
+  // FocusMeasureTypeT::TypeE getFocusMeasureType() const;
+  // void setFocusMeasureType(FocusMeasureTypeT::TypeE focusMeasureType);
 
   FittingCurveTypeT::TypeE getFocusCurveType() const;
   void setFocusCurveType(FittingCurveTypeT::TypeE focusCurveType);
   
   bool checkDevices() const;
+
 };
 
 #endif /*SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FOCUS_CURVE_RECORDER_LOGIC_H_*/

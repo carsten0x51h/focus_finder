@@ -30,6 +30,8 @@ namespace Ui {
     class FocusCurveRecorderPanel;
 }
 
+enum FocusCurveRecorderDetailViewE { SUMMARY, CURVE, POINT, PROGRESS };
+
 /**
 *  @brief
 */
@@ -38,19 +40,20 @@ class FocusCurveRecorderPanelT : public QWidget
     Q_OBJECT
 
 public:
-    /**
-    *  @brief
-    *    Constructor
-    */
-    FocusCurveRecorderPanelT(QWidget * parent, std::shared_ptr<FocusCurveRecorderLogicT> focusCurveRecorderLogic);
+  /**
+   *  @brief
+   *    Constructor
+   */
+  FocusCurveRecorderPanelT(QWidget * parent, std::shared_ptr<FocusCurveRecorderLogicT> focusCurveRecorderLogic);
 
-    /**
-    *  @brief
-    *    Destructor
-    */
-    virtual ~FocusCurveRecorderPanelT();
+  /**
+   *  @brief
+   *    Destructor
+   */
+  virtual ~FocusCurveRecorderPanelT();
 
-    void reset();
+  void reset();
+  void selectDetailView(FocusCurveRecorderDetailViewE detailView);
 
     signals:
   void focusCurveRecorderStartedSignal();
@@ -74,7 +77,7 @@ private:
   QHBoxLayout * getMainToolBar();
 
   void addFocusCurveType(FittingCurveTypeT::TypeE focusCurveType);
-  void initFocusMeasureCombobox();
+  //void initFocusMeasureCombobox();
   void initFocusCurveTypeCombobox();
   
   void setBtnIcon(QAbstractButton * btn, const std::string & filename);

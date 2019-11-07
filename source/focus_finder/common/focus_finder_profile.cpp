@@ -24,6 +24,8 @@ FocusFinderProfileT::FocusFinderProfileT() :
 		mFocusName(DeviceT::NONE),
 		mFilterName(DeviceT::NONE),
 		mStarWindowSize(33, 33),
+		mLimitFocusMeasureType(FocusMeasureTypeT::HFD),
+		mCurveFocusMeasureType(FocusMeasureTypeT::FWHM_VERT),
 		mStarDetectionSnrBoundary(1.0f) {
 	LOG(debug)
 	<< "FocusFinderProfileT::FocusFinderProfileT()..." << std::endl;
@@ -77,6 +79,21 @@ const SizeT<unsigned int> & FocusFinderProfileT::getStarWindowSize() const {
 }
 void FocusFinderProfileT::setStarWindowSize(const SizeT<unsigned int> & starWindowSize) {
 	mStarWindowSize = starWindowSize;
+}
+
+FocusMeasureTypeT::TypeE FocusFinderProfileT::getLimitFocusMeasureType() const {
+  return mLimitFocusMeasureType;
+}
+void FocusFinderProfileT::setLimitFocusMeasureType(FocusMeasureTypeT::TypeE limitFocusMeasureType) {
+  mLimitFocusMeasureType = limitFocusMeasureType;
+}
+
+FocusMeasureTypeT::TypeE FocusFinderProfileT::getCurveFocusMeasureType() const {
+  return mCurveFocusMeasureType;
+}
+
+void FocusFinderProfileT::setCurveFocusMeasureType(FocusMeasureTypeT::TypeE curveFocusMeasureType) {
+  mCurveFocusMeasureType = curveFocusMeasureType;
 }
 
 

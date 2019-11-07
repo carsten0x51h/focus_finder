@@ -14,6 +14,7 @@
 #include "centroid_type.h"
 #include "exception.h"
 #include "focus_finder_factory.h"
+#include "focus_measure_type.h"
 
 DEF_Exception(FocusFinderProfile);
 
@@ -41,7 +42,13 @@ public:
 
 	const SizeT<unsigned int> & getStarWindowSize() const;
 	void setStarWindowSize(const SizeT<unsigned int> & starWindowSize);
+  
+  FocusMeasureTypeT::TypeE getLimitFocusMeasureType() const;
+  void setLimitFocusMeasureType(FocusMeasureTypeT::TypeE limitFocusMeasureType);
 
+  FocusMeasureTypeT::TypeE getCurveFocusMeasureType() const;
+  void setCurveFocusMeasureType(FocusMeasureTypeT::TypeE curveFocusMeasureType);
+  
 	float getStarDetectionSnrBoundary() const;
 	void setStarDetectionSnrBoundary(float starDetectionSnrBoundary);
 
@@ -90,6 +97,8 @@ private:
 	// Calibration settings
 	SizeT<unsigned int> mStarWindowSize;
 
+  FocusMeasureTypeT::TypeE mLimitFocusMeasureType;
+  FocusMeasureTypeT::TypeE mCurveFocusMeasureType;
 
 	float mStarDetectionSnrBoundary;
 

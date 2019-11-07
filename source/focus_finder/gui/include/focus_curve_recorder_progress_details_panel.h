@@ -11,6 +11,7 @@
 #include <QWidget>
 #include <QPixmap>
 #include <QHBoxLayout>
+#include <QProgressBar>
 
 class FocusCurveRecorderLogicT;
 
@@ -42,9 +43,9 @@ public:
 
   void setIteration(size_t currentIteration, size_t numTotalIterations);
   void setCurrentIterationProgress(int progressPerc);
-  void setCurrentIterationProgressText(const std::string & currentProgressText);
+  void setCurrentIterationProgressText(const QString & currentProgressText);
   void setTotalProgress(int progressPerc);
-  void setTotalProgressText(const std::string & totalProgressText);
+  void setTotalProgressText(const QString & totalProgressText);
 
   void startAnimation();
   void stopAnimation();
@@ -59,6 +60,8 @@ protected:
   const QScopedPointer<Ui::FocusCurveRecorderProgressDetailsPanel> m_ui;
 
 private:
+  void setProgress(QProgressBar * progressBar, int progressPerc);
+
   std::shared_ptr<FocusCurveRecorderLogicT> mFocusCurveRecorderLogic;
    QMovie * mMovie;
 };

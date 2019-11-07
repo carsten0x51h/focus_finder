@@ -16,7 +16,7 @@
 #include "../common/include/focus_curve_recorder_logic.h"
 #include "../common/include/focus_measure_type.h"
 
-FocusCurveViewWidgetT::FocusCurveViewWidgetT(QWidget * parent, std::shared_ptr<FocusCurveRecorderLogicT> focusCurveRecorderLogic) : QLabel(parent), mFocusCurveRecorderLogic(focusCurveRecorderLogic), mFocusMeasureType(FocusMeasureTypeT::HFD)
+FocusCurveViewWidgetT::FocusCurveViewWidgetT(QWidget * parent, std::shared_ptr<FocusCurveRecorderLogicT> focusCurveRecorderLogic) : QLabel(parent), mFocusCurveRecorderLogic(focusCurveRecorderLogic)
 {
   QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
   sizePolicy.setHorizontalStretch(100);
@@ -32,7 +32,7 @@ FocusCurveViewWidgetT::FocusCurveViewWidgetT(QWidget * parent, std::shared_ptr<F
 FocusCurveViewWidgetT::~FocusCurveViewWidgetT()
 {
 }
-void FocusCurveViewWidgetT::drawFocusCurveRecordSet(QPainter * p, std::shared_ptr<FocusCurveRecordSetT> focusCurveRecordSet) {
+void FocusCurveViewWidgetT::drawFocusCurveRecordSet(QPainter * p, std::shared_ptr<FocusCurveRecordSetT> focusCurveRecordSet, std::shared_ptr<FocusCurveRecorderT> focusCurveRecorder) {
 
   // Min / max focus positions
   int minFocusPos = 0; // TODO...
@@ -42,13 +42,15 @@ void FocusCurveViewWidgetT::drawFocusCurveRecordSet(QPainter * p, std::shared_pt
   float minFocusMeasure = 0; // TODO
   float maxFocusMeasure = 20; // TODO
   float deltaFocusMeasure = maxFocusMeasure - minFocusMeasure;
+
+  const FocusFinderProfileT & focusFinderProfile = focusCurveRecorder->getFocusFinderProfile();
   
   for (FocusCurveRecordSetT::const_iterator it = focusCurveRecordSet->begin(); it != focusCurveRecordSet->end(); ++it) {
 
 	  auto fcr = *it;
 
 	  float focusPos = fcr->getCurrentAbsoluteFocusPos();
-	  float focusMeasure = fcr->getFocusMeasure(mFocusMeasureType);
+	  float focusMeasure = fcr->getFocusMeasure(focusFinderProfile.getCurveFocusMeasureType());
 	    
 	  // Transform coordinates
 	  float xpos = (focusPos / (float) deltaFocusPos) * width();
@@ -67,7 +69,7 @@ void FocusCurveViewWidgetT::drawFocusCurveRecordSet(QPainter * p, std::shared_pt
 void FocusCurveViewWidgetT::drawFocusCurveRecordSets(QPainter * p) {
   auto focusCurveRecorder = mFocusCurveRecorderLogic->getFocusCurveRecorder();
 
-
+  // TODO: Should this widget really use the FocusCurveRecorder? Or should the RecordSets being set from outside?
   
   if (focusCurveRecorder != nullptr) {
     auto focusCurveRecordSets = focusCurveRecorder->getFocusCurveRecordSets();
@@ -79,20 +81,20 @@ void FocusCurveViewWidgetT::drawFocusCurveRecordSets(QPainter * p) {
     
     for (const auto & recordSet : *focusCurveRecordSets) {
       // TODO: Draw each in a different color...?!
-      drawFocusCurveRecordSet(p, recordSet);
+      drawFocusCurveRecordSet(p, recordSet, focusCurveRecorder);
     }	  
   } else {
     LOG(debug) << "FocusCurveViewWidgetT::drawFocusCurveRecordSets... nothing to draw... no focus curve recorder." << std::endl;
   }
 }
 
-FocusMeasureTypeT::TypeE FocusCurveViewWidgetT::getFocusMeasureType() const {
-  return mFocusMeasureType;
-}
+// FocusMeasureTypeT::TypeE FocusCurveViewWidgetT::getFocusMeasureType() const {
+//   return mFocusMeasureType;
+// }
 
-void FocusCurveViewWidgetT::setFocusMeasureType(FocusMeasureTypeT::TypeE focusMeasureType) {
-  mFocusMeasureType = focusMeasureType;
-}
+// void FocusCurveViewWidgetT::setFocusMeasureType(FocusMeasureTypeT::TypeE focusMeasureType) {
+//   mFocusMeasureType = focusMeasureType;
+// }
 
 
 void FocusCurveViewWidgetT::update() {

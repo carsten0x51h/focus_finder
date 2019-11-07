@@ -58,11 +58,10 @@ private:
   PointT<float> mLastFocusStarPos;
 
   FocusFinderProfileT mFocusFinderProfile;
-  FocusMeasureTypeT::TypeE mFocusMeasureType;
 
 public:
   FocusCurveRecorderT() :
-    mCamera(nullptr), mFocus(nullptr), mFilter(nullptr), mFocusMeasureType(FocusMeasureTypeT::_Count) {
+    mCamera(nullptr), mFocus(nullptr), mFilter(nullptr) {
   }
 
   virtual std::string getName() const = 0;
@@ -74,14 +73,6 @@ public:
   virtual void cancel() = 0;
   virtual void reset() = 0;
   virtual std::shared_ptr<const FocusCurveRecordSetContainerT> getFocusCurveRecordSets() const = 0;
-
-  FocusMeasureTypeT::TypeE getFocusMeasureType() const {
-    return mFocusMeasureType;
-  }
-  
-  void setFocusMeasureType(FocusMeasureTypeT::TypeE focusMeasureType) {
-    mFocusMeasureType = focusMeasureType;
-  }
 
   
   std::shared_ptr<CameraT> getCamera() const {

@@ -107,39 +107,50 @@ FocusCurveRecorderPanelT::FocusCurveRecorderPanelT(QWidget * parent, std::shared
     
     reset();
 }
+
+void FocusCurveRecorderPanelT::selectDetailView(FocusCurveRecorderDetailViewE detailView)
+{
+  LOG(debug) << "FocusCurveRecorderPanelT::onPushButtonPressed... detailView=" << detailView << std::endl;
+
+  switch (detailView) {
+  case SUMMARY:
+    mFocusCurveRecorderSummaryDetailsPanel->setVisible(true);
+    mFocusCurveRecorderCurveDetailsPanel->setVisible(false);
+    mFocusCurveRecorderPointDetailsPanel->setVisible(false);
+    mFocusCurveRecorderProgressDetailsPanel->setVisible(false);
+    break;
+  case CURVE:
+    mFocusCurveRecorderSummaryDetailsPanel->setVisible(false);
+    mFocusCurveRecorderCurveDetailsPanel->setVisible(true);
+    mFocusCurveRecorderPointDetailsPanel->setVisible(false);
+    mFocusCurveRecorderProgressDetailsPanel->setVisible(false);
+    break;
+  case POINT:
+    mFocusCurveRecorderSummaryDetailsPanel->setVisible(false);
+    mFocusCurveRecorderCurveDetailsPanel->setVisible(false);
+    mFocusCurveRecorderPointDetailsPanel->setVisible(true);
+    mFocusCurveRecorderProgressDetailsPanel->setVisible(false);
+    break;
+  case PROGRESS:
+    mFocusCurveRecorderSummaryDetailsPanel->setVisible(false);
+    mFocusCurveRecorderCurveDetailsPanel->setVisible(false);
+    mFocusCurveRecorderPointDetailsPanel->setVisible(false);
+    mFocusCurveRecorderProgressDetailsPanel->setVisible(true);
+    break;
+  default:
+    LOG(error) << "Invalid detailView " << detailView  << ". Not changing the view!" << std::endl;
+    break;
+  }
+}
+
 void FocusCurveRecorderPanelT::onPushButtonPressed()
 {
   static int idx = 0;
   
   idx = (++idx) % 4;
-  
-  LOG(debug) << "FocusCurveRecorderPanelT::onPushButtonPressed... idx=" << idx << std::endl;
 
-  if (idx == 0) {
-    mFocusCurveRecorderSummaryDetailsPanel->setVisible(true);
-    mFocusCurveRecorderProgressDetailsPanel->setVisible(false);
-    mFocusCurveRecorderCurveDetailsPanel->setVisible(false);
-    mFocusCurveRecorderPointDetailsPanel->setVisible(false);
-  }
-  else if (idx == 1) {
-    mFocusCurveRecorderSummaryDetailsPanel->setVisible(false);
-    mFocusCurveRecorderProgressDetailsPanel->setVisible(true);
-    mFocusCurveRecorderCurveDetailsPanel->setVisible(false);
-    mFocusCurveRecorderPointDetailsPanel->setVisible(false);
-  }
-  else if (idx == 2) {
-    mFocusCurveRecorderSummaryDetailsPanel->setVisible(false);
-    mFocusCurveRecorderProgressDetailsPanel->setVisible(false);
-    mFocusCurveRecorderCurveDetailsPanel->setVisible(true);
-    mFocusCurveRecorderPointDetailsPanel->setVisible(false);
-  }
-  else if (idx == 3) {
-    mFocusCurveRecorderSummaryDetailsPanel->setVisible(false);
-    mFocusCurveRecorderProgressDetailsPanel->setVisible(false);
-    mFocusCurveRecorderCurveDetailsPanel->setVisible(false);
-    mFocusCurveRecorderPointDetailsPanel->setVisible(true);
-  }
-  
+  FocusCurveRecorderDetailViewE detailView = static_cast<FocusCurveRecorderDetailViewE>(idx);
+  selectDetailView(detailView);  
 }
 
 
@@ -216,7 +227,11 @@ void FocusCurveRecorderPanelT::onFocusCurveRecordPressed(bool isChecked) {
     //       -> depends on selection... -> FocusFinder profile...
 
     // TODO: Get value from UI and set it here...
-    mFocusCurveRecorderLogic->setFocusMeasureType(FocusMeasureTypeT::HFD);
+
+    // TODO: focusFinderProfile....
+    
+    
+    //mFocusCurveRecorderLogic->setFocusMeasureType(FocusMeasureTypeT::HFD);
 
     // HACK / TODO: For now we create always a new instance...
     // TODO: Do not create here?! -> Factory?
@@ -224,14 +239,6 @@ void FocusCurveRecorderPanelT::onFocusCurveRecordPressed(bool isChecked) {
     
     auto focusCurveRecorder = mFocusCurveRecorderLogic->getFocusCurveRecorder();
 
-    // TODO: Get value from UI
-    focusCurveRecorder->setFocusMeasureType(FocusMeasureTypeT::FWHM_VERT);
-
-    // TODO: Can FocusCurveViewPanelT extract this info from "focusCurveRecorder" instead?
-    mFocusCurveViewPanel->setFocusMeasureType(FocusMeasureTypeT::FWHM_VERT);
-
-
-    
     // Register FocusCurveRecorder UI listeners
     // FocusCurveRecorder started
     focusCurveRecorder->registerFocusCurveRecorderStartedListener([&]() {
@@ -284,6 +291,10 @@ void FocusCurveRecorderPanelT::onFocusCurveRecordPressed(bool isChecked) {
     LOG(debug)
       << "Starting focus curve recorder '" << focusCurveRecorder->getName() << "'..." << std::endl;
 
+
+    selectDetailView(PROGRESS);
+    
+    
     mRecorderExec->start();
   } else {
     LOG(info)
@@ -382,6 +393,8 @@ void FocusCurveRecorderPanelT::onFocusCurveRecorderFinished(std::shared_ptr<cons
 	//mFocusRecorder->fitFocusCurve(focusCurveRecordSet);
 	
 	mFocusCurveViewPanel->update();
+
+	mFocusCurveRecorderProgressDetailsPanel->stopAnimation();
 }
 
 void FocusCurveRecorderPanelT::onFocusCurveRecorderNewRecord(std::shared_ptr<FocusCurveRecordT> focusCurveRecord) {
@@ -406,6 +419,9 @@ void FocusCurveRecorderPanelT::onFocusCurveRecorderProgressUpdate(float progress
 
   // TODO: Somewhere else...
   //mFocusCurveViewPanel->setFocusCurve(focusCurveRecord);
+
+  mFocusCurveRecorderProgressDetailsPanel->setCurrentIterationProgress(progress);
+  mFocusCurveRecorderProgressDetailsPanel->setCurrentIterationProgressText(msg);
 }
 
 void FocusCurveRecorderPanelT::onFocusCurveRecorderCancelled() {
@@ -420,12 +436,14 @@ void FocusCurveRecorderPanelT::onFocusCurveRecorderCancelled() {
 	mFocusCurveRecordButton->setEnabled(true);
 
 	//    updateFocusFinderMainMenuBar();
+	mFocusCurveRecorderProgressDetailsPanel->stopAnimation();
 }
 
 void FocusCurveRecorderPanelT::onFocusCurveRecorderStarted() {
 	LOG(debug)
 	<< "FocusCurveRecorderPanelT::onFocusCurveRecorderStarted..." << std::endl;
 	mFocusCurveRecordButton->startAnimation();
+	mFocusCurveRecorderProgressDetailsPanel->startAnimation();
 }
 
 void FocusCurveRecorderPanelT::createFocusCurveRecordButton() {

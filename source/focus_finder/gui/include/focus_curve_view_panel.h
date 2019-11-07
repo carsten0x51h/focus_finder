@@ -40,8 +40,8 @@ public:
   //void setFocusCurve(std::shared_ptr<const FocusCurveT> focusCurve);
   void update();
 
-  FocusMeasureTypeT::TypeE getFocusMeasureType() const;
-  void setFocusMeasureType(FocusMeasureTypeT::TypeE focusMeasureType);
+  // FocusMeasureTypeT::TypeE getFocusMeasureType() const;
+  // void setFocusMeasureType(FocusMeasureTypeT::TypeE focusMeasureType);
 
 
 signals:
