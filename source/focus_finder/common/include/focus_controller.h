@@ -21,15 +21,15 @@
 //       But problem is, that registering/unregistering the callback needs to be repeated when mCamera changes - setCamera()
 //       -> overwrite setCamera and call super method?
 
-DEF_Exception(FocusAnalyzer);
-DEF_Exception(FocusAnalyzerFailed);
-DEF_Exception(FocusAnalyzerCancelled);
+DEF_Exception(FocusController);
+DEF_Exception(FocusControllerFailed);
+DEF_Exception(FocusControllerCancelled);
 
-class FocusAnalyzerT {
+class FocusControllerT {
 private:
-  // Prevent copy of FocusAnalyzerT
-  FocusAnalyzerT(const FocusAnalyzerT &);
-  FocusAnalyzerT & operator=(const FocusAnalyzerT &);
+  // Prevent copy of FocusControllerT
+  FocusControllerT(const FocusControllerT &);
+  FocusControllerT & operator=(const FocusControllerT &);
 
   std::shared_ptr<CameraT> mCamera;
   std::shared_ptr<FocusT> mFocus;
@@ -39,12 +39,12 @@ private:
   FocusFinderProfileT mFocusFinderProfile;
 
 
-  // TODO: Rename FocusCurveRecordT to FocusAnalyzerRecordT? Or just RecordT? or StarRecordT?
-  typedef boost::signals2::signal<void(float, std::string, std::shared_ptr<FocusCurveRecordT>)> FocusAnalyzerProgressUpdateListenersT;
-  FocusAnalyzerProgressUpdateListenersT mFocusAnalyzerProgressUpdateListeners;
+  // TODO: Rename FocusCurveRecordT to FocusControllerRecordT? Or just RecordT? or StarRecordT?
+  typedef boost::signals2::signal<void(float, std::string, std::shared_ptr<FocusCurveRecordT>)> FocusControllerProgressUpdateListenersT;
+  FocusControllerProgressUpdateListenersT mFocusControllerProgressUpdateListeners;
   
-  typedef boost::signals2::signal<void(std::shared_ptr<FocusCurveRecordT>)> FocusAnalyzerNewRecordListenersT;
-  FocusAnalyzerNewRecordListenersT mFocusAnalyzerNewRecordListeners;
+  typedef boost::signals2::signal<void(std::shared_ptr<FocusCurveRecordT>)> FocusControllerNewRecordListenersT;
+  FocusControllerNewRecordListenersT mFocusControllerNewRecordListeners;
 
     
   void waitForFocus(std::chrono::milliseconds timeout) const;
@@ -61,24 +61,24 @@ private:
   int mInitialFocusPos;
 
  protected:
-  void notifyFocusAnalyzerProgressUpdate(float progress,
+  void notifyFocusControllerProgressUpdate(float progress,
 				       const std::string & msg, std::shared_ptr<FocusCurveRecordT> focusCurveRecord = nullptr) const {
-    mFocusAnalyzerProgressUpdateListeners(progress, msg, focusCurveRecord);
+    mFocusControllerProgressUpdateListeners(progress, msg, focusCurveRecord);
   }
-  void notifyFocusAnalyzerProgressUpdate(const std::string & msg, std::shared_ptr<FocusCurveRecordT> focusCurveRecord = nullptr) const {
-    mFocusAnalyzerProgressUpdateListeners(-1.0F, msg, focusCurveRecord);
+  void notifyFocusControllerProgressUpdate(const std::string & msg, std::shared_ptr<FocusCurveRecordT> focusCurveRecord = nullptr) const {
+    mFocusControllerProgressUpdateListeners(-1.0F, msg, focusCurveRecord);
   }
-  void notifyFocusAnalyzerProgressUpdate(std::shared_ptr<FocusCurveRecordT> focusCurveRecord = nullptr) const {
-    mFocusAnalyzerProgressUpdateListeners(-1.0F, "", focusCurveRecord);
+  void notifyFocusControllerProgressUpdate(std::shared_ptr<FocusCurveRecordT> focusCurveRecord = nullptr) const {
+    mFocusControllerProgressUpdateListeners(-1.0F, "", focusCurveRecord);
   }
-  void notifyFocusAnalyzerNewRecord(std::shared_ptr<FocusCurveRecordT> focusCurveRecord) {
-    mFocusAnalyzerNewRecordListeners(focusCurveRecord);
+  void notifyFocusControllerNewRecord(std::shared_ptr<FocusCurveRecordT> focusCurveRecord) {
+    mFocusControllerNewRecordListeners(focusCurveRecord);
   }
 
 public:
-  //FocusAnalyzerT();
-  FocusAnalyzerT(std::shared_ptr<CameraT> camera, std::shared_ptr<FocusT> focus, std::shared_ptr<FilterT> filter);
-  ~FocusAnalyzerT();
+  //FocusControllerT();
+  FocusControllerT(std::shared_ptr<CameraT> camera, std::shared_ptr<FocusT> focus, std::shared_ptr<FilterT> filter);
+  ~FocusControllerT();
 
   void cancel();
   
@@ -116,20 +116,20 @@ public:
 
 
   
-  boost::signals2::connection registerFocusAnalyzerProgressUpdateListener(
-									       const FocusAnalyzerProgressUpdateListenersT::slot_type & inCallBack) {
-    return mFocusAnalyzerProgressUpdateListeners.connect(inCallBack);
+  boost::signals2::connection registerFocusControllerProgressUpdateListener(
+									       const FocusControllerProgressUpdateListenersT::slot_type & inCallBack) {
+    return mFocusControllerProgressUpdateListeners.connect(inCallBack);
   }
-  template<class T> void unregistermFocusAnalyzerProgressUpdateListener(
+  template<class T> void unregistermFocusControllerProgressUpdateListener(
 									    const T & inCallBack) {
     inCallBack.disconnect();
   }
 
-  boost::signals2::connection registerFocusAnalyzerNewRecordListener(
-									       const FocusAnalyzerNewRecordListenersT::slot_type & inCallBack) {
-    return mFocusAnalyzerNewRecordListeners.connect(inCallBack);
+  boost::signals2::connection registerFocusControllerNewRecordListener(
+									       const FocusControllerNewRecordListenersT::slot_type & inCallBack) {
+    return mFocusControllerNewRecordListeners.connect(inCallBack);
   }
-  template<class T> void unregisterFocusAnalyzerNewRecordListener(
+  template<class T> void unregisterFocusControllerNewRecordListener(
 									    const T & inCallBack) {
     inCallBack.disconnect();
   }

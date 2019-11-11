@@ -1,7 +1,5 @@
 // TODO: Remove the includes which are not required...
 #include <chrono>
-//#include <thread>
-//#include <condition_variable>
 #include <mutex>
 
 #include <boost/bind.hpp>
@@ -31,87 +29,86 @@
 #include "include/focus.h"
 #include "include/filter.h"
 
-#include "include/focus_analyzer.h"
+#include "include/focus_controller.h"
 
 
-//FocusAnalyzerT::FocusAnalyzerT() : mCamera(nullptr), mFocus(nullptr), mFilter(nullptr) {
-FocusAnalyzerT::FocusAnalyzerT(std::shared_ptr<CameraT> camera, std::shared_ptr<FocusT> focus, std::shared_ptr<FilterT> filter) : mCancelled(false), mCamera(camera), mFocus(focus), mFilter(filter) {
+FocusControllerT::FocusControllerT(std::shared_ptr<CameraT> camera, std::shared_ptr<FocusT> focus, std::shared_ptr<FilterT> filter) : mCancelled(false), mCamera(camera), mFocus(focus), mFilter(filter) {
 
   // TODO: Check if require devices are != nullptr?! Or pass by reference?
   
-  // TODO / FIXME: This won't work if the profile changes and the current instance of the FocusAnalyzer would stay alife. Then it would be registered to the old camera...
+  // TODO / FIXME: This won't work if the profile changes and the current instance of the FocusController would stay alife. Then it would be registered to the old camera...
 
 
     mCameraExposureFinishedConnection =
       getCamera()->registerExposureCycleFinishedListener(
-							 boost::bind(&FocusAnalyzerT::onImageReceived,
+							 boost::bind(&FocusControllerT::onImageReceived,
 								     this, _1, _2, _3));
 
   mInitialFocusPos = getFocus()->getCurrentPos();
 }
 
-FocusAnalyzerT::~FocusAnalyzerT()
+FocusControllerT::~FocusControllerT()
 {
   cleanup();
 }
 
 
-std::shared_ptr<CameraT> FocusAnalyzerT::getCamera() const
+std::shared_ptr<CameraT> FocusControllerT::getCamera() const
 {
   return mCamera;
 }
-// void FocusAnalyzerT::setCamera(std::shared_ptr<CameraT> camera)
+// void FocusControllerT::setCamera(std::shared_ptr<CameraT> camera)
 // {
 //   mCamera = camera;
 // }
 
-std::shared_ptr<FocusT> FocusAnalyzerT::getFocus() const
+std::shared_ptr<FocusT> FocusControllerT::getFocus() const
 {
   return mFocus;
 }
-// void FocusAnalyzerT::setFocus(std::shared_ptr<FocusT> focus)
+// void FocusControllerT::setFocus(std::shared_ptr<FocusT> focus)
 // {
 //   mFocus = focus;
 // }
 
-std::shared_ptr<FilterT> FocusAnalyzerT::getFilter() const
+std::shared_ptr<FilterT> FocusControllerT::getFilter() const
 {
   return mFilter;
 }
-// void FocusAnalyzerT::setFilter(std::shared_ptr<FilterT> filter)
+// void FocusControllerT::setFilter(std::shared_ptr<FilterT> filter)
 // {
 //   mFilter = filter;
 // }
 
 // TODO: Maybe we find a better name?!
-void FocusAnalyzerT::setLastFocusStarPos(PointT<float> lastFocusStarPos)
+void FocusControllerT::setLastFocusStarPos(PointT<float> lastFocusStarPos)
 {
   mLastFocusStarPos = lastFocusStarPos;
 }
-PointT<float> FocusAnalyzerT::getLastFocusStarPos() const
+PointT<float> FocusControllerT::getLastFocusStarPos() const
 {
   return mLastFocusStarPos;
 }
 
-void FocusAnalyzerT::setFocusFinderProfile(const FocusFinderProfileT & profile)
+void FocusControllerT::setFocusFinderProfile(const FocusFinderProfileT & profile)
 {
   mFocusFinderProfile = profile;
 }
-const FocusFinderProfileT & FocusAnalyzerT::getFocusFinderProfile() const
+const FocusFinderProfileT & FocusControllerT::getFocusFinderProfile() const
 {
   return mFocusFinderProfile;
 }
 
 
 // TODO: Do not just return the one float but all data HfdT, vertical ahnd horizontal FwhmT etc. in a data structure...
-std::shared_ptr<FocusCurveRecordT> FocusAnalyzerT::measureFocus() {
+std::shared_ptr<FocusCurveRecordT> FocusControllerT::measureFocus() {
   using namespace std::chrono_literals;
   
   std::shared_ptr<FocusCurveRecordT> record = nullptr;  
   PointT<unsigned int> lastFocusStarPos = getLastFocusStarPos().to<unsigned int>();
 
   LOG(debug)
-    << "FocusAnalyzerT::run - focus star pos=("
+    << "FocusControllerT::run - focus star pos=("
     << lastFocusStarPos.x() << ", " << lastFocusStarPos.y() << ")"
     << std::endl;
 
@@ -134,7 +131,7 @@ std::shared_ptr<FocusCurveRecordT> FocusAnalyzerT::measureFocus() {
 						       outerWindowSize);
 
   LOG(debug)
-    << "FocusAnalyzerT::run - calculated outer ROI=" << outerRoi
+    << "FocusControllerT::run - calculated outer ROI=" << outerRoi
     << std::endl;
 
   // Set ROI based on last focus star position
@@ -149,11 +146,11 @@ std::shared_ptr<FocusCurveRecordT> FocusAnalyzerT::measureFocus() {
     try {
   
       // TODO: Use exposure time set by the user...
-      LOG(debug) << "FocusAnalyzerT::measureFocus... starting exposure..." << std::endl;
+      LOG(debug) << "FocusControllerT::measureFocus... starting exposure..." << std::endl;
 
       runExposureBlocking(1000ms);
  
-      LOG(debug) << "FocusAnalyzerT::measureFocus... exposure finished." << std::endl;
+      LOG(debug) << "FocusControllerT::measureFocus... exposure finished." << std::endl;
 
 
       // Calc center of subframe
@@ -162,7 +159,7 @@ std::shared_ptr<FocusCurveRecordT> FocusAnalyzerT::measureFocus() {
 					       std::ceil(mCurrentImage->height() / 2));
 
       LOG(debug)
-	<< "FocusAnalyzerT::run - centerOuterSubframe="
+	<< "FocusControllerT::run - centerOuterSubframe="
 	<< centerOuterSubframe << std::endl;
 
       // In outer subframe (mCurrentImage) coordinates
@@ -171,7 +168,7 @@ std::shared_ptr<FocusCurveRecordT> FocusAnalyzerT::measureFocus() {
 							   getFocusFinderProfile().getStarWindowSize());
 
       LOG(debug)
-	<< "FocusAnalyzerT::run - calculated inner ROI=" << innerRoi
+	<< "FocusControllerT::run - calculated inner ROI=" << innerRoi
 	<< std::endl;
 
       // get_crop() from mCurrentImage using innerRoi
@@ -181,7 +178,7 @@ std::shared_ptr<FocusCurveRecordT> FocusAnalyzerT::measureFocus() {
 							);
 
       LOG(debug)
-	<< "FocusAnalyzerT::run - innerSubFrameImg size - w="
+	<< "FocusControllerT::run - innerSubFrameImg size - w="
 	<< innerSubFrameImg.width() << ", h="
 	<< innerSubFrameImg.height() << std::endl;
 
@@ -200,7 +197,7 @@ std::shared_ptr<FocusCurveRecordT> FocusAnalyzerT::measureFocus() {
 	  << "Unable to determine new centroid." << std::endl;
 
 	// TODO: Retry? Or just cancel? For now we cancel...
-	throw FocusAnalyzerCancelledExceptionT();
+	throw FocusControllerCancelledExceptionT();
       }
 
       // NOTE: Those coordinates are in coordinates of the inner subframe! We need them in "outer sub frame" coordinates!
@@ -208,7 +205,7 @@ std::shared_ptr<FocusCurveRecordT> FocusAnalyzerT::measureFocus() {
       int deltaY = (outerRoi.height() - innerRoi.height()) / 2;
 
       LOG(debug)
-	<< "FocusAnalyzerT::run - deltaX=" << deltaX << ", deltaY="
+	<< "FocusControllerT::run - deltaX=" << deltaX << ", deltaY="
 	<< deltaY << std::endl;
 
       PointFT newCentroidInnerRoiCoords = *newCentroidOpt;
@@ -217,10 +214,10 @@ std::shared_ptr<FocusCurveRecordT> FocusAnalyzerT::measureFocus() {
 					newCentroidInnerRoiCoords.y() + deltaY);
 
       LOG(debug)
-	<< "FocusAnalyzerT::run - new centroid (inner frame)="
+	<< "FocusControllerT::run - new centroid (inner frame)="
 	<< newCentroidInnerRoiCoords << std::endl;
       LOG(debug)
-	<< "FocusAnalyzerT::run - new centroid (outer frame)="
+	<< "FocusControllerT::run - new centroid (outer frame)="
 	<< newCentroidOuterRoiCoords << std::endl;
 
       // Use newly calculated center (newCentroidOuterRoiCoords) to again get sub-frame from mCurrentImage
@@ -232,7 +229,7 @@ std::shared_ptr<FocusCurveRecordT> FocusAnalyzerT::measureFocus() {
 						       std::round(newCentroidOuterRoiCoords.y()));
 
       LOG(debug)
-	<< "FocusAnalyzerT::run - new centroid rounded to next int="
+	<< "FocusControllerT::run - new centroid rounded to next int="
 	<< newCentroidRoundedToNextInt << std::endl;
 
       auto innerCorrectedRoi = RectT<unsigned int>::fromCenterPoint(
@@ -240,7 +237,7 @@ std::shared_ptr<FocusCurveRecordT> FocusAnalyzerT::measureFocus() {
 								    getFocusFinderProfile().getStarWindowSize());
 
       LOG(debug)
-	<< "FocusAnalyzerT::run - calculated inner corrected ROI="
+	<< "FocusControllerT::run - calculated inner corrected ROI="
 	<< innerCorrectedRoi << std::endl;
 
       // get_crop() from mCurrentImage using corrected innerRoi
@@ -251,7 +248,7 @@ std::shared_ptr<FocusCurveRecordT> FocusAnalyzerT::measureFocus() {
 								 );
 
       LOG(debug)
-	<< "FocusAnalyzerT::run - innerCorrectedSubFrameImgsize - w="
+	<< "FocusControllerT::run - innerCorrectedSubFrameImgsize - w="
 	<< innerCorrectedSubFrameImg.width() << ", h="
 	<< innerCorrectedSubFrameImg.height() << std::endl;
 
@@ -262,10 +259,10 @@ std::shared_ptr<FocusCurveRecordT> FocusAnalyzerT::measureFocus() {
       // TODO: Calculate HFD
       HfdT hfd(innerCorrectedSubFrameImg);
       LOG(debug)
-	<< "FocusAnalyzerT::run - HFD: " << hfd.getValue() << std::endl;
+	<< "FocusControllerT::run - HFD: " << hfd.getValue() << std::endl;
 
 
-      LOG(debug) << "FocusAnalyzerT::measureFocus... focus measure calculated: " << hfd.getValue() << std::endl;
+      LOG(debug) << "FocusControllerT::measureFocus... focus measure calculated: " << hfd.getValue() << std::endl;
 
 
 
@@ -287,7 +284,7 @@ std::shared_ptr<FocusCurveRecordT> FocusAnalyzerT::measureFocus() {
 								innerCorrectedSubFrameImg, centerIdxVert));
 
       LOG(debug)
-	<< "FocusAnalyzerT::run - FWHM(HORZ): " << fwhmHorz.getValue()
+	<< "FocusControllerT::run - FWHM(HORZ): " << fwhmHorz.getValue()
 	<< ", FWHM(VERT): " << fwhmVert.getValue() << std::endl;
 
       // Convert center coordinates to frame coordinates (absolute position within image)
@@ -332,7 +329,7 @@ std::shared_ptr<FocusCurveRecordT> FocusAnalyzerT::measureFocus() {
 }
 
 
-void FocusAnalyzerT::waitForFocus(std::chrono::milliseconds timeout) const {
+void FocusControllerT::waitForFocus(std::chrono::milliseconds timeout) const {
   auto isFocusPositionReachedOrCancelledLambda = [=, this]() -> bool {
 						   LOG(debug) << "current pos=" << getFocus()->getCurrentPos()
 							      << ", target pos=" << getFocus()->getTargetPos()
@@ -353,11 +350,11 @@ void FocusAnalyzerT::waitForFocus(std::chrono::milliseconds timeout) const {
 
 // TODO: binary search?!
 // BOUNDARY SCAN!
-void FocusAnalyzerT::moveUntilFocusMeasureLimitReached(const SelfOrientationResultT & selfOrientationResult, float stepSize, float focusMeasureLimit) {
+void FocusControllerT::moveUntilFocusMeasureLimitReached(const SelfOrientationResultT & selfOrientationResult, float stepSize, float focusMeasureLimit) {
   using namespace std::chrono_literals;
 
   LOG(debug)
-    << "FocusAnalyzerT::moveUntilFocusMeasureLimitReached..." << std::endl;
+    << "FocusControllerT::moveUntilFocusMeasureLimitReached..." << std::endl;
 
 
   // TODO: Get values from focus device
@@ -372,7 +369,7 @@ void FocusAnalyzerT::moveUntilFocusMeasureLimitReached(const SelfOrientationResu
 
   //Notify about FocusCurve recorder update...
 
-  notifyFocusAnalyzerProgressUpdate(0.0F, "Boundary scan running...", curveRecord);
+  notifyFocusControllerProgressUpdate(0.0F, "Boundary scan running...", curveRecord);
   //notifyFocusCurveRecorderProgressUpdate(".", curveRecord);
 
   int stepNo = 0;
@@ -383,7 +380,7 @@ void FocusAnalyzerT::moveUntilFocusMeasureLimitReached(const SelfOrientationResu
   while(! limitCrossed) {
 
     LOG(debug)
-      << "FocusAnalyzerT::moveUntilFocusMeasureLimitReached..."
+      << "FocusControllerT::moveUntilFocusMeasureLimitReached..."
       << "limit " << focusMeasureLimit
       << " in direction " << FocusDirectionT::asStr(limitFocusDirection)
       << " not yet reached - (focusMeasure=" << focusMeasure << ")"
@@ -404,9 +401,9 @@ void FocusAnalyzerT::moveUntilFocusMeasureLimitReached(const SelfOrientationResu
     LOG(warning) << "pos: " << getFocus()->getCurrentPos() << ", maxPossibleStepsIntoLimitDirection: " << maxPossibleStepsIntoLimitDirection << ", progressPerc: " << progressPerc << std::endl;
     
   
-    notifyFocusAnalyzerProgressUpdate(progressPerc, "Boundary scan running...", curveRecord);
+    notifyFocusControllerProgressUpdate(progressPerc, "Boundary scan running...", curveRecord);
 
-    notifyFocusAnalyzerNewRecord(curveRecord);
+    notifyFocusControllerNewRecord(curveRecord);
 
     limitCrossed = (initiallyBelow ? focusMeasure >= focusMeasureLimit : focusMeasure <= focusMeasureLimit);
     
@@ -415,10 +412,10 @@ void FocusAnalyzerT::moveUntilFocusMeasureLimitReached(const SelfOrientationResu
     ++stepNo;
   }
 
-  notifyFocusAnalyzerProgressUpdate(100.0F, "Boundary scan finished.");
+  notifyFocusControllerProgressUpdate(100.0F, "Boundary scan finished.");
 
   LOG(info)
-    << "FocusAnalyzerT::moveUntilFocusMeasureLimitReached..."
+    << "FocusControllerT::moveUntilFocusMeasureLimitReached..."
     << "limit " << focusMeasureLimit
     << " in direction " << FocusDirectionT::asStr(limitFocusDirection)
     << " reached - (focusMeasure=" << focusMeasure << ")"
@@ -426,19 +423,19 @@ void FocusAnalyzerT::moveUntilFocusMeasureLimitReached(const SelfOrientationResu
 }
 
 
-void FocusAnalyzerT::checkCancelled() const {
+void FocusControllerT::checkCancelled() const {
   if (mCancelled.load()) {
-    throw FocusAnalyzerCancelledExceptionT("Focus curve recorder cancelled.");
+    throw FocusControllerCancelledExceptionT("Focus curve recorder cancelled.");
   }
 }
 
-void FocusAnalyzerT::cancel() {
+void FocusControllerT::cancel() {
   mCancelled = true;
   cv.notify_all();
 }
 
 // NOTE: Callback from camera device, registered in setCamera of base class FocusFinder
-void FocusAnalyzerT::onImageReceived(RectT<unsigned int> roi,
+void FocusControllerT::onImageReceived(RectT<unsigned int> roi,
 		std::shared_ptr<const ImageT> image, bool lastFrame) {
 
   // TODO: Store image.... roi etc...
@@ -448,15 +445,15 @@ void FocusAnalyzerT::onImageReceived(RectT<unsigned int> roi,
 }
 
 
-SelfOrientationResultT FocusAnalyzerT::performSelfOrientation() {
+SelfOrientationResultT FocusControllerT::performSelfOrientation() {
   using namespace std::chrono_literals;
 
   SelfOrientationResultT selfOrientationResult;
   
   selfOrientationResult.record1 = measureFocus();
   //Notify about FocusCurve recorder update...
-  notifyFocusAnalyzerProgressUpdate(0.0f, "Self orientation running....", selfOrientationResult.record1);
-  notifyFocusAnalyzerNewRecord(selfOrientationResult.record1);
+  notifyFocusControllerProgressUpdate(0.0f, "Self orientation running....", selfOrientationResult.record1);
+  notifyFocusControllerNewRecord(selfOrientationResult.record1);
 
   // TODO: Should this be configurable?
   const float STEP_FACTOR = 3.0F;
@@ -465,8 +462,8 @@ SelfOrientationResultT FocusAnalyzerT::performSelfOrientation() {
     
   selfOrientationResult.record2 = measureFocus();
   //Notify about FocusCurve recorder update...
-  notifyFocusAnalyzerProgressUpdate(100.0F, "Self orientation finished.", selfOrientationResult.record2);
-  notifyFocusAnalyzerNewRecord(selfOrientationResult.record2);
+  notifyFocusControllerProgressUpdate(100.0F, "Self orientation finished.", selfOrientationResult.record2);
+  notifyFocusControllerNewRecord(selfOrientationResult.record2);
 
   FocusMeasureTypeT::TypeE curveFocusMeasureType = mFocusFinderProfile.getCurveFocusMeasureType();
   
@@ -491,17 +488,17 @@ SelfOrientationResultT FocusAnalyzerT::performSelfOrientation() {
     // No change detected - unable to determine target focus direction - something is probably wrong...
     // Wrong step size? Invalid focus star? Maybe a hotpixel?
     LOG(error)
-      << "FocusAnalyzerT::determineTargetFocusDirection... Unable to determine target focus direction. No difference in focus measure detected." << std::endl;
+      << "FocusControllerT::determineTargetFocusDirection... Unable to determine target focus direction. No difference in focus measure detected." << std::endl;
     
     // TODO: reporting?
-    throw FocusAnalyzerCancelledExceptionT("Unable to determine target focus direction. No difference in focus measure detected.");
+    throw FocusControllerCancelledExceptionT("Unable to determine target focus direction. No difference in focus measure detected.");
   }
   
   return selfOrientationResult;
 }
 
 
-void FocusAnalyzerT::moveFocusByBlocking(
+void FocusControllerT::moveFocusByBlocking(
 		FocusDirectionT::TypeE direction, int ticks,
 		std::chrono::milliseconds timeout) {
 
@@ -512,15 +509,15 @@ void FocusAnalyzerT::moveFocusByBlocking(
 
 	// If it was cancelled, throw cancel exception
 	if (mCancelled) {
-		throw FocusAnalyzerCancelledExceptionT();
+		throw FocusControllerCancelledExceptionT();
 	}
 }
 
 
-void FocusAnalyzerT::moveFocusToBlocking(int absPos, std::chrono::milliseconds timeout) {
+void FocusControllerT::moveFocusToBlocking(int absPos, std::chrono::milliseconds timeout) {
 
   if (getFocus() == nullptr) {
-    throw FocusAnalyzerFailedExceptionT("No focus device set.");
+    throw FocusControllerFailedExceptionT("No focus device set.");
   }
   
   // Set the target position (abs)
@@ -530,13 +527,13 @@ void FocusAnalyzerT::moveFocusToBlocking(int absPos, std::chrono::milliseconds t
 
   // If it was cancelled, throw cancel exception
   if (mCancelled) {
-    throw FocusAnalyzerCancelledExceptionT("Unable to determine target focus direction. No difference in focus measure detected.");
+    throw FocusControllerCancelledExceptionT("Unable to determine target focus direction. No difference in focus measure detected.");
   }
 }
 
 
 // TODO: Add binning?
-void FocusAnalyzerT::runExposureBlocking(
+void FocusControllerT::runExposureBlocking(
 						     std::chrono::milliseconds expTime) {
 
   // TODO: Check if getCamera() is set...
@@ -553,24 +550,24 @@ void FocusAnalyzerT::runExposureBlocking(
 
   // If it was cancelled, throw cancel exception
   if (mCancelled) {
-    throw FocusAnalyzerCancelledExceptionT();
+    throw FocusControllerCancelledExceptionT();
   }
 }
 
 
-void FocusAnalyzerT::checkIfStarIsThere(const ImageT & img,
+void FocusControllerT::checkIfStarIsThere(const ImageT & img,
 		float * outSnr) const {
 	float snr = SnrT::calculate(img);
 
 	LOG(debug)
-	<< "FocusAnalyzerT::run - SNR: " << snr << std::endl;
+	<< "FocusControllerT::run - SNR: " << snr << std::endl;
 
 	if (snr < getFocusFinderProfile().getStarDetectionSnrBoundary()) {
 		LOG(warning)
-		<< "FocusAnalyzerT::run - no valid star detected." << std::endl;
+		<< "FocusControllerT::run - no valid star detected." << std::endl;
 
 		// TODO: How to handle? Just cancel? Or repeat? For now we cancel...
-		throw FocusAnalyzerCancelledExceptionT();
+		throw FocusControllerCancelledExceptionT();
 	}
 
 	if (outSnr != nullptr) {
@@ -579,35 +576,35 @@ void FocusAnalyzerT::checkIfStarIsThere(const ImageT & img,
 }
 
 
-void FocusAnalyzerT::devicesAvailabilityCheck() {
+void FocusControllerT::devicesAvailabilityCheck() {
   // Check that camera is there
   if(getCamera() == nullptr) {
     LOG(error) << "No camera set." << std::endl;
     // TODO: Rename exception!
-    throw FocusAnalyzerFailedExceptionT("No camera set.");
+    throw FocusControllerFailedExceptionT("No camera set.");
   }
   
   // Check that focus is there
   if (getFocus() == nullptr) {
     LOG(error) << "No focus set." << std::endl;
-    throw FocusAnalyzerFailedExceptionT("No focus set.");
+    throw FocusControllerFailedExceptionT("No focus set.");
   }
 }
 
-void FocusAnalyzerT::cleanup() {
+void FocusControllerT::cleanup() {
   using namespace std::chrono_literals;
 
   LOG(debug)
-    << "FocusAnalyzerT::cleanup..." << std::endl;
+    << "FocusControllerT::cleanup..." << std::endl;
 
   // In any case move the focus to the initial position (if focus device is still available)
   try {
     moveFocusToBlocking(mInitialFocusPos, 30000ms /*timeout*/);
-  } catch (FocusAnalyzerFailedExceptionT & exc) {
-    LOG(error) << "FocusAnalyzerT::cleanup... no focus device set!" << std::endl;
+  } catch (FocusControllerFailedExceptionT & exc) {
+    LOG(error) << "FocusControllerT::cleanup... no focus device set!" << std::endl;
   }
 
-  // NOTE: Re-register?!?! -> no... cleanup() should only be called at the end-of-life of the FocusAnalyzer object.
+  // NOTE: Re-register?!?! -> no... cleanup() should only be called at the end-of-life of the FocusController object.
   // TODO: Check if getCamera() still returns valid device...
   getCamera()->unregisterExposureCycleFinishedListener(mCameraExposureFinishedConnection);
 }

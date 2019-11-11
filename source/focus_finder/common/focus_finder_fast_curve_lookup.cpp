@@ -16,9 +16,9 @@
 #include "include/focus_curve_record_builder.h"
 #include "include/curve_function_factory.h"
 
-class FocusAnalyzerT;
+class FocusControllerT;
 
-FocusFinderFastCurveLookupT::FocusFinderFastCurveLookupT(std::shared_ptr<FocusAnalyzerT> focusAnalyzer) : FocusFinderT(focusAnalyzer),
+FocusFinderFastCurveLookupT::FocusFinderFastCurveLookupT(std::shared_ptr<FocusControllerT> focusController) : FocusFinderT(focusController),
   mCancelled(false),
   mIsRunning(false) {
   LOG(debug)
@@ -38,7 +38,7 @@ void FocusFinderFastCurveLookupT::reset() {
 
 void FocusFinderFastCurveLookupT::checkCancelled() const {
 	if (mCancelled.load()) {
-		throw FocusAnalyzerCancelledExceptionT("Focus finder cancelled.");
+		throw FocusControllerCancelledExceptionT("Focus finder cancelled.");
 	}
 }
 
@@ -555,7 +555,7 @@ void FocusFinderFastCurveLookupT::run() {
 
 		focusFinderCleanup();
 
-	} catch (FocusAnalyzerCancelledExceptionT & exc) {
+	} catch (FocusControllerCancelledExceptionT & exc) {
 		focusFinderCleanup();
 
 		// TODO: Improve error handling... -> ReportingT?
@@ -598,7 +598,7 @@ void FocusFinderFastCurveLookupT::focusFinderCleanup() {
 
 void FocusFinderFastCurveLookupT::cancel() {
 	mCancelled = true;
-	getFocusAnalyzer()->cancel();
+	getFocusController()->cancel();
 }
 
 ///**********************************************************************

@@ -89,7 +89,7 @@ void FocusCurveViewWidgetT::drawFocusCurveRecordSets(QPainter * p) {
     return;
   }
   
-  auto focusAnalyzer = focusCurveRecorder->getFocusAnalyzer();
+  auto focusAnalyzer = focusCurveRecorder->getFocusController();
 
   if (focusAnalyzer == nullptr) {
     return;

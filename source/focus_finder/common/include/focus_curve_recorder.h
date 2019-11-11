@@ -8,7 +8,7 @@
 #include "exception.h"
 
 #include "focus_curve_record_set.h"
-#include "focus_analyzer.h"
+#include "focus_controller.h"
 
 // DEF_Exception(FocusCurveRecorder);
 // DEF_Exception(FocusCurveRecorderFailed);
@@ -45,18 +45,18 @@ private:
   typedef boost::signals2::signal<void(float, std::string, std::shared_ptr<FocusCurveRecordT>)> FocusCurveRecorderProgressUpdateListenersT;
   FocusCurveRecorderProgressUpdateListenersT mFocusCurveRecorderProgressUpdateListeners;
   
-  std::shared_ptr<FocusAnalyzerT> mFocusAnalyzer;
+  std::shared_ptr<FocusControllerT> mFocusController;
 
 public:
-  FocusCurveRecorderT(std::shared_ptr<FocusAnalyzerT> focusAnalyzer) : mFocusAnalyzer(focusAnalyzer)
+  FocusCurveRecorderT(std::shared_ptr<FocusControllerT> focusController) : mFocusController(focusController)
   {
   }
 
   virtual ~FocusCurveRecorderT() {
   }
 
-  std::shared_ptr<FocusAnalyzerT> getFocusAnalyzer() { return mFocusAnalyzer; }
-  std::shared_ptr<const FocusAnalyzerT> getFocusAnalyzer() const { return mFocusAnalyzer; }
+  std::shared_ptr<FocusControllerT> getFocusController() { return mFocusController; }
+  std::shared_ptr<const FocusControllerT> getFocusController() const { return mFocusController; }
   virtual std::string getName() const = 0;
   virtual bool isRunning() const = 0;
   virtual void run() = 0;

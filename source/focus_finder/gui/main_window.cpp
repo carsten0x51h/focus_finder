@@ -46,7 +46,7 @@
 #include "../common/include/image_converter_16to8.h"
 #include "../common/include/tuple_printer.h"
 //#include "../common/include/linear_bw_stretch_mapper_function.h" // TODO: Dependency is to be removed
-#include "../common/include/focus_analyzer.h"
+#include "../common/include/focus_controller.h"
 
 #include "ui_main_window.h"
 
@@ -121,89 +121,86 @@ void MainWindow::onStartFocusFinderPressed() {
 
 	if (!isActive) {
 
-		// TODO: Check that ffExec it is not yet running?
+	  // TODO: Check that ffExec it is not yet running?
+	  
+	  // TODO: Check that every device is connected?
+	  
+	  // TODO: Always create a new focus finder instance? Otherwise.. where to store?
+	  //       -> depends on selection... -> FocusFinder profile...
+	  
+	  auto focusController = std::make_shared<FocusControllerT>(mFfl.getCurrentCamera(), mFfl.getCurrentFocus(), mFfl.getCurrentFilter());
+	  
+	  auto lastFocusStarPosOpt = mFfl.getLastFocusStarPos();
 
-		// TODO: Check that every device is connected?
-
-		// TODO: Always create a new focus finder instance? Otherwise.. where to store?
-		//       -> depends on selection... -> FocusFinder profile...
-
-	  auto focusAnalyzer = std::make_shared<FocusAnalyzerT>(mFfl.getCurrentCamera(), mFfl.getCurrentFocus(), mFfl.getCurrentFilter());
-		// focusAnalyzer->setCamera(mFfl.getCurrentCamera());
-		// focusAnalyzer->setFocus(mFfl.getCurrentFocus());
-		// focusAnalyzer->setFilter(mFfl.getCurrentFilter());
-
-		auto lastFocusStarPosOpt = mFfl.getLastFocusStarPos();
-
-		//if (!lastFocusStarPosOpt) {
-			// TODO: Handle case where no focus star is set / available
-		//}
-		focusAnalyzer->setLastFocusStarPos(lastFocusStarPosOpt.value());
-
-
-		auto activeProfileOpt = mFfl.getProfileManager()->getActiveProfile();
-
-		// TODO: Make sure that activeProfile is set...
-//		if (!activeProfileOpt) {
-//		}
-		focusAnalyzer->setFocusFinderProfile(activeProfileOpt.value());
-
-
-
-		// HACK / TODO: For now we create always a new instance...
-		// TODO: Do not create here?! -> Factory?
-
-		auto focusFinder = FocusFinderFactoryT::getInstance(
-								    FocusFinderStrategyT::FAST_CURVE_LOOKUP, focusAnalyzer);
-		
-		// Register focusFinder UI listeners
-		// TODO: Is unregister actually required? We create a new instalce always...
-		// FoFi started
-		focusFinder->registerFocusFinderStartedListener([&]() {
-			emit focusFinderStartedSignal();
+	  //if (!lastFocusStarPosOpt) {
+	  // TODO: Handle case where no focus star is set / available
+	  //}
+	  focusController->setLastFocusStarPos(lastFocusStarPosOpt.value());
+	  
+	  
+	  auto activeProfileOpt = mFfl.getProfileManager()->getActiveProfile();
+	  
+	  // TODO: Make sure that activeProfile is set...
+	  //		if (!activeProfileOpt) {
+	  //		}
+	  focusController->setFocusFinderProfile(activeProfileOpt.value());
+	  
+	  
+	  
+	  // HACK / TODO: For now we create always a new instance...
+	  // TODO: Do not create here?! -> Factory?
+	  
+	  auto focusFinder = FocusFinderFactoryT::getInstance(
+							      FocusFinderStrategyT::FAST_CURVE_LOOKUP, focusController);
+	  
+	  // Register focusFinder UI listeners
+	  // TODO: Is unregister actually required? We create a new instalce always...
+	  // FoFi started
+	  focusFinder->registerFocusFinderStartedListener([&]() {
+							    emit focusFinderStartedSignal();
+							  });
+	  
+	  qRegisterMetaType < std::shared_ptr<FocusCurveRecordT> > ("FocusCurveRecordPtrT");
+	  
+	  // HACK: Move up!?
+	  // qRegisterMetaType < std::shared_ptr<FocusCurveRecordSetT> > ("FocusCurveRecordSetPtrT");
+	  // TODO / FIXME: For some reason the following line is required HERE - it is not sufficient to use the MACRO above. Furthermore it is not sufficient to register this type in the focus_curve_recorder_panel...
+	  qRegisterMetaType < std::shared_ptr<const FocusCurveRecordSetContainerT> > ("FocusCurveRecordSetContainerPtrT");
+	  
+	  
+	  // FoFi running / status update
+	  focusFinder->registerFocusFinderProgressUpdateListener(
+								 [&](float progress, const std::string & msg, std::shared_ptr<FocusCurveRecordT> record) {
+								   emit focusFinderProgressUpdateSignal(progress, QString::fromStdString(msg), record);
+								 });
+	  
+	  // FoFi finished
+	  focusFinder->registerFocusFinderFinishedListener([&]() {
+							     emit focusFinderFinishedSignal();
+							   });
+	  
+	  // FoFi cancel
+	  focusFinder->registerFocusFinderCancelledListener([&]() {
+							      emit focusFinderCancelledSignal();
 		});
-
-		qRegisterMetaType < std::shared_ptr<FocusCurveRecordT> > ("FocusCurveRecordPtrT");
-
-		// HACK: Move up!?
-		// qRegisterMetaType < std::shared_ptr<FocusCurveRecordSetT> > ("FocusCurveRecordSetPtrT");
-		// TODO / FIXME: For some reason the following line is required HERE - it is not sufficient to use the MACRO above. Furthermore it is not sufficient to register this type in the focus_curve_recorder_panel...
-    qRegisterMetaType < std::shared_ptr<const FocusCurveRecordSetContainerT> > ("FocusCurveRecordSetContainerPtrT");
-
-
-		// FoFi running / status update
-		focusFinder->registerFocusFinderProgressUpdateListener(
-				[&](float progress, const std::string & msg, std::shared_ptr<FocusCurveRecordT> record) {
-					emit focusFinderProgressUpdateSignal(progress, QString::fromStdString(msg), record);
-				});
-
-		// FoFi finished
-		focusFinder->registerFocusFinderFinishedListener([&]() {
-			emit focusFinderFinishedSignal();
-		});
-
-		// FoFi cancel
-		focusFinder->registerFocusFinderCancelledListener([&]() {
-			emit focusFinderCancelledSignal();
-		});
-
-		ffExec->setTask(focusFinder);
-
-		LOG(debug)
-		<< "Starting '" << focusFinder->getName() << "'..." << std::endl;
-
+	  
+	  ffExec->setTask(focusFinder);
+	  
+	  LOG(debug)
+	    << "Starting '" << focusFinder->getName() << "'..." << std::endl;
+	  
 		ffExec->start();
 	} else {
-		LOG(info)
-		<< "Cancelling running focus finder..." << std::endl;
-		ffExec->cancel();
-
-		mStartFocusFinderButton->setEnabled(false);
-
-		LOG(info)
-		<< "Running focus finder cancelled." << std::endl;
+	  LOG(info)
+	    << "Cancelling running focus finder..." << std::endl;
+	  ffExec->cancel();
+	  
+	  mStartFocusFinderButton->setEnabled(false);
+	  
+	  LOG(info)
+	    << "Running focus finder cancelled." << std::endl;
 	}
-
+	
 	updateFocusFinderMainMenuBar();
 }
 

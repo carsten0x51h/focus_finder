@@ -14,7 +14,7 @@
 #include "exception.h"
 
 class FocusCurveRecordT;
-class FocusAnalyzerT;
+class FocusControllerT;
 
 //DEF_Exception(FocusFinderCancelled);
 
@@ -36,15 +36,15 @@ private:
   typedef boost::signals2::signal<void()> FocusFinderCancelledListenersT;
   FocusFinderCancelledListenersT mFocusFinderCancelledListeners;
 
-  std::shared_ptr<FocusAnalyzerT> mFocusAnalyzer;
+  std::shared_ptr<FocusControllerT> mFocusController;
 
 public:
-  FocusFinderT(std::shared_ptr<FocusAnalyzerT> focusAnalyzer) : mFocusAnalyzer(focusAnalyzer) {
+  FocusFinderT(std::shared_ptr<FocusControllerT> focusAnalyzer) : mFocusController(focusAnalyzer) {
   }
 
   virtual ~FocusFinderT() {
   }
-  std::shared_ptr<FocusAnalyzerT> getFocusAnalyzer() { return mFocusAnalyzer; }
+  std::shared_ptr<FocusControllerT> getFocusController() { return mFocusController; }
   
   virtual std::string getName() const = 0;
   virtual bool isRunning() const = 0;

@@ -204,8 +204,8 @@ void FocusCurveRecorderPanelT::onFocusCurveRecordPressed(bool isChecked) {
     auto focusCurveRecorder = mFocusCurveRecorderLogic->getFocusCurveRecorder();
 
     try {
-      focusCurveRecorder->getFocusAnalyzer()->devicesAvailabilityCheck();
-    } catch (FocusAnalyzerFailedExceptionT & exc) {
+      focusCurveRecorder->getFocusController()->devicesAvailabilityCheck();
+    } catch (FocusControllerFailedExceptionT & exc) {
       // TODO: Log error / warning...
       return;
     }

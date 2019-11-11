@@ -3,10 +3,10 @@
 #include "include/focus_curve_recorder_factory.h"
 #include "include/default_focus_curve_recorder.h"
 
-class FocusAnalyzerT;
+class FocusControllerT;
 
 std::shared_ptr<FocusCurveRecorderT> FocusCurveRecorderFactoryT::getInstance(
-									     const FocusCurveRecorderTypeT::TypeE & type, std::shared_ptr<FocusAnalyzerT> focusAnalyzer) {
+									     const FocusCurveRecorderTypeT::TypeE & type, std::shared_ptr<FocusControllerT> focusAnalyzer) {
 
 	switch (type) {
 	case FocusCurveRecorderTypeT::DEFAULT:

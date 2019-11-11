@@ -23,7 +23,7 @@
 #include "include/curve_half.h"
 #include "include/focus_direction.h"
 
-DefaultFocusCurveRecorderT::DefaultFocusCurveRecorderT(std::shared_ptr<FocusAnalyzerT> focusAnalyzer) : FocusCurveRecorderT(focusAnalyzer),
+DefaultFocusCurveRecorderT::DefaultFocusCurveRecorderT(std::shared_ptr<FocusControllerT> focusController) : FocusCurveRecorderT(focusController),
 													mCancelled(false),
 													mIsRunning(false),
 													mStepSize(1000), // TODO: Not as member, get from profile...
@@ -48,22 +48,22 @@ void DefaultFocusCurveRecorderT::reset() {
 	mFocusCurveRecordSets->clear();
 
 	
-	getFocusAnalyzer()->cleanup();
+	getFocusController()->cleanup();
 }
 
 void DefaultFocusCurveRecorderT::checkCancelled() const {
   if (mCancelled.load()) {
-    throw FocusAnalyzerCancelledExceptionT("Focus curve recorder cancelled.");
+    throw FocusControllerCancelledExceptionT("Focus curve recorder cancelled.");
   }
 }
 
 FocusMeasureTypeT::TypeE DefaultFocusCurveRecorderT::getLimitFocusMeasureType() const {
-  return getFocusAnalyzer()->getFocusFinderProfile().getLimitFocusMeasureType();
+  return getFocusController()->getFocusFinderProfile().getLimitFocusMeasureType();
 }
 
 
 FocusMeasureTypeT::TypeE DefaultFocusCurveRecorderT::getCurveFocusMeasureType() const {
-  return getFocusAnalyzer()->getFocusFinderProfile().getCurveFocusMeasureType();
+  return getFocusController()->getFocusFinderProfile().getCurveFocusMeasureType();
 }
 
 
@@ -71,10 +71,10 @@ CurveHalfT::TypeE DefaultFocusCurveRecorderT::locateStartingPosition() {
   LOG(debug)
     << "DefaultFocusCurveRecorderT::locateStartingPosition..." << std::endl;
 
-  SelfOrientationResultT selfOrientationResult = getFocusAnalyzer()->performSelfOrientation();
+  SelfOrientationResultT selfOrientationResult = getFocusController()->performSelfOrientation();
   
   // Move close to the limiting focus measure (into the determined direction, in steps of size mStepSize)
-  getFocusAnalyzer()->moveUntilFocusMeasureLimitReached(selfOrientationResult, mStepSize, mFocusMeasureLimit);
+  getFocusController()->moveUntilFocusMeasureLimitReached(selfOrientationResult, mStepSize, mFocusMeasureLimit);
 
   return selfOrientationResult.curveHalf;
 }
@@ -97,7 +97,7 @@ std::shared_ptr<FocusCurveRecordSetT> DefaultFocusCurveRecorderT::recordFocusCur
   
   LOG(debug) << "We are on the " << CurveHalfT::asStr(curveHalf) << "... -> recording direction=" << FocusDirectionT::asStr(recordingDirection) << std::endl;
 
-  auto curveRecord = getFocusAnalyzer()->measureFocus();
+  auto curveRecord = getFocusController()->measureFocus();
 
   focusCurveRecordSet->push_back(curveRecord);
     
@@ -109,11 +109,11 @@ std::shared_ptr<FocusCurveRecordSetT> DefaultFocusCurveRecorderT::recordFocusCur
   do {
     notifyFocusCurveRecorderRecordSetUpdate(focusCurveRecordSet);
 
-    getFocusAnalyzer()->moveFocusByBlocking(recordingDirection, mStepSize, 30000ms);
+    getFocusController()->moveFocusByBlocking(recordingDirection, mStepSize, 30000ms);
     
     notifyFocusCurveRecorderProgressUpdate(-1, "Recording curve...", curveRecord);
 
-    curveRecord = getFocusAnalyzer()->measureFocus();
+    curveRecord = getFocusController()->measureFocus();
     
     focusCurveRecordSet->push_back(curveRecord);
 
@@ -172,7 +172,7 @@ void DefaultFocusCurveRecorderT::run() {
   // Notify that focus finder started
   notifyFocusCurveRecorderStarted();
 
-  getFocusAnalyzer()->devicesAvailabilityCheck();
+  getFocusController()->devicesAvailabilityCheck();
 
 
   CurveHalfT::TypeE curveHalf = locateStartingPosition();
@@ -473,29 +473,29 @@ void DefaultFocusCurveRecorderT::run() {
   notifyFocusCurveRecorderFinished(mFocusCurveRecordSets);
 
     
-  getFocusAnalyzer()->cleanup();
+  getFocusController()->cleanup();
 
 
-  } catch (FocusAnalyzerFailedExceptionT & exc) {
+  } catch (FocusControllerFailedExceptionT & exc) {
     // TODO: Improve error handling... -> ReportingT?
     LOG(warning)
       << "Focus curve recorder failed." << std::endl;
 
     // TODO: Problem... cleanup also can take time since focus position may be changed... -> introduce additional state "cancelling"?
-    getFocusAnalyzer()->cleanup();
+    getFocusController()->cleanup();
     
     // Notify that FocusCurveRecorder was cancelled...
     // TODO: Introduce notifyFocusCurveRecorderFailed()....
     notifyFocusCurveRecorderCancelled();    
   }
-  catch (FocusAnalyzerCancelledExceptionT & exc) {
+  catch (FocusControllerCancelledExceptionT & exc) {
 
     // TODO: Improve error handling... -> ReportingT?
     LOG(warning)
       << "Focus curve recorder was cancelled." << std::endl;
 
     // TODO: Problem... cleanup also can take time since focus position may be changed... -> introduce additional state "cancelling"?
-    getFocusAnalyzer()->cleanup();
+    getFocusController()->cleanup();
     
     // Notify that FocusCurveRecorder was cancelled...
     notifyFocusCurveRecorderCancelled();
@@ -517,7 +517,7 @@ void DefaultFocusCurveRecorderT::run() {
   	LOG(error)
   	<< "Hit timeout, unable tu finish curve recording." << std::endl;
 
-	getFocusAnalyzer()->cleanup();
+	getFocusController()->cleanup();
 
   	// Notify that curve recorder was cancelled...
   	// TODO: Maybe introduce notifyFocusFinderFailed()...
@@ -528,7 +528,7 @@ void DefaultFocusCurveRecorderT::run() {
     LOG(warning)
       << "Matching the focus curve failed." << std::endl;
     
-    getFocusAnalyzer()->cleanup();
+    getFocusController()->cleanup();
   }
 	
   mIsRunning = false;
@@ -556,7 +556,7 @@ void DefaultFocusCurveRecorderT::cancel() {
   // cv.notify_all();
 
   mCancelled = true;
-  getFocusAnalyzer()->cancel();
+  getFocusController()->cancel();
 }
 
 std::shared_ptr<const FocusCurveRecordSetContainerT> DefaultFocusCurveRecorderT::getFocusCurveRecordSets() const {

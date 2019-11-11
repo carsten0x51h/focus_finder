@@ -10,12 +10,12 @@
 //#include "focus_curve_record_set.h"
 #include "focus_measure_type.h"
 #include "curve_half.h"
-#include "focus_analyzer.h"
+//#include "focus_controller.h"
 
 // TODO / IDEA: Maybe HfdT and FwhmT should both implement a generic inteface "FocusMeasureT" which just hast "float getValue()".
 
 class FocusCurveRecordSetT;
-class FocusAnalyzerT;
+class FocusControllerT;
 
 class DefaultFocusCurveRecorderT: public FocusCurveRecorderT {
 private:
@@ -39,7 +39,7 @@ private:
   std::shared_ptr<FocusCurveRecordSetContainerT> mFocusCurveRecordSets;
 
 public:
-  DefaultFocusCurveRecorderT(std::shared_ptr<FocusAnalyzerT> focusAnalyzer);
+  DefaultFocusCurveRecorderT(std::shared_ptr<FocusControllerT> focusController);
   
   // Implement focus curve recorder interface
   std::string getName() const override;
