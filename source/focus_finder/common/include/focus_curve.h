@@ -48,6 +48,9 @@ public:
   
   float getLowerFocusPos() const;
   float getUpperFocusPos() const;
+
+  float getBestAbsFocusPos() const;
+  float getRelativeFocusPosBoundary() const;
   
   float calcFocusMeasureByFocusPosition(float focusPosition) const;
   float calcFocusPositionByFocusMeasure(float focusMeasure) const;
@@ -56,7 +59,8 @@ public:
   FocusMeasureTypeT::TypeE getFocusMeasureType() const;
   FittingCurveTypeT::TypeE getFocusCurveType() const;
   const CurveFitSummaryT & getCurveFitSummary() const;
-
+  const CurveParmsT & getCurveParms() const;
+  
   std::ostream & print(std::ostream & os) const;
   
   friend std::ostream & operator<<(std::ostream & os, const FocusCurveT & focusCurve);

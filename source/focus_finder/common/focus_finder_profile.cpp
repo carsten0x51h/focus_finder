@@ -26,6 +26,7 @@ FocusFinderProfileT::FocusFinderProfileT() :
 		mStarWindowSize(33, 33),
 		mLimitFocusMeasureType(FocusMeasureTypeT::HFD),
 		mCurveFocusMeasureType(FocusMeasureTypeT::FWHM_VERT),
+		mStepSize(1000),
 		mStarDetectionSnrBoundary(1.0f) {
 	LOG(debug)
 	<< "FocusFinderProfileT::FocusFinderProfileT()..." << std::endl;
@@ -94,6 +95,14 @@ FocusMeasureTypeT::TypeE FocusFinderProfileT::getCurveFocusMeasureType() const {
 
 void FocusFinderProfileT::setCurveFocusMeasureType(FocusMeasureTypeT::TypeE curveFocusMeasureType) {
   mCurveFocusMeasureType = curveFocusMeasureType;
+}
+
+int FocusFinderProfileT::getStepSize() const {
+  return mStepSize;
+}
+
+void FocusFinderProfileT::setStepSize(int stepSize) {
+  mStepSize = stepSize;
 }
 
 

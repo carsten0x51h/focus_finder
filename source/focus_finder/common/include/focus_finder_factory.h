@@ -14,10 +14,11 @@
 #include "enum_helper.h"
 
 class FocusFinderT;
+class FocusAnalyzerT;
 
 class FocusFinderFactoryT {
 public:
-	static std::shared_ptr<FocusFinderT> getInstance(const FocusFinderStrategyT::TypeE & strategy);
+  static std::shared_ptr<FocusFinderT> getInstance(const FocusFinderStrategyT::TypeE & strategy, std::shared_ptr<FocusAnalyzerT> focusAnalyzer);
 };
 
 

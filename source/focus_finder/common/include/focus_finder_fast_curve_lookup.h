@@ -19,6 +19,7 @@
 
 #include "focus_finder.h"
 #include "curve_fit_algorithm.h"
+#include "focus_analyzer.h"
 #include "focus.h"
 
 
@@ -66,7 +67,7 @@ private:
 
 
 public:
-	FocusFinderFastCurveLookupT();
+  FocusFinderFastCurveLookupT(std::shared_ptr<FocusAnalyzerT> focusAnalyzer);
 
 	// Implement focus finder interface
 	std::string getName() const override;

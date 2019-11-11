@@ -11,29 +11,9 @@
 
 #include "exception.h"
 #include "device.h"
-#include "enum_helper.h"
+#include "focus_direction.h"
 
 DEF_Exception(Focus);
-
-/**
- * LoopModeT
- */
-struct FocusDirectionT {
-  enum TypeE {
-    INWARD,
-    OUTWARD,
-    _Count
-  };
-
-  static const char * asStr(const TypeE & inType) {
-    switch (inType) {
-    	case INWARD: return "INWARD";
-    	case OUTWARD: return "OUTWARD";
-    	default: return "<?>";
-    }
-  }
-  MAC_AS_TYPE(Type, E, _Count);
-};
 
 
 class FocusT : public DeviceT {
@@ -114,6 +94,12 @@ public:
 		inCallBack.disconnect();
 	}
 
+  // Idea to simplify the unregistering of each single listener to all the events in case the device is switched.
+  void clearListeners() {
+    mTargetPositionReachedListeners.disconnect_all_slots();
+    mFocusPositionChangedListeners.disconnect_all_slots();
+    mFocusMovementAbortedListeners.disconnect_all_slots();
+  }
 
 protected:
 	void notifyTargetPositionReached(int currentPosition) const { mTargetPositionReachedListeners(currentPosition); }

@@ -32,8 +32,6 @@ class FocusCurveRecorderLogicT {
 
   FittingCurveTypeT::TypeE getFocusCurveType() const;
   void setFocusCurveType(FittingCurveTypeT::TypeE focusCurveType);
-  
-  bool checkDevices() const;
 
 };
 

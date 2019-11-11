@@ -148,8 +148,17 @@ void FocusFinderLogicT::updateProfile() {
 	}
 
 	if (hasOldCamera) {
-		// There was already an old device - unregister listener and register to the new one.
-		mCameraDevice->unregisterExposureCycleFinishedListener(mExposureCycleFinishedConnection);
+	  // Clear (unregister) all previously registered listeners from the old device. NOTE: Do this only if the device has changes! All components will have to register their listeners again anyway after the device has changed.
+	  
+	  //   mCameraDevice->clearListeners();
+	  
+	  // TODO: Do the same in here for focuser and filter as well...
+	  // IDEA: Each device may call a callback which informs whomever that it's listener was removed...?!
+	  
+	  // TODO: Remove the unregister code from all the components...
+	  //  -> we could also introduce a more granular deviceChanged() callback/listener (e.g. below)
+	  // There was already an old device - unregister listener and register to the new one.
+	  mCameraDevice->unregisterExposureCycleFinishedListener(mExposureCycleFinishedConnection);
 	}
 
 	// Register to new device
@@ -164,6 +173,11 @@ void FocusFinderLogicT::updateProfile() {
 	}
 
 	mCameraDevice = newCameraDevice;
+
+
+	
+ // TODO: Shouldn't getCurrentCamera() return mCameraDevice instead?
+ // 	  TODO: Shouldn't mCameraDevice be protected by a lockguard? Because the event which changes it comes from the "profile manager" callback which might be async to a request to getCurrentCamera()....
 }
 
 void FocusFinderLogicT::setSelectedRoi(const RectT<unsigned int> & roi) {
@@ -369,6 +383,7 @@ std::shared_ptr<FocusCurveRecorderLogicT> FocusFinderLogicT::getFocusCurveRecord
   return mFocusCurveRecorderLogic;
 }
 
+// TODO: Move to mFocusAnalyzer?
 const FrameT & FocusFinderLogicT::getLastFrame() const {
 	// TODO: Need mutex guard!!!-> or atomic?
 	return mLastFrame;

@@ -212,6 +212,7 @@ private:
     void onImageConverterValueChanged();
 
     // Store current devices
+  // TODO: Why actually storing a ptr? Why not always querying the current one from the focus finder logic? Shouldn't this logic hold pointers to this logic instead? But the problem is: when a device changes (profile change), there might be listeners registerd to this device. -> profile change should call a function which provides old and new device ptr so that each device listener has the chance to be unregister it's listeners. In any case, the respective component (e.g. main window) still needs to react on the device change.The point in time when the callback which informs about the change is very important! This is a bigger change... 
     std::shared_ptr<CameraT> mCameraDevice;
     std::shared_ptr<FocusT> mFocusDevice;
     std::shared_ptr<FilterT> mFilterDevice;

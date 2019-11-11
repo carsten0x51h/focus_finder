@@ -4,6 +4,7 @@
 #include "curve_function.h"
 #include "curve_parms.h"
 #include "enum_helper.h"
+#include "point.h"
 
 class CurveFunctionHyperbolicT : public CurveFunctionT {
  public:
@@ -32,6 +33,8 @@ class CurveFunctionHyperbolicT : public CurveFunctionT {
   CurveFunctionHyperbolicT(const CurveParmsT & curveParms);
   std::string getName() const;
   float f(float x) const;
+  PointFT min() const;
+  PointFT max() const;
 };
 
 #endif /*SOURCE_FOCUS_FINDER_COMMON_INCLUDE_CURVE_FUNCTION_HYPERBOLIC_H_*/

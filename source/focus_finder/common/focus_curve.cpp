@@ -72,6 +72,24 @@ float FocusCurveT::getUpperFocusPos() const {
   return mUpperFocusPos;
 }
 
+float FocusCurveT::getBestAbsFocusPos() const {
+  return mFocusCurveFunction->min().x();
+}
+
+float FocusCurveT::getRelativeFocusPosBoundary() const {
+
+  // Calculate focus pos boundaries relative to curve center (best focus pos)
+  float bestAbsFocusPos = getBestAbsFocusPos();
+  float deltaLower = std::abs(bestAbsFocusPos - mLowerFocusPos);
+  float deltaUpper = std::abs(mUpperFocusPos - bestAbsFocusPos);
+
+  return std::max(deltaLower, deltaUpper);
+}
+
+const CurveParmsT & FocusCurveT::getCurveParms() const {
+  return mCurveParms;
+}
+
 float FocusCurveT::calcFocusMeasureByFocusPosition(float focusPosition) const {
   // TODO: IMPLEMENT
   // TODO: Check the boundaries??

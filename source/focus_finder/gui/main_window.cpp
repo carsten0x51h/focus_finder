@@ -45,7 +45,8 @@
 #include "../common/include/profile_manager.h"
 #include "../common/include/image_converter_16to8.h"
 #include "../common/include/tuple_printer.h"
-#include "../common/include/linear_bw_stretch_mapper_function.h" // TODO: Dependency is to be removed
+//#include "../common/include/linear_bw_stretch_mapper_function.h" // TODO: Dependency is to be removed
+#include "../common/include/focus_analyzer.h"
 
 #include "ui_main_window.h"
 
@@ -127,23 +128,17 @@ void MainWindow::onStartFocusFinderPressed() {
 		// TODO: Always create a new focus finder instance? Otherwise.. where to store?
 		//       -> depends on selection... -> FocusFinder profile...
 
-		// HACK / TODO: For now we create always a new instance...
-		// TODO: Do not create here?! -> Factory?
-
-		auto focusFinder = FocusFinderFactoryT::getInstance(
-				FocusFinderStrategyT::FAST_CURVE_LOOKUP);
-
-		// Set devices
-		focusFinder->setCamera(mFfl.getCurrentCamera());
-		focusFinder->setFocus(mFfl.getCurrentFocus());
-		focusFinder->setFilter(mFfl.getCurrentFilter());
+	  auto focusAnalyzer = std::make_shared<FocusAnalyzerT>(mFfl.getCurrentCamera(), mFfl.getCurrentFocus(), mFfl.getCurrentFilter());
+		// focusAnalyzer->setCamera(mFfl.getCurrentCamera());
+		// focusAnalyzer->setFocus(mFfl.getCurrentFocus());
+		// focusAnalyzer->setFilter(mFfl.getCurrentFilter());
 
 		auto lastFocusStarPosOpt = mFfl.getLastFocusStarPos();
 
 		//if (!lastFocusStarPosOpt) {
 			// TODO: Handle case where no focus star is set / available
 		//}
-		focusFinder->setLastFocusStarPos(lastFocusStarPosOpt.value());
+		focusAnalyzer->setLastFocusStarPos(lastFocusStarPosOpt.value());
 
 
 		auto activeProfileOpt = mFfl.getProfileManager()->getActiveProfile();
@@ -151,9 +146,16 @@ void MainWindow::onStartFocusFinderPressed() {
 		// TODO: Make sure that activeProfile is set...
 //		if (!activeProfileOpt) {
 //		}
-		focusFinder->setFocusFinderProfile(activeProfileOpt.value());
+		focusAnalyzer->setFocusFinderProfile(activeProfileOpt.value());
 
 
+
+		// HACK / TODO: For now we create always a new instance...
+		// TODO: Do not create here?! -> Factory?
+
+		auto focusFinder = FocusFinderFactoryT::getInstance(
+								    FocusFinderStrategyT::FAST_CURVE_LOOKUP, focusAnalyzer);
+		
 		// Register focusFinder UI listeners
 		// TODO: Is unregister actually required? We create a new instalce always...
 		// FoFi started

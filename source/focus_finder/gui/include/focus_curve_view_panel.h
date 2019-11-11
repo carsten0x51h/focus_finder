@@ -16,6 +16,8 @@ namespace Ui {
     class FocusCurveViewPanel;
 }
 
+class FocusCurveT;
+
 /**
 *  @brief
 */
@@ -39,6 +41,8 @@ public:
 	void reset();
   //void setFocusCurve(std::shared_ptr<const FocusCurveT> focusCurve);
   void update();
+
+  void drawCurveHack(std::shared_ptr<FocusCurveT> focusCurve);
 
   // FocusMeasureTypeT::TypeE getFocusMeasureType() const;
   // void setFocusMeasureType(FocusMeasureTypeT::TypeE focusMeasureType);

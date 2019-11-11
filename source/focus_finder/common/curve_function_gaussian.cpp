@@ -19,3 +19,13 @@ float CurveFunctionGaussianT::f(float x) const {
   
   return MathFunctionsT::gaussian(x, b, p, c, w);
 }
+
+PointFT CurveFunctionGaussianT::min() const {
+  // TODO: Implement...?
+  throw CurveFunctionExceptionT("CurveFunctionGaussianT::min() not implemented.");
+}
+
+PointFT CurveFunctionGaussianT::max() const {
+  // TODO: Implement...?
+  throw CurveFunctionExceptionT("CurveFunctionGaussianT::max() not implemented.");
+}

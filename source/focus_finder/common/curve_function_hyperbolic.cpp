@@ -1,6 +1,7 @@
 #include "include/curve_function_hyperbolic.h"
 #include "include/curve_parms.h"
 #include "include/math_functions.h"
+#include "include/point.h"
 
 CurveFunctionHyperbolicT::CurveFunctionHyperbolicT(const CurveParmsT & curveParms) : CurveFunctionT(curveParms) {
   
@@ -19,3 +20,16 @@ float CurveFunctionHyperbolicT::f(float x) const {
   
   return MathFunctionsT::hyperbolic(x, a, b, c, d);
 }
+
+PointFT CurveFunctionHyperbolicT::min() const {
+  // For the hyperbolic curve, "c" is the minimum x value.
+  // TODO: Is this always true? Can't it be the max. as well?
+  float x = mCurveParms.get(IdxT::C_IDX).getValue();
+  return PointFT(x, f(x));
+}
+
+PointFT CurveFunctionHyperbolicT::max() const {
+  // TODO: Implement...?
+  throw CurveFunctionExceptionT("CurveFunctionHyperbolicT::max() not implemented.");
+}
+

@@ -5,8 +5,12 @@
 #include <QPoint>
 #include <QResizeEvent>
 #include <QLabel>
+#include <QColor>
 
 #include <memory>
+
+#include <boost/range/adaptors.hpp>
+#include <boost/range/algorithm.hpp>
 
 #include "include/focus_curve_view_widget.h"
 
@@ -15,8 +19,19 @@
 #include "../common/include/focus_curve_record_set.h"
 #include "../common/include/focus_curve_recorder_logic.h"
 #include "../common/include/focus_measure_type.h"
+#include "../common/include/focus_curve.h"
+#include "../common/include/point.h"
 
-FocusCurveViewWidgetT::FocusCurveViewWidgetT(QWidget * parent, std::shared_ptr<FocusCurveRecorderLogicT> focusCurveRecorderLogic) : QLabel(parent), mFocusCurveRecorderLogic(focusCurveRecorderLogic)
+
+
+// HACK: TODO: Do not hardcode!! Move away...
+int FocusCurveViewWidgetT::minFocusPos = 0;
+int FocusCurveViewWidgetT::maxFocusPos = 80000;
+float FocusCurveViewWidgetT::minFocusMeasure = 0.0f;
+float FocusCurveViewWidgetT::maxFocusMeasure = 20.0f;
+
+  
+FocusCurveViewWidgetT::FocusCurveViewWidgetT(QWidget * parent, std::shared_ptr<FocusCurveRecorderLogicT> focusCurveRecorderLogic) : QLabel(parent), mFocusCurveRecorderLogic(focusCurveRecorderLogic), mFocusCurveHack(nullptr)
 {
   QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
   sizePolicy.setHorizontalStretch(100);
@@ -29,59 +44,101 @@ FocusCurveViewWidgetT::FocusCurveViewWidgetT(QWidget * parent, std::shared_ptr<F
   reset();
 }
 
+QPointF FocusCurveViewWidgetT::transformToScreenCoordinates(float focusPos, float focusMeasure) {
+  int deltaFocusPos = maxFocusPos - minFocusPos;
+  float deltaFocusMeasure = maxFocusMeasure - minFocusMeasure;
+
+  // Transform coordinates
+  float xpos = (focusPos / (float) deltaFocusPos) * width();
+  float ypos = (1.0F - (focusMeasure / deltaFocusMeasure)) * height();
+  
+  return QPointF(xpos, ypos);
+}
+
 FocusCurveViewWidgetT::~FocusCurveViewWidgetT()
 {
 }
-void FocusCurveViewWidgetT::drawFocusCurveRecordSet(QPainter * p, std::shared_ptr<FocusCurveRecordSetT> focusCurveRecordSet, std::shared_ptr<FocusCurveRecorderT> focusCurveRecorder) {
+      std::vector<PointFT> dataPoints;
+
+void FocusCurveViewWidgetT::drawFocusCurveRecordSet(QPainter * p, const std::vector<PointFT> & dataPoints, const FocusFinderProfileT & focusFinderProfile, QColor color) {
 
   // Min / max focus positions
-  int minFocusPos = 0; // TODO...
-  int maxFocusPos = 80000; // TODO...
   int deltaFocusPos = maxFocusPos - minFocusPos;
-
-  float minFocusMeasure = 0; // TODO
-  float maxFocusMeasure = 20; // TODO
   float deltaFocusMeasure = maxFocusMeasure - minFocusMeasure;
-
-  const FocusFinderProfileT & focusFinderProfile = focusCurveRecorder->getFocusFinderProfile();
   
-  for (FocusCurveRecordSetT::const_iterator it = focusCurveRecordSet->begin(); it != focusCurveRecordSet->end(); ++it) {
+  for (std::vector<PointFT>::const_iterator it = dataPoints.begin(); it != dataPoints.end(); ++it) {
 
-	  auto fcr = *it;
-
-	  float focusPos = fcr->getCurrentAbsoluteFocusPos();
-	  float focusMeasure = fcr->getFocusMeasure(focusFinderProfile.getCurveFocusMeasureType());
+    float focusPos = it->x();
+    float focusMeasure = it->y();
 	    
-	  // Transform coordinates
-	  float xpos = (focusPos / (float) deltaFocusPos) * width();
-	  float ypos = (1.0F - (focusMeasure / deltaFocusMeasure)) * height();
-
-	  LOG(debug) << "FocusCurveViewWidgetT::drawFocusCurveRecordSet... focusPos=" << focusPos << ", width=" << width() << ", draw point (x, y)=" << xpos << ", " << ypos << ")." << std::endl;
-	  
-	  QPointF center(xpos, ypos);
-	  p->setPen(QPen(QBrush(QColor(0, 255, 0, 255)), 1, Qt::SolidLine));
-	  p->setBrush(QBrush(QColor(255, 255, 255, 0)));
-	  p->drawEllipse(center, 5 /*radius*/, 5 /*radius*/);
-	}
-  
+    // Transform coordinates
+    QPointF center = transformToScreenCoordinates(focusPos, focusMeasure);
+    
+    LOG(debug) << "FocusCurveViewWidgetT::drawFocusCurveRecordSet... focusPos=" << focusPos << ", focusMeasure=" << focusMeasure << ", width=" << width() << ", draw point (x, y)=" << center.x() << ", " << center.y() << ")." << std::endl;
+    
+    p->setPen(QPen(QBrush(color), 1, Qt::SolidLine));
+    p->setBrush(QBrush(QColor(255, 255, 255, 0)));
+    p->drawEllipse(center, 5 /*radius*/, 5 /*radius*/);
+  }
 }
 
 void FocusCurveViewWidgetT::drawFocusCurveRecordSets(QPainter * p) {
   auto focusCurveRecorder = mFocusCurveRecorderLogic->getFocusCurveRecorder();
 
-  // TODO: Should this widget really use the FocusCurveRecorder? Or should the RecordSets being set from outside?
+  if (focusCurveRecorder == nullptr) {
+    return;
+  }
   
-  if (focusCurveRecorder != nullptr) {
+  auto focusAnalyzer = focusCurveRecorder->getFocusAnalyzer();
+
+  if (focusAnalyzer == nullptr) {
+    return;
+  }
+  
+  const FocusFinderProfileT & focusFinderProfile = focusAnalyzer->getFocusFinderProfile();
+
+  // TODO: Should this widget really use the FocusCurveRecorder? Or should the RecordSets being set from outside?
+
+  if (mFocusCurveHack) {
+    const CurveFitSummaryT & curveFitSummary = mFocusCurveHack->getCurveFitSummary();
+
+    LOG(debug) << "FocusCurveViewWidgetT::drawFocusCurveRecordSets... drawing curveFitSummary.matchedDataPoints..." << std::endl;
+    
+    drawFocusCurveRecordSet(p, curveFitSummary.matchedDataPoints, focusFinderProfile, QColor(0, 255, 0, 255));
+
+
+    
+    LOG(debug) << "FocusCurveViewWidgetT::drawFocusCurveRecordSets... drawing curveFitSummary.outliers..." << std::endl;
+
+    std::vector<PointFT> outlierPoints;
+
+    auto extractOutlierPointsFunction = [&] (const PointWithResidualT & outlier) { return outlier.point; };
+    boost::range::copy(curveFitSummary.outliers | boost::adaptors::transformed(extractOutlierPointsFunction), std::back_inserter(outlierPoints));
+    
+    drawFocusCurveRecordSet(p, outlierPoints, focusFinderProfile, QColor(255, 255, 0, 255));
+
+    
+  } else if (focusCurveRecorder != nullptr) {
     auto focusCurveRecordSets = focusCurveRecorder->getFocusCurveRecordSets();
     // FocusMeasureTypeT::TypeE focusMeasureType = focusCurveRecorder->getFocusMeasureType();
-
     
     LOG(debug) << "FocusCurveViewWidgetT::drawFocusCurveRecordSets...focusCurveRecordSets.size(): " << focusCurveRecordSets->size() << std::endl;
-
     
     for (const auto & recordSet : *focusCurveRecordSets) {
+
+      std::vector<PointFT> dataPoints;
+      
+      auto transformRecordSetToPointFunction = [&] (std::shared_ptr<FocusCurveRecordT> rs) {
+						 return PointFT(
+								rs->getCurrentAbsoluteFocusPos(),
+								rs->getFocusMeasure(focusFinderProfile.getCurveFocusMeasureType())
+								);
+					       };
+      
+      boost::range::copy(*recordSet | boost::adaptors::transformed(transformRecordSetToPointFunction), std::back_inserter(dataPoints));
+      
       // TODO: Draw each in a different color...?!
-      drawFocusCurveRecordSet(p, recordSet, focusCurveRecorder);
+      drawFocusCurveRecordSet(p, dataPoints, focusFinderProfile, QColor(0, 255, 0, 255));
     }	  
   } else {
     LOG(debug) << "FocusCurveViewWidgetT::drawFocusCurveRecordSets... nothing to draw... no focus curve recorder." << std::endl;
@@ -101,15 +158,46 @@ void FocusCurveViewWidgetT::update() {
   repaint();
 }
 
+
+
+void FocusCurveViewWidgetT::drawCurveHack(std::shared_ptr<FocusCurveT> focusCurve) {
+  mFocusCurveHack = focusCurve;
+  repaint();
+}
+
 void FocusCurveViewWidgetT::paintEvent(QPaintEvent * event) {
 
 	QPainter p(this);
 
 	// TODO: Make the view widget to allow multiple "curves"? HFD, FWHN etc...	
-
 	drawFocusCurveRecordSets(& p);
-	
 
+
+	// Draw focus curve
+	p.setPen(QPen(QBrush(QColor(255, 0, 0, 255)), 1, Qt::SolidLine));
+	p.setBrush(QBrush(QColor(255, 255, 255, 0)));
+
+	if (mFocusCurveHack != nullptr) {
+	  // TODO: Later use the boundaries of the curve instead of min/max focus pos!
+	  int lowerFocusPos = mFocusCurveHack->getLowerFocusPos();
+	  int upperFocusPos = mFocusCurveHack->getUpperFocusPos();
+	  
+	  for (int xScreen = 0; xScreen < width(); ++xScreen) {
+
+	    float focusPos = lowerFocusPos + ((float) xScreen / (float) width()) * (float) (upperFocusPos - lowerFocusPos);
+	    float focusMeasure = mFocusCurveHack->calcFocusMeasureByFocusPosition(focusPos);
+	    
+	    QPointF center = transformToScreenCoordinates(focusPos, focusMeasure);
+	//     focusMeasureScaled
+	// p.drawLine(QPointF(mLastMousePos.x(), 0), QPointF(mLastMousePos.x(), height()));
+	    
+	    p.drawEllipse(center, 2 /*radius*/, 2 /*radius*/);
+
+	    // TODO: Paint...
+	  }
+	}
+
+	
 //	if (mHfd.valid()) {
 //
 //		const ImageT & img = mHfd.getResultImage();
@@ -156,7 +244,6 @@ void FocusCurveViewWidgetT::paintEvent(QPaintEvent * event) {
 	p.setBrush(QBrush(QColor(255, 255, 255, 0)));
 	p.drawLine(QPointF(mLastMousePos.x(), 0), QPointF(mLastMousePos.x(), height()));
 	p.drawLine(QPointF(0, mLastMousePos.y()), QPointF(width(), mLastMousePos.y()));
-	
 	
 	Q_UNUSED(event);
 }

@@ -43,6 +43,11 @@ void FocusCurveViewPanelT::update() {
   mFocusCurveWidget->update();
 }
 
+void FocusCurveViewPanelT::drawCurveHack(std::shared_ptr<FocusCurveT> focusCurve) {
+  mFocusCurveWidget->drawCurveHack(focusCurve);
+}
+
+
 // FocusMeasureTypeT::TypeE FocusCurveViewPanelT::getFocusMeasureType() const {
 //   return mFocusCurveWidget->getFocusMeasureType();
 // }

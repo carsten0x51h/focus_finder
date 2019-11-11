@@ -40,8 +40,12 @@ endif()
 # 
 
 set(sources
+  ../common/include/focus_analyzer.h
+  ../common/focus_analyzer.cpp
   ../common/include/floating_point_equality.h
   ../common/include/quantile.h
+  ../common/include/curve_half.h
+  ../common/include/focus_direction.h
   ../common/include/thresholding_algorithm.h
   ../common/include/thresholding_algorithm_type.h
   ../common/include/otsu_thresholding_algorithm.h

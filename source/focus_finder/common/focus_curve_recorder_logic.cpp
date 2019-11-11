@@ -8,6 +8,7 @@
 #include "include/focus_curve_recorder.h"
 #include "include/profile_manager.h"
 #include "include/focus_curve.h"
+#include "include/focus_analyzer.h"
 
 class FocusCurveRecordSetT;
 
@@ -20,69 +21,31 @@ std::shared_ptr<FocusCurveRecorderT> FocusCurveRecorderLogicT::getFocusCurveReco
 
 void FocusCurveRecorderLogicT::resetFocusCurveRecorder(FocusCurveRecorderTypeT::TypeE focusCurveRecorderType) {
 
-    auto focusCurveRecorder = FocusCurveRecorderFactoryT::getInstance(
-							focusCurveRecorderType);
+  auto focusAnalyzer = std::make_shared<FocusAnalyzerT>(mFfl.getCurrentCamera(), mFfl.getCurrentFocus(), mFfl.getCurrentFilter());
+  // focusAnalyzer->setCamera(mFfl.getCurrentCamera());
+  // focusAnalyzer->setFocus(mFfl.getCurrentFocus());
+  // focusAnalyzer->setFilter(mFfl.getCurrentFilter());
 
-    // Set devices
-    focusCurveRecorder->setCamera(mFfl.getCurrentCamera());
-    focusCurveRecorder->setFocus(mFfl.getCurrentFocus());
-    focusCurveRecorder->setFilter(mFfl.getCurrentFilter());
+  auto lastFocusStarPosOpt = mFfl.getLastFocusStarPos();
 
-
-    auto lastFocusStarPosOpt = mFfl.getLastFocusStarPos();
-
-    //if (!lastFocusStarPosOpt) {
-    // TODO: Handle case where no focus star is set / available
-    //}
-		
-    focusCurveRecorder->setLastFocusStarPos(lastFocusStarPosOpt.value());
-
-    auto activeProfileOpt = mFfl.getProfileManager()->getActiveProfile();
-    
-    //if (!activeProfileOpt) {
-    // TODO: Make sure that activeProfile is set...
-    //}
-    focusCurveRecorder->setFocusFinderProfile(activeProfileOpt.value());
-
-    
-    //auto activeProfileOpt = mFfl.getProfileManager()->getActiveProfile();
-
-    // TODO: Make sure that activeProfile is set...
-    //		if (!activeProfileOpt) {
-    //		}
-    // TODO: Implement
-    //focusCurveRecorder->setFocusFinderProfile(activeProfileOpt.value());
-
-    mFocusCurveRecorder = focusCurveRecorder;
-}
+  //if (!lastFocusStarPosOpt) {
+  // TODO: Handle case where no focus star is set / available
+  //}
+  focusAnalyzer->setLastFocusStarPos(lastFocusStarPosOpt.value());
 
 
-bool FocusCurveRecorderLogicT::checkDevices() const {
-  auto activeCamera = mFfl.getCurrentCamera();
-  auto activeFocuser = mFfl.getCurrentCamera();
+  auto activeProfileOpt = mFfl.getProfileManager()->getActiveProfile();
+
+  // TODO: Make sure that activeProfile is set...
+  //if (!activeProfileOpt) {
+  //}
+  focusAnalyzer->setFocusFinderProfile(activeProfileOpt.value());
+
   
-  if (!activeCamera) {
-    LOG(warning)
-      << "No camera set!" << std::endl;
-    return false;
-  }
-  
-  if (!activeFocuser) {
-    LOG(warning)
-      << "No focuser set!" << std::endl;
-    return false;
-  }
-  return true;
+  mFocusCurveRecorder = FocusCurveRecorderFactoryT::getInstance(
+								focusCurveRecorderType,
+								focusAnalyzer);
 }
-
-// FocusMeasureTypeT::TypeE FocusCurveRecorderLogicT::getFocusMeasureType() const {
-//   //return mFocusMeasureType;
-//   // TODO: Read from profile...
-// }
-
-// // void FocusCurveRecorderLogicT::setFocusMeasureType(FocusMeasureTypeT::TypeE focusMeasureType) {
-// //   mFocusMeasureType = focusMeasureType;
-// // }
 
 FittingCurveTypeT::TypeE FocusCurveRecorderLogicT::getFocusCurveType() const {
   return mFocusCurveType;

@@ -197,8 +197,15 @@ void FocusCurveRecorderPanelT::onFocusCurveRecordPressed(bool isChecked) {
   LOG(debug) << "FocusCurveRecorderPanelT::onFocusCurveRecordPressed... mFocusCurveRecordButton->isChecked(): " << isChecked << std::endl;
 
   if (isChecked) {
+    // HACK / TODO: For now we create always a new instance...
+    // TODO: Do not create here?! -> Factory?
+    mFocusCurveRecorderLogic->resetFocusCurveRecorder(FocusCurveRecorderTypeT::DEFAULT);
+    
+    auto focusCurveRecorder = mFocusCurveRecorderLogic->getFocusCurveRecorder();
 
-    if (!mFocusCurveRecorderLogic->checkDevices()) {
+    try {
+      focusCurveRecorder->getFocusAnalyzer()->devicesAvailabilityCheck();
+    } catch (FocusAnalyzerFailedExceptionT & exc) {
       // TODO: Log error / warning...
       return;
     }
@@ -233,11 +240,6 @@ void FocusCurveRecorderPanelT::onFocusCurveRecordPressed(bool isChecked) {
     
     //mFocusCurveRecorderLogic->setFocusMeasureType(FocusMeasureTypeT::HFD);
 
-    // HACK / TODO: For now we create always a new instance...
-    // TODO: Do not create here?! -> Factory?
-    mFocusCurveRecorderLogic->resetFocusCurveRecorder(FocusCurveRecorderTypeT::DEFAULT);
-    
-    auto focusCurveRecorder = mFocusCurveRecorderLogic->getFocusCurveRecorder();
 
     // Register FocusCurveRecorder UI listeners
     // FocusCurveRecorder started
@@ -360,7 +362,19 @@ void FocusCurveRecorderPanelT::onFocusCurveRecorderRecordSetFinished(std::shared
 	<< "FocusCurveRecorderPanelT::onFocusCurveRecorderRecordSetFinished..." << std::endl;
 	
 	// Match the curve...
+	// TODO: Do not use mFocusCurveRecorderLogic->getFocusCurveType()... use selection from UI!
 	auto focusCurve = std::make_shared<FocusCurveT>(focusCurveRecordSet, mFocusCurveRecorderLogic->getFocusCurveType());
+
+	
+	// HACK TO SEE THE CURVE!
+	mFocusCurveViewPanel->drawCurveHack(focusCurve);
+	mFocusCurveRecorderCurveDetailsPanel->setCurveDetails(focusCurve);
+  
+	// HACK TO SEE THE DELTA
+	float relFocusPosBoundary = focusCurve->getRelativeFocusPosBoundary();
+	LOG(debug) << "relFocusPosBoundary: " << relFocusPosBoundary << std::endl;
+
+	
 	//TODO: What happens to focusCurve?? -> needs to be drawn......
 	  
 	// TODO: Currently we do not cache the calculatef FocusCurve.

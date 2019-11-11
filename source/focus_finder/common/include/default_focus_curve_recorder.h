@@ -1,88 +1,51 @@
 #ifndef SOURCE_FOCUS_FINDER_COMMON_INCLUDE_DEFAULT_FOCUS_CURVE_RECORDER_H_
 #define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_DEFAULT_FOCUS_CURVE_RECORDER_H_
 
-#include <list>
-#include <atomic>
-
-#include <thread>
-#include <condition_variable>
-
-#include <boost/signals2.hpp>
+//#include <thread>
+//#include <atomic>
+//#include <condition_variable>
+//#include <boost/signals2.hpp>
 
 #include "focus_curve_recorder.h"
-#include "focus_curve_record_set.h"
+//#include "focus_curve_record_set.h"
 #include "focus_measure_type.h"
-
+#include "curve_half.h"
+#include "focus_analyzer.h"
 
 // TODO / IDEA: Maybe HfdT and FwhmT should both implement a generic inteface "FocusMeasureT" which just hast "float getValue()".
 
-
-class FocusCurveRecordT;
-
-
-// TODO: enum struct in own header file? Better name?
-enum CurveHalfE { LeftHalf, RightHalf };
-
-// TODO: Move to sep. class...?
-struct SelfOrientationResultT {
-  FocusDirectionT::TypeE focusDirectionToLimit;
-  CurveHalfE curveHalf;
-  std::shared_ptr<FocusCurveRecordT> record1;
-  std::shared_ptr<FocusCurveRecordT> record2;
-};
-
-
+class FocusCurveRecordSetT;
+class FocusAnalyzerT;
 
 class DefaultFocusCurveRecorderT: public FocusCurveRecorderT {
 private:
-	// Prevent copy
-	DefaultFocusCurveRecorderT(const DefaultFocusCurveRecorderT &);
-	DefaultFocusCurveRecorderT & operator=(const DefaultFocusCurveRecorderT &);
-
+  // Prevent copy
+  DefaultFocusCurveRecorderT(const DefaultFocusCurveRecorderT &);
+  DefaultFocusCurveRecorderT & operator=(const DefaultFocusCurveRecorderT &);
+  
   FocusMeasureTypeT::TypeE getLimitFocusMeasureType() const;
   FocusMeasureTypeT::TypeE getCurveFocusMeasureType() const;
-  void devicesAvailabilityCheck();
-  void cleanup();
+  //void cleanup();
   void checkCancelled() const;
-  void waitForFocus(std::chrono::milliseconds timeout) const;
-  void moveFocusToBlocking(int absPos, std::chrono::milliseconds timeout);
-  void moveFocusByBlocking(FocusDirectionT::TypeE direction, int ticks, std::chrono::milliseconds timeout);
-  SelfOrientationResultT performSelfOrientation();
-  void moveUntilFocusMeasureLimitReached(const SelfOrientationResultT & selfOrientationResult, float stepSize, float focusMeasureLimit);
-  CurveHalfE locateStartingPosition();
-  std::shared_ptr<FocusCurveRecordT> measureFocus();
-  std::shared_ptr<FocusCurveRecordSetT> recordFocusCurveRecordSet(CurveHalfE curveHalf);
-  void onImageReceived(RectT<unsigned int> roi,
-		       std::shared_ptr<const ImageT> image, bool lastFrame);
+  CurveHalfT::TypeE locateStartingPosition();
+  std::shared_ptr<FocusCurveRecordSetT> recordFocusCurveRecordSet(CurveHalfT::TypeE curveHalf);
 
-
-  void checkIfStarIsThere(const ImageT & img, float * outSnr = 0) const;
-  void runExposureBlocking(std::chrono::milliseconds expTime);
-
-  std::shared_ptr<const ImageT> mCurrentImage;
-
-  boost::signals2::connection mCameraExposureFinishedConnection;
-
-  std::atomic<bool> mCancelled;
+  std::atomic<bool> mCancelled; // TODO: Still required?
   std::atomic<bool> mIsRunning;
 
-  std::condition_variable cv;
-  std::mutex cvMutex;
-
-  int mInitialFocusPos;
   int mStepSize;
   float mFocusMeasureLimit;
 
   std::shared_ptr<FocusCurveRecordSetContainerT> mFocusCurveRecordSets;
 
 public:
-	DefaultFocusCurveRecorderT();
-
-	// Implement focus curve recorder interface
-	std::string getName() const override;
-
-    bool isRunning() const override;
-    void run() override;
+  DefaultFocusCurveRecorderT(std::shared_ptr<FocusAnalyzerT> focusAnalyzer);
+  
+  // Implement focus curve recorder interface
+  std::string getName() const override;
+  
+  bool isRunning() const override;
+  void run() override;
   void cancel() override;
   void reset() override;
 

@@ -84,6 +84,13 @@ public:
 		inCallBack.disconnect();
 	}
 
+  // Idea to simplify the unregistering of each single listener to all the events in case the device is switched.
+  void clearListeners() {
+    mFilterPositionChangedListeners.disconnect_all_slots();
+    mTargetPositionReachedListeners.disconnect_all_slots();
+    mFilterMovementAbortedListeners.disconnect_all_slots();
+  }
+
 protected:
 	void notifyFilterPositionChanged(int currentPosition) const { mFilterPositionChangedListeners(currentPosition); }
 	void notifyTargetPositionReached(int targetPosition) const { mTargetPositionReachedListeners(targetPosition); }

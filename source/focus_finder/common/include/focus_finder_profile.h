@@ -48,6 +48,9 @@ public:
 
   FocusMeasureTypeT::TypeE getCurveFocusMeasureType() const;
   void setCurveFocusMeasureType(FocusMeasureTypeT::TypeE curveFocusMeasureType);
+
+  int getStepSize() const;
+  void setStepSize(int stepSize);
   
 	float getStarDetectionSnrBoundary() const;
 	void setStarDetectionSnrBoundary(float starDetectionSnrBoundary);
@@ -108,6 +111,7 @@ private:
 
 	FocusFinderStrategyT::TypeE mFocusFinderStrategy; // TODO: Actually, this is more a curve type which is used to fit the measured values...
 
+  int mStepSize;
 	// TODO: There are probably settings which are specific for the respective "focus finder strategy"
 //	e.g.
 //	mMaxHfd / mMaxFwhm / limiting HFD?;

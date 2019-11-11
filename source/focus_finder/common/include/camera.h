@@ -131,6 +131,8 @@ public:
 	virtual void clearRoi() = 0;
 
 
+
+  
 	// Internal?
 	//virtual bool isCompressed() = 0; - internal?
 	//virtual bool getShutterState() = 0 - internal?
@@ -174,6 +176,16 @@ public:
 		inCallBack.disconnect();
 	}
 
+  // Idea to simplify the unregistering of each single listener to all the events in case the device is switched.
+  void clearListeners() {
+    mExposureDelayTimerUpdListeners.disconnect_all_slots();
+    mExposureTimerUpdListeners.disconnect_all_slots();
+    mFrameTransferUpdListeners.disconnect_all_slots();
+    mExposureCancelledListeners.disconnect_all_slots();
+    mExposureCycleFinishedListeners.disconnect_all_slots();
+  }
+
+  
 protected:
 	// To be used by startExposure, cancelExposure and actual device implementation.
 	void notifyExposureCycleFinished(RectT<unsigned int> roiRect, std::shared_ptr<const ImageT> resultImage, bool lastExposure) const { mExposureCycleFinishedListeners(roiRect, resultImage, lastExposure); }

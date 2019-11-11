@@ -24,6 +24,7 @@
 #define __WAIT_FOR__ __WAIT_FOR__
 
 #include <chrono>
+#include <thread>
 
 #include "exception.h"
 #include "logging.h"

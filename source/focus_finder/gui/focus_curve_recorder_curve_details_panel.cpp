@@ -49,7 +49,6 @@ void FocusCurveRecorderCurveDetailsPanelT::setCurveDetails(std::shared_ptr<const
 {
   std::stringstream ss;
 
-
   std::time_t t = focusCurve->getDateTime();
   char mbstr[100];
   std::strftime(mbstr, sizeof(mbstr), "%A %c", std::localtime(& t));
@@ -87,4 +86,24 @@ void FocusCurveRecorderCurveDetailsPanelT::setCurveDetails(std::shared_ptr<const
   // ss << std::fixed << focusCurve->getBestFocusPos();
   // m_ui->lblBestFocusPos->setText(QString::fromStdString(ss.str()));
   // ss.str(std::string());
+
+  const CurveParmsT & curveParms = focusCurve->getCurveParms();
+    
+  m_ui->tblCurveParams->setColumnCount(2);
+  m_ui->tblCurveParams->setRowCount(curveParms.size());
+    
+  for (size_t idx = 0; idx < curveParms.size(); ++idx) {
+    const CurveParmT & parm = curveParms.get(idx);
+
+    // TODO: Memory leak?
+    QTableWidgetItem * nameItem = new QTableWidgetItem(QString::fromStdString(parm.getName()));
+    nameItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+    m_ui->tblCurveParams->setItem(idx, 0, nameItem);
+    
+    // TODO: Memory leak?
+    QTableWidgetItem * valueItem = new QTableWidgetItem(tr("%1").arg(parm.getValue()));
+    valueItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+    m_ui->tblCurveParams->setItem(idx, 1, valueItem);    
+  }
+  
 }

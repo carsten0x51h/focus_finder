@@ -1,23 +1,18 @@
 #ifndef SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FOCUS_CURVE_RECORDER_H_
 #define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FOCUS_CURVE_RECORDER_H_
 
-#include <list>
 #include <memory>
 #include <functional>
+#include <boost/signals2.hpp>
 
 #include "exception.h"
 
-#include "camera.h"
-#include "focus.h"
-#include "filter.h"
-
-#include "focus_finder_profile.h"
 #include "focus_curve_record_set.h"
-#include "focus_measure_type.h"
+#include "focus_analyzer.h"
 
-DEF_Exception(FocusCurveRecorder);
-DEF_Exception(FocusCurveRecorderFailed);
-DEF_Exception(FocusCurveRecorderCancelled);
+// DEF_Exception(FocusCurveRecorder);
+// DEF_Exception(FocusCurveRecorderFailed);
+// DEF_Exception(FocusCurveRecorderCancelled);
 
 class FocusCurveRecordT;
 class FocusCurveRecordSetT;
@@ -27,7 +22,6 @@ private:
   // Prevent copy of FocusCurveRecorder
   FocusCurveRecorderT(const FocusCurveRecorderT &);
   FocusCurveRecorderT & operator=(const FocusCurveRecorderT &);
-
   
   typedef boost::signals2::signal<void()> FocusCurveRecorderStartedListenersT;
   FocusCurveRecorderStartedListenersT mFocusCurveRecorderStartedListeners;
@@ -51,66 +45,25 @@ private:
   typedef boost::signals2::signal<void(float, std::string, std::shared_ptr<FocusCurveRecordT>)> FocusCurveRecorderProgressUpdateListenersT;
   FocusCurveRecorderProgressUpdateListenersT mFocusCurveRecorderProgressUpdateListeners;
   
-  std::shared_ptr<CameraT> mCamera;
-  std::shared_ptr<FocusT> mFocus;
-  std::shared_ptr<FilterT> mFilter;
-
-  PointT<float> mLastFocusStarPos;
-
-  FocusFinderProfileT mFocusFinderProfile;
+  std::shared_ptr<FocusAnalyzerT> mFocusAnalyzer;
 
 public:
-  FocusCurveRecorderT() :
-    mCamera(nullptr), mFocus(nullptr), mFilter(nullptr) {
+  FocusCurveRecorderT(std::shared_ptr<FocusAnalyzerT> focusAnalyzer) : mFocusAnalyzer(focusAnalyzer)
+  {
   }
 
-  virtual std::string getName() const = 0;
   virtual ~FocusCurveRecorderT() {
   }
-  
+
+  std::shared_ptr<FocusAnalyzerT> getFocusAnalyzer() { return mFocusAnalyzer; }
+  std::shared_ptr<const FocusAnalyzerT> getFocusAnalyzer() const { return mFocusAnalyzer; }
+  virtual std::string getName() const = 0;
   virtual bool isRunning() const = 0;
   virtual void run() = 0;
   virtual void cancel() = 0;
   virtual void reset() = 0;
   virtual std::shared_ptr<const FocusCurveRecordSetContainerT> getFocusCurveRecordSets() const = 0;
 
-  
-  std::shared_ptr<CameraT> getCamera() const {
-    return mCamera;
-  }
-  
-  void setCamera(std::shared_ptr<CameraT> camera) {
-    mCamera = camera;
-  }
-
-  std::shared_ptr<FocusT> getFocus() const {
-    return mFocus;
-  }
-  void setFocus(std::shared_ptr<FocusT> focus) {
-    mFocus = focus;
-  }
-
-  std::shared_ptr<FilterT> getFilter() const {
-    return mFilter;
-  }
-  void setFilter(std::shared_ptr<FilterT> filter) {
-    mFilter = filter;
-  }
-
-  // TODO: Maybe we find a better name?!
-  void setLastFocusStarPos(PointT<float> lastFocusStarPos) {
-    mLastFocusStarPos = lastFocusStarPos;
-  }
-  PointT<float> getLastFocusStarPos() const {
-    return mLastFocusStarPos;
-  }
-
-  void setFocusFinderProfile(const FocusFinderProfileT & profile) {
-    mFocusFinderProfile = profile;
-  }
-  const FocusFinderProfileT & getFocusFinderProfile() const {
-    return mFocusFinderProfile;
-  }
 
   boost::signals2::connection registerFocusCurveRecorderStartedListener(
 									const FocusCurveRecorderStartedListenersT::slot_type & inCallBack) {
