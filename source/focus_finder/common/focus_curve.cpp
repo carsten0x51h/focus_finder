@@ -91,15 +91,35 @@ const CurveParmsT & FocusCurveT::getCurveParms() const {
 }
 
 float FocusCurveT::calcFocusMeasureByFocusPosition(float focusPosition) const {
-  // TODO: IMPLEMENT
   // TODO: Check the boundaries??
   
   return mFocusCurveFunction->f(focusPosition);
 }
 
-float FocusCurveT::calcFocusPositionByFocusMeasure(float focusMeasure) const {
-  // TODO: IMPLEMENT
-    return 0.0;
+// TODO: static version? -> pass in focusCurveFunction
+std::vector<float> FocusCurveT::calcFocusPositionByFocusMeasure(std::shared_ptr<const CurveFunctionT> curveFunction, float focusMeasure) {
+  std::vector<float> results;
+  
+  // TODO: Check the boundaries??
+  // TODO: Case when no value...
+  
+  float estimatedPos = curveFunction->f_inv(focusMeasure);
+  
+  if (estimatedPos < std::numeric_limits<float>::epsilon()) {
+    // Only one value
+    results.push_back(estimatedPos);
+  } else {
+    // Because of the curve shape - we need to consder both values...
+    //TODO: Can we assume that here always? Ot shouldn't that be done by MathT::<function>...?
+    results.push_back(+estimatedPos);    
+    results.push_back(-estimatedPos);
+  }
+  
+  return results;
+}
+
+std::vector<float> FocusCurveT::calcFocusPositionByFocusMeasure(float focusMeasure) const {
+  return FocusCurveT::calcFocusPositionByFocusMeasure(mFocusCurveFunction, focusMeasure);
 }
 
 std::time_t FocusCurveT::getDateTime() const {

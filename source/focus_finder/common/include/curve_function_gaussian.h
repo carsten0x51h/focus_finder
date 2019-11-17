@@ -33,6 +33,7 @@ class CurveFunctionGaussianT : public CurveFunctionT {
   CurveFunctionGaussianT(const CurveParmsT & curveParms);
   std::string getName() const;
   float f(float x) const;
+  float f_inv(float x) const;
   PointFT min() const;
   PointFT max() const;
 };

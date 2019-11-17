@@ -16,6 +16,8 @@ CurveParmsT LmCurveMatcherT::fillCurveParms(
 	CurveParmsT curveParms(resultVec->size);
 	auto parmNames = mLmFittingCurve->getParmNames();
 
+	//TODO: FIXED_PARMS - Only iterate about  the non-fixed ones... --> ask mLmFittingCurve for this info...
+	  
 	for (size_t idx = 0; idx < resultVec->size; ++idx) {
 		std::string parmName = parmNames.at(idx);
 		float value = gsl_vector_get(resultVec, idx);

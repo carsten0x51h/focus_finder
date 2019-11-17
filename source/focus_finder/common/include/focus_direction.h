@@ -17,6 +17,11 @@ struct FocusDirectionT {
     	default: return "<?>";
     }
   }
+
+  static TypeE invert(const TypeE & inType) {
+    return (inType == FocusDirectionT::INWARD ? FocusDirectionT::OUTWARD : FocusDirectionT::INWARD);
+  }
+
   MAC_AS_TYPE(Type, E, _Count);
 };
 

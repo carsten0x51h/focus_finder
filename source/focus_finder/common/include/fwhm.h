@@ -65,58 +65,55 @@ DEF_Exception(Fwhm);
 class FwhmT {
 
 private:
-	std::vector<PointFT> mImgValues;
-	std::vector<PointFT> mFitValues;
-	std::vector<PointWithResidualT> mOutlierValues;
+  bool mValid;
+  std::vector<PointFT> mImgValues;
+  std::vector<PointFT> mFitValues;
+  std::vector<PointWithResidualT> mOutlierValues;
+  
+  CurveParmsT mGaussParms;
+  
+  static const double SIGMA_TO_FWHM;
 
-	CurveParmsT mGaussParms;
-
-	static const double SIGMA_TO_FWHM;
-
-	CurveParmsT fitValues(const std::vector<PointFT> & imgValues,
+  CurveParmsT fitValues(const std::vector<PointFT> & imgValues,
 			double inEpsAbs = 1e-2, double inEpsRel = 1e-2);
+  void calcIsValid();
+  void throwIfNotValid() const;
 
 public:
+  FwhmT();
+  FwhmT(const std::vector<float> & inValues, double inEpsAbs = 1e-2,
+	     double inEpsRel = 1e-2, bool inThrowIfNotValid = true);
+  void set(const std::vector<float> & inValues, double inEpsAbs = 1e-2,
+	   double inEpsRel = 1e-2, bool inThrowIfNotValid = true);
 
-	FwhmT();
-	FwhmT(const std::vector<float> & inValues, double inEpsAbs = 1e-2,
-			double inEpsRel = 1e-2);
-	void set(const std::vector<float> & inValues, double inEpsAbs = 1e-2,
-			double inEpsRel = 1e-2);
+  bool valid() const;
+  void reset();
 
-	inline bool valid() const {
-		return (mImgValues.size() > 0 && mFitValues.size() > 0);
-	}
+  /**
+   * Calc FWHM ["] from FWHM [px]
+   * FWHM = sigma * 1.66510922 (=2*sqrt(ln(2)))
+   *
+   * See http://mathworld.wolfram.com/GaussianFunction
+   * TODO: --> Needs F?! --> Move out of here?!--> Diff class?!
+   */
+  //TODO: We want to have this value in PX and ".... depending on the purpose...
+  
+  static inline double sigmaToFwhm(double sigma) {
+    return FwhmT::SIGMA_TO_FWHM * sigma;
+  }
+  static inline double fwhmToSigma(double sigma) {
+    return sigma / FwhmT::SIGMA_TO_FWHM;
+  }
 
-	inline void reset() {
-		mImgValues.clear();
-		mFitValues.clear();
-		mOutlierValues.clear();
-	}
+  float getValue(bool inThrowIfNotValid = true) const;
+  const std::vector<PointFT> & getImgValues() const;
+  const std::vector<PointFT> & getFitValues() const;
+  const std::vector<PointWithResidualT> & getOutlierValues() const;
 
-	/**
-	 * Calc FWHM ["] from FWHM [px]
-	 * FWHM = sigma * 1.66510922 (=2*sqrt(ln(2)))
-	 *
-	 * See http://mathworld.wolfram.com/GaussianFunction
-	 * TODO: --> Needs F?! --> Move out of here?!--> Diff class?!
-	 */
-	static inline double sigmaToFwhm(double sigma) {
-		return FwhmT::SIGMA_TO_FWHM * sigma;
-	}
-	static inline double fwhmToSigma(double sigma) {
-		return sigma / FwhmT::SIGMA_TO_FWHM;
-	}
+  float getStandardDeviation() const;
 
-	float getValue() const;
-	const std::vector<PointFT> & getImgValues() const;
-	const std::vector<PointFT> & getFitValues() const;
-	const std::vector<PointWithResidualT> & getOutlierValues() const;
-
-	float getStandardDeviation() const;
-
-	std::ostream & print(std::ostream & os, bool inPrintDetails = false) const;
-	friend std::ostream & operator<<(std::ostream & os, const FwhmT & inFwhm);
+  std::ostream & print(std::ostream & os, bool inPrintDetails = false) const;
+  friend std::ostream & operator<<(std::ostream & os, const FwhmT & inFwhm);
 };
 
 #endif // _FWHM_HPP_

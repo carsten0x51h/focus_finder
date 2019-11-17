@@ -20,6 +20,11 @@ float CurveFunctionGaussianT::f(float x) const {
   return MathFunctionsT::gaussian(x, b, p, c, w);
 }
 
+float CurveFunctionGaussianT::f_inv(float x) const {
+  // TODO: IMPLEMENT
+  throw CurveFunctionExceptionT("CurveFunctionGaussianT::f_inv() not implemented.");
+}
+
 PointFT CurveFunctionGaussianT::min() const {
   // TODO: Implement...?
   throw CurveFunctionExceptionT("CurveFunctionGaussianT::min() not implemented.");

@@ -42,9 +42,12 @@ endif()
 set(sources
   ../common/include/focus_controller.h
   ../common/focus_controller.cpp
+  ../common/include/self_orientation_result.h
+  ../common/self_orientation_result.cpp
   ../common/include/floating_point_equality.h
   ../common/include/quantile.h
   ../common/include/curve_half.h
+  ../common/include/boundary_location.h
   ../common/include/focus_direction.h
   ../common/include/thresholding_algorithm.h
   ../common/include/thresholding_algorithm_type.h
@@ -129,6 +132,10 @@ set(sources
   ../common/lm_fitting_curve.cpp
   ../common/include/lm_fitting_curve_hyperbolic.h
   ../common/lm_fitting_curve_hyperbolic.cpp
+  ../common/include/lm_fitting_curve_hyperbolic_pos_only.h
+  ../common/lm_fitting_curve_hyperbolic_pos_only.cpp
+  ../common/include/curve_function_hyperbolic_pos_only.h
+  ../common/curve_function_hyperbolic_pos_only.cpp
   ../common/include/lm_fitting_curve_parabolic.h
   ../common/lm_fitting_curve_parabolic.cpp
   ../common/include/lm_fitting_curve_gaussian.h

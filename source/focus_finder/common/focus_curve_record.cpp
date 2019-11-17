@@ -59,7 +59,7 @@ float FocusCurveRecordT::getFocusMeasure(std::shared_ptr<FocusCurveRecordT> focu
   case FocusMeasureTypeT::FWHM_HORZ:
     return focusCurveRecord->getFwhmHorz().getValue();
   case FocusMeasureTypeT::FWHM_AVERAGE:
-    return (focusCurveRecord->getFwhmHorz().getValue() + focusCurveRecord->getFwhmVert().getValue()) / 2.0f;
+    return (focusCurveRecord->getFwhmHorz().getValue() + focusCurveRecord->getFwhmVert().getValue()) / 2.0F;
   default:
     throw FocusCurveRecordExceptionT("Invalid focus measure type.");
   }

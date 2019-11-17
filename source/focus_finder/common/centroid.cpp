@@ -394,13 +394,6 @@ void CentroidT::calcIntensityWeightedCenter(const ImageT & inImg,
 		Jmean2 += calcJy2(inImg, i);
 	}
 
-	// DEBUG: Store image "inImg"
-	ImageT imgSave(inImg);
-	imgSave.normalize(0, 255);
-	imgSave.save("/home/devnull/.fofi/test.png");
-	// DEBUG END!
-
-
 	std::get<0>(*outCentroidPos) = Imean2 / Ixy2;
 	std::get<1>(*outCentroidPos) = Jmean2 / Ixy2;
 

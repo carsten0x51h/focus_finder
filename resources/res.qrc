@@ -1,5 +1,6 @@
 <RCC>
   <qresource prefix="res">
+    <file>fofi_splash_screen.png</file>
     <file>telescope_focusing.gif</file>
     <file>mIconExpand.svg</file>
     <file>mIconCollapse.svg</file>

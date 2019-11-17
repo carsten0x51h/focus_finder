@@ -13,11 +13,16 @@
 #include "include/fwhm.h"
 #include "include/image_slicer.h"
 #include "include/focus_curve_record.h"
+#include "include/focus_curve_record_set.h"
 #include "include/focus_curve_record_builder.h"
 #include "include/curve_function_factory.h"
+#include "include/curve_function.h"
+#include "include/focus_curve.h"
+#include "include/boundary_location.h"
 
 class FocusControllerT;
 
+// TODO: Find a better name for this class.... we don't really lookup something...
 FocusFinderFastCurveLookupT::FocusFinderFastCurveLookupT(std::shared_ptr<FocusControllerT> focusController) : FocusFinderT(focusController),
   mCancelled(false),
   mIsRunning(false) {
@@ -46,6 +51,42 @@ bool FocusFinderFastCurveLookupT::isRunning() const {
     return mIsRunning.load();
 }
 
+
+
+BoundaryLocationT::TypeE FocusFinderFastCurveLookupT::determineBoundaryLoc(float lowerFocusMeasure, float upperFocusMeasure, float focusMeasure) const {
+  BoundaryLocationT::TypeE boundaryLoc;
+      
+  if (focusMeasure < lowerFocusMeasure) {
+    // If inside boundary
+    boundaryLoc = BoundaryLocationT::INSIDE_BOUNDARY;
+  } else if (focusMeasure > upperFocusMeasure) {
+    // If outside boundary
+    boundaryLoc = BoundaryLocationT::OUTSIDE_BOUNDARY;
+  } else {
+    // We are already in the boundary range (i.e. close to the limit) -> we are already done -> do not move.
+    boundaryLoc = BoundaryLocationT::WITHIN_BOUNDARY_RANGE;
+  }
+  return boundaryLoc;
+}
+
+
+
+// float FocusFinderFastCurveLookupT::estimateRelPos(std::shared_ptr<CurveFunctionT> focusCurveFunction, float focusMeasure, CurveHalfT::TypeE curveHalf) {
+
+//   std::vector<float> estimatedFocusPositions = FocusCurveT::calcFocusPositionByFocusMeasure(focusCurveFunction, focusMeasure);
+ 
+//   //std::vector<float> possibleFocusPositions2 = focusCurveFunction->f_inv(focusMeasure2);
+//   //     std::vector<float> possibleFocusPositions = focusCurveFunction->f_inv(focusMeasure1);
+//   //     if (curveHalf == ...) {
+//   // 	return ...;
+//   //     } else if () {
+//   // 	return ...;
+//   //     }
+//   // }
+//   //return 123;
+// }
+
+	
 /**
  * Process
  * -------
@@ -64,536 +105,456 @@ bool FocusFinderFastCurveLookupT::isRunning() const {
  */
 void FocusFinderFastCurveLookupT::run() {
 
-  // TODO TODO TODO: Implement...
-  
-  // // HACK! For testing only
-  // // Hyperbolic curve parms 
-  // CurveParmsT parms(4);
-  // parms[0] = CurveParmT("IDX_A", 15268.2);
-  // parms[1] = CurveParmT("IDX_B", 11.074);
-  // parms[2] = CurveParmT("IDX_C", 0); // Was 36347.7 - For the calibration curve, previous abs. focus pos. is not relevant -> 0.
-  // parms[3] = CurveParmT("IDX_D", -8.40146); // For slope alone it does not matter, but for a given data point 
-
-  // // Boundaries -> required? -> Better save dx (from center of curve until boundary in both directions, take max.)...
-  // float relFocusStepsBoundary = 20590; // Measured (max.)
-  // auto focusCurveFunction = CurveFunctionFactoryT::getInstance(FittingCurveTypeT::HYPERBOLIC, parms);
-
-
-
-  // std::vector<PointFT> measurements;
-
-  
-  // // -> calc from curve! -> Min.
-  // float minExpectedFocusMeasure = focusCurveFunction->min().y();
-
-  // // -> calc from curve! (right / outer boundary focus measure value) 
-  // float maxExpectedFocusMeasure = focusCurveFunction->f(relFocusStepsBoundary);
-
-  // // Measure focus 1...
-  // float absFocusPos1 = 12315; // TODO...
-  // float focusMeasure1 = 9.3; // TODO...
-
-  // measurements.push_back(PointFT(absFocusPos1, focusMeasure1));
-
-  
-  // // So far, there are two possible locations on the curve..., and we don't know which one to choose... (more precisely, we have +/-x) -> we need a second point...
-  // std::vector<float> possibleFocusPositions = focusCurveFunction->f_inv(focusMeasure1);
-
-  
-  // // Move focus -> which direction? -> use minExpectedFocusMeasure, maxExpectedFocusMeasure and focusMeasure1 to decide? -> does not make sense... can be on both positions of the curve! Randfälle testen: z.B. kann man nicht nach links gehen, wenn man schon am linken Rand ist, und umgekehrt - bzw. der Abstand zum jeweiligen Rand kleiner als "faktor * stepSize" ist.
-  // // Moving by "factor * stepSize" may be problematic when almost in focus...
-  // // maybe this code and the code below can be removed and the code from the focus curve recorder can be used!
-  // move(factor * stepSize);
-
-  // // Assume, we moved outwards (to the right...) and measure:
-  // // Measure focus 2...
-  // float absFocusPos2 = 16315; // TODO...
-  // float focusMeasure2 = 7.1; // TODO...
-
-  // measurements.push_back(PointFT(absFocusPos2, focusMeasure2));
-
-  
-  // // TODO: This logic can probably be written much shorter!
-  // // TODO: See curve recorder logic.... -> same problem... same code, and better wording...
-  // CurveHalfE curveHalf = determineCurveSide() {
-  //   if (direction == OUTWARDS) {
-  //     if (focusImproved) { // focusMeasure1 > focusMeasure2
-  // 	// -> left part of the curve
-  //     }
-  //     else if(! focusWorsened) { // focusMeasure1 < focusMeasure2
-  // 	// -> right part of the curve      
-  //     } else {
-  // 	// Problem, focus did not move?
-  //     }
-  //   } else {
-  //     if (focusImproved) { // focusMeasure1 > focusMeasure2
-  // 	// -> right part of the curve
-  //     }
-  //     else if(! focusWorsened) { // focusMeasure1 < focusMeasure2
-  // 	// -> left part of the curve      
-  //     } else {
-  // 	// Problem, focus did not move?
-  //     }
-  //   }
-  // }
-
-  // //std::vector<float> possibleFocusPositions2 = focusCurveFunction->f_inv(focusMeasure2);
-  
-
-  // float estimateRelPos(focusCurveFunction, curveHalf) {
-  //     std::vector<float> possibleFocusPositions = focusCurveFunction->f_inv(focusMeasure1);
-  //     if (curveHalf == ...) {
-  // 	return ...;
-  //     } else if () {
-  // 	return ...;
-  //     }
-  // }
-
-
-  // int distBetweenMeasurements = stepSize; // NOTE: Here only use stepSize, factor * stepSize is only used for initial step to determine direction.
-  // int distMovedSoFar = ; // CALC, since we already moved! -> move on top
-  // float sum = 0;
-  // size_t numMeasurements = 0;
-  // float stillToMove = 0;
-
-
-
-  
-  // float averagedDistanceEstimationToBestFocus = calcAverageRealInitialDist(measurements);
-  // float distLeftToBestPos = averagedDistanceEstimationToBestFocus - distMovedSoFar;
-
- 
-  // while(distLeftToBestPos > distanceBetweenMeasurements) {
-
-  //   move(distBetweenMeasurements); // Direction depends on curveHalf... / prev. movement direction...
-  //   distMovedSoFar += distBetweenMeasurements;
-
-  //   tie(absFocusPos, focusMeasure) = measure();
-    
-  //   measurements.push_back(PointFT(absFocusPos, focusMeasure));
-
-    
-  //   averagedDistanceEstimationToBestFocus = calcAverageRealInitialDist(measurements);
-
-  //   distLeftToBestPos = averagedDistanceEstimationToBestFocus - distMovedSoFar;
-  // }
-  
-  // // Finally, move and measure one last time 
-  // move(distLeftToBestPos);
-  // measure();
-
-
-
-
-  
-
-  // float calcAverageRealInitialDist(const std::vector<PointFT> & measurements, focusCurveFunction, curveHalf) {
-  //   float sum = 0;
-
-  //   // TODO: measurements should be sorted by absFocusPos..., starting with smallest (?) Or does this depend on the curveHalf?
-
-    
-  //   // We have at least two points in here...
-  //   // We iterate so that we analyze measurements 0 & 1, 1 & 2, 2 & 3, etc.
-  //   int sum = 0;
-
-  //   PointFT p0 = measurements.at(0);
-  //   float focusMeasure = p0.y();
-  //   float estimatedRelFocusPos = estimateRelPos(focusCurveFunction, curveHalf, focusMeasure);
-
-  //   sum += estimatedRelFocusPos;
-    
-    
-  //   for (size_t idx = 0; idx < measurements.size() - 1; ++idx) {
-  //     PointFT pi = measurements.at(idx);
-  //     PointFT pj = measurements.at(idx + 1);
-
-  //     int deltaSteps = std::abs(p0.x() - p1.x());
-
-  //     sum += deltaSteps;
-      
-  //   }
-
-    
-  //   estimatedPos = estimateRelPos(focusCurveFunction, curveHalf);
-
-    
-  //   sum += distMovedSoFar + std::abs(estimateRelPos);
-
-    
-  //   return sum / (float) measurements.size();
-  // }
-  
-  // // TODO: 
-
-  
-  
-  // // int lowerAbsFocusPosBoundary = absFocusPos1 - relFocusStepsBoundary;
-  // // int lpperAbsFocusPosBoundary = absFocusPos1 + relFocusStepsBoundary;
-
-
-
-
-
-  
-    
   mIsRunning = true;
 
-	LOG(debug)
-	<< "FocusFinderFastCurveLookupT::run..." << std::endl;
-
-	try {
-		using namespace std::chrono_literals;
-
-		// TODO: Check that device manager is set
-
-		// TODO: filter...
-
-		// TODO: Check that camera is there
-		// TODO: Check that focus is there
-
-		// Register on camera
-		// NOTE / TODO: For some reason std::bind did not compile....
-		// TODO: Remove... moved to focus_analyzer.cpp constructor
-		// mCameraExposureFinishedConnection =
-		// 		getCamera()->registerExposureCycleFinishedListener(
-		// 				boost::bind(&FocusFinderFastCurveLookupT::onImageReceived,
-		// 						this, _1, _2, _3));
-
-		// Notify that focus finder started
-		notifyFocusFinderStarted();
-
-		// First, only simulate a long delay....
-
-		LOG(debug)
-		<< "FocusFinderFastCurveLookupT::run - phase 1..." << std::endl;
-
-		// Notify about FoFi update...
-		notifyFocusFinderProgressUpdate(0.0, "Starting...");
-
-		// TODO: Set the filter...
-
-
-	// 	// TODO / HACK....
-		// TODO: Use function measure() which was moved to FocusAnalyzerT...
-	// 	for(int i = 0; i < 5; ++i) {
-
-	// 		// TODO: First take picture, then move... -> move down.....?!!!!
-	// 		getFocusAnalyzer()->moveFocusByBlocking(FocusDirectionT::INWARD, 1000, 30000ms);
-
-	// 		// This is the focus position for which a star image wil be taken
-	// 		int currentFocusPos = getFocusAnalyzer()->getFocus()->getCurrentPos();
-
-	// 		PointT<unsigned int> lastFocusStarPos = getFocusAnalyzer()->getLastFocusStarPos().to<
-	// 				unsigned int>();
-
-	// 		LOG(debug)
-	// 		<< "FocusFinderFastCurveLookupT::run - focus star pos=("
-	// 				<< lastFocusStarPos.x() << ", " << lastFocusStarPos.y() << ")"
-	// 				<< std::endl;
-
-	// 		// Calc "extended ROI (we want some more space around the actual star window size -> factor).
-	// 		// TODO: Simplify: Overload operator=* -> multiply scalar with size.
-	// 		// NOTE: +1 to make the result odd...
-	// 		unsigned int factor = 2;
-	// 		SizeT<unsigned int> windowSize =
-	// 				getFocusAnalyzer()->getFocusFinderProfile().getStarWindowSize();
-
-	// 		// NOTE: In case factor is evenm we need to add +1 to make the result odd.
-	// 		int oddMaker = (factor % 2 == 0 ? +1 : 0);
-
-	// 		SizeT<unsigned int> outerWindowSize(
-	// 				windowSize.width() * factor + oddMaker,
-	// 				windowSize.height() * factor + oddMaker);
-
-	// 		// NOTE: This is in frame coordinates
-	// 		auto outerRoi = RectT<unsigned int>::fromCenterPoint(lastFocusStarPos,
-	// 				outerWindowSize);
-
-	// 		LOG(debug)
-	// 		<< "FocusFinderFastCurveLookupT::run - calculated outer ROI=" << outerRoi
-	// 				<< std::endl;
-
-	// 		// Set ROI based on last focus star position
-	// 		getFocusAnalyzer()->getCamera()->setRoi(outerRoi);
-
-	// 		// Take a picture
-	// 		runExposureBlocking(1000ms /*TODO: Set exp time*/);
-
-	// 		// Calc center of subframe
-	// 		PointT<unsigned int> centerOuterSubframe(
-	// 				std::ceil(mCurrentImage->width() / 2),
-	// 				std::ceil(mCurrentImage->height() / 2));
-
-	// 		LOG(debug)
-	// 		<< "FocusFinderFastCurveLookupT::run - centerOuterSubframe="
-	// 				<< centerOuterSubframe << std::endl;
-
-	// 		// In outer subframe (mCurrentImage) coordinates
-	// 		auto innerRoi = RectT<unsigned int>::fromCenterPoint(
-	// 				centerOuterSubframe,
-	// 				getFocusFinderProfile().getStarWindowSize());
-
-	// 		LOG(debug)
-	// 		<< "FocusFinderFastCurveLookupT::run - calculated inner ROI=" << innerRoi
-	// 				<< std::endl;
-
-	// 		// get_crop() from mCurrentImage using innerRoi
-	// 		ImageT innerSubFrameImg = mCurrentImage->get_crop(innerRoi.x() /*x0*/,
-	// 				innerRoi.y() /*y0*/, innerRoi.x() + innerRoi.width() - 1/*x1*/,
-	// 				innerRoi.y() + innerRoi.height() - 1/*y1*/
-	// 				);
-
-	// 		LOG(debug)
-	// 		<< "FocusFinderFastCurveLookupT::run - innerSubFrameImg size - w="
-	// 				<< innerSubFrameImg.width() << ", h="
-	// 				<< innerSubFrameImg.height() << std::endl;
-
-	// 		// Determine SNR of recorded area to check if there could be astar around.
-	// 		checkIfStarIsThere(innerSubFrameImg);
-
-	// 		// TODO: Do not hardcode IWC, do not hardcode "sub mean"
-	// 		ImageT newCenterImage;
-
-	// 		auto newCentroidOpt = CentroidT::calculate(innerSubFrameImg,
-	// 				CentroidTypeT::IWC, true /*sub mean*/, &newCenterImage);
-
-	// 		if (!newCentroidOpt) {
-	// 			// TODO: Improve logging? ReportingT?
-	// 			LOG(error)
-	// 			<< "Unable to determine new centroid." << std::endl;
-
-	// 			// TODO: Retry? Or just cancel? For now we cancel...
-	// 			throw FocusFinderCancelledExceptionT();
-	// 		}
-
-	// 		// NOTE: Those coordinates are in coordinates of the inner subframe! We need them in "outer sub frame" coordinates!
-	// 		int deltaX = (outerRoi.width() - innerRoi.width()) / 2;
-	// 		int deltaY = (outerRoi.height() - innerRoi.height()) / 2;
-
-	// 		LOG(debug)
-	// 		<< "FocusFinderFastCurveLookupT::run - deltaX=" << deltaX << ", deltaY="
-	// 				<< deltaY << std::endl;
-
-	// 		PointFT newCentroidInnerRoiCoords = *newCentroidOpt;
-	// 		PointFT newCentroidOuterRoiCoords(
-	// 				newCentroidInnerRoiCoords.x() + deltaX,
-	// 				newCentroidInnerRoiCoords.y() + deltaY);
-
-	// 		LOG(debug)
-	// 		<< "FocusFinderFastCurveLookupT::run - new centroid (inner frame)="
-	// 				<< newCentroidInnerRoiCoords << std::endl;
-	// 		LOG(debug)
-	// 		<< "FocusFinderFastCurveLookupT::run - new centroid (outer frame)="
-	// 				<< newCentroidOuterRoiCoords << std::endl;
-
-	// 		// Use newly calculated center (newCentroidOuterRoiCoords) to again get sub-frame from mCurrentImage
-	// 		// TODO: Currently we just round() the float position to the closest int. This may be
-	// 		//       improved by introducing sub-pixel accurracy...
-	// 		// TODO: We may introduce a round() function for conversion from PointTF to PointT...?
-	// 		PointT<unsigned int> newCentroidRoundedToNextInt(
-	// 				std::round(newCentroidOuterRoiCoords.x()),
-	// 				std::round(newCentroidOuterRoiCoords.y()));
-
-	// 		LOG(debug)
-	// 		<< "FocusFinderFastCurveLookupT::run - new centroid rounded to next int="
-	// 				<< newCentroidRoundedToNextInt << std::endl;
-
-	// 		auto innerCorrectedRoi = RectT<unsigned int>::fromCenterPoint(
-	// 				newCentroidRoundedToNextInt,
-	// 				getFocusFinderProfile().getStarWindowSize());
-
-	// 		LOG(debug)
-	// 		<< "FocusFinderFastCurveLookupT::run - calculated inner corrected ROI="
-	// 				<< innerCorrectedRoi << std::endl;
-
-	// 		// get_crop() from mCurrentImage using corrected innerRoi
-	// 		ImageT innerCorrectedSubFrameImg = mCurrentImage->get_crop(
-	// 				innerCorrectedRoi.x() /*x0*/, innerCorrectedRoi.y() /*y0*/,
-	// 				innerCorrectedRoi.x() + innerCorrectedRoi.width() - 1/*x1*/,
-	// 				innerCorrectedRoi.y() + innerCorrectedRoi.height() - 1/*y1*/
-	// 				);
-
-	// 		LOG(debug)
-	// 		<< "FocusFinderFastCurveLookupT::run - innerCorrectedSubFrameImgsize - w="
-	// 				<< innerCorrectedSubFrameImg.width() << ", h="
-	// 				<< innerCorrectedSubFrameImg.height() << std::endl;
-
-	// 		// Determine SNR of recorded area to check if there could be a star around.
-	// 		float snr;
-	// 		checkIfStarIsThere(innerCorrectedSubFrameImg, &snr);
-
-	// 		// TODO: Calculate HFD
-	// 		HfdT hfd(innerCorrectedSubFrameImg);
-	// 		LOG(debug)
-	// 		<< "FocusFinderFastCurveLookupT::run - HFD: " << hfd.getValue() << std::endl;
-
-	// 		// NOTE / TODO: This only works ifh height() is odd
-	// 		size_t centerIdxHorz = std::floor(
-	// 				innerCorrectedSubFrameImg.height() / 2);
-
-	// 		FwhmT fwhmHorz(
-	// 				ImageSlicerT::slice<SliceDirectionT::HORZ>(
-	// 						innerCorrectedSubFrameImg, centerIdxHorz));
-
-	// 		// NOTE / TODO: This only works if width() is odd
-	// 		size_t centerIdxVert = std::floor(
-	// 				innerCorrectedSubFrameImg.width() / 2);
-
-	// 		FwhmT fwhmVert(
-	// 				ImageSlicerT::slice<SliceDirectionT::VERT>(
-	// 						innerCorrectedSubFrameImg, centerIdxVert));
-
-	// 		LOG(debug)
-	// 		<< "FocusFinderFastCurveLookupT::run - FWHM(HORZ): " << fwhmHorz.getValue()
-	// 				<< ", FWHM(VERT): " << fwhmVert.getValue() << std::endl;
-
-	// 		// Convert center coordinates to frame coordinates (absolute position within image)
-	// 		PointFT newCentroidAbsRoiCoords(
-	// 				newCentroidOuterRoiCoords.x() + outerRoi.x(),
-	// 				newCentroidOuterRoiCoords.y() + outerRoi.y());
-
-	// 		// Calculate "drift" (movement of center position since last picture
-	// 		std::tuple<float, float> drift(
-	// 				newCentroidAbsRoiCoords.x() - lastFocusStarPos.x(),
-	// 				newCentroidAbsRoiCoords.y() - lastFocusStarPos.y());
-
-	// 		// Fill all so far collected data into the "FoFi Result Structure"
-	// 		auto record = FocusCurveRecordBuilderT()
-	// 				.setAbsoluteFocusPos(currentFocusPos)
-	// 				.setDrift(drift)
-	// 				.setSnr(snr)
-	// 				.setHorzFwhm(fwhmHorz)
-	// 				.setVertFwhm(fwhmVert)
-	// 				.setHfd(hfd)
-	// 				.setRoiImage(*mCurrentImage) // Take a copy
-	// 				.setCorrectedStarImage(innerCorrectedSubFrameImg)
-	// 				.setAbsStarCenterPos(newCentroidAbsRoiCoords)
-	// 				.build();
-
-	// 		// Notify about FoFi update...
-	// 		notifyFocusFinderProgressUpdate(60.0, "Phase 2 finished.", record);
-        // }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-		using namespace std::chrono_literals;
-		std::this_thread::sleep_for(2s);
-
-		// Check if it was cancelled
-		checkCancelled();
-
-		// Notify about FoFi update...
-		notifyFocusFinderProgressUpdate(30.0, "Phase 1 finished.");
-
-		LOG(debug)
-		<< "FocusFinderFastCurveLookupT::run - phase 2..." << std::endl;
-
-		std::this_thread::sleep_for(2s);
-
-		// Check if it was cancelled
-		checkCancelled();
-
-		// Notify about FoFi update...
-		notifyFocusFinderProgressUpdate(60.0, "Phase 2 finished.");
-
-		LOG(debug)
-		<< "FocusFinderFastCurveLookupT::run - phase 3..." << std::endl;
-
-		std::this_thread::sleep_for(2s);
-
-		// Check if it was cancelled
-		checkCancelled();
-
-		// HACK!!! TODO: Remove...
-		// MyDataContainerT dataPointsToFit;
-		// dataPointsToFit.push_back(std::make_pair<float, float>(1, 2));
-		// dataPointsToFit.push_back(std::make_pair<float, float>(3, 4));
-		// dataPointsToFit.push_back(std::make_pair<float, float>(5, 6));
-		// dataPointsToFit.push_back(std::make_pair<float, float>(6, 4));
-		// dataPointsToFit.push_back(std::make_pair<float, float>(7, 3));
-		// dataPointsToFit.push_back(std::make_pair<float, float>(8, 2));
-
-		// // TODO: See FwhmT for usage....
-		// CurveParmsT p = CurveFitAlgorithmT::fitCurve(FittingCurveTypeT::TypeE ct, Rng dps,
-		// 	const CurveFitParmsT & curveFitParms,
-		// 					     CurveFitSummaryT * outSummary = nullptr);
-
-		
-		// TODO: The hyperbolic fit will not be performed here... only after measurement... / at the end...
-		// CurveParamsT::TypeT hyperbolCurveParms;
-		// HyperbolMatcherT::fitGslLevenbergMarquart<MyDataAccessorT>(
-		// 		dataPointsToFit, &hyperbolCurveParms, 0.1f /*EpsAbs*/,
-		// 		0.1f /*EpsRel*/);
-
-		// // Print calculated curve parameters
-		// LOG(debug)
-		// << "a=" << hyperbolCurveParms[CurveParamsT::A_IDX] << std::endl << "b="
-		// 		<< hyperbolCurveParms[CurveParamsT::B_IDX] << std::endl << "c="
-		// 		<< hyperbolCurveParms[CurveParamsT::C_IDX] << std::endl << "d="
-		// 		<< hyperbolCurveParms[CurveParamsT::D_IDX] << std::endl;
-
-		// LOG(debug)
-		// << "FocusFinderFastCurveLookupT::run - finished" << std::endl;
-
-		// Notify about FoFi update...
-		notifyFocusFinderProgressUpdate(100.0, "Phase 3 finished.");
-
-		// Notify that FoFi was finished...
-		notifyFocusFinderFinished();
-
-		focusFinderCleanup();
-
-	} catch (FocusControllerCancelledExceptionT & exc) {
-		focusFinderCleanup();
-
-		// TODO: Improve error handling... -> ReportingT?
-		LOG(warning)
-		<< "Focus finder was cancelled." << std::endl;
-
-		// Notify that FoFi was cancelled...
-		notifyFocusFinderCancelled();
-	} catch (FocusExceptionT & exc) {
-		// TODO: MAybe write one common exception handler for the FoFi here since code repeats!
-		focusFinderCleanup();
-
-		// TODO: Improve error handling... -> ReportingT?
-		LOG(error)
-		<< "Hit focus exception: " << exc.what() << std::endl;
-
-		// Notify that FoFi was cancelled...
-		// TODO: Maybe introduce notifyFocusFinderFailed()...
-		notifyFocusFinderCancelled();
-
-	} catch (TimeoutExceptionT & exc) {
-		focusFinderCleanup();
-
-		// TODO: Improve error handling... -> ReportingT?
-		LOG(error)
-		<< "Hit timeout, unable to find focus." << std::endl;
-
-		// Notify that FoFi was cancelled...
-		// TODO: Maybe introduce notifyFocusFinderFailed()...
-		notifyFocusFinderCancelled();
+  
+  ////////////////////////////////////////////////////////////////////////
+  // HACK! For testing only
+  ////////////////////////////////////////////////////////////////////////
+  // Hyperbolic curve parms 
+  CurveParmsT parms(4);
+  parms[0] = CurveParmT("IDX_A", 15268.2);
+  parms[1] = CurveParmT("IDX_B", 11.074);
+  parms[2] = CurveParmT("IDX_C", 0); // Was 36347.7 - For the calibration curve, previous abs. focus pos. is not relevant -> 0.
+  parms[3] = CurveParmT("IDX_D", -8.40146); // For slope alone it does not matter, but for a given data point 
+
+  // Boundaries -> required? -> Better save dx (from center of curve until boundary in both directions, take max.)...
+  float relFocusStepsBoundary = 20590; // Measured (max.)
+  auto focusCurveFunction = CurveFunctionFactoryT::getInstance(FittingCurveTypeT::HYPERBOLIC, parms);
+
+  ////////////////////////////////////////////////////////////////////////
+
+
+  // TODO: Check that device manager is set
+  
+  // TODO: Check if focus controller is set
+  auto focusFinderProfile = getFocusController()->getFocusFinderProfile();
+  
+  // Estimate distance to best focus (focus curve minimum)
+  auto curveFocusMeasureType = focusFinderProfile.getCurveFocusMeasureType();
+
+
+  // TODO: curveFocusMeasureType is HFD / FWHM...?
+  // HACK
+  std::shared_ptr<FocusCurveRecordSetT> records = std::make_shared<FocusCurveRecordSetT>(curveFocusMeasureType, 12.0 /*HACK!!!*/);
+  //std::vector<std::shared_ptr<FocusCurveRecordT> > records;  
+    
+
+  LOG(debug)
+    << "FocusFinderFastCurveLookupT::run..." << std::endl;
+
+  try {
+    using namespace std::chrono_literals;
+
+
+
+    // TODO: Check that camera is there  --> use focus controller checkDeviceAvailable() function
+    // TODO: Check that focus is there --> use focus controller checkDeviceAvailable() function
+
+
+    // Notify that focus finder started
+    notifyFocusFinderStarted();
+    
+    // TODO: Set the filter...
+
+    
+    // Read the current focus controller
+    mInitialAbsPosition = getFocusController()->getFocus()->getCurrentPos();
+
+    
+    // Self orientation
+    LOG(debug)
+      << "FocusFinderFastCurveLookupT::run - Self orientation..." << std::endl;
+    
+    SelfOrientationResultT selfOrientationResult = getFocusController()->performSelfOrientation();
+
+    LOG(debug)
+      << "FocusFinderFastCurveLookupT::run - Self orientation result:"
+      << selfOrientationResult
+      << std::endl;
+
+    
+    CurveHalfT::TypeE curveHalf = selfOrientationResult.curveHalf; // TODO: Better name "CurveSectorT"?
+      
+    records->push_back(selfOrientationResult.record1);
+    records->push_back(selfOrientationResult.record2);
+    
+    // Sort the measurements by abs. position
+    // auto sortMeasuresByAbsPosLambda = [] (std::shared_ptr<const FocusCurveRecordT> c1, std::shared_ptr<const FocusCurveRecordT> c2) -> bool
+    // 				      {
+    // 					return c1->getCurrentAbsoluteFocusPos() < c2->getCurrentAbsoluteFocusPos();
+    // 				      };
+
+    // TODO: Is this required here?
+    //std::sort(records->begin(), records->end(), sortMeasuresByAbsPosLambda);
+    
+    
+
+
+    // DEBUG START
+    LOG(debug) << "FocusFinderFastCurveLookupT::Measured values by self orientation" << std::endl
+	       << "FocusFinderFastCurveLookupT::------------------------------------" << std::endl;
+
+    for (auto record : *records) {
+      float focusMeasure = record->getFocusMeasure(curveFocusMeasureType);
+      
+      LOG(debug) << "FocusFinderFastCurveLookupT::Focus measure=" << focusMeasure << " (" << FocusMeasureTypeT::asStr(curveFocusMeasureType) << ")"
+		 << ", abs focus pos=" << record->getCurrentAbsoluteFocusPos()
+		 << std::endl;
+    }
+    // DEBUG END
+
+    
+    
+    // TODO: This is problematic... e.g. if the seeing is better or worse (compared to when the curve was recorded)... then the curve shifts up/down.... and then the lookup of the measureValue points to a different relatice position ... The only thing that would match would be the slope....
+    //  -> Maybe it is possible to go to the other "curve half" and measure again
+    //  -> IDEA: do a curve match with each new measure point for H(x,c,d) where c is the shift
+    //           in x direction and d is the shift into y direction. c is the "perfect" focus pos.
+    //  -> This way it is not even required to calculate f_inv / and or estimate the corresponding x position!
+
+    // TODO: IMPLEMENT
+    // TODO: IMPLEMENT
+    // TODO: IMPLEMENT
+    // TODO: IMPLEMENT
+  // --> The actual question is: What will be used by the actual FocusFinder? -> probably just a subset of the CurveParmsT and some boundary values... so not the FocusCurveT object itself! From this a new CurveFunctionT object will be constructed.
+  // -> So what is new, now... in the focus finder itself, now another curve fitting will take place. Again, we pass the curveShape/Type, the data points, some settings (error etc.) and - what is new - a list of fixed parameters
+    // -> So that means, that we this time will create a new FocusCurve object with each new data point we measure! That means, the following call
+    //
+    //auto focusCurve = std::make_shared<FocusCurveT>(focusCurveRecordSet, mFocusCurveRecorderLogic->getFocusCurveType());
+    //
+    // Will take place for each newly measured data point. Each new data point will be added to focusCurveRecordSet before.
+    // Now the difference is, that this time the fitting curve (which is used inside) actually has some fixed parameters (the ones we know from the long measurements...)
+    // So, those numbers have to be passed somehow to the FittingCurveT function object (which is currently located even inside the fit() function of the CurveFitAlgorithmT)....
+    // -> Question is, if FocusCurveT should take a FittingCurveT object ptr instead of an enum type.....?! Then it would be possible to write:
+    //
+    // std::shared_ptr<LmFittingCurveT> fc = LmFittingCurveFactoryT::getInstance(ct);
+    // fc->fixParm("A_IDX", value);
+    //
+    // Even worse: It depends on the curve type which parameters need to be fixed! This "knowledge" should not be coded into the LmFittingCurveT sub-classes, because it is a "special thing" regarding the algorithm which wants to fix certain curve parameters to certain values.
+    // Idea: "keepShape" or "positionParmsOnly" could be abstractions...
+    // Maybe I should first test if fixing a and b of the hyperbolc curve is even successful... (-> write a new sub-class of FittingCurveT, and somehow hach passing in the two parameters (just hardcode them!))... If that really works, the effort to generalize the fixing of curve parameters is probably worth it! But not before!
+
+    
+    // HACK TO TEST THE CONCEPT
+
+    // // ESTIMATE THE CLOSEST BOUNDARY USING THE KNOWN FOCUS CURVE
+    // // Calc start pos. (average over two points)
+    // float xLimitRel = focusCurveFunction->f_inv(12.0 /*HACK!!!*/); // NOTE: Should always return the positive part (TODO: May fail...)
+    
+    // float focusMeasure1 = selfOrientationResult.record1->getFocusMeasure(curveFocusMeasureType);
+    // float absPos1 = selfOrientationResult.record1->getCurrentAbsoluteFocusPos();
+    // float relEstimatedPos1 = focusCurveFunction->f_inv(focusMeasure1);
+    
+    // float focusMeasure2 = selfOrientationResult.record2->getFocusMeasure(curveFocusMeasureType);
+    // float absPos2 = selfOrientationResult.record2->getCurrentAbsoluteFocusPos();
+    // float relEstimatedPos2 = focusCurveFunction->f_inv(focusMeasure2);
+
+    // float deltaReallyMoved = absPos1 - absPos2;
+
+    // float distToLimit1 = xLimitRel - relEstimatedPos1;
+    // float distToLimit2 = xLimitRel - relEstimatedPos2;
+
+    // float currAbsPos = getFocusController()->getFocus()->getCurrentPos();
+    
+    // // Average out the error in the xrel (resulting from moise in the focus measures) which implicitly lead to estimation/lookup errors (xrel).
+    // float dxRel1;
+    // float dxRel2;
+    
+    // if (curveHalf == CurveHalfT::LEFT_HALF) {
+    //   // x2 > x1 -> distToLimit2 < distToLimit1, deltaReallyMoved > 0 since moving always INWARD
+    //   dxRel1 = distToLimit1 - deltaReallyMoved;
+    //   dxRel2 = distToLimit2;
+    // } else {
+    //   // X2 < x1 -> distToLimit2 > distToLimit1, deltaReallyMoved > 0 since moving always INWARD
+    //   dxRel1 = distToLimit1;
+    //   dxRel2 = distToLimit2 - deltaReallyMoved;
+    // }
+
+    // // Estimated, averaged relative distance from current focus pos. to closest limit.
+    // float dxRelAv = (dxRel1 + dxRel2) / 2.0; // TODO: What if dxRelAv < 0?
+
+    // float minTheoreticalFocusMeasure = focusCurveFunction->f(0);
+
+    // LOG(debug) << "xLimitRel=" << xLimitRel << std::endl
+    // 	       << "Measure 1 (absPos=" << absPos1 << ", focusMeasure=" << focusMeasure1 << ", relEstimatedPos=" << relEstimatedPos1 << ")" << std::endl
+    // 	       << "Measure 2 (absPos=" << absPos2 << ", focusMeasure=" << focusMeasure2 << ", relEstimatedPos=" << relEstimatedPos2 << ")" << std::endl
+    // 	       << "deltaReallyMoved=" << deltaReallyMoved << std::endl
+    // 	       << "distToLimit1=" << distToLimit1 << std::endl
+    // 	       << "distToLimit2=" << distToLimit2 << std::endl
+    // 	       << "currAbsPos=" << currAbsPos << std::endl
+    // 	       << "absDest=" << (selfOrientationResult.focusDirectionToLimit == FocusDirectionT::INWARD ? currAbsPos + dxRelAv : currAbsPos - dxRelAv) << std::endl
+    // 	       << "dxRel1=" << dxRel1 << ", dxRel2=" << dxRel2 << ", dxRelAv=" << dxRelAv << std::endl
+    // 	       << "direction to limit: " << FocusDirectionT::asStr(selfOrientationResult.focusDirectionToLimit) << std::endl
+    // 	       << "minTheoreticalFocusMeasure: " << minTheoreticalFocusMeasure << std::endl;
+
+    // // Invert movement direction if negative (HACK?!)
+    // FocusDirectionT::TypeE finalDir = selfOrientationResult.focusDirectionToLimit;
+    
+    // if (dxRelAv > 0) {
+    //   finalDir = (finalDir == FocusDirectionT::INWARD ? FocusDirectionT::OUTWARD : FocusDirectionT::INWARD);
+    // }
+
+    // getFocusController()->moveFocusByBlocking(finalDir, std::fabs(dxRelAv), 30000ms);
+
+
+
+
+
+
+
+
+    // TODO: Move this to the FocusController...
+    //
+    // FIND CLOSEST BOUNDARY UISNG THE FOCUS CURVE
+    // NOTE: All this fails if the self-orientation is not correct!
+    float focusMeasureLimit = 12.0F; // HACK
+    float focusMeasureDelta = 1.5F; // HACK
+
+    float lowerFocusMeasure = focusMeasureLimit - focusMeasureDelta;
+    float upperFocusMeasure = focusMeasureLimit + focusMeasureDelta;
+
+    float lowerRelLimitPos = focusCurveFunction->f_inv(lowerFocusMeasure);
+    float upperRelLimitPos = focusCurveFunction->f_inv(upperFocusMeasure);
+
+    float focusMeasure = selfOrientationResult.record2->getFocusMeasure(curveFocusMeasureType);
+    float estimatedRelPos = focusCurveFunction->f_inv(focusMeasure);
+
+
+    float moveStep1 = 0;
+    BoundaryLocationT::TypeE boundaryLoc = determineBoundaryLoc(lowerFocusMeasure, upperFocusMeasure, focusMeasure);
+    
+    if (boundaryLoc == BoundaryLocationT::INSIDE_BOUNDARY) {
+      moveStep1 = lowerRelLimitPos - estimatedRelPos;
+    } else if (boundaryLoc == BoundaryLocationT::OUTSIDE_BOUNDARY) {
+	moveStep1 = estimatedRelPos - upperRelLimitPos;
+    } else {
+      moveStep1 = 0;
+    }
+
+    LOG(debug) << "focusMeasureLimit=" << focusMeasureLimit << ", focusMeasureDelta=" << focusMeasureDelta
+	       << " -> limit focus measure range=[" << lowerFocusMeasure << ", " << upperFocusMeasure << "]" << std::endl
+	       << " -> estimated rel position range=[" << lowerRelLimitPos << ", " << upperRelLimitPos << "]" << std::endl
+	       << " -> current focus measure=" << focusMeasure << " -> estimated rel. pos=" << estimatedRelPos << std::endl
+	       << " -> our pos. with respect to boundary: " << BoundaryLocationT::asStr(boundaryLoc) << std::endl
+	       << " -> moveStep1=" << moveStep1 << std::endl;
+
+
+    if (boundaryLoc != BoundaryLocationT::WITHIN_BOUNDARY_RANGE) {
+
+      // Move focus
+      getFocusController()->moveFocusByBlocking(selfOrientationResult.focusDirectionToLimit, moveStep1, 30000ms);
+
+      // Measure again
+      auto record2 = getFocusController()->measureFocus();
+      float focusMeasure2 = record2->getFocusMeasure(curveFocusMeasureType);
+
+      
+      BoundaryLocationT::TypeE boundaryLoc2 = determineBoundaryLoc(lowerFocusMeasure, upperFocusMeasure, focusMeasure2);
+
+
+      // TODO / FIXME: In case starting OUTSIDE_BOUNDARY, it may be problematic to lookup an x from the curve (f_inv), since it is probably quite inaccurate! Instead we could do a linear step-by-step move with regular stepSize until we reach the boundary range...
+      
+      // TODO: Also check if we maybe OVERSHOT the goal already?!?!
+      bool goalOvershot = (boundaryLoc == BoundaryLocationT::INSIDE_BOUNDARY && boundaryLoc2 == BoundaryLocationT::OUTSIDE_BOUNDARY ||
+			   boundaryLoc == BoundaryLocationT::OUTSIDE_BOUNDARY && boundaryLoc2 == BoundaryLocationT::INSIDE_BOUNDARY);
+
+      FocusDirectionT::TypeE dir = selfOrientationResult.focusDirectionToLimit;
+      
+      if (goalOvershot) {
+	// TODO: HANDLE!
+	LOG(error) << "FocusFinderFastCurveLookupT::GOAL OVERSHOT (1) !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
+
+	// Invert direction
+	dir = FocusDirectionT::invert(dir);
+      }
+      
+      // Fine tuning
+      float moveBy2 = upperRelLimitPos - lowerRelLimitPos;
+      float stepFinetuneSize = moveBy2 / 2.0F;      
+       
+      while (boundaryLoc2 != BoundaryLocationT::WITHIN_BOUNDARY_RANGE) {
+
+	// Move focus
+	getFocusController()->moveFocusByBlocking(dir, stepFinetuneSize, 30000ms);
+	
+	// Measure again
+	record2 = getFocusController()->measureFocus();
+	focusMeasure2 = record2->getFocusMeasure(curveFocusMeasureType);
+	
+	boundaryLoc2 = determineBoundaryLoc(lowerFocusMeasure, upperFocusMeasure, focusMeasure2);
+	
+	// TODO: Also check if we maybe OVERSHOT the goal already?!?!
+	bool goalOvershot = (boundaryLoc == BoundaryLocationT::INSIDE_BOUNDARY && boundaryLoc2 == BoundaryLocationT::OUTSIDE_BOUNDARY ||
+			     boundaryLoc == BoundaryLocationT::OUTSIDE_BOUNDARY && boundaryLoc2 == BoundaryLocationT::INSIDE_BOUNDARY);
+	
+	if (goalOvershot) {
+	  // TODO: HANDLE!
+	  LOG(error) << "FocusFinderFastCurveLookupT::GOAL OVERSHOT (2) !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! TODO: HANDLE!" << std::endl;
+
+	  // Invert direction!
+	  dir = FocusDirectionT::invert(dir);
+	  stepFinetuneSize = stepFinetuneSize / 2.0F;
 	}
+	
+	// IDEA...
+	// --> Maybe better make a loop instead of 2 steps... and always check if we OVERSHOT the goal - then we can handle it!
+      }
 
-    mIsRunning = false;
+      LOG(debug) << "FocusFinderFastCurveLookupT::BOUNDARY FINDER FINISHED! focusMeasure2=" << focusMeasure2 << std::endl
+		 << ", focusMeasureLimit=" << focusMeasureLimit << " focus measure range=["
+		 << lowerFocusMeasure << ", " << upperFocusMeasure << "]" << std::endl
+		 << ", abs focus pos: " << getFocusController()->getFocus()->getCurrentPos() << std::endl;
+
+    } else {
+      LOG(debug) << "FocusFinderFastCurveLookupT::We are already close to the boundary. focusMeasure=" << focusMeasure
+		 << ", focusMeasureLimit=" << focusMeasureLimit << " focus measure range=["
+		 << lowerFocusMeasure << ", " << upperFocusMeasure << "], Doing nothing." << std::endl
+		 << ", abs focus pos: " << getFocusController()->getFocus()->getCurrentPos() << std::endl;
+    }
+
+    // TODO: Is it even required to store it?
+    int closerAbsBoundaryPos = getFocusController()->getFocus()->getCurrentPos();
+
+
+
+
+
+
+
+
+
+
+    //
+    //
+    //
+    //
+    // With the boundary info - record a curve and do the curve match every round...
+    //
+    //
+    //
+    // GIVEN: -closerAbsBoundaryPos (current pos.)
+    //        -curveHalf
+    
+    float foFiStepSize = 3000; // TODO... use configured value...
+
+    // TODO: Is it possible to estimate the opposite boundary? -> yes, at least the minimal distance...
+    // --> At least go until this position
+    // Introduce this as an additional condition for the loop below...
+    //float upperBoundary = 60000; // HACK to get defined behaviour to test main function
+
+    
+    float currentAbsPos = getFocusController()->getFocus()->getCurrentPos();
+
+    std::shared_ptr<FocusCurveT> focusCurve = nullptr;
+    
+    //while(rightBoundary > currentAbsPos) {
+    while(focusMeasure < focusMeasureLimit) {
+
+      // Movement direction is opposite direction than direction to boundary
+      FocusDirectionT::TypeE dirToOtherBoundary = FocusDirectionT::invert(selfOrientationResult.focusDirectionToLimit);
+
+      getFocusController()->moveFocusByBlocking(dirToOtherBoundary, foFiStepSize, 30000ms);
+	
+      auto newRecord = getFocusController()->measureFocus();
+      records->push_back(newRecord);
+
+      focusMeasure = newRecord->getFocusMeasure(curveFocusMeasureType);
+	
+      currentAbsPos = getFocusController()->getFocus()->getCurrentPos();
+	
+      try {
+    	focusCurve = std::make_shared<FocusCurveT>(records, FittingCurveTypeT::HYPERBOLIC_POS_ONLY);
+
+    	float estimatedBestAbsPos = focusCurve->getCurveParms().get("C_IDX").getValue();
+	
+    	LOG(debug) << "XX Curve matching successful... currently best focus pos: " << estimatedBestAbsPos << std::endl;
+	
+      } catch (CurveFitExceptionT & exc) {
+    	// TODO...
+    	LOG(debug) << "XX Curve matching failed... " << exc.what() << ". Retrying..." << std::endl;
+      }
+    } // end while
+
+
+    
+    
+    if (focusCurve != nullptr) {
+      float estimatedBestAbsPosFinal = focusCurve->getCurveParms().get("C_IDX").getValue();
+      LOG(debug) << "XX Curve matching - Finally best focus position (estimated)=" << estimatedBestAbsPosFinal << std::endl;
+
+      getFocusController()->moveFocusToBlocking(estimatedBestAbsPosFinal, 30000ms);
+
+      auto finalRecord = getFocusController()->measureFocus();
+      float currFocusMeasure = finalRecord->getFocusMeasure(curveFocusMeasureType);
+      
+      LOG(debug) << "XX Curve matching - FINAL, currFocusMeasure=" << currFocusMeasure << std::endl;
+      
+    } else {
+      LOG(debug) << "NOT DETERMINED..." << std::endl;
+    }
+
+
+
+
+
+
+
+    
+					     
+    // Notify that FoFi was finished...
+    notifyFocusFinderFinished();
+
+
+  } catch (FocusControllerCancelledExceptionT & exc) {
+    focusFinderCleanup();
+
+    // TODO: Improve error handling... -> ReportingT?
+    LOG(warning)
+      << "Focus finder was cancelled." << std::endl;
+
+    // Notify that FoFi was cancelled...
+    notifyFocusFinderCancelled();
+  } catch (FocusExceptionT & exc) {
+    // TODO: MAybe write one common exception handler for the FoFi here since code repeats!
+    focusFinderCleanup();
+
+    // TODO: Improve error handling... -> ReportingT?
+    LOG(error)
+      << "Hit focus exception: " << exc.what() << std::endl;
+
+    // Notify that FoFi was cancelled...
+    // TODO: Maybe introduce notifyFocusFinderFailed()...
+    notifyFocusFinderCancelled();
+
+  } catch (TimeoutExceptionT & exc) {
+    focusFinderCleanup();
+
+    // TODO: Improve error handling... -> ReportingT?
+    LOG(error)
+      << "Hit timeout, unable to find focus." << std::endl;
+
+    // Notify that FoFi was cancelled...
+    // TODO: Maybe introduce notifyFocusFinderFailed()...
+    notifyFocusFinderCancelled();
+  }
+
+  mIsRunning = false;
+}
+
+void FocusFinderFastCurveLookupT::rollbackFocus() {
+  using namespace std::chrono_literals;
+  
+  LOG(debug)
+    << "FocusFinderFastCurveLookupT::rollbackFocus..." << std::endl;
+  
+  getFocusController()->moveFocusToBlocking(mInitialAbsPosition, 30000ms);
 }
 
 void FocusFinderFastCurveLookupT::focusFinderCleanup() {
-	LOG(debug)
-	<< "FocusFinderFastCurveLookupT::focusFinderCleanup..." << std::endl;
+  LOG(debug)
+    << "FocusFinderFastCurveLookupT::focusFinderCleanup..." << std::endl;
+  
+  rollbackFocus();
 }
 
 void FocusFinderFastCurveLookupT::cancel() {

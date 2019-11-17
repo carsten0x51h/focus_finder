@@ -5,7 +5,10 @@
 #include "include/lm_fitting_curve_hyperbolic.h"
 #include "include/lm_fitting_curve_parabolic.h"
 #include "include/lm_fitting_curve_gaussian.h"
+#include "include/lm_fitting_curve_hyperbolic_pos_only.h"
 
+// NOTE / TODO: In case the "LmFittingCurveHyperbolicPosOnlyT" is really required AND it should be constructed by this factory, we could supply parameters "a" and "b" using variadic templates. See the following link for an example:
+// https://stackoverflow.com/questions/28256550/factory-pattern-using-variadic-template
 std::shared_ptr<LmFittingCurveT> LmFittingCurveFactoryT::getInstance(const FittingCurveTypeT::TypeE & fittingCurveType) {
 
 	switch(fittingCurveType) {
@@ -20,6 +23,9 @@ std::shared_ptr<LmFittingCurveT> LmFittingCurveFactoryT::getInstance(const Fitti
 
 	case FittingCurveTypeT::GAUSSIAN:
 		return std::make_shared<LmFittingCurveGaussianT>();
+		
+	case FittingCurveTypeT::HYPERBOLIC_POS_ONLY:
+		return std::make_shared<LmFittingCurveHyperbolicPosOnlyT>();
 
 	default:
 		return nullptr;

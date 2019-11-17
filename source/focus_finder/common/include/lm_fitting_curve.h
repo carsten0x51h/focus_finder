@@ -14,7 +14,6 @@ class LmFittingCurveT {
 public:
 	virtual std::string getName() const = 0;
 
-
 	//virtual std::vector<std::string> getParmNames() const = 0;
 	template<typename Idx>
 	std::vector<std::string>

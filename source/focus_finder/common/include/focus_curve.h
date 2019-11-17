@@ -43,7 +43,6 @@ public:
 
   // FittingCurveTypeT::TypeE curveType, const CurveParmsT & curveParms, FocusMeasureTypeT::TypeE focusMeasureType, int lowerFocusPos, int upperFocusPos, float focusMeasureLimit
   FocusCurveT(std::shared_ptr<const FocusCurveRecordSetT> focusCurveRecordSet, FittingCurveTypeT::TypeE curveType);
-
   ~FocusCurveT();
   
   float getLowerFocusPos() const;
@@ -53,7 +52,9 @@ public:
   float getRelativeFocusPosBoundary() const;
   
   float calcFocusMeasureByFocusPosition(float focusPosition) const;
-  float calcFocusPositionByFocusMeasure(float focusMeasure) const;
+
+  static std::vector<float> calcFocusPositionByFocusMeasure(std::shared_ptr<const CurveFunctionT> curveFunction, float focusMeasure);
+  std::vector<float> calcFocusPositionByFocusMeasure(float focusMeasure) const;
 
   std::time_t getDateTime() const;
   FocusMeasureTypeT::TypeE getFocusMeasureType() const;

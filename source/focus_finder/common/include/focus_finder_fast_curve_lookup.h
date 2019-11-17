@@ -8,20 +8,21 @@
 #define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FOCUS_FINDER_FAST_CURVE_LOOKUP_H_
 
 #include <vector>
-#include <array>
-#include <atomic>
+//#include <array>
 #include <chrono>
 
-#include <thread>
-#include <condition_variable>
+//#include <atomic>
+//#include <thread>
 
 #include <boost/signals2.hpp>
 
 #include "focus_finder.h"
 #include "curve_fit_algorithm.h"
 #include "focus_controller.h"
+#include "boundary_location.h"
 #include "focus.h"
 
+class CurveFunctionT;
 
 ///////////////////////////////////////////////////////////////////////
 // Custom data structure + accessor
@@ -41,41 +42,37 @@ public:
 
 class FocusFinderFastCurveLookupT: public FocusFinderT {
 private:
-	// Prevent copy
-	FocusFinderFastCurveLookupT(const FocusFinderFastCurveLookupT &);
-	FocusFinderFastCurveLookupT & operator=(const FocusFinderFastCurveLookupT &);
+  // Prevent copy
+  FocusFinderFastCurveLookupT(const FocusFinderFastCurveLookupT &);
+  FocusFinderFastCurveLookupT & operator=(const FocusFinderFastCurveLookupT &);
+  
+  //float estimateRelPos(std::shared_ptr<CurveFunctionT> focusCurveFunction, float focusMeasure, CurveHalfT::TypeE curveHalf);
 
-	void onImageReceived(RectT<unsigned int> roi,
-			std::shared_ptr<const ImageT> image, bool lastFrame);
-
-	void focusFinderCleanup();
-
-	void checkIfStarIsThere(const ImageT & img, float * outSnr = 0) const;
-	void runExposureBlocking(std::chrono::milliseconds expTime);
-	void moveFocusByBlocking(FocusDirectionT::TypeE direction, int ticks, std::chrono::milliseconds timeout);
-	void checkCancelled() const;
-
-	std::shared_ptr<const ImageT> mCurrentImage;
-
-	boost::signals2::connection mCameraExposureFinishedConnection;
-
-	std::atomic<bool> mCancelled;
-    std::atomic<bool> mIsRunning;
-
-	std::condition_variable cv;
-	std::mutex cvMutex;
-
-
+  BoundaryLocationT::TypeE determineBoundaryLoc(float lowerFocusMeasure, float upperFocusMeasure, float focusMeasure) const;
+  
+  void rollbackFocus();
+  void focusFinderCleanup();
+  
+  void checkCancelled() const;
+  
+  std::shared_ptr<const ImageT> mCurrentImage;
+  
+  boost::signals2::connection mCameraExposureFinishedConnection;
+  
+  std::atomic<bool> mCancelled;
+  std::atomic<bool> mIsRunning;  
+  int mInitialAbsPosition;
+  
 public:
   FocusFinderFastCurveLookupT(std::shared_ptr<FocusControllerT> focusController);
 
-	// Implement focus finder interface
-	std::string getName() const override;
-
-    bool isRunning() const override;
-    void run() override;
-	void cancel() override;
-	void reset() override;
+  // Implement focus finder interface
+  std::string getName() const override;
+  
+  bool isRunning() const override;
+  void run() override;
+  void cancel() override;
+  void reset() override;
 };
 
 #endif /* SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FOCUS_FINDER_FAST_CURVE_LOOKUP_H_ */

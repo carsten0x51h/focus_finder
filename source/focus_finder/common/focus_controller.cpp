@@ -143,20 +143,61 @@ std::shared_ptr<FocusCurveRecordT> FocusControllerT::measureFocus() {
   bool success = false;
   
   while(! success && retry < retries) {
+
     try {
-  
+
       // TODO: Use exposure time set by the user...
       LOG(debug) << "FocusControllerT::measureFocus... starting exposure..." << std::endl;
 
-      runExposureBlocking(1000ms);
- 
+      size_t numSamples = 3;
+      size_t sampleNo = 0;
+      ImageT sumImg;
+      
+      while (sampleNo < numSamples) {
+	runExposureBlocking(1000ms);
+
+	// // DEBUG: Store image "inImg"
+	// ImageT imgSaveX(*mCurrentImage);
+	// imgSaveX.normalize(0, 255);
+	// std::stringstream ss;
+	// ss << "/home/devnull/.fofi/single_frame" << sampleNo << ".png";
+	// imgSaveX.save(ss.str().c_str());
+	// // DEBUG END!
+
+	// TODO: Maybe there is a better way...
+	if (sumImg.width() == 0 || sumImg.height() == 0) {
+	  LOG(debug) << "YYY Assigning image..." << std::endl;
+	  sumImg = *mCurrentImage;
+	} else {
+	  sumImg += *mCurrentImage;
+	}
+	
+	++sampleNo;
+      }
+
+      // // DEBUG: Store image "inImg"
+      // ImageT imgSave(sumImg);
+      // imgSave.normalize(0, 255);
+      // imgSave.save("/home/devnull/.fofi/test.png");
+      // // DEBUG END!
+
+
+      ImageT averageCurrentImage = sumImg / (float) numSamples;
+
+      // // DEBUG: Store image "inImg"
+      // ImageT imgSave2(averageCurrentImage);
+      // imgSave2.normalize(0, 255);
+      // imgSave2.save("/home/devnull/.fofi/test2.png");
+      // // DEBUG END!
+      
+      
       LOG(debug) << "FocusControllerT::measureFocus... exposure finished." << std::endl;
 
 
       // Calc center of subframe
       PointT<unsigned int> centerOuterSubframe(
-					       std::ceil(mCurrentImage->width() / 2),
-					       std::ceil(mCurrentImage->height() / 2));
+					       std::ceil(averageCurrentImage.width() / 2),
+					       std::ceil(averageCurrentImage.height() / 2));
 
       LOG(debug)
 	<< "FocusControllerT::run - centerOuterSubframe="
@@ -171,8 +212,8 @@ std::shared_ptr<FocusCurveRecordT> FocusControllerT::measureFocus() {
 	<< "FocusControllerT::run - calculated inner ROI=" << innerRoi
 	<< std::endl;
 
-      // get_crop() from mCurrentImage using innerRoi
-      ImageT innerSubFrameImg = mCurrentImage->get_crop(innerRoi.x() /*x0*/,
+      // get_crop() from averageCurrentImage using innerRoi
+      ImageT innerSubFrameImg = averageCurrentImage.get_crop(innerRoi.x() /*x0*/,
 							innerRoi.y() /*y0*/, innerRoi.x() + innerRoi.width() - 1/*x1*/,
 							innerRoi.y() + innerRoi.height() - 1/*y1*/
 							);
@@ -220,7 +261,7 @@ std::shared_ptr<FocusCurveRecordT> FocusControllerT::measureFocus() {
 	<< "FocusControllerT::run - new centroid (outer frame)="
 	<< newCentroidOuterRoiCoords << std::endl;
 
-      // Use newly calculated center (newCentroidOuterRoiCoords) to again get sub-frame from mCurrentImage
+      // Use newly calculated center (newCentroidOuterRoiCoords) to again get sub-frame from averageCurrentImage
       // TODO: Currently we just round() the float position to the closest int. This may be
       //       improved by introducing sub-pixel accurracy...
       // TODO: We may introduce a round() function for conversion from PointTF to PointT...?
@@ -240,8 +281,8 @@ std::shared_ptr<FocusCurveRecordT> FocusControllerT::measureFocus() {
 	<< "FocusControllerT::run - calculated inner corrected ROI="
 	<< innerCorrectedRoi << std::endl;
 
-      // get_crop() from mCurrentImage using corrected innerRoi
-      ImageT innerCorrectedSubFrameImg = mCurrentImage->get_crop(
+      // get_crop() from averageCurrentImage using corrected innerRoi
+      ImageT innerCorrectedSubFrameImg = averageCurrentImage.get_crop(
 								 innerCorrectedRoi.x() /*x0*/, innerCorrectedRoi.y() /*y0*/,
 								 innerCorrectedRoi.x() + innerCorrectedRoi.width() - 1/*x1*/,
 								 innerCorrectedRoi.y() + innerCorrectedRoi.height() - 1/*y1*/
@@ -255,8 +296,9 @@ std::shared_ptr<FocusCurveRecordT> FocusControllerT::measureFocus() {
       // Determine SNR of recorded area to check if there could be a star around.
       float snr;
       checkIfStarIsThere(innerCorrectedSubFrameImg, &snr);
+      
 
-      // TODO: Calculate HFD
+      // Calculate HFD
       HfdT hfd(innerCorrectedSubFrameImg);
       LOG(debug)
 	<< "FocusControllerT::run - HFD: " << hfd.getValue() << std::endl;
@@ -305,7 +347,7 @@ std::shared_ptr<FocusCurveRecordT> FocusControllerT::measureFocus() {
 	.setHorzFwhm(fwhmHorz)
 	.setVertFwhm(fwhmVert)
 	.setHfd(hfd)
-	.setRoiImage(*mCurrentImage) // Take a copy
+	.setRoiImage(averageCurrentImage) // Take a copy
 	.setCorrectedStarImage(innerCorrectedSubFrameImg)
 	.setAbsStarCenterPos(newCentroidAbsRoiCoords)
 	.build();
@@ -320,9 +362,13 @@ std::shared_ptr<FocusCurveRecordT> FocusControllerT::measureFocus() {
     }
   } // end while
 
+  
   if (! success) {
-    // TODO: THROW EXC - not possible to match after N retries
-    LOG(error) << "Unable to calculate FWHM after " << retries << " retries." << std::endl;
+    // Throw exception - not possible to match after given max. number of retries
+    std::stringstream ss;
+    ss << "Unable to calculate FWHM after " << retries << " retries.";
+    LOG(error) << ss.str() << std::endl;
+    throw FocusControllerFailedExceptionT(ss.str());
   }
   
   return record;

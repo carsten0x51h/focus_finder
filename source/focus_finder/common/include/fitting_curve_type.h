@@ -10,6 +10,7 @@ struct FittingCurveTypeT {
     PARABOLIC,
     GAUSSIAN,
     LINEAR_SLOPE,
+    HYPERBOLIC_POS_ONLY,
     _Count
   };
 
@@ -19,6 +20,7 @@ struct FittingCurveTypeT {
     	case PARABOLIC: return "PARABOLIC";
     	case GAUSSIAN: return "GAUSSIAN";
     	case LINEAR_SLOPE: return "LINEAR_SLOPE";
+    case HYPERBOLIC_POS_ONLY: return "HYPERBOLIC_POS_ONLY";
     	default: return "<?>";
     }
   }
