@@ -24,6 +24,8 @@
 #include "include/point.h"
 #include "include/point_with_residual.h"
 #include "include/self_orientation_result.h"
+#include "include/boundary_location.h"
+#include "include/curve_function.h"
 
 #include "include/camera.h"
 #include "include/focus.h"
@@ -156,14 +158,6 @@ std::shared_ptr<FocusCurveRecordT> FocusControllerT::measureFocus() {
       while (sampleNo < numSamples) {
 	runExposureBlocking(1000ms);
 
-	// // DEBUG: Store image "inImg"
-	// ImageT imgSaveX(*mCurrentImage);
-	// imgSaveX.normalize(0, 255);
-	// std::stringstream ss;
-	// ss << "/home/devnull/.fofi/single_frame" << sampleNo << ".png";
-	// imgSaveX.save(ss.str().c_str());
-	// // DEBUG END!
-
 	// TODO: Maybe there is a better way...
 	if (sumImg.width() == 0 || sumImg.height() == 0) {
 	  LOG(debug) << "YYY Assigning image..." << std::endl;
@@ -173,24 +167,13 @@ std::shared_ptr<FocusCurveRecordT> FocusControllerT::measureFocus() {
 	}
 	
 	++sampleNo;
+
+	// TODO: checkCanelled()!!!
+	// TODO: Pass numSamples as function parameter!
       }
-
-      // // DEBUG: Store image "inImg"
-      // ImageT imgSave(sumImg);
-      // imgSave.normalize(0, 255);
-      // imgSave.save("/home/devnull/.fofi/test.png");
-      // // DEBUG END!
-
 
       ImageT averageCurrentImage = sumImg / (float) numSamples;
 
-      // // DEBUG: Store image "inImg"
-      // ImageT imgSave2(averageCurrentImage);
-      // imgSave2.normalize(0, 255);
-      // imgSave2.save("/home/devnull/.fofi/test2.png");
-      // // DEBUG END!
-      
-      
       LOG(debug) << "FocusControllerT::measureFocus... exposure finished." << std::endl;
 
 
@@ -390,25 +373,16 @@ void FocusControllerT::waitForFocus(std::chrono::milliseconds timeout) const {
   wait_for(isFocusPositionReachedOrCancelledLambda, timeout);
 }
 
-
-
-
-
-// TODO: binary search?!
-// BOUNDARY SCAN!
-void FocusControllerT::moveUntilFocusMeasureLimitReached(const SelfOrientationResultT & selfOrientationResult, float stepSize, float focusMeasureLimit) {
+// TODO: Return final abs pos?
+void FocusControllerT::boundaryScanLinear(const SelfOrientationResultT & selfOrientationResult, float stepSize, float focusMeasureLimit) {
   using namespace std::chrono_literals;
-
-  LOG(debug)
-    << "FocusControllerT::moveUntilFocusMeasureLimitReached..." << std::endl;
-
 
   // TODO: Get values from focus device
   int minAbsFocusPos = 0;
   int maxAbsFocusPos = 80000;
-
-
   
+  LOG(debug)
+    << "FocusControllerT::boundaryScanLinear..." << std::endl;
   
   FocusDirectionT::TypeE limitFocusDirection = selfOrientationResult.focusDirectionToLimit;
   auto curveRecord = selfOrientationResult.record2;
@@ -426,7 +400,7 @@ void FocusControllerT::moveUntilFocusMeasureLimitReached(const SelfOrientationRe
   while(! limitCrossed) {
 
     LOG(debug)
-      << "FocusControllerT::moveUntilFocusMeasureLimitReached..."
+      << "FocusControllerT::linearBoundaryScan..."
       << "limit " << focusMeasureLimit
       << " in direction " << FocusDirectionT::asStr(limitFocusDirection)
       << " not yet reached - (focusMeasure=" << focusMeasure << ")"
@@ -444,7 +418,7 @@ void FocusControllerT::moveUntilFocusMeasureLimitReached(const SelfOrientationRe
     float maxPossibleStepsIntoLimitDirection = (limitFocusDirection == FocusDirectionT::INWARD ? (getFocus()->getCurrentPos() - minAbsFocusPos) / (float) stepSize : (maxAbsFocusPos - getFocus()->getCurrentPos()) / (float) stepSize);
     float progressPerc = 100.0F * (stepNo / maxPossibleStepsIntoLimitDirection);
 
-    LOG(warning) << "pos: " << getFocus()->getCurrentPos() << ", maxPossibleStepsIntoLimitDirection: " << maxPossibleStepsIntoLimitDirection << ", progressPerc: " << progressPerc << std::endl;
+    LOG(debug) << "FocusControllerT::linearBoundaryScan... pos: " << getFocus()->getCurrentPos() << ", maxPossibleStepsIntoLimitDirection: " << maxPossibleStepsIntoLimitDirection << ", progressPerc: " << progressPerc << std::endl;
     
   
     notifyFocusControllerProgressUpdate(progressPerc, "Boundary scan running...", curveRecord);
@@ -461,11 +435,147 @@ void FocusControllerT::moveUntilFocusMeasureLimitReached(const SelfOrientationRe
   notifyFocusControllerProgressUpdate(100.0F, "Boundary scan finished.");
 
   LOG(info)
-    << "FocusControllerT::moveUntilFocusMeasureLimitReached..."
+    << "FocusControllerT::linearBoundaryScan..."
     << "limit " << focusMeasureLimit
     << " in direction " << FocusDirectionT::asStr(limitFocusDirection)
     << " reached - (focusMeasure=" << focusMeasure << ")"
     << ", focus position=" << getFocus()->getCurrentPos() << std::endl;
+}
+
+
+
+BoundaryLocationT::TypeE FocusControllerT::determineBoundaryLoc(float lowerFocusMeasure, float upperFocusMeasure, float focusMeasure) const {
+  BoundaryLocationT::TypeE boundaryLoc;
+      
+  if (focusMeasure < lowerFocusMeasure) {
+    // If inside boundary
+    boundaryLoc = BoundaryLocationT::INSIDE_BOUNDARY;
+  } else if (focusMeasure > upperFocusMeasure) {
+    // If outside boundary
+    boundaryLoc = BoundaryLocationT::OUTSIDE_BOUNDARY;
+  } else {
+    // We are already in the boundary range (i.e. close to the limit) -> we are already done -> do not move.
+    boundaryLoc = BoundaryLocationT::WITHIN_BOUNDARY_RANGE;
+  }
+  return boundaryLoc;
+}
+
+/**
+ * FIND CLOSEST BOUNDARY UISNG THE FOCUS CURVE.
+ *
+ * NOTE: All this fails if the self-orientation is not correct!
+ */
+int FocusControllerT::boundaryScanWithFocusCurveSupport(std::shared_ptr<CurveFunctionT> focusCurveFunction, const SelfOrientationResultT & selfOrientationResult, FocusMeasureTypeT::TypeE curveFocusMeasureType, float focusMeasureLimit, float focusMeasureDelta) {
+
+  using namespace std::chrono_literals;
+
+  float lowerFocusMeasure = focusMeasureLimit - focusMeasureDelta;
+  float upperFocusMeasure = focusMeasureLimit + focusMeasureDelta;
+
+  float lowerRelLimitPos = focusCurveFunction->f_inv(lowerFocusMeasure);
+  float upperRelLimitPos = focusCurveFunction->f_inv(upperFocusMeasure);
+
+  float focusMeasure = selfOrientationResult.record2->getFocusMeasure(curveFocusMeasureType);
+  float estimatedRelPos = focusCurveFunction->f_inv(focusMeasure);
+
+
+  float moveStep1 = 0;
+  BoundaryLocationT::TypeE boundaryLoc = determineBoundaryLoc(lowerFocusMeasure, upperFocusMeasure, focusMeasure);
+    
+  if (boundaryLoc == BoundaryLocationT::INSIDE_BOUNDARY) {
+    moveStep1 = lowerRelLimitPos - estimatedRelPos;
+  } else if (boundaryLoc == BoundaryLocationT::OUTSIDE_BOUNDARY) {
+    moveStep1 = estimatedRelPos - upperRelLimitPos;
+  } else {
+    moveStep1 = 0;
+  }
+
+  LOG(debug) << "FocusControllerT::boundaryScanWithFocusCurveSupport..."
+	     << "focusMeasureLimit=" << focusMeasureLimit << ", focusMeasureDelta=" << focusMeasureDelta
+	     << " -> limit focus measure range=[" << lowerFocusMeasure << ", " << upperFocusMeasure << "]" << std::endl
+	     << " -> estimated rel position range=[" << lowerRelLimitPos << ", " << upperRelLimitPos << "]" << std::endl
+	     << " -> current focus measure=" << focusMeasure << " -> estimated rel. pos=" << estimatedRelPos << std::endl
+	     << " -> our pos. with respect to boundary: " << BoundaryLocationT::asStr(boundaryLoc) << std::endl
+	     << " -> moveStep1=" << moveStep1 << std::endl;
+
+  notify()????
+    
+  if (boundaryLoc != BoundaryLocationT::WITHIN_BOUNDARY_RANGE) {
+
+    // Move focus
+    moveFocusByBlocking(selfOrientationResult.focusDirectionToLimit, moveStep1, 30000ms);
+
+    // Measure again
+    auto record2 = measureFocus();
+    float focusMeasure2 = record2->getFocusMeasure(curveFocusMeasureType);
+
+      
+    BoundaryLocationT::TypeE boundaryLoc2 = determineBoundaryLoc(lowerFocusMeasure, upperFocusMeasure, focusMeasure2);
+
+
+    // TODO / FIXME: In case starting OUTSIDE_BOUNDARY, it may be problematic to lookup an x from the curve (f_inv), since it is probably quite inaccurate! Instead we could do a linear step-by-step move with regular stepSize until we reach the boundary range...
+      
+    // TODO: Also check if we maybe OVERSHOT the goal already?!?!
+    bool goalOvershot = (boundaryLoc == BoundaryLocationT::INSIDE_BOUNDARY && boundaryLoc2 == BoundaryLocationT::OUTSIDE_BOUNDARY ||
+			 boundaryLoc == BoundaryLocationT::OUTSIDE_BOUNDARY && boundaryLoc2 == BoundaryLocationT::INSIDE_BOUNDARY);
+
+    FocusDirectionT::TypeE dir = selfOrientationResult.focusDirectionToLimit;
+      
+    if (goalOvershot) {
+      LOG(debug) << "FocusControllerT::boundaryScanWithFocusCurveSupport..."
+		 << "GOAL OVERSHOT (1) !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
+
+      // Invert direction
+      dir = FocusDirectionT::invert(dir);
+    }
+      
+    // Fine tuning
+    float moveBy2 = upperRelLimitPos - lowerRelLimitPos;
+    float stepFinetuneSize = moveBy2 / 2.0F;      
+       
+    while (boundaryLoc2 != BoundaryLocationT::WITHIN_BOUNDARY_RANGE) {
+
+      // Move focus
+      moveFocusByBlocking(dir, stepFinetuneSize, 30000ms);
+	
+      // Measure again
+      record2 = measureFocus();
+	
+      focusMeasure2 = record2->getFocusMeasure(curveFocusMeasureType);
+	
+      boundaryLoc2 = determineBoundaryLoc(lowerFocusMeasure, upperFocusMeasure, focusMeasure2);
+	
+      // Check if we maybe OVERSHOT the goal already
+      bool goalOvershot = (boundaryLoc == BoundaryLocationT::INSIDE_BOUNDARY && boundaryLoc2 == BoundaryLocationT::OUTSIDE_BOUNDARY ||
+			   boundaryLoc == BoundaryLocationT::OUTSIDE_BOUNDARY && boundaryLoc2 == BoundaryLocationT::INSIDE_BOUNDARY);
+	
+      if (goalOvershot) {
+	LOG(debug) << "FocusControllerT::boundaryScanWithFocusCurveSupport..."
+		   << "OVERSHOT (2) !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
+
+	// Invert direction!
+	dir = FocusDirectionT::invert(dir);
+	stepFinetuneSize = stepFinetuneSize / 2.0F;
+      }
+
+      // TODO: checkCancelled()!
+    }
+
+    LOG(debug) << "FocusControllerT::boundaryScanWithFocusCurveSupport..."
+	       << "FINISHED! focusMeasure=" << focusMeasure2 << std::endl
+	       << ", focusMeasureLimit=" << focusMeasureLimit << " focus measure range=["
+	       << lowerFocusMeasure << ", " << upperFocusMeasure << "]" << std::endl
+	       << ", abs focus pos: " << getFocus()->getCurrentPos() << std::endl;
+
+  } else {
+    LOG(debug) << "FocusControllerT::boundaryScanWithFocusCurveSupport..."
+	       << "FINISHED! We are already close to the boundary. focusMeasure=" << focusMeasure
+	       << ", focusMeasureLimit=" << focusMeasureLimit << " focus measure range=["
+	       << lowerFocusMeasure << ", " << upperFocusMeasure << "], Doing nothing." << std::endl
+	       << ", abs focus pos: " << getFocus()->getCurrentPos() << std::endl;
+  }
+
+  return getFocus()->getCurrentPos();
 }
 
 
@@ -501,9 +611,10 @@ SelfOrientationResultT FocusControllerT::performSelfOrientation() {
   notifyFocusControllerProgressUpdate(0.0f, "Self orientation running....", selfOrientationResult.record1);
   notifyFocusControllerNewRecord(selfOrientationResult.record1);
 
-  // TODO: Should this be configurable?
+  // TODO: Should this be configurable? -> YES, part of profile...?!... Just need a good name...
   const float STEP_FACTOR = 3.0F;
-  
+
+  // TODO: Should the FocusControllerT be aware of mFocusFinderProfile? Or should parms be passed?
   moveFocusByBlocking(FocusDirectionT::INWARD, STEP_FACTOR * mFocusFinderProfile.getStepSize(), 30000ms);
     
   selfOrientationResult.record2 = measureFocus();

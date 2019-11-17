@@ -48,8 +48,6 @@ private:
   
   //float estimateRelPos(std::shared_ptr<CurveFunctionT> focusCurveFunction, float focusMeasure, CurveHalfT::TypeE curveHalf);
 
-  BoundaryLocationT::TypeE determineBoundaryLoc(float lowerFocusMeasure, float upperFocusMeasure, float focusMeasure) const;
-  
   void rollbackFocus();
   void focusFinderCleanup();
   

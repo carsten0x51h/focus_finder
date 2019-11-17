@@ -16,6 +16,9 @@
 #include "focus_measure_type.h"
 #include "focus_finder_profile.h"
 #include "self_orientation_result.h"
+#include "boundary_location.h"
+
+class CurveFunctionT;
 
 // TODO: Question is, if FocusFinder should have a callback for "exposure finished"... actually it should be implemented in sub class....
 //       But problem is, that registering/unregistering the callback needs to be repeated when mCamera changes - setCamera()
@@ -49,6 +52,8 @@ private:
     
   void waitForFocus(std::chrono::milliseconds timeout) const;
   void onImageReceived(RectT<unsigned int> roi, std::shared_ptr<const ImageT> image, bool lastFrame);
+  BoundaryLocationT::TypeE determineBoundaryLoc(float lowerFocusMeasure, float upperFocusMeasure, float focusMeasure) const;
+
   
   std::shared_ptr<const ImageT> mCurrentImage;
   
@@ -109,7 +114,13 @@ public:
   void checkCancelled() const;
   
   SelfOrientationResultT performSelfOrientation();
-  void moveUntilFocusMeasureLimitReached(const SelfOrientationResultT & selfOrientationResult, float stepSize, float focusMeasureLimit);
+
+  // TODO: Could there also be a "binary search" to be faster than "boundaryScanLinear" even without having a curve?!
+  void boundaryScanLinear(const SelfOrientationResultT & selfOrientationResult, float stepSize, float focusMeasureLimit);
+
+  int boundaryScanWithFocusCurveSupport(std::shared_ptr<CurveFunctionT> focusCurveFunction, const SelfOrientationResultT & selfOrientationResult, FocusMeasureTypeT::TypeE curveFocusMeasureType, float focusMeasureLimit, float focusMeasureDelta = 1.5F);
+  
+
   std::shared_ptr<FocusCurveRecordT> measureFocus();
   
   void cleanup(); // NOTE: Called from destructor

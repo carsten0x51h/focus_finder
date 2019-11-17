@@ -74,7 +74,7 @@ CurveHalfT::TypeE DefaultFocusCurveRecorderT::locateStartingPosition() {
   SelfOrientationResultT selfOrientationResult = getFocusController()->performSelfOrientation();
   
   // Move close to the limiting focus measure (into the determined direction, in steps of size mStepSize)
-  getFocusController()->moveUntilFocusMeasureLimitReached(selfOrientationResult, mStepSize, mFocusMeasureLimit);
+  getFocusController()->boundaryScanLinear(selfOrientationResult, mStepSize, mFocusMeasureLimit);
 
   return selfOrientationResult.curveHalf;
 }
