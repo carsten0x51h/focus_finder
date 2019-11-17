@@ -9,6 +9,8 @@ AboutDialogT::AboutDialogT(QWidget * parent) : QDialog(parent),
 {
     // Setup UI
     m_ui->setupUi(this);
+
+    setFixedSize(size());
 }
 
 AboutDialogT::~AboutDialogT()
