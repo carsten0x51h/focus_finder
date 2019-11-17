@@ -498,7 +498,7 @@ int FocusControllerT::boundaryScanWithFocusCurveSupport(std::shared_ptr<CurveFun
 	     << " -> our pos. with respect to boundary: " << BoundaryLocationT::asStr(boundaryLoc) << std::endl
 	     << " -> moveStep1=" << moveStep1 << std::endl;
 
-  notify()????
+  // TODO: How to notify()????
     
   if (boundaryLoc != BoundaryLocationT::WITHIN_BOUNDARY_RANGE) {
 
