@@ -133,6 +133,7 @@ find_package(Boost COMPONENTS log system log thread REQUIRED)
 ADD_DEFINITIONS(-DBOOST_LOG_DYN_LINK)
 INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIR})
 
+include(FindTIFF)
 
 
 # 

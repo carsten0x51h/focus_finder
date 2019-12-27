@@ -26,35 +26,36 @@
 class CurveFitAlgorithmT {
 public:
 	template<typename Rng>
-	static CurveParmsT fitCurve(FittingCurveTypeT::TypeE ct, Rng dps,
+	static CurveParmsT fitCurve(Rng dps,
 			const CurveFitParmsT & curveFitParms,
 			CurveFitSummaryT * outSummary = nullptr) {
+	  FittingCurveTypeT::TypeE ct = curveFitParms.getFittingCurveType();
 	  std::shared_ptr<LmFittingCurveT> fc = LmFittingCurveFactoryT::getInstance(ct);
-		LmCurveMatcherT cm(fc);
+	  LmCurveMatcherT cm(fc);
 		OutlierFilterT outlierFilter;
 		CurveParmsT cp;
 		CurveFitSummaryT summary;
 
 		size_t numInitialDataPoints = std::distance(dps.begin(), dps.end());
 		size_t numMinRequiredDataPoints = numInitialDataPoints
-				* (1.0f - curveFitParms.maxAcceptedOutliersPerc / 100.0f);
+				* (1.0f - curveFitParms.getMaxAcceptedOutliersPerc() / 100.0f);
 
-		bool wantOutlierRemoval = (curveFitParms.outlierBoundaryFactor > 0);
+		bool wantOutlierRemoval = (curveFitParms.getOutlierBoundaryFactor() > 0);
 		const size_t numMinInitialRequiredDataPoints = 8; // TODO: ok? Probably more... 10 ?
 
 		// Check input parameters
 		THROW_IF(CurveFit,
 				numInitialDataPoints < numMinInitialRequiredDataPoints,
 				"Insufficient data points.");
-		THROW_IF(CurveFit, curveFitParms.numMaxIterations < 1,
+		THROW_IF(CurveFit, curveFitParms.getNumMaxIterations() < 1,
 				"Number of iterations needs to be at least 1.");
-		THROW_IF(CurveFit, curveFitParms.epsrel < 0,
+		THROW_IF(CurveFit, curveFitParms.getMaxAcceptedRelativError() < 0,
 				"Relative error needs to be greater or equal 0.");
-		THROW_IF(CurveFit, curveFitParms.epsabs < 0,
+		THROW_IF(CurveFit, curveFitParms.getMaxAcceptedAbsoluteError() < 0,
 				"Absolute error needs to be greater or equal 0.");
 		THROW_IF(CurveFit,
-				curveFitParms.maxAcceptedOutliersPerc < 0
-						|| curveFitParms.maxAcceptedOutliersPerc > 100,
+				curveFitParms.getMaxAcceptedOutliersPerc() < 0
+						|| curveFitParms.getMaxAcceptedOutliersPerc() > 100,
 				"Max accepted outlier percentage out of range 0..100.");
 
 		// Take an initial copy of the incoming data points.
@@ -102,7 +103,7 @@ public:
 									| boost::adaptors::transformed(
 											[&](const auto & pr) {return pr.residual;});
 
-					float outlierBoundary = curveFitParms.outlierBoundaryFactor
+					float outlierBoundary = curveFitParms.getOutlierBoundaryFactor()
 							* QuantileT::calc<float>(residuals, 0.75) /*q3*/;
 
 					outlierFilter.setOutlierBoundary(outlierBoundary);

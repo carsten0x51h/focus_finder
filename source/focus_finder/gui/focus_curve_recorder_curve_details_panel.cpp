@@ -61,7 +61,7 @@ void FocusCurveRecorderCurveDetailsPanelT::setCurveDetails(std::shared_ptr<const
   ss.str(std::string());
 
 
-  ss << std::fixed << FittingCurveTypeT::asStr(focusCurve->getFocusCurveType());
+  ss << std::fixed << FocusCurveTypeT::asStr(focusCurve->getFocusCurveType());
   m_ui->lblCurveShape->setText(QString::fromStdString(ss.str()));
   ss.str(std::string());
 

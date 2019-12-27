@@ -12,6 +12,7 @@
 
 #include "tuple_printer.h"
 
+
 /**
  * SizeT structure (W x H).
  */

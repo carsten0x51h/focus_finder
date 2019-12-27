@@ -29,20 +29,21 @@ DEF_Exception(ProfileManager);
  */
 class ProfileManagerT {
 private:
-	typedef boost::signals2::signal<void (void)> ActiveProfileChangedListenersT;
-	ActiveProfileChangedListenersT mActiveProfileChangedListeners;
+  typedef boost::signals2::signal<void (void)> ActiveProfileChangedListenersT;
+  ActiveProfileChangedListenersT mActiveProfileChangedListeners;
 
-	typedef boost::signals2::signal<void (void)> ProfileListChangedListenersT;
-	ProfileListChangedListenersT mProfileListChangedListeners;
+  typedef boost::signals2::signal<void (void)> ProfileListChangedListenersT;
+  ProfileListChangedListenersT mProfileListChangedListeners;
 
-
+  static const std::string PROFILE_CFG_FILENAME;
+  
   // static?, as public? -> to be used by GUI...
   // TODO: std::string proposeProfileFilename(const std::string & profileName);
 
   /**
    * Concats root path with filename.
    */
-  std::string composeFullPath(const std::string & profileFilename) const;
+  std::filesystem::path composeFullPath(const std::string & profileDirectoryName) const;
 
   /**
    * Holds the active profile (if any).
@@ -50,14 +51,14 @@ private:
   std::optional<FocusFinderProfileT> mActiveProfile;
 
   /**
-   * Holds the filename to the actice profile.
+   * Holds the directory name to the actice profile.
    */
-  std::string mActiveProfileFilename;
+  std::string mActiveProfileDirectoryName;
 
   /**
    * Holds root path where profiles are stored.
    */
-  std::string mProfileRootPath; // Location where profiles are stored
+  //std::string mProfileRootPath; // Location where profiles are stored
 
 
 protected:
@@ -76,12 +77,28 @@ public:
   std::optional<FocusFinderProfileT> getActiveProfile() const;
 
 
+  std::string getActiveProfileDirectoryName() const;
+  
   /**
    * If there is an active profile, returns the filename of the
    * currently active profile. Otherwise an empty string.
    */
-  std::string getActiveProfileFilename() const;
+  // -> TODO: Required? Should return path to "getActiveProfileDirectory()" + /profile.cfg 
+  //std::string getActiveProfileFilename() const;
 
+
+  /**
+   * Return the root path to the profile directory.
+   * 
+   */
+  static std::filesystem::path getProfilesRootDirectory();
+  
+  /**
+   * Return the path to the currently active profile directory.
+   * If there is no active profile, an empty string is returned.
+   * Example: ~/.fofi/profile_1
+   */
+  std::string getActiveProfileDirectory() const;
 
   /**
    * Remove active profile so that no profile is active any longer.
@@ -96,7 +113,7 @@ public:
    * If active profile already is set, just return.
    * Throws if profile not found.
    */
-  void activateProfile(const std::string & profileFilename);
+  void activateProfile(const std::string & profileDirectoryName);
 
 
   /**
@@ -107,7 +124,7 @@ public:
    * Throws if profile file not found.
    * Throws if deletion of file fails.
    */
-  void deleteProfile(const std::string & profileFilename);
+  void deleteProfile(const std::string & profileDirectoryName);
 
 
   /**
@@ -118,7 +135,7 @@ public:
    * TODO: Pass a flag to overwrite an existing file?
    * TODO: Pass flag to control if new profile should directly be activated?
    */
-  void addProfile(const std::string & profileFilename, const FocusFinderProfileT & newProfile);
+  void addProfile(const std::string & profileDirectoryName, const FocusFinderProfileT & newProfile);
 
 
   /**
@@ -126,36 +143,40 @@ public:
    *
    * Throw if profile file not found.
    */
-  void updateProfile(const std::string & profileFilename, const FocusFinderProfileT & modifiedProfile);
+  void updateProfile(const std::string & profileDirectoryName, const FocusFinderProfileT & modifiedProfile);
 
 
   /**
-   * Return a list of available profile (filenames).
+   * Return a list of available profile (directory names).
    * In case there are no profiles, the vector is empty.
+   *
+   * The function looks for directories under 'getActiveProfileDirectory()'
+   * for the file profile.cfg. If it is found, the containing directory is
+   * added. Otherwise, the directory is ignored.
    */
-  std::vector<std::string> getProfileFilenames() const;
+  std::vector<std::string> getProfileDirectoryNames() const;
 
 
   /**
    * Notify listeners about the change of the currently active profile.
    */
-   boost::signals2::connection registerActiveProfileChangedListener(const ActiveProfileChangedListenersT::slot_type & inCallBack) {
-   	return mActiveProfileChangedListeners.connect(inCallBack);
-   }
-   template <class T> void unregisterActiveProfileChangedListener(const T & inCallBack) {
-   	mActiveProfileChangedListeners.disconnect(inCallBack);
-   }
+  boost::signals2::connection registerActiveProfileChangedListener(const ActiveProfileChangedListenersT::slot_type & inCallBack) {
+    return mActiveProfileChangedListeners.connect(inCallBack);
+  }
+  template <class T> void unregisterActiveProfileChangedListener(const T & inCallBack) {
+    mActiveProfileChangedListeners.disconnect(inCallBack);
+  }
 
 
-   /**
-    * Notify listeners that list of prifles has changed.
-    */
-   boost::signals2::connection registerProfileListChangedListener(const ProfileListChangedListenersT::slot_type & inCallBack) {
-   	return mProfileListChangedListeners.connect(inCallBack);
-   }
-   template <class T> void unregisterProfileListChangedListener(const T & inCallBack) {
-	   mProfileListChangedListeners.disconnect(inCallBack);
-   }
+  /**
+   * Notify listeners that list of prifles has changed.
+   */
+  boost::signals2::connection registerProfileListChangedListener(const ProfileListChangedListenersT::slot_type & inCallBack) {
+    return mProfileListChangedListeners.connect(inCallBack);
+  }
+  template <class T> void unregisterProfileListChangedListener(const T & inCallBack) {
+    mProfileListChangedListeners.disconnect(inCallBack);
+  }
 
 };
 

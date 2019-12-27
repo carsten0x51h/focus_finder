@@ -21,7 +21,7 @@ class IndiDeviceManagerT : public DeviceManagerT {
 
 public:
 	static const std::string sDefaultIndiHostname;
-	static int sDefaultIndiPort;
+	static const int sDefaultIndiPort;
 
 
 	IndiDeviceManagerT();

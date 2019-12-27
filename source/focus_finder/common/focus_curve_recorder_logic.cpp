@@ -12,12 +12,20 @@
 
 class FocusCurveRecordSetT;
 
-FocusCurveRecorderLogicT::FocusCurveRecorderLogicT(FocusFinderLogicT & ffl) : mFfl(ffl), mFocusCurveRecorder(nullptr), mFocusCurveType(FittingCurveTypeT::HYPERBOLIC) {
+FocusCurveRecorderLogicT::FocusCurveRecorderLogicT(FocusFinderLogicT & ffl) : mFfl(ffl), mFocusCurveRecorder(nullptr) {
 }
 
 std::shared_ptr<FocusCurveRecorderT> FocusCurveRecorderLogicT::getFocusCurveRecorder() {
   return mFocusCurveRecorder;
 }
+
+std::optional<FocusFinderProfileT> FocusCurveRecorderLogicT::getActiveProfile() {
+  return mFfl.getProfileManager()->getActiveProfile();
+}
+
+  // TODO: Make sure that activeProfile is set...
+  //if (!activeProfileOpt) {
+  //}
 
 void FocusCurveRecorderLogicT::resetFocusCurveRecorder(FocusCurveRecorderTypeT::TypeE focusCurveRecorderType) {
 
@@ -41,12 +49,4 @@ void FocusCurveRecorderLogicT::resetFocusCurveRecorder(FocusCurveRecorderTypeT::
   mFocusCurveRecorder = FocusCurveRecorderFactoryT::getInstance(
 								focusCurveRecorderType,
 								focusController);
-}
-
-FittingCurveTypeT::TypeE FocusCurveRecorderLogicT::getFocusCurveType() const {
-  return mFocusCurveType;
-}
-
-void FocusCurveRecorderLogicT::setFocusCurveType(FittingCurveTypeT::TypeE focusCurveType) {
-     mFocusCurveType = focusCurveType;
 }

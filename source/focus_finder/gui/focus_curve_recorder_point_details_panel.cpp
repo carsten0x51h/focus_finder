@@ -54,12 +54,13 @@ void FocusCurveRecorderPointDetailsPanelT::setPointDetails(std::shared_ptr<Focus
 {
   std::stringstream ss;
 
-
-  std::time_t t = focusCurveRecord->getDateTime();
-  char mbstr[100];
-  std::strftime(mbstr, sizeof(mbstr), "%A %c", std::localtime(& t));
-  m_ui->lblDateTime->setText(QString::fromStdString(std::string(mbstr)));
-  ss.str(std::string());
+  // TODO: focusCurveRecord->getDateTime() changed to time_point...
+  //       --> adapt code below...
+  // std::time_t t = focusCurveRecord->getDateTime();
+  // char mbstr[100];
+  // std::strftime(mbstr, sizeof(mbstr), "%A %c", std::localtime(& t));
+  // m_ui->lblDateTime->setText(QString::fromStdString(std::string(mbstr)));
+  // ss.str(std::string());
 
   
   ss << std::fixed << std::setprecision(2) << focusCurveRecord->getHfd().getValue();

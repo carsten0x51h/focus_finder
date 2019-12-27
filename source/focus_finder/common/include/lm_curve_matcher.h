@@ -86,10 +86,10 @@ public:
 			}
 
 			// See http://www.csse.uwa.edu.au/programming/gsl-1.0/gsl-ref_35.html
-			status = gsl_multifit_test_delta(solver->dx, solver->x, curveFitParms.epsabs,
-					curveFitParms.epsrel);
+			status = gsl_multifit_test_delta(solver->dx, solver->x, curveFitParms.getMaxAcceptedAbsoluteError(),
+					curveFitParms.getMaxAcceptedRelativError());
 
-		} while (GSL_CONTINUE == status && iter < curveFitParms.numMaxIterations);
+		} while (GSL_CONTINUE == status && iter < curveFitParms.getNumMaxIterations());
 
 		// Store the result into the summary
 		lmCurveMatcherSummary.numIterationsRequired = iter;

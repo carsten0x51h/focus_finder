@@ -324,6 +324,7 @@ std::shared_ptr<FocusCurveRecordT> FocusControllerT::measureFocus() {
 
       // Fill all so far collected data into the "FoFi Result Structure"
       record = FocusCurveRecordBuilderT()
+ 	.setCreationTimestamp(std::chrono::high_resolution_clock::now())
 	.setAbsoluteFocusPos(getFocus()->getCurrentPos())
 	.setDrift(drift)
 	.setSnr(snr)
@@ -516,8 +517,8 @@ int FocusControllerT::boundaryScanWithFocusCurveSupport(std::shared_ptr<CurveFun
     // TODO / FIXME: In case starting OUTSIDE_BOUNDARY, it may be problematic to lookup an x from the curve (f_inv), since it is probably quite inaccurate! Instead we could do a linear step-by-step move with regular stepSize until we reach the boundary range...
       
     // TODO: Also check if we maybe OVERSHOT the goal already?!?!
-    bool goalOvershot = (boundaryLoc == BoundaryLocationT::INSIDE_BOUNDARY && boundaryLoc2 == BoundaryLocationT::OUTSIDE_BOUNDARY ||
-			 boundaryLoc == BoundaryLocationT::OUTSIDE_BOUNDARY && boundaryLoc2 == BoundaryLocationT::INSIDE_BOUNDARY);
+    bool goalOvershot = ((boundaryLoc == BoundaryLocationT::INSIDE_BOUNDARY && boundaryLoc2 == BoundaryLocationT::OUTSIDE_BOUNDARY) ||
+      (boundaryLoc == BoundaryLocationT::OUTSIDE_BOUNDARY && boundaryLoc2 == BoundaryLocationT::INSIDE_BOUNDARY));
 
     FocusDirectionT::TypeE dir = selfOrientationResult.focusDirectionToLimit;
       

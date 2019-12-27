@@ -10,66 +10,85 @@
 #include "include/focus_finder_profile.h"
 #include "include/home_directory_finder.h"
 
-std::string ProfileManagerT::composeFullPath(
-		const std::string & profileFileName) const {
-	// TODO: Use filesystem path to construct sDefaultPath..
-	return mProfileRootPath + "/" + profileFileName;
+
+const std::string ProfileManagerT::PROFILE_CFG_FILENAME = "profile.cfg";
+
+
+std::filesystem::path ProfileManagerT::composeFullPath(
+		const std::string & profileDirectoryName) const {
+
+  std::filesystem::path fullPath = ProfileManagerT::getProfilesRootDirectory();
+
+  fullPath /= profileDirectoryName;
+  fullPath /= PROFILE_CFG_FILENAME;
+  
+  return fullPath;
 }
 
 ProfileManagerT::ProfileManagerT() :
-		mActiveProfile(std::nullopt), mProfileRootPath(
-				HomeDirectoryFinderT::getHomeDir() + "/.fofi") // TODO: Use filesystem path to construct sDefaultPath..
+  mActiveProfile(std::nullopt)
 {
-	// Create ".fofi" in home directory if it does not exist.
-	// TODO: Only create if it does not exist...
-	// TODO: Error handling...
-	std::filesystem::create_directories(mProfileRootPath);
+  // Create ".fofi" in home directory if it does not exist.
+  // TODO: Only create if it does not exist...
+  // TODO: Error handling...
+  std::filesystem::create_directories(ProfileManagerT::getProfilesRootDirectory());
 }
 
 ProfileManagerT::~ProfileManagerT() {
 }
 
 std::optional<FocusFinderProfileT> ProfileManagerT::getActiveProfile() const {
-	return mActiveProfile;
+  return mActiveProfile;
 }
 
-std::string ProfileManagerT::getActiveProfileFilename() const {
-	return mActiveProfileFilename;
+std::string ProfileManagerT::getActiveProfileDirectoryName() const {
+  return mActiveProfileDirectoryName;
 }
 
 void ProfileManagerT::clearActiveProfile() {
-	mActiveProfile.reset();
-	mActiveProfileFilename = ""; // TODO: nullptr? or null?
-
-	// Notify all listeners about profile change
-	// TODO: Only notify if something has changed?
-	notifyActiveProfileChanged();
+  mActiveProfile.reset();
+  mActiveProfileDirectoryName = ""; // TODO: nullptr? or null?
+  
+  // Notify all listeners about profile change
+  // TODO: Only notify if something has changed?
+  notifyActiveProfileChanged();
 }
 
-void ProfileManagerT::activateProfile(const std::string & profileFilename) {
-	try {
-		mActiveProfile.emplace(
-				FocusFinderProfileT::load(composeFullPath(profileFilename)));
-		mActiveProfileFilename = profileFilename;
-
-		// Notify all listeners about profile change
-		notifyActiveProfileChanged();
-
-	} catch (FocusFinderProfileExceptionT & exc) {
-		throw ProfileManagerExceptionT(exc.what());
-	}
+void ProfileManagerT::activateProfile(const std::string & profileDirectoryName) {
+  try {
+    mActiveProfile.emplace(
+			   FocusFinderProfileT::load(composeFullPath(profileDirectoryName).string())
+			   );
+    
+    LOG(debug) << "Active profile: " << std::endl;
+    
+    if (mActiveProfile.has_value()) {
+      LOG(debug) << mActiveProfile.value() << std::endl;
+    }
+    else {
+      LOG(debug) << "<not set>" << std::endl;
+    }
+    
+    mActiveProfileDirectoryName = profileDirectoryName;
+    
+    // Notify all listeners about profile change
+    notifyActiveProfileChanged();
+    
+  } catch (FocusFinderProfileExceptionT & exc) {
+    throw ProfileManagerExceptionT(exc.what());
+  }
 }
 
-void ProfileManagerT::deleteProfile(const std::string & profileFilename) {
-	if (profileFilename.empty()) {
-		throw ProfileManagerExceptionT("No profile filename specified.");
+void ProfileManagerT::deleteProfile(const std::string & profileDirectoryName) {
+	if (profileDirectoryName.empty()) {
+		throw ProfileManagerExceptionT("No profile directory name specified.");
 	}
 
 	std::error_code ec;
-	std::string fullPathToprofileFile = composeFullPath(profileFilename);
+	std::string fullPathToProfileFile = composeFullPath(profileDirectoryName).string();
 
 	// Check if file exists
-	bool exists = std::filesystem::exists(fullPathToprofileFile, ec);
+	bool exists = std::filesystem::exists(fullPathToProfileFile, ec);
 
 	if (ec) {
 		// Error even checking if file is there...
@@ -81,7 +100,7 @@ void ProfileManagerT::deleteProfile(const std::string & profileFilename) {
 	}
 
 	// Delete profile from filesystem
-	std::filesystem::remove(fullPathToprofileFile, ec);
+	std::filesystem::remove(fullPathToProfileFile, ec);
 
 	if (ec) {
 		// Error deleting file...
@@ -92,28 +111,28 @@ void ProfileManagerT::deleteProfile(const std::string & profileFilename) {
 	notifyProfileListChanged();
 
 	// If the deleted one is the currently active profile, clear the active profile.
-	if (mActiveProfileFilename == profileFilename) {
+	if (mActiveProfileDirectoryName == profileDirectoryName) {
 		LOG(debug)
-		<< "ProfileManagerT::deleteProfile... mActiveProfileFilename = "
-				<< mActiveProfileFilename << " == profileFilename = " << profileFilename
+		<< "ProfileManagerT::deleteProfile... mActiveProfileDirectoryName = "
+				<< mActiveProfileDirectoryName << " == profileDirectoryName = " << profileDirectoryName
 				<< " -> clearing active profile..." << std::endl;
 
 		clearActiveProfile();
 	}
 }
 
-void ProfileManagerT::addProfile(const std::string & profileFilename,
+void ProfileManagerT::addProfile(const std::string & profileDirectoryName,
 		const FocusFinderProfileT & newProfile) {
-	if (profileFilename.empty()) {
-		throw ProfileManagerExceptionT("No profile filename specified.");
+	if (profileDirectoryName.empty()) {
+		throw ProfileManagerExceptionT("No profile directory name specified.");
 	}
 
 	// Check if file is there already (how to handle?)
 	std::error_code ec;
-	std::string fullPathToprofileFile = composeFullPath(profileFilename);
+	std::string fullPathToProfileFile = composeFullPath(profileDirectoryName).string();
 
 	// Check if file exists
-	bool exists = std::filesystem::exists(fullPathToprofileFile, ec);
+	bool exists = std::filesystem::exists(fullPathToProfileFile, ec);
 
 	if (ec) {
 		// Error even checking if file is there...
@@ -126,7 +145,7 @@ void ProfileManagerT::addProfile(const std::string & profileFilename,
 
 	// Store to file
 	try {
-		FocusFinderProfileT::save(fullPathToprofileFile, newProfile);
+		FocusFinderProfileT::save(fullPathToProfileFile, newProfile);
 	} catch (FocusFinderProfileExceptionT & exc) {
 		throw ProfileManagerExceptionT(exc.what());
 	}
@@ -135,43 +154,67 @@ void ProfileManagerT::addProfile(const std::string & profileFilename,
 	notifyProfileListChanged();
 }
 
-void ProfileManagerT::updateProfile(const std::string & profileFilename,
+void ProfileManagerT::updateProfile(const std::string & profileDirectoryName,
 		const FocusFinderProfileT & modifiedProfile) {
-	if (profileFilename.empty()) {
-		throw ProfileManagerExceptionT("No profile filename specified.");
+	if (profileDirectoryName.empty()) {
+		throw ProfileManagerExceptionT("No profile directory name specified.");
 	}
 
-	std::string fullPathToprofileFile = composeFullPath(profileFilename);
+	std::string fullPathToProfileFile = composeFullPath(profileDirectoryName).string();
 
 	// Store to file
 	try {
-		FocusFinderProfileT::save(fullPathToprofileFile, modifiedProfile);
+		FocusFinderProfileT::save(fullPathToProfileFile, modifiedProfile);
 	} catch (FocusFinderProfileExceptionT & exc) {
 		throw ProfileManagerExceptionT(exc.what());
 	}
 
 	// In case the updated profile is currently the active one, overwrite the active one with the modified one and notify listeners.
-	if (mActiveProfileFilename == profileFilename) {
+	if (mActiveProfileDirectoryName == profileDirectoryName) {
 		// Set new active profile
 		mActiveProfile.emplace(modifiedProfile);
-		mActiveProfileFilename = profileFilename;
+		mActiveProfileDirectoryName = profileDirectoryName;
 
 		// Notify all listeners about profile change
 		notifyActiveProfileChanged();
 	}
 }
 
-std::vector<std::string> ProfileManagerT::getProfileFilenames() const {
-	std::vector<std::string> profileFilenames;
+std::string ProfileManagerT::getActiveProfileDirectory() const {
+  std::filesystem::path activeProfileDirectory = ProfileManagerT::getProfilesRootDirectory();
 
-	for (auto& p : std::filesystem::directory_iterator(mProfileRootPath)) {
-		auto filePath = p.path();
-		bool isRegularFile = std::filesystem::is_regular_file(p.status());
+  activeProfileDirectory /= mActiveProfileDirectoryName;
+  
+  return activeProfileDirectory;
+}
 
-		if (isRegularFile
-				&& boost::iequals(filePath.extension().c_str(), ".fofi")) {
-			profileFilenames.push_back(filePath.filename());
-		}
-	}
-	return profileFilenames;
+std::filesystem::path ProfileManagerT::getProfilesRootDirectory() {
+  std::filesystem::path profileRootPath = HomeDirectoryFinderT::getHomeDir();
+
+  profileRootPath /= ".fofi";
+  profileRootPath /= "profiles";
+  
+  return profileRootPath;
+}
+
+
+std::vector<std::string> ProfileManagerT::getProfileDirectoryNames() const {
+  std::vector<std::string> profileDirectoryNames;
+  std::error_code ec;
+
+  for (auto& p : std::filesystem::directory_iterator(ProfileManagerT::getProfilesRootDirectory())) {
+
+    auto fullProfileFilePath = p.path();
+    fullProfileFilePath /= PROFILE_CFG_FILENAME;
+
+    bool isDirectory = std::filesystem::is_directory(p.status());
+    bool profileCfgFilePathExists = std::filesystem::exists(fullProfileFilePath, ec);
+    bool profileCfgFileIsRegularFile = std::filesystem::is_regular_file(fullProfileFilePath, ec);
+	
+    if (isDirectory && profileCfgFilePathExists && profileCfgFileIsRegularFile) {
+      profileDirectoryNames.push_back(p.path().filename());
+    }
+
+  }
+  return profileDirectoryNames;
 }

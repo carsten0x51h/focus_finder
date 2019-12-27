@@ -3,6 +3,9 @@
  *
  *  Created on: Apr 12, 2019
  *      Author: devnull
+ *
+ *
+ * TODO: Rename asType() to valueOf()!
  */
 
 #ifndef SOURCE_FOCUS_FINDER_COMMON_INCLUDE_ENUM_HELPER_H_

@@ -33,3 +33,8 @@ gnuplot -e "a=218.591" -e "b=10.5494" -e "c=30005.9" -e "d=-7.35399" -e "i='vcur
 # vcurve3.dat with outlier detection
 #    (x,y)=(30500,22.1), residual=3.37812
 gnuplot -e "a=262.142" -e "b=13.1955" -e "c=30011" -e "d=-9.81638" -e "i='vcurve3.dat'" -e "o='vcurve3_curve_with_outlier_detection.png'" hyperbolic_fit.gplt
+
+
+
+# Trying averaging of parameters
+gnuplot -e "a=262.142" -e "b=13.1955" -e "c=30011" -e "d=-9.81638" -e "i='vcurve3.dat'" -e "o='averaging1.png'" hyperbolic_fit.gplt

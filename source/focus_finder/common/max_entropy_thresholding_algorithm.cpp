@@ -1,6 +1,5 @@
 #include <cmath>
-#include <boost/range/adaptors.hpp>
-#include <boost/range/algorithm.hpp>
+#include <vector>
 
 #include "include/image.h"
 #include "include/logging.h"
@@ -9,6 +8,9 @@
 
 std::string MaxEntropyThresholdingAlgorithmT::getName() const { return "MaxEntropyThresholdingAlgorithmT"; }
 
+// TODO: bitDepth is not required..?! -> remove it...
+// TODO: Supply number of bins at parameter / template parameter?
+// TODO: Supply image type also as template parameter?
 float MaxEntropyThresholdingAlgorithmT::calc(const ImageT & img, long bitDepth) const {
 
   LOG(debug) << "MaxEntropyThresholdingAlgorithmT::calc..." << std::endl;
@@ -24,6 +26,13 @@ float MaxEntropyThresholdingAlgorithmT::calc(const ImageT & img, long bitDepth) 
 	     << ", numBins=" << numBins << ", min=" << min << ", max=" << max
 	     << ", img-dim (w x h)=" << img.width() << " x " << img.height() << std::endl;
 
+  /**
+   * IMPORTANT / IDEA: "Shrink" /map the float image pixel values to 256 possible brightness levels (i.e. 256 histogram bins).
+   * The reason is that the performance of the "max entropy algorithm" strongly depends on the histogram size / number of bins.
+   * Note that the threshold which will be calculated based on this histogram will be the correct one for this "shrinked"
+   * histogram. In order to get the threshold for the initial float image, this transformation needs to be reverted
+   * later (see comment below).
+   */
   cimg_forXY(img, x, y) {
     int idx = (numBins - 1) * (img(x,y)-min) / (max - min);
     ++hist[idx];
@@ -110,6 +119,10 @@ float MaxEntropyThresholdingAlgorithmT::calc(const ImageT & img, long bitDepth) 
     }
   }
 
+  /**
+   * IMPORTANT: The histogram was "shrinked" to 256 values, i.e. float pixel value range was mapped to 256 brightness values.
+   * This "shrinking" step needs to be reverted so that the calculated threshold matches the original float image.
+   */
   float th2 = min + (threshold / numBins) * (max - min);
   
   LOG(debug) << "MaxEntropyThresholdingAlgorithmT::calc...threshold: " << threshold << ", th2: " << th2 << std::endl;

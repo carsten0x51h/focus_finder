@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>960</width>
-    <height>492</height>
+    <height>501</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -221,7 +221,7 @@
               <property name="bottomMargin">
                <number>6</number>
               </property>
-              <item row="0" column="0">
+              <item row="1" column="0">
                <widget class="QLabel" name="label_2">
                 <property name="minimumSize">
                  <size>
@@ -230,22 +230,42 @@
                  </size>
                 </property>
                 <property name="text">
-                 <string>Focus measure limit:</string>
+                 <string>Focus measure limit</string>
                 </property>
                </widget>
               </item>
-              <item row="1" column="0">
+              <item row="2" column="1">
+               <widget class="QSpinBox" name="spinNumFocusCurvesToRecord"/>
+              </item>
+              <item row="2" column="0">
                <widget class="QLabel" name="label">
                 <property name="text">
-                 <string>#Curves to record:</string>
+                 <string>#Curves to record</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QDoubleSpinBox" name="spinFocusMeasureLimit"/>
+              </item>
+              <item row="0" column="0">
+               <widget class="QLabel" name="label_3">
+                <property name="text">
+                 <string>Exposure time [s]</string>
                 </property>
                </widget>
               </item>
               <item row="0" column="1">
-               <widget class="QDoubleSpinBox" name="spinFocusMeasureLimit"/>
-              </item>
-              <item row="1" column="1">
-               <widget class="QSpinBox" name="spinBox"/>
+               <widget class="QDoubleSpinBox" name="spinFocusCurveRecordingExposureTime">
+                <property name="decimals">
+                 <number>1</number>
+                </property>
+                <property name="singleStep">
+                 <double>0.500000000000000</double>
+                </property>
+                <property name="value">
+                 <double>1.000000000000000</double>
+                </property>
+               </widget>
               </item>
              </layout>
             </item>
@@ -354,6 +374,13 @@
       </layout>
      </item>
     </layout>
+   </item>
+   <item row="1" column="0">
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Apply|QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>

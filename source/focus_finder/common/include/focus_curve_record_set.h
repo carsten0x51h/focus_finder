@@ -23,12 +23,13 @@ public:
   FocusMeasureTypeT::TypeE getFocusMeasureType() const;
   float getFocusMeasureLimit() const;
   std::pair<int, int> minmaxFocusPos() const;
+
+  static std::shared_ptr<FocusCurveRecordSetT> load(const boost::property_tree::ptree & pt);
+  static void save(boost::property_tree::ptree & pt, std::shared_ptr<FocusCurveRecordSetT> focusCurveRecordSet);
   
-  std::ostream & print(std::ostream & os) const;
+  std::ostream & print(std::ostream & os, size_t indent = 0) const;
   friend std::ostream & operator<<(std::ostream & os, const FocusCurveRecordSetT & focusCurveRecordSet);
 };
-
-typedef std::list<std::shared_ptr<FocusCurveRecordSetT> > FocusCurveRecordSetContainerT;
 
 #endif /*SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FOCUS_CURVE_RECORD_SET_H_*/
 

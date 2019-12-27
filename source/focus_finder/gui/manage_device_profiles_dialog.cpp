@@ -37,17 +37,17 @@ void ManageDeviceProfilesDialogT::refillProfileList() {
 
 	m_ui->cbxSelectedProfile->clear();
 
-	auto profileFilenames = mFfl.getProfileManager()->getProfileFilenames();
+	auto profileDirectoryNames = mFfl.getProfileManager()->getProfileDirectoryNames();
 
-	std::for_each(profileFilenames.begin(), profileFilenames.end(),
+	std::for_each(profileDirectoryNames.begin(), profileDirectoryNames.end(),
 			[&](const std::string & profileFilename) {
 				m_ui->cbxSelectedProfile->addItem(QString::fromStdString(profileFilename));
 			});
 
 	// Select the currently active profile entry - BEFORE connecting the QT listener...
-	std::string activeProfileFilename = mFfl.getProfileManager()->getActiveProfileFilename();
+	std::string activeProfileDirectoryName = mFfl.getProfileManager()->getActiveProfileDirectoryName();
 
-	int idx = m_ui->cbxSelectedProfile->findText(QString::fromStdString(activeProfileFilename));
+	int idx = m_ui->cbxSelectedProfile->findText(QString::fromStdString(activeProfileDirectoryName));
 
 	m_ui->cbxSelectedProfile->setCurrentIndex(idx);
 
@@ -69,18 +69,18 @@ void ManageDeviceProfilesDialogT::addDevices() {
 	auto activeProfile = mFfl.getProfileManager()->getActiveProfile();
 
 	mCameraPanel = new ManageDeviceEntryPanelT(mFfl, "Camera",
-			(activeProfile ? activeProfile->getCameraName() : DeviceT::NONE));
+			(activeProfile ? activeProfile->getCameraDeviceName() : DeviceT::NONE));
 
 	addDevicePanel(mCameraPanel);
 
 	mFocusPanel = new ManageDeviceEntryPanelT(mFfl, "Focus",
-			(activeProfile ? activeProfile->getFocusName() : DeviceT::NONE));
+			(activeProfile ? activeProfile->getFocusDeviceName() : DeviceT::NONE));
 
 	addDevicePanel(mFocusPanel);
 
 
 	mFilterPanel = new ManageDeviceEntryPanelT(mFfl, "Filter",
-			(activeProfile ? activeProfile->getFilterName() : DeviceT::NONE));
+			(activeProfile ? activeProfile->getFilterDeviceName() : DeviceT::NONE));
 
 	addDevicePanel(mFilterPanel);
 }
@@ -112,22 +112,22 @@ void ManageDeviceProfilesDialogT::onDeleteProfileActionTriggeredSlot() {
 
 	auto profileManager = mFfl.getProfileManager();
 
-	std::string activeProfileFilename = profileManager->getActiveProfileFilename();
+	std::string activeProfileDirectoryName = profileManager->getActiveProfileDirectoryName();
 
-	int result = showDeleteWarningMessage(activeProfileFilename);
+	int result = showDeleteWarningMessage(activeProfileDirectoryName);
 
 	if (result == QMessageBox::Yes) {
 		// TODO: try-catch .. error handling -> UI...
 		// This call results in a callback to "onActiveProfileChangedSlot" which
 		// automatically updates the UI. It also triggers a callback that the
 		// list of profiles has changed whic leads to the call of "onProfileListChangedSlot".
-		profileManager->deleteProfile(activeProfileFilename);
+		profileManager->deleteProfile(activeProfileDirectoryName);
 	}
 }
 
 void ManageDeviceProfilesDialogT::updateMenuStatus() {
-	std::string activeProfileFilename = mFfl.getProfileManager()->getActiveProfileFilename();
-	bool isProfileSelected = (!activeProfileFilename.empty());
+	std::string activeProfileDirectoryName = mFfl.getProfileManager()->getActiveProfileDirectoryName();
+	bool isProfileSelected = (! activeProfileDirectoryName.empty());
 
 	mDeleteProfileAction->setEnabled(isProfileSelected);
 	mSettingsProfileAction->setEnabled(isProfileSelected);
@@ -141,17 +141,17 @@ void ManageDeviceProfilesDialogT::profileToUI(std::optional<FocusFinderProfileT>
 
 	this->setWindowTitle(QString::fromStdString(baseTitle + (profileOpt.has_value() ? profileOpt.value().getName() : notSet)));
 
-	mCameraPanel->setDeviceName(profileOpt.has_value() ? profileOpt.value().getCameraName() : notSet);
-	mFocusPanel->setDeviceName(profileOpt.has_value() ? profileOpt.value().getFocusName() : notSet);
-	mFilterPanel->setDeviceName(profileOpt.has_value() ? profileOpt.value().getFilterName() : notSet);
+	mCameraPanel->setDeviceName(profileOpt.has_value() ? profileOpt.value().getCameraDeviceName() : notSet);
+	mFocusPanel->setDeviceName(profileOpt.has_value() ? profileOpt.value().getFocusDeviceName() : notSet);
+	mFilterPanel->setDeviceName(profileOpt.has_value() ? profileOpt.value().getFilterDeviceName() : notSet);
 
 
 	// Select the currently active profile entry
 	m_ui->cbxSelectedProfile->blockSignals(true);
 
-	std::string activeProfileFilename = mFfl.getProfileManager()->getActiveProfileFilename();
+	std::string activeProfileDirectoryName = mFfl.getProfileManager()->getActiveProfileDirectoryName();
 
-	int idx = m_ui->cbxSelectedProfile->findText(QString::fromStdString(activeProfileFilename));
+	int idx = m_ui->cbxSelectedProfile->findText(QString::fromStdString(activeProfileDirectoryName));
 
 	m_ui->cbxSelectedProfile->setCurrentIndex(idx);
 

@@ -3,31 +3,42 @@
 
 #include <memory>
 #include <tuple>
+#include <chrono>
 
 #include "focus_curve_record.h"
 #include "fwhm.h"
 #include "hfd.h"
 #include "image.h"
 #include "point.h"
+#include "timestamp.h"
 
 class FocusCurveRecordBuilderT {
 private:
-	int mCurrentFocusPos;
-	float mSnr;
-	FwhmT mFwhmHorz;
-	FwhmT mFwhmVert;
-	HfdT mHfd;
-	ImageT mRoiImage;
-	ImageT mCorrectedStarImage;
-	PointFT mAbsStarCenterPos;
-	std::tuple<float, float> mDrift;
+  TimestampT mCreationTimestamp;
+  int mCurrentFocusPos;
+  std::tuple<float, float> mDrift;
+  PointFT mAbsStarCenterPos;
+  std::chrono::duration<float> mExposureTime;
 
+  float mSnr;
+  FwhmT mFwhmHorz;
+  FwhmT mFwhmVert;
+  HfdT mHfd;
+  ImageT mRoiImage;
+  ImageT mCorrectedStarImage;
+  
 public:
 	FocusCurveRecordBuilderT() :
 			mCurrentFocusPos(0), mSnr(0), mAbsStarCenterPos(0, 0), mDrift(0, 0) {
 		// TODO: Automatically sets the creation date and time (?)
 	}
 
+	FocusCurveRecordBuilderT & setCreationTimestamp(TimestampT creationTimestamp) {
+		mCreationTimestamp = creationTimestamp;
+		return (*this);
+	}
+
+  
 	FocusCurveRecordBuilderT & setAbsoluteFocusPos(int currentFocusPos) {
 		mCurrentFocusPos = currentFocusPos;
 		return (*this);
@@ -85,8 +96,15 @@ public:
 				return (*this);
 			}
 
+	FocusCurveRecordBuilderT & setExposureTime(
+			std::chrono::duration<float> exposureTime) {
+		mExposureTime = exposureTime;
+		return (*this);
+	}
+
+  
 	std::shared_ptr<FocusCurveRecordT> build() const {
-		return std::make_shared<FocusCurveRecordT>(mCurrentFocusPos, mSnr,
+	  return std::make_shared<FocusCurveRecordT>(mCreationTimestamp, mCurrentFocusPos, mExposureTime, mSnr,
 				mFwhmHorz, mFwhmVert, mHfd, mRoiImage, mCorrectedStarImage,
 				mAbsStarCenterPos, mDrift);
 	}

@@ -17,7 +17,7 @@
 #include "basedevice.h"
 
 const std::string IndiDeviceManagerT::sDefaultIndiHostname = "localhost";
-int IndiDeviceManagerT::sDefaultIndiPort = 7624;
+const int IndiDeviceManagerT::sDefaultIndiPort = 7624;
 
 IndiDeviceManagerT::IndiDeviceManagerT() {
 	LOG(debug) << "IndiDeviceManagerT::IndiDeviceManagerT()..."

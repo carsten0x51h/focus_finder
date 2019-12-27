@@ -1503,8 +1503,11 @@ LOG(debug) << "exposureRunning: " << exposureRunning << std::endl;
 
     mEditCalibrationDataAction->setEnabled(enableEditCalibrationAction);
 
-    mStartFocusFinderButton->setEnabled(readyForCalibration && hasCalibrationData);
-
+    // NOTE: Problem here is, that disabling the main functionality of this button, also disables the
+    //       menu... Therefore, it is enabled when it is at least ready for calibration. If there
+    //       is no calibration, it is proposed to the user when the button is pressed. Otherwise,
+    //       the focus finder just starts with the calibration available.
+    mStartFocusFinderButton->setEnabled(readyForCalibration);
 
 
     // mManageDeviceProfilesButton - enabled if
@@ -1548,8 +1551,11 @@ MainWindow::MainWindow() :
 	createImageConverterPanel();
 	createFocusCntlPanel();
 	createFilterCntlPanel();
-	createHfdViewPanel();
-	createFwhmViewPanels();
+
+	// TODO: They take too much space this way - find better way...
+	//createHfdViewPanel();
+	//createFwhmViewPanels();
+
 	createFocusFinderMainMenuBar();
 	createStatusBar();
 	createAboutDialog();

@@ -2,16 +2,20 @@ TODO
 ----
 
 -NEXT
-	-Recorder should listen to position events from focuser -> draw a line of current position...
-	-Should Hfd, Fwhm vert, Fwhm horz all be calculated right after recording (during the recording process), or just the one which is needed??
-	-Match the recorded data points and draw the curve!
 
-	-HfdT and FwhmT refactoring! Adapt FwhmT to new curve fitting tmpl,... etc etc etc. -> Use FwhmT instead of HfdT for simulator...
-    -Remove X11 from CMakeLists again!, image.h -> re-enamble display 0!
-	-Erste V-Curve aufnehmen :-)
+	-Store recorded curve on disk (as part of profile)
+	-Impl. operator<< for enums using asStr()?
+	-Handle cancel exception in "focus curve recorder" and "focus finder"
+	-Remove hardcoded exposure times (e.g. in focus curve recorder -> maybe this field should be inegrated also into the focus curve recorder frame!)
+	-Recorder should listen to position events from focuser -> draw a line of current position...
+	-Use stored focus curve / function from prifle in focus finder
+	-Should Hfd, Fwhm vert, Fwhm horz all be calculated right after recording (during the recording process), or just the one which is needed??
+	-AboutDialog -> draw program version on image!
 	-On INDI-Server disconnect (or camera disconnect, or camera device removal), stop exposure
 
+	-Extend curve fitting so that certain parameters can be "fixed" (-> difficult / more effort)
 
+	-Use boost log to filter out logs by component (-> different channels?), 
 
 -MainWindow
 	-Selected POI should overwrite ROI?! (if both are selected?)

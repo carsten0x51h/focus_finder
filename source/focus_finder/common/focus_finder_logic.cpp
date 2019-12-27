@@ -47,6 +47,8 @@ FocusFinderLogicT::FocusFinderLogicT() :
 	//       -> Maybe right in this class. There could be #ifdef statements to distinguish
 	//          between the different OSs. There the one or the other DeviceManager could be
 	//          instantiated and also configured.
+	//
+	// TODO: Port and hostname should not be hardcoded...  
 	auto indiDeviceMgr = std::make_shared<IndiDeviceManagerT>();
 
 	indiDeviceMgr->setHostname("localhost");
@@ -110,7 +112,7 @@ std::shared_ptr<CameraT> FocusFinderLogicT::getCurrentCamera() {
 	auto activeProfile = mProfileManager->getActiveProfile();
 
 	return (activeProfile ?
-			mDeviceManager->getCamera(activeProfile->getCameraName()) :
+			mDeviceManager->getCamera(activeProfile->getCameraDeviceName()) :
 			nullptr);
 }
 
@@ -118,7 +120,7 @@ std::shared_ptr<FocusT> FocusFinderLogicT::getCurrentFocus() {
 	auto activeProfile = mProfileManager->getActiveProfile();
 
 	return (activeProfile ?
-			mDeviceManager->getFocus(activeProfile->getFocusName()) :
+			mDeviceManager->getFocus(activeProfile->getFocusDeviceName()) :
 			nullptr);
 }
 
@@ -126,7 +128,7 @@ std::shared_ptr<FilterT> FocusFinderLogicT::getCurrentFilter() {
 	auto activeProfile = mProfileManager->getActiveProfile();
 
 	return (activeProfile ?
-			mDeviceManager->getFilter(activeProfile->getFilterName()) :
+			mDeviceManager->getFilter(activeProfile->getFilterDeviceName()) :
 			nullptr);
 }
 

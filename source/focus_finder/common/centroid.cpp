@@ -44,7 +44,8 @@ void CentroidT::calcCentroid2ndMoment(const ImageT & inImg,
 	// Find max pixel value and position
 	// TODO: We may use min_max function instead!?
 	double maxValue = 0;
-	int xPosMax = 0, yPosMax = 0;
+	int xPosMax = 0;
+	int yPosMax = 0;
 
 	// TODO: Use CImg max() function?
 	cimg_forXY(inImg, x, y)

@@ -5,9 +5,10 @@
 #include <memory>
 #include <ctime>
 
-#include "fitting_curve_type.h"
+#include "focus_curve_type.h"
 #include "focus_measure_type.h"
 #include "curve_parms.h"
+#include "curve_fit_parms.h"
 #include "curve_function.h"
 #include "curve_fit_summary.h"
 
@@ -17,7 +18,7 @@ class FocusCurveRecordSetT;
 
 class FocusCurveT {
 private:
-  FittingCurveTypeT::TypeE mFocusCurveType;   // < Curve type used to match the focus curve - e.g. HYPERBOLIC
+  FocusCurveTypeT::TypeE mFocusCurveType;   // < Curve type used to match the focus curve - e.g. HYPERBOLIC
   CurveParmsT mCurveParms;                    // < The resulting curve parameters from the match
   CurveFitSummaryT mCurveFitSummary;
 
@@ -35,14 +36,7 @@ private:
   std::shared_ptr<CurveFunctionT> mFocusCurveFunction;
 
 public:
-  static const float EPS_REL;
-  static const float EPS_ABS;
-  static const size_t MAX_NUM_ITER;
-  static const float OUTLIER_BOUNDARY_FACTOR;
-  static const float MAX_ACCEPTED_OUTLIERS_PERC;
-
-  // FittingCurveTypeT::TypeE curveType, const CurveParmsT & curveParms, FocusMeasureTypeT::TypeE focusMeasureType, int lowerFocusPos, int upperFocusPos, float focusMeasureLimit
-  FocusCurveT(std::shared_ptr<const FocusCurveRecordSetT> focusCurveRecordSet, FittingCurveTypeT::TypeE curveType);
+  FocusCurveT(std::shared_ptr<const FocusCurveRecordSetT> focusCurveRecordSet, const CurveFitParmsT & curveFitParms);
   ~FocusCurveT();
   
   float getLowerFocusPos() const;
@@ -58,7 +52,7 @@ public:
 
   std::time_t getDateTime() const;
   FocusMeasureTypeT::TypeE getFocusMeasureType() const;
-  FittingCurveTypeT::TypeE getFocusCurveType() const;
+  FocusCurveTypeT::TypeE getFocusCurveType() const;
   const CurveFitSummaryT & getCurveFitSummary() const;
   const CurveParmsT & getCurveParms() const;
   

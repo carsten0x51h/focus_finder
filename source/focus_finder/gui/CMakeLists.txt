@@ -44,6 +44,10 @@ set(sources
   ../common/focus_controller.cpp
   ../common/include/self_orientation_result.h
   ../common/self_orientation_result.cpp
+  ../common/include/timestamp.h
+  ../common/timestamp.cpp
+  ../common/include/focus_finder_calibration.h
+  ../common/focus_finder_calibration.cpp
   ../common/include/floating_point_equality.h
   ../common/include/quantile.h
   ../common/include/curve_half.h
@@ -74,6 +78,8 @@ set(sources
   ../common/focus_curve_record.cpp
   ../common/include/focus_curve_record_set.h
   ../common/focus_curve_record_set.cpp
+  ../common/include/focus_curve_record_set_container.h
+  ../common/focus_curve_record_set_container.cpp
   ../common/include/focus_curve_recorder_logic.h
   ../common/focus_curve_recorder_logic.cpp
   ../common/include/focus_curve.h
@@ -346,7 +352,9 @@ target_link_libraries(${target}
     indi
     indiclient
     z
+    ${TIFF_LIBRARIES}
     ${DEFAULT_LINKER_OPTIONS}
+    ${Boost_REGEX_LIBRARY}
 )
 
 #   cfitsio

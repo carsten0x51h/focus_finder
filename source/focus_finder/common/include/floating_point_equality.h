@@ -6,7 +6,6 @@
 
 // https://stackoverflow.com/questions/19837576/comparing-floating-point-number-to-zero
 // see Knuth section 4.2.2 pages 217-218
-// TODO: Move to sep. class / header file?
 template <typename T>
 static bool isAlmostEqual(T x, T y) {
   return std::abs(x - y) <= std::numeric_limits<T>::epsilon() * std::abs(x);

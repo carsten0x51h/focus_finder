@@ -4,6 +4,7 @@
 #include <QHBoxLayout>
 #include <QAbstractButton>
 
+
 #include "include/focus_curve_recorder_panel.h"
 #include "include/focus_curve_view_panel.h"
 #include "include/focus_curve_recorder_progress_details_panel.h"
@@ -28,6 +29,7 @@
 
 Q_DECLARE_METATYPE(FocusMeasureTypeT::TypeE)
 Q_DECLARE_METATYPE(FittingCurveTypeT::TypeE)
+Q_DECLARE_METATYPE(FocusCurveTypeT::TypeE)
 Q_DECLARE_METATYPE(std::shared_ptr<FocusCurveRecordSetT>)
 
 
@@ -99,7 +101,13 @@ FocusCurveRecorderPanelT::FocusCurveRecorderPanelT(QWidget * parent, std::shared
     //mFocusCurveRecorderCurveDetailsPanel->setParent(m_ui->wgtDetailsWidget);
     //mFocusCurveRecorderProgressDetailsPanel->startAnimation();
 
+    // Take a copy from the active profile.
+    // TODO: If there is no active profile, the user should not be able to come here...
+    //       However, in that case, all should be disabled. User can just press Ok & Cancel.
+    auto activeProfileOpt = mFocusCurveRecorderLogic->getActiveProfile();
 
+    mActiveProfileTmp = activeProfileOpt.value();
+    
     
     // HACK - REMOVE LATER!
     connect(m_ui->pushButton, & QPushButton::pressed, this, & FocusCurveRecorderPanelT::onPushButtonPressed);
@@ -110,8 +118,8 @@ FocusCurveRecorderPanelT::FocusCurveRecorderPanelT(QWidget * parent, std::shared
 
 void FocusCurveRecorderPanelT::selectDetailView(FocusCurveRecorderDetailViewE detailView)
 {
-  LOG(debug) << "FocusCurveRecorderPanelT::onPushButtonPressed... detailView=" << detailView << std::endl;
-
+  LOG(debug) << "FocusCurveRecorderPanelT::selectDetailView... detailView=" << detailView << std::endl;
+  
   switch (detailView) {
   case SUMMARY:
     mFocusCurveRecorderSummaryDetailsPanel->setVisible(true);
@@ -144,7 +152,7 @@ void FocusCurveRecorderPanelT::selectDetailView(FocusCurveRecorderDetailViewE de
 }
 
 void FocusCurveRecorderPanelT::onPushButtonPressed()
-{
+{ 
   static int idx = 0;
   
   idx = (++idx) % 4;
@@ -190,8 +198,58 @@ FocusCurveRecorderPanelT::~FocusCurveRecorderPanelT()
 
 void FocusCurveRecorderPanelT::reset() {
 
+  // Set "focus curve recording exposure time"
+  auto focusCurveRecordingExposureTime = mActiveProfileTmp.getFocusCurveRecordingExposureTime();
+  m_ui->spinFocusCurveRecordingExposureTime->setValue(focusCurveRecordingExposureTime.count());
+
+  // Set focus measure limit
+  m_ui->spinFocusMeasureLimit->setValue(mActiveProfileTmp.getFocusMeasureLimit());
+
+  // Set num focus curves to record
+  m_ui->spinNumFocusCurvesToRecord->setValue(mActiveProfileTmp.getNumberCurvesToRecord());
+
+  // Fill the focus curve shape...
+  CurveFitParmsT curveFitParms = mActiveProfileTmp.getFocusCurveMatchingParms();
+  FocusCurveTypeT::TypeE focusCurveTypeToSelect = FocusCurveTypeT::fromFittingCurve(curveFitParms.getFittingCurveType());
+
+  m_ui->cbxFocusCurveType->blockSignals(true);
+  m_ui->cbxFocusCurveType->clear();
+
+  for(size_t idx = 0; idx < FocusCurveTypeT::_Count; ++idx) {
+    FocusCurveTypeT::TypeE focusCurveType = static_cast<FocusCurveTypeT::TypeE>(idx);
+
+    QVariant data;
+    data.setValue(focusCurveType);
+    
+    m_ui->cbxFocusCurveType->addItem(QString::fromStdString(FocusCurveTypeT::asStr(focusCurveType)), data);
+  }
+
+  m_ui->cbxFocusCurveType->blockSignals(false);
+
+  // Select the entry from the profile...
+  int idxToSelect = m_ui->cbxFocusCurveType->findText(QString::fromStdString(FocusCurveTypeT::asStr(focusCurveTypeToSelect)));
+  
+  m_ui->cbxFocusCurveType->setCurrentIndex(idxToSelect);
+
+
+  
 }
 
+void FocusCurveRecorderPanelT::on_buttonBox_clicked(QAbstractButton *button)
+{
+  if(button == m_ui->buttonBox->button(QDialogButtonBox::Apply) ){
+    LOG(debug) << "FocusCurveRecorderPanelT::on_buttonBox_clicked... APPLY pressed..." << std::endl;
+    // TODO: Store but don't close
+  }
+  else if(button == m_ui->buttonBox->button(QDialogButtonBox::Ok)) {
+    LOG(debug) << "FocusCurveRecorderPanelT::on_buttonBox_clicked... OK pressed..." << std::endl;
+    // TODO: Store and close
+  }
+  else if (button == m_ui->buttonBox->button(QDialogButtonBox::Cancel)) {
+    LOG(debug) << "FocusCurveRecorderPanelT::on_buttonBox_clicked... CANCEL pressed..." << std::endl;
+    // TODO: Don't store and close
+  }
+}
 
 void FocusCurveRecorderPanelT::onFocusCurveRecordPressed(bool isChecked) {
   LOG(debug) << "FocusCurveRecorderPanelT::onFocusCurveRecordPressed... mFocusCurveRecordButton->isChecked(): " << isChecked << std::endl;
@@ -360,10 +418,29 @@ void FocusCurveRecorderPanelT::onFocusCurveRecordPressed(bool isChecked) {
 void FocusCurveRecorderPanelT::onFocusCurveRecorderRecordSetFinished(std::shared_ptr<FocusCurveRecordSetT> focusCurveRecordSet) {
 	LOG(debug)
 	<< "FocusCurveRecorderPanelT::onFocusCurveRecorderRecordSetFinished..." << std::endl;
-	
+
+
+	// TODO: Remove / replace by real values...
+	const float EPS_REL = 1e-2; // TODO: Do not hardcode
+	const float EPS_ABS = 1e-2; // TODO: Do not hardcode
+	const size_t MAX_NUM_ITER = 10000; // TODO: Do not hardcode?
+	const bool ENABLE_OUTLIER_DETECTION = true;  // TODO: Do not hardcode?
+	const float OUTLIER_BOUNDARY_FACTOR = 1.5F; // TODO: Do not hardcode?
+	const float MAX_ACCEPTED_OUTLIERS_PERC = 20.0F; // TODO: Do not hardcode?
+	const FocusCurveTypeT::TypeE focusCurveType = FocusCurveTypeT::HYPERBOLIC;
+
 	// Match the curve...
-	// TODO: Do not use mFocusCurveRecorderLogic->getFocusCurveType()... use selection from UI!
-	auto focusCurve = std::make_shared<FocusCurveT>(focusCurveRecordSet, mFocusCurveRecorderLogic->getFocusCurveType());
+	CurveFitParmsT curveFitParms(
+				     FocusCurveTypeT::toFittingCurve(focusCurveType),
+				     EPS_REL, /*epsrel*/
+				     EPS_ABS, /*epsabs*/
+				     MAX_NUM_ITER, /*maxnumiter*/
+				     ENABLE_OUTLIER_DETECTION,
+				     OUTLIER_BOUNDARY_FACTOR, /*outlier boundary factor*/
+				     MAX_ACCEPTED_OUTLIERS_PERC /* max. accepted outliers perc. */
+				     );
+
+	auto focusCurve = std::make_shared<FocusCurveT>(focusCurveRecordSet, curveFitParms);
 
 	
 	// HACK TO SEE THE CURVE!

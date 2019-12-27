@@ -44,7 +44,7 @@ FwhmT::FwhmT() : mValid(false) {
 // TODO: Fwhm as template ??
 FwhmT::FwhmT(const std::vector<float> & inValues, double inEpsAbs,
 	double inEpsRel, bool inThrowIfNotValid) {
-  this->set(inValues, inEpsAbs, inEpsRel);
+  this->set(inValues, inEpsAbs, inEpsRel, inThrowIfNotValid);
 }
 
 void FwhmT::set(const std::vector<float> & inValues, double inEpsAbs,
@@ -83,15 +83,18 @@ CurveParmsT FwhmT::fitValues(const std::vector<PointFT> & imgValues, double inEp
 
   try {
     // TODO: Optionally pass in as FwhmParmsT... (put inEpsRel and inEpsAbs in there as well...)
+    // TODO: Include FittingCurveTypeT::TypeE into the curveFitParms - it belongs there since it also determines against what should be fit
     CurveFitParmsT curveFitParms(
+				 FittingCurveTypeT::GAUSSIAN,
 				 inEpsRel, /*epsrel*/
 				 inEpsAbs, /*epsabs*/
 				 10000, /*maxnumiter*/
+				 true, /*enable outlier detection*/
 				 1.5F, /*outlier boundary factor*/
 				 20.0F /* max. accepted outliers perc. */
 				 );
 
-    curveParms = CurveFitAlgorithmT::fitCurve(FittingCurveTypeT::GAUSSIAN, imgValues,
+    curveParms = CurveFitAlgorithmT::fitCurve(imgValues,
 					      curveFitParms,
 					      & curveFitSummary);
 

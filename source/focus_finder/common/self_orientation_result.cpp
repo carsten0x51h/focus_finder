@@ -11,9 +11,10 @@ SelfOrientationResultT::print(std::ostream & os) const {
      << *record1 << std::endl
      << "Record2: " << std::endl
      << *record2;
+
+  return os;
 }
 
 std::ostream & operator<<(std::ostream & os, const SelfOrientationResultT & selfOrientationResult) {
   return selfOrientationResult.print(os);
 }
-

@@ -11,6 +11,9 @@
 // We do not want X11 dependency
 #define cimg_display 0
 
+// See https://stackoverflow.com/questions/3021050/write-tiff-float-images-using-cimg
+#define cimg_use_tiff
+
 #include <CImg.h>
 
 // If X11 is used, the following things need to be undefined because of a conflict with definitions in QT5.

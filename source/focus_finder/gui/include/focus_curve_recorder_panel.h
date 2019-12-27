@@ -18,6 +18,7 @@
 #include "../include/focus_curve_recorder_panel.h"
 
 #include "../../common/include/focus_finder_logic.h"
+#include "../../common/include/focus_finder_profile.h"
 #include "../../common/include/focus_curve_recorder.h"
 
 class FocusCurveViewPanelT;
@@ -54,8 +55,8 @@ public:
 
   void reset();
   void selectDetailView(FocusCurveRecorderDetailViewE detailView);
-
-    signals:
+  
+signals:
   void focusCurveRecorderStartedSignal();
   void focusCurveRecorderNewRecordSignal(std::shared_ptr<FocusCurveRecordT> focusCurveRecord);
   void focusCurveRecorderRecordSetUpdateSignal(std::shared_ptr<FocusCurveRecordSetT> focusCurveRecordSet);
@@ -64,9 +65,12 @@ public:
   void focusCurveRecorderFinishedSignal(std::shared_ptr<const FocusCurveRecordSetContainerT> focusCurveRecordSetContainer);
   void focusCurveRecorderCancelledSignal();
 
+					  
 protected slots:
-	void onPushButtonPressed();
+  void onPushButtonPressed();
+  void on_buttonBox_clicked(QAbstractButton *button);
 
+  
 protected:
     const QScopedPointer<Ui::FocusCurveRecorderPanel> m_ui;
 protected slots:
@@ -74,6 +78,8 @@ protected slots:
   void onFocusCurveTypeSelectionChanged();
 
 private:
+  FocusFinderProfileT mActiveProfileTmp;
+
   QHBoxLayout * getMainToolBar();
 
   void addFocusCurveType(FittingCurveTypeT::TypeE focusCurveType);

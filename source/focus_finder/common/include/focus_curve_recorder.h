@@ -8,6 +8,7 @@
 #include "exception.h"
 
 #include "focus_curve_record_set.h"
+#include "focus_curve_record_set_container.h"
 #include "focus_controller.h"
 
 // DEF_Exception(FocusCurveRecorder);
