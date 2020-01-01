@@ -52,7 +52,7 @@ void IndiUsbDeviceConnectorT::connectInternal() {
 	bool isConnected;
 
 	try {
-		wait_for(isConnOrCancel, 5000ms);
+		wait_for(isConnOrCancel, 10000ms);
 		isConnected = true;
 	} catch (TimeoutExceptionT & exc) {
 		notifyDeviceConnectionTimeout();

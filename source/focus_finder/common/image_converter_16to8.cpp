@@ -9,7 +9,7 @@
 #include <cmath>
 
 ImageConverter16To8T::ImageConverter16To8T() {
-	mLut.resize(std::numeric_limits < uint16_t > ::max());
+	mLut.resize(std::numeric_limits < uint16_t > ::max() + 1);
 }
 
 void ImageConverter16To8T::setMapperFunction(
@@ -18,8 +18,8 @@ void ImageConverter16To8T::setMapperFunction(
 
 	mMapperFunction = mapperFunction;
 
-	mMapperFunction->setSrcRange(0, std::numeric_limits < uint16_t > ::max());
-	mMapperFunction->setDestRange(0, std::numeric_limits<unsigned char>::max());
+	mMapperFunction->setSrcRange(0, std::numeric_limits < uint16_t > ::max() + 1);
+	mMapperFunction->setDestRange(0, std::numeric_limits<unsigned char>::max() + 1);
 
 	updateLut();
 }

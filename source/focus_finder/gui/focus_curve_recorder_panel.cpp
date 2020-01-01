@@ -3,7 +3,7 @@
 #include <QWidget>
 #include <QHBoxLayout>
 #include <QAbstractButton>
-
+#include <QDoubleSpinBox>
 
 #include "include/focus_curve_recorder_panel.h"
 #include "include/focus_curve_view_panel.h"
@@ -79,8 +79,10 @@ FocusCurveRecorderPanelT::FocusCurveRecorderPanelT(QWidget * parent, std::shared
     // Configure setting elements
     /////////////////////////////
 
-    initFocusCurveTypeCombobox();
+    connect(m_ui->cbxFocusCurveType, QOverload<int>::of(&QComboBox::currentIndexChanged),
+	    this, &FocusCurveRecorderPanelT::onFocusCurveTypeSelectionChanged);
 
+    
     // Add progress details panel
     mFocusCurveRecorderSummaryDetailsPanel = new FocusCurveRecorderSummaryDetailsPanelT(m_ui->wgtDetailsWidget, focusCurveRecorderLogic);
     m_ui->layDetailsWidget->addWidget(mFocusCurveRecorderSummaryDetailsPanel, 0/*row*/, 0/*col*/, 1/*rowspan*/, 1/*colspan*/);
@@ -107,6 +109,15 @@ FocusCurveRecorderPanelT::FocusCurveRecorderPanelT(QWidget * parent, std::shared
     auto activeProfileOpt = mFocusCurveRecorderLogic->getActiveProfile();
 
     mActiveProfileTmp = activeProfileOpt.value();
+
+
+    // Add change listeners
+    connect(m_ui->spinFocusCurveRecordingExposureTime,  QOverload<double>::of(& QDoubleSpinBox::valueChanged), this, & FocusCurveRecorderPanelT::onSpinFocusCurveRecordingExposureTimeValueChanged);
+
+    connect(m_ui->spinFocusMeasureLimit, QOverload<double>::of(& QDoubleSpinBox::valueChanged), this, & FocusCurveRecorderPanelT::onSpinFocusMeasureLimitValueChanged);
+
+    connect(m_ui->spinNumFocusCurvesToRecord, QOverload<int>::of(& QSpinBox::valueChanged), this, & FocusCurveRecorderPanelT::onSpinNumFocusCurvesToRecordValueChanged);
+
     
     
     // HACK - REMOVE LATER!
@@ -114,6 +125,25 @@ FocusCurveRecorderPanelT::FocusCurveRecorderPanelT(QWidget * parent, std::shared
 
     
     reset();
+}
+
+void FocusCurveRecorderPanelT::onSpinFocusCurveRecordingExposureTimeValueChanged(double value) {
+  LOG(debug) << "FocusCurveRecorderPanelT::onSpinFocusCurveRecordingExposureTimeValueChanged... value=" << value << std::endl;
+
+  std::chrono::duration<float> d(value);
+  mActiveProfileTmp.setFocusCurveRecordingExposureTime(d);
+}
+
+void FocusCurveRecorderPanelT::onSpinFocusMeasureLimitValueChanged(double value) {
+  LOG(debug) << "FocusCurveRecorderPanelT::onSpinFocusMeasureLimitValueChanged... value=" << value << std::endl;
+
+  mActiveProfileTmp.setFocusMeasureLimit(value);
+}
+
+void FocusCurveRecorderPanelT::onSpinNumFocusCurvesToRecordValueChanged(int value) {
+  LOG(debug) << "FocusCurveRecorderPanelT::onSpinNumFocusCurvesToRecordValueChanged... value=" << value << std::endl;
+
+  mActiveProfileTmp.setNumberCurvesToRecord(value);
 }
 
 void FocusCurveRecorderPanelT::selectDetailView(FocusCurveRecorderDetailViewE detailView)
@@ -161,33 +191,17 @@ void FocusCurveRecorderPanelT::onPushButtonPressed()
   selectDetailView(detailView);  
 }
 
-
-void FocusCurveRecorderPanelT::addFocusCurveType(FittingCurveTypeT::TypeE focusCurveType) {
-  QVariant data;
-  data.setValue(focusCurveType);
-  
-  m_ui->cbxFocusCurveType->addItem(
-				   QString::fromStdString(FittingCurveTypeT::asStr(focusCurveType)),
-				   data
-				   );
-}
-
-void FocusCurveRecorderPanelT::initFocusCurveTypeCombobox() {
-
-  addFocusCurveType(FittingCurveTypeT::HYPERBOLIC);
-  addFocusCurveType(FittingCurveTypeT::PARABOLIC);
-  
-  connect(m_ui->cbxFocusCurveType, QOverload<int>::of(&QComboBox::currentIndexChanged),
-    		this, &FocusCurveRecorderPanelT::onFocusCurveTypeSelectionChanged);
-}
-
 void FocusCurveRecorderPanelT::onFocusCurveTypeSelectionChanged() {
   QVariant cbxData = m_ui->cbxFocusCurveType->currentData();
-  auto focusCurveType = cbxData.value<FittingCurveTypeT::TypeE>();
+  auto focusCurveType = cbxData.value<FocusCurveTypeT::TypeE>();
 
-  LOG(debug) << "FocusCurveRecorderPanelT::onFocusCurveTypeSelectionChanged...focusCurveType=" << FittingCurveTypeT::asStr(focusCurveType) << std::endl;
+  LOG(debug) << "FocusCurveRecorderPanelT::onFocusCurveTypeSelectionChanged...focusCurveType=" << FocusCurveTypeT::asStr(focusCurveType) << std::endl;
 
-  // TODO...
+  CurveFitParmsT curveFitParms = mActiveProfileTmp.getFocusCurveMatchingParms();
+  
+  curveFitParms.setFittingCurveType(FocusCurveTypeT::toFittingCurve(focusCurveType));
+  
+  mActiveProfileTmp.setFocusCurveMatchingParms(curveFitParms);
 }
 
 
@@ -240,6 +254,9 @@ void FocusCurveRecorderPanelT::on_buttonBox_clicked(QAbstractButton *button)
   if(button == m_ui->buttonBox->button(QDialogButtonBox::Apply) ){
     LOG(debug) << "FocusCurveRecorderPanelT::on_buttonBox_clicked... APPLY pressed..." << std::endl;
     // TODO: Store but don't close
+
+    //TODO: Save it and set it as active profile?! or vice versa?
+    //mActiveProfileTmp
   }
   else if(button == m_ui->buttonBox->button(QDialogButtonBox::Ok)) {
     LOG(debug) << "FocusCurveRecorderPanelT::on_buttonBox_clicked... OK pressed..." << std::endl;
@@ -420,26 +437,29 @@ void FocusCurveRecorderPanelT::onFocusCurveRecorderRecordSetFinished(std::shared
 	<< "FocusCurveRecorderPanelT::onFocusCurveRecorderRecordSetFinished..." << std::endl;
 
 
-	// TODO: Remove / replace by real values...
-	const float EPS_REL = 1e-2; // TODO: Do not hardcode
-	const float EPS_ABS = 1e-2; // TODO: Do not hardcode
-	const size_t MAX_NUM_ITER = 10000; // TODO: Do not hardcode?
-	const bool ENABLE_OUTLIER_DETECTION = true;  // TODO: Do not hardcode?
-	const float OUTLIER_BOUNDARY_FACTOR = 1.5F; // TODO: Do not hardcode?
-	const float MAX_ACCEPTED_OUTLIERS_PERC = 20.0F; // TODO: Do not hardcode?
-	const FocusCurveTypeT::TypeE focusCurveType = FocusCurveTypeT::HYPERBOLIC;
+	// // TODO: Remove / replace by real values...
+	// const float EPS_REL = 1e-2; // TODO: Do not hardcode
+	// const float EPS_ABS = 1e-2; // TODO: Do not hardcode
+	// const size_t MAX_NUM_ITER = 10000; // TODO: Do not hardcode?
+	// const bool ENABLE_OUTLIER_DETECTION = true;  // TODO: Do not hardcode?
+	// const float OUTLIER_BOUNDARY_FACTOR = 1.5F; // TODO: Do not hardcode?
+	// const float MAX_ACCEPTED_OUTLIERS_PERC = 20.0F; // TODO: Do not hardcode?
+	// const FocusCurveTypeT::TypeE focusCurveType = FocusCurveTypeT::HYPERBOLIC;
 
-	// Match the curve...
-	CurveFitParmsT curveFitParms(
-				     FocusCurveTypeT::toFittingCurve(focusCurveType),
-				     EPS_REL, /*epsrel*/
-				     EPS_ABS, /*epsabs*/
-				     MAX_NUM_ITER, /*maxnumiter*/
-				     ENABLE_OUTLIER_DETECTION,
-				     OUTLIER_BOUNDARY_FACTOR, /*outlier boundary factor*/
-				     MAX_ACCEPTED_OUTLIERS_PERC /* max. accepted outliers perc. */
-				     );
+	  
+	// // Match the curve...
+	// CurveFitParmsT curveFitParms(
+	// 			     FocusCurveTypeT::toFittingCurve(focusCurveType),
+	// 			     EPS_REL, /*epsrel*/
+	// 			     EPS_ABS, /*epsabs*/
+	// 			     MAX_NUM_ITER, /*maxnumiter*/
+	// 			     ENABLE_OUTLIER_DETECTION,
+	// 			     OUTLIER_BOUNDARY_FACTOR, /*outlier boundary factor*/
+	// 			     MAX_ACCEPTED_OUTLIERS_PERC /* max. accepted outliers perc. */
+	// 			     );
 
+	CurveFitParmsT curveFitParms = mActiveProfileTmp.getFocusCurveMatchingParms();
+	
 	auto focusCurve = std::make_shared<FocusCurveT>(focusCurveRecordSet, curveFitParms);
 
 	

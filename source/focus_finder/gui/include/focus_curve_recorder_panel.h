@@ -69,7 +69,9 @@ signals:
 protected slots:
   void onPushButtonPressed();
   void on_buttonBox_clicked(QAbstractButton *button);
-
+  void onSpinFocusCurveRecordingExposureTimeValueChanged(double value);
+  void onSpinFocusMeasureLimitValueChanged(double value);
+  void onSpinNumFocusCurvesToRecordValueChanged(int value);
   
 protected:
     const QScopedPointer<Ui::FocusCurveRecorderPanel> m_ui;
@@ -82,9 +84,7 @@ private:
 
   QHBoxLayout * getMainToolBar();
 
-  void addFocusCurveType(FittingCurveTypeT::TypeE focusCurveType);
   //void initFocusMeasureCombobox();
-  void initFocusCurveTypeCombobox();
   
   void setBtnIcon(QAbstractButton * btn, const std::string & filename);
   bool deviceCheck() const;
