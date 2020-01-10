@@ -11,7 +11,7 @@ When starting this project there was the following situation: There was a free p
 
 Without understatement this project currently is still in the proof-of-concept phase. That means it is not yet usable. However, if you think this project holds some potential and may be useful for you, or if you maybe work on a similar project, I would be happy to hear your feedback. We might join our efforts and share our experiences and of course any support in the development of this tool is also very welcome!
 
-Please visit my blog https://www.lost-infinity.com for further details. The first article I published about this project can be found here: https://www.lost-infinity.com/fofi-a-free-telescope-focus-finder-software
+Please visit my blog https://www.lost-infinity.com for further details. The first article I published about this project can be found here: https://www.lost-infinity.com/fofi-a-free-automatic-telescope-focus-finder-software
 
 
 build & install
