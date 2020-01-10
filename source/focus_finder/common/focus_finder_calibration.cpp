@@ -19,7 +19,7 @@ FocusFinderCalibrationT::~FocusFinderCalibrationT() {
 
 
 
-const FocusCurveRecordSetContainerT & FocusFinderCalibrationT::getCalibrationData() const {
+FocusCurveRecordSetContainerT & FocusFinderCalibrationT::getCalibrationData() {
   return mFocusCurveRecordSetContainer;
 }
 
@@ -87,7 +87,7 @@ void FocusFinderCalibrationT::setCalibrationData(const FocusCurveRecordSetContai
     auto firstFocusCurveRecord = mFocusCurveRecordSetContainer.front();
 
     // TODO: ENABLE
-    //    mFocusCurve = std::make_shared<FocusCurveT>(firstFocusCurveRecord, curveFitParms);
+    mFocusCurve = std::make_shared<FocusCurveT>(firstFocusCurveRecord, curveFitParms);
   }
 }
 
@@ -107,9 +107,24 @@ std::shared_ptr<FocusCurveT> FocusFinderCalibrationT::getFocusCurve() const {
 
 
 void FocusFinderCalibrationT::save(boost::property_tree::ptree & pt, std::shared_ptr<FocusFinderCalibrationT> focusFinderCalibration) {
-  LOG(debug) << "FocusFinderCalibrationT::save... TODO: Implement..." << std::endl;
+  LOG(debug) << "FocusFinderCalibrationT::save... TODO: Implement further..." << std::endl;
+
+  const FocusCurveRecordSetContainerT & focusCurveRecordSets = focusFinderCalibration->getCalibrationData();
+
+  // Store the focusCurveRecordSets...
+  boost::property_tree::ptree focusCurvesPt;
+
+  for (auto & focusCurveRecordSet : focusCurveRecordSets) {
+    FocusCurveRecordSetT::save(focusCurvesPt, focusCurveRecordSet);
+  }
+  
+  pt.add_child("focus_curves", focusCurvesPt);
+  
+  LOG(debug) << "Finished storing '" << focusCurveRecordSets.size() << "' focus curve record sets..." << std::endl;
 
 
+  
+    
   // This is test code moved from CurveRecorderGUI to here... it was used to test the storing of curve data... parts of it may have to be used somewhere here in the save contect - or somewhere else...
 //   // TODO: REMOVE!!!
 // #include <boost/property_tree/ptree.hpp>

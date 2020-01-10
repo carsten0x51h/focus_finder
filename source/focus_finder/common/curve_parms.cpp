@@ -38,7 +38,7 @@ const CurveParmT & CurveParmsT::get(const std::string & name) const {
 
 	if (iter == mCurveParms.end()) {
 		std::stringstream ss;
-		ss << "Cure parameter with name '" << name << "' not found."
+		ss << "Curve parameter with name '" << name << "' not found."
 				<< std::endl;
 		throw CurveParmExceptionT(ss.str());
 	}

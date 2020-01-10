@@ -23,6 +23,10 @@ std::optional<FocusFinderProfileT> FocusCurveRecorderLogicT::getActiveProfile() 
   return mFfl.getProfileManager()->getActiveProfile();
 }
 
+std::shared_ptr<ProfileManagerT> FocusCurveRecorderLogicT::getProfileManager() const {
+  return mFfl.getProfileManager();
+}
+
   // TODO: Make sure that activeProfile is set...
   //if (!activeProfileOpt) {
   //}

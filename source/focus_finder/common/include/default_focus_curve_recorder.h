@@ -25,6 +25,9 @@ private:
   
   FocusMeasureTypeT::TypeE getLimitFocusMeasureType() const;
   FocusMeasureTypeT::TypeE getCurveFocusMeasureType() const;
+  float getFocusMeasureLimit() const;
+  int getStepSize() const;
+  
   //void cleanup();
   void checkCancelled() const;
   CurveHalfT::TypeE locateStartingPosition();
@@ -32,9 +35,6 @@ private:
 
   std::atomic<bool> mCancelled; // TODO: Still required?
   std::atomic<bool> mIsRunning;
-
-  int mStepSize;
-  float mFocusMeasureLimit;
 
   std::shared_ptr<FocusCurveRecordSetContainerT> mFocusCurveRecordSets;
 

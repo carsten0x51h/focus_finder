@@ -684,7 +684,6 @@ void MainWindow::createExposureButton() {
 void MainWindow::updateExposureTime() {
 
 	if (mCameraDevice) {
-
 		QVariant data = mExposureTimeCbx->currentData();
 
 		auto t = data.value<std::chrono::milliseconds>();
@@ -694,6 +693,19 @@ void MainWindow::updateExposureTime() {
 				<< std::endl;
 
 		mCameraDevice->setExposureTime(t);
+
+
+		// Also store the respective value in the profile
+		auto activeProfileOpt = mFfl.getProfileManager()->getActiveProfile();
+		auto seconds = std::chrono::duration_cast<std::chrono::duration<float> >(t);
+		
+		LOG(debug)
+		<< "MainWindow::updateExposureTime - storing value t=" << seconds.count() << "s to profile..."
+				<< std::endl;
+
+		FocusFinderProfileT activeProfile = activeProfileOpt.value();
+		activeProfile.setExposureTime(seconds);
+		mFfl.getProfileManager()->updateProfile(mFfl.getProfileManager()->getActiveProfileDirectoryName() /*profileDirectoryName*/, activeProfile);
 	}
 }
 
@@ -704,8 +716,9 @@ void MainWindow::onExposureTimeSelectionChangedSlot() {
 }
 
 void MainWindow::updateExposureTimeSelector() {
-	LOG(debug)
-	<< "MainWindow::updateExposureTimeSelector..." << std::endl;
+  // NOTE: This log pollutes the logfile...
+  // LOG(debug)
+  // << "MainWindow::updateExposureTimeSelector..." << std::endl;
 
 	mExposureTimeCbx->blockSignals(true);
 
@@ -728,7 +741,7 @@ void MainWindow::updateExposureTimeSelector() {
     mExposureTimeCbx->setEnabled(enableExposureTimeSelector);
 
 
-	// Fill in exposure time values. Those depend on tne abilities of the camera.
+	// Fill in exposure time values. Those depend on the abilities of the camera.
 	// Get min possible exposure time from camera. Use this value to limit the values
 	// in the cbx.
 	if (mCameraDevice && mCameraDevice->getConnector()->isConnected()) {
@@ -755,10 +768,11 @@ void MainWindow::updateExposureTimeSelector() {
 				stream << std::fixed << std::setprecision(2) << seconds.count()
 						<< "s";
 
-				LOG(debug)
-				<< "MainWindow::updateExposureTimeSelector... adding '"
-						<< stream.str() << "', setting t=" << t.count()
-						<< "ms to CBX userdata." << std::endl;
+				// NOTE: This log pollutes the logfile...
+				// LOG(debug)
+				// << "MainWindow::updateExposureTimeSelector... adding '"
+				// 		<< stream.str() << "', setting t=" << t.count()
+				// 		<< "ms to CBX userdata." << std::endl;
 
 				QVariant data;
 				data.setValue(t);
@@ -768,12 +782,12 @@ void MainWindow::updateExposureTimeSelector() {
 			}
 		}
 
-		mExposureTimeCbx->blockSignals(false);
 
 		// Set selected entry
 		// TODO: This is not so nice...
-		auto cameraExposureTime = mCameraDevice->getExposureTime();
-
+		//auto cameraExposureTime = mCameraDevice->getExposureTime();
+		auto cameraExposureTime = activeProfile.value().getExposureTime();
+		
 		auto seconds =
 				std::chrono::duration_cast<std::chrono::duration<float> >(
 						cameraExposureTime);
@@ -784,6 +798,8 @@ void MainWindow::updateExposureTimeSelector() {
 		int idx = mExposureTimeCbx->findText(
 				QString::fromStdString(stream.str()));
 		mExposureTimeCbx->setCurrentIndex(idx);
+		
+		mExposureTimeCbx->blockSignals(false);
 
 	} else {
 		mExposureTimeCbx->setEnabled(false);

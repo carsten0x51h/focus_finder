@@ -101,8 +101,8 @@ public:
   int getCameraCoolerTargetTemperature() const;
   void setCameraCoolerTargetTemperature(int cameraCoolerTargetTemperature);
 
-  std::chrono::duration<float> getFocusCurveRecordingExposureTime() const;
-  void setFocusCurveRecordingExposureTime(std::chrono::duration<float> focusCurveRecordingExposureTime);
+  std::chrono::duration<float> getExposureTime() const;
+  void setExposureTime(std::chrono::duration<float> exposureTime);
 
 
 
@@ -201,7 +201,7 @@ private:
   int mFocusingFilterPos;
   bool mEnableCameraCooler;
   int mCameraCoolerTargetTemperature;
-  std::chrono::duration<float> mFocusCurveRecordingExposureTime;
+  std::chrono::duration<float> mExposureTime;
 
 
   /**

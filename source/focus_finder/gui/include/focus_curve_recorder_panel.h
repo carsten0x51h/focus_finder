@@ -69,7 +69,6 @@ signals:
 protected slots:
   void onPushButtonPressed();
   void on_buttonBox_clicked(QAbstractButton *button);
-  void onSpinFocusCurveRecordingExposureTimeValueChanged(double value);
   void onSpinFocusMeasureLimitValueChanged(double value);
   void onSpinNumFocusCurvesToRecordValueChanged(int value);
   

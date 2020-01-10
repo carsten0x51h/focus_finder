@@ -148,15 +148,25 @@ std::shared_ptr<FocusCurveRecordT> FocusControllerT::measureFocus() {
 
     try {
 
+      // TODO
       // TODO: Use exposure time set by the user...
+      // TODO
       LOG(debug) << "FocusControllerT::measureFocus... starting exposure..." << std::endl;
 
       size_t numSamples = 3;
       size_t sampleNo = 0;
       ImageT sumImg;
+
+      // TODO: Better pass in the exposure time as parameter? Because Using the following function limits the more generic measureFocus() function to the context of curve recording...
+
+      auto expTime = getFocusFinderProfile().getExposureTime();
+      std::chrono::milliseconds inMs = std::chrono::duration_cast<std::chrono::milliseconds>(expTime);
+
+      LOG(debug) << "FocusControllerT::measureFocus... expTime: " << expTime.count() << " -> inMs: " << inMs.count() << std::endl;
+
       
       while (sampleNo < numSamples) {
-	runExposureBlocking(1000ms);
+	runExposureBlocking(inMs);
 
 	// TODO: Maybe there is a better way...
 	if (sumImg.width() == 0 || sumImg.height() == 0) {
@@ -292,7 +302,7 @@ std::shared_ptr<FocusCurveRecordT> FocusControllerT::measureFocus() {
 
 
 
-      // NOTE / TODO: This only works ifh height() is odd
+      // NOTE / TODO: This only works if height() is odd
       size_t centerIdxHorz = std::floor(
 					innerCorrectedSubFrameImg.height() / 2);
 
@@ -317,6 +327,16 @@ std::shared_ptr<FocusCurveRecordT> FocusControllerT::measureFocus() {
 				      newCentroidOuterRoiCoords.x() + outerRoi.x(),
 				      newCentroidOuterRoiCoords.y() + outerRoi.y());
 
+
+      // If star tracking is enabled, set the new last focus star pos
+      bool starTrackingEnabled = getFocusFinderProfile().getEnableStarAutoTracking();
+
+      if (starTrackingEnabled) {
+	LOG(debug) << "FocusControllerT::measureFocus... Star tracking enabbled... setting focus star position to new centroid position " << newCentroidAbsRoiCoords << std::endl;
+	setLastFocusStarPos(newCentroidAbsRoiCoords);
+      }
+
+
       // Calculate "drift" (movement of center position since last picture
       std::tuple<float, float> drift(
 				     newCentroidAbsRoiCoords.x() - lastFocusStarPos.x(),
@@ -334,6 +354,7 @@ std::shared_ptr<FocusCurveRecordT> FocusControllerT::measureFocus() {
 	.setRoiImage(averageCurrentImage) // Take a copy
 	.setCorrectedStarImage(innerCorrectedSubFrameImg)
 	.setAbsStarCenterPos(newCentroidAbsRoiCoords)
+	.setExposureTime(expTime)
 	.build();
 
       success = true;
@@ -630,7 +651,7 @@ SelfOrientationResultT FocusControllerT::performSelfOrientation() {
   
   // TODO: Should a minimum difference be required?
   // TODO / FIXME!! mFocusMeasureLimit no longer defined... the limiting value depends on the FocusMeasureType! So either the appl. has some good defaults ( can calculate them depending on camera and telescope settings etc., or the user can specify default values for all the focus measures in the profile. Furthermore, this value could simply be supplied as a parameter to this function! Then the selfOrientation function does not care if the value comes from the profile, a pre-calculation or a UI....
-  bool aboveFocusMeasureLimit = (focusMeasure2 > 12.0F/*FIXME!!mFocusMeasureLimit*/);
+  bool aboveFocusMeasureLimit = (focusMeasure2 > 18.0F/*FIXME!!mFocusMeasureLimit*/);
 
   if (focusMeasure2 > focusMeasure1) {
     // We are on the "left" half of the curve

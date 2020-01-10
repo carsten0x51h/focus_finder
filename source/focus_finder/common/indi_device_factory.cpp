@@ -29,11 +29,25 @@ void IndiDeviceFactoryT::readIndiDriverInfo() {
 	// TODO: Do not hardcode filename... This one is for sure different for different OSs
 	//       and installations. Check the kstars implementation of INDI - see ksutils.cpp
 	//       for default paths and indidriver.cpp for loading of driver.xml.
-	//       In kstars a file named Options.h is included everywhere which alos holds a
+	//       In kstars a file named Options.h is included everywhere which holds a
 	//       method "Options::indiDriversDir()". This header file appears to be generated
 	//       somehow at compiletime - at least is does not exist in the repo by default.
 	IndiDriverInfoT driverInfo("/usr/share/indi/drivers.xml");
 
+	// TODO / NOTE:
+	// The code below is from indidriver.cpp (kstars). It shows that *_sk.xml files are skipped.
+	// However, that means, in newer INDI versions, a skeleton file exists which contains all the
+	// properties of the driver (and default values?). Question is, if this file should be read
+	// manually or if INDI will do this automatically.
+	// In addition, things have changed: Now there is one XML file (and sometimes a corresponding *_sk.xml
+	// file) per driver. Therefore, the current implementation of kstars should be checked! 
+	//
+	// libindi 0.7.1: Skip skeleton files
+        // if (fileInfo.fileName().endsWith(QLatin1String("_sk.xml")))
+        //     continue;
+
+
+	
 	for (const auto & devGroup : driverInfo.devGroups()) {
 		for (const auto & dev : devGroup.devices()) {
 			std::string driverName = dev.driver().name();

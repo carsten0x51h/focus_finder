@@ -36,16 +36,28 @@ std::pair<int, int> FocusCurveRecordSetT::minmaxFocusPos() const {
 }
 
 
-void FocusCurveRecordSetT::save(boost::property_tree::ptree & pt, std::shared_ptr<FocusCurveRecordSetT> focusCurveRecordSet) {
-  LOG(debug) << "FocusCurveRecordSetT::save... TODO: Implement..." << std::endl;
+void FocusCurveRecordSetT::save(boost::property_tree::ptree & focusCurvesPt, std::shared_ptr<FocusCurveRecordSetT> focusCurveRecordSet) {
+  LOG(debug) << "FocusCurveRecordSetT::save... Storing " << focusCurveRecordSet->size() << " records..." << std::endl;
+
+  boost::property_tree::ptree recordSetPt;
+
+  for (auto & focusCurveRecord : *focusCurveRecordSet) {
+    FocusCurveRecordT::save(recordSetPt, *focusCurveRecord);    
+  }
+  focusCurvesPt.add_child("record_set", recordSetPt);
+
+  // <record_set creation_timestamp="1574134119">
+  // TODO: focusCurvesPt.put("record_set.<xmlattr>.creation_timestamp", focusCurveRecordSet);
+
 }
 
 
 std::shared_ptr<FocusCurveRecordSetT> FocusCurveRecordSetT::load(const boost::property_tree::ptree & pt) {
 
   //get<FocusMeasureTypeT>()
-  FocusMeasureTypeT::TypeE focusMeasureType = FocusMeasureTypeT::FWHM_AVERAGE; // TODO: LOAD
-  float focusMeasureLimit = 12.0F; // TODO: Load
+  FocusMeasureTypeT::TypeE focusMeasureType = FocusMeasureTypeT::HFD; // TODO: LOAD
+  float focusMeasureLimit = 18.0F; // TODO: Load
+  // TODO: Load creation_timestamp....
   
   auto focusCurveRecordSet = std::make_shared<FocusCurveRecordSetT>(focusMeasureType, focusMeasureLimit);
   

@@ -15,7 +15,7 @@ class FocusFinderCalibrationT {
   FocusFinderCalibrationT();
   ~FocusFinderCalibrationT();
   
-  const FocusCurveRecordSetContainerT & getCalibrationData() const;
+  FocusCurveRecordSetContainerT & getCalibrationData();
   void setCalibrationData(const FocusCurveRecordSetContainerT & focusCurveRecordSetContainer, const CurveFitParmsT & curveFitParms);
 
   bool isValid() const;

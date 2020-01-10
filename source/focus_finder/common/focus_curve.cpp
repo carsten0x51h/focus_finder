@@ -18,9 +18,6 @@ FocusCurveT::FocusCurveT(std::shared_ptr<const FocusCurveRecordSetT> focusCurveR
   // IDEA: The best fiting curve type could later also be determined automatically...
   mFocusCurveType = FocusCurveTypeT::fromFittingCurve(curveFitParms.getFittingCurveType());
   
-  
-  CurveParmsT curveParms;
-
   std::vector<PointFT> fitValues;
   std::vector<PointWithResidualT> outlierValues;
 

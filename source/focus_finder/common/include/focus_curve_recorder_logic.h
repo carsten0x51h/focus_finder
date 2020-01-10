@@ -9,6 +9,7 @@
 #include "focus_curve_record_set.h"
 #include "focus_curve_recorder_type.h"
 
+class ProfileManagerT;
 
 class FocusCurveRecorderLogicT {
  private:
@@ -19,10 +20,12 @@ class FocusCurveRecorderLogicT {
  public:
   FocusCurveRecorderLogicT(FocusFinderLogicT & ffl);
 
+  std::optional<FocusFinderProfileT> getActiveProfile();
+  std::shared_ptr<ProfileManagerT> getProfileManager() const;
+  
   std::shared_ptr<FocusCurveRecorderT> getFocusCurveRecorder();
   void resetFocusCurveRecorder(FocusCurveRecorderTypeT::TypeE focusCurveRecorderType);
 
-  std::optional<FocusFinderProfileT> getActiveProfile();
 };
 
 #endif /*SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FOCUS_CURVE_RECORDER_LOGIC_H_*/

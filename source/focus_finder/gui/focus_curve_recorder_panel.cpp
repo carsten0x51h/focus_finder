@@ -112,8 +112,6 @@ FocusCurveRecorderPanelT::FocusCurveRecorderPanelT(QWidget * parent, std::shared
 
 
     // Add change listeners
-    connect(m_ui->spinFocusCurveRecordingExposureTime,  QOverload<double>::of(& QDoubleSpinBox::valueChanged), this, & FocusCurveRecorderPanelT::onSpinFocusCurveRecordingExposureTimeValueChanged);
-
     connect(m_ui->spinFocusMeasureLimit, QOverload<double>::of(& QDoubleSpinBox::valueChanged), this, & FocusCurveRecorderPanelT::onSpinFocusMeasureLimitValueChanged);
 
     connect(m_ui->spinNumFocusCurvesToRecord, QOverload<int>::of(& QSpinBox::valueChanged), this, & FocusCurveRecorderPanelT::onSpinNumFocusCurvesToRecordValueChanged);
@@ -125,13 +123,6 @@ FocusCurveRecorderPanelT::FocusCurveRecorderPanelT(QWidget * parent, std::shared
 
     
     reset();
-}
-
-void FocusCurveRecorderPanelT::onSpinFocusCurveRecordingExposureTimeValueChanged(double value) {
-  LOG(debug) << "FocusCurveRecorderPanelT::onSpinFocusCurveRecordingExposureTimeValueChanged... value=" << value << std::endl;
-
-  std::chrono::duration<float> d(value);
-  mActiveProfileTmp.setFocusCurveRecordingExposureTime(d);
 }
 
 void FocusCurveRecorderPanelT::onSpinFocusMeasureLimitValueChanged(double value) {
@@ -212,10 +203,6 @@ FocusCurveRecorderPanelT::~FocusCurveRecorderPanelT()
 
 void FocusCurveRecorderPanelT::reset() {
 
-  // Set "focus curve recording exposure time"
-  auto focusCurveRecordingExposureTime = mActiveProfileTmp.getFocusCurveRecordingExposureTime();
-  m_ui->spinFocusCurveRecordingExposureTime->setValue(focusCurveRecordingExposureTime.count());
-
   // Set focus measure limit
   m_ui->spinFocusMeasureLimit->setValue(mActiveProfileTmp.getFocusMeasureLimit());
 
@@ -257,6 +244,13 @@ void FocusCurveRecorderPanelT::on_buttonBox_clicked(QAbstractButton *button)
 
     //TODO: Save it and set it as active profile?! or vice versa?
     //mActiveProfileTmp
+    auto profileManager = mFocusCurveRecorderLogic->getProfileManager();
+    //auto activeProfileOpt = mFocusCurveRecorderLogic->getActiveProfile();
+
+    LOG(debug) << "Updating profile '" << profileManager->getActiveProfileDirectoryName() << "'...";
+
+    profileManager->updateProfile(profileManager->getActiveProfileDirectoryName() /*profileDirectoryName*/,
+				  mActiveProfileTmp);
   }
   else if(button == m_ui->buttonBox->button(QDialogButtonBox::Ok)) {
     LOG(debug) << "FocusCurveRecorderPanelT::on_buttonBox_clicked... OK pressed..." << std::endl;
@@ -458,19 +452,40 @@ void FocusCurveRecorderPanelT::onFocusCurveRecorderRecordSetFinished(std::shared
 	// 			     MAX_ACCEPTED_OUTLIERS_PERC /* max. accepted outliers perc. */
 	// 			     );
 
+
+
+	
+	// Add the recorded record set to the tmp profile
+	// TODO / NOTE: This should not happen here in the GUI! -> Move this to the FocusCurveRecorderLogic! This one will need its own listener!...
+	auto focusFinderCalibration = mActiveProfileTmp.getFocusFinderCalibration(); // std::shared_ptr<FocusFinderCalibrationT> 
+	FocusCurveRecordSetContainerT & focusCurveRecordSetContainer = focusFinderCalibration->getCalibrationData();
+	focusCurveRecordSetContainer.push_back(focusCurveRecordSet);
+
+
+	
+
+	
+
 	CurveFitParmsT curveFitParms = mActiveProfileTmp.getFocusCurveMatchingParms();
-	
-	auto focusCurve = std::make_shared<FocusCurveT>(focusCurveRecordSet, curveFitParms);
 
-	
-	// HACK TO SEE THE CURVE!
-	mFocusCurveViewPanel->drawCurveHack(focusCurve);
-	mFocusCurveRecorderCurveDetailsPanel->setCurveDetails(focusCurve);
+	try {
+	  auto focusCurve = std::make_shared<FocusCurveT>(focusCurveRecordSet, curveFitParms);
+
+	  // Print the calculated curve parms
+	  LOG(info) << "Calculated focus curve parameters: " << std::endl
+		    << *focusCurve << std::endl;
+
+	  // HACK TO SEE THE CURVE!
+	  mFocusCurveViewPanel->drawCurveHack(focusCurve);
+	  mFocusCurveRecorderCurveDetailsPanel->setCurveDetails(focusCurve);
   
-	// HACK TO SEE THE DELTA
-	float relFocusPosBoundary = focusCurve->getRelativeFocusPosBoundary();
-	LOG(debug) << "relFocusPosBoundary: " << relFocusPosBoundary << std::endl;
-
+	  // HACK TO SEE THE DELTA
+	  float relFocusPosBoundary = focusCurve->getRelativeFocusPosBoundary();
+	  LOG(debug) << "relFocusPosBoundary: " << relFocusPosBoundary << std::endl;
+	} catch(CurveFitExceptionT & exc) {
+	  LOG(error) << "Focus curve fitting failed! Reason: " << exc.what() << std::endl;
+	  // TODO: ReportingT....
+	}
 	
 	//TODO: What happens to focusCurve?? -> needs to be drawn......
 	  

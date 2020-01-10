@@ -81,7 +81,7 @@ std::shared_ptr<ImageT> IndiCameraT::convertIndiBlobToCImg(IBLOB* iblob) const {
 
 	} else {
 		LOG(debug) << "Successfully opened TMP file. Writing image to "
-				<< sfn << endl;
+			   << sfn << std::endl;
 
 		// TODO: IDEA - we may do the write below in chunks to have a better
 		//       indication of the porgress.
@@ -92,7 +92,7 @@ std::shared_ptr<ImageT> IndiCameraT::convertIndiBlobToCImg(IBLOB* iblob) const {
 				sizeof(char), iblob->bloblen, sfp);
 
 		LOG(debug) << "bytesWritten: " << bytesWritten << " to file: "
-				<< sfn << endl;
+			   << sfn << std::endl;
 
 		// TODO: Use filesystem::close...
 		fclose(sfp);
@@ -361,6 +361,9 @@ std::chrono::milliseconds IndiCameraT::getMaxExposureTime() const {
 // Exposure related properties
 void IndiCameraT::startExposure() {
 
+  std::chrono::milliseconds dura( 2000 );
+  std::this_thread::sleep_for( dura );
+  
 	if (DeviceConnectionStateT::CONNECTED
 			!= mIndiConnector->getConnectionState()) {
 		// TODO: Maybe better reporting? + return
@@ -438,7 +441,10 @@ std::chrono::milliseconds IndiCameraT::getExposureTime() const {
 
 void IndiCameraT::setExposureTime(
 		const std::chrono::milliseconds & exposureTime) {
-	mExposureTime = exposureTime;
+  mExposureTime = exposureTime;
+  // TODO ! HACK!
+  //using namespace std::chrono_literals;
+  //mExposureTime = 1000ms;
 }
 
 void IndiCameraT::setExposureDelay(

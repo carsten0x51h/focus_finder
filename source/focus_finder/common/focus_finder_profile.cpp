@@ -44,11 +44,11 @@ FocusFinderProfileT::FocusFinderProfileT() :
   mFocusingFilterPos(-1), // TODO: OK?
   mEnableCameraCooler(false),
   mCameraCoolerTargetTemperature(-10),
-  mFocusCurveRecordingExposureTime(1s),
+  mExposureTime(1s),
 
   mLimitFocusMeasureType(FocusMeasureTypeT::HFD),
   mCurveFocusMeasureType(FocusMeasureTypeT::FWHM_AVERAGE),
-  mStepSize(1000), // TODO: Should there be a "valid" default? Or better 0?
+  mStepSize(50), // TODO: Should there be a "valid" default? Or better 0?
   mNumberCurvesToRecord(5),
   mFocusMeasureLimit(10.0F) { // TODO: Depends on focus measure and system...
 
@@ -199,11 +199,11 @@ void FocusFinderProfileT::setCameraCoolerTargetTemperature(int cameraCoolerTarge
   mCameraCoolerTargetTemperature = cameraCoolerTargetTemperature;
 }
 
-std::chrono::duration<float> FocusFinderProfileT::getFocusCurveRecordingExposureTime() const {
-  return mFocusCurveRecordingExposureTime;
+std::chrono::duration<float> FocusFinderProfileT::getExposureTime() const {
+  return mExposureTime;
 }
-void FocusFinderProfileT::setFocusCurveRecordingExposureTime(std::chrono::duration<float> focusCurveRecordingExposureTime) {
-  mFocusCurveRecordingExposureTime = focusCurveRecordingExposureTime;
+void FocusFinderProfileT::setExposureTime(std::chrono::duration<float> exposureTime) {
+  mExposureTime = exposureTime;
 }
 
 
@@ -331,7 +331,7 @@ FocusFinderProfileT FocusFinderProfileT::load(const std::string & fullProfilePat
     profile.setFocusingFilterPos(pt.get(imagingPath + ".focusing_filter_pos", defaults().getFocusingFilterPos()));  // NOTE: -1 = do not change / set
     profile.setEnableCameraCooler(pt.get(imagingPath + ".enable_camera_cooler", defaults().getEnableCameraCooler()));
     profile.setCameraCoolerTargetTemperature(pt.get(imagingPath + ".camera_cooler_target_temperature", defaults().getCameraCoolerTargetTemperature()));
-    profile.setFocusCurveRecordingExposureTime(pt.get(imagingPath + ".focus_curve_recording_exposure_time", defaults().getFocusCurveRecordingExposureTime()));
+    profile.setExposureTime(pt.get(imagingPath + ".exposure_time", defaults().getExposureTime()));
 
     
     /**
@@ -443,7 +443,7 @@ void FocusFinderProfileT::save(const std::string & fullProfilePath, const FocusF
     pt.put<bool>(imagingPath + ".enable_camera_cooler", profile.getEnableCameraCooler());
     pt.put<int>(imagingPath + ".camera_cooler_target_temperature", profile.getCameraCoolerTargetTemperature());
 
-    pt.put<std::chrono::duration<float> >(imagingPath + ".focus_curve_recording_exposure_time", profile.getFocusCurveRecordingExposureTime());
+    pt.put<std::chrono::duration<float> >(imagingPath + ".exposure_time", profile.getExposureTime());
 
 
     /**
@@ -480,9 +480,10 @@ void FocusFinderProfileT::save(const std::string & fullProfilePath, const FocusF
      *   pt.add_child("calibration.data", ptSub);
      *
      */
-    FocusFinderCalibrationT::save(pt, profile.getFocusFinderCalibration());
+    boost::property_tree::ptree calibrationPt;
+    FocusFinderCalibrationT::save(calibrationPt, profile.getFocusFinderCalibration());
+    pt.add_child("profile.calibration", calibrationPt);
 
-    
     
     // Add further fiels which should need to be stored here...
 
@@ -543,7 +544,7 @@ std::ostream & FocusFinderProfileT::print(std::ostream & os, size_t indent) cons
      << prefix << "Focusing filter pos: " << mFocusingFilterPos << std::endl
      << prefix << "Camera cooler enabled: " << (mEnableCameraCooler ? "yes" : "no") << std::endl
      << prefix << "Camera cooler target temperature: " << mCameraCoolerTargetTemperature << std::endl
-     << prefix << "Focus curve recording exposure time[s]: " <<  mFocusCurveRecordingExposureTime.count() << std::endl;
+     << prefix << "Exposure time[s]: " <<  mExposureTime.count() << std::endl;
   
 
   /**

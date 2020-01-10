@@ -25,6 +25,8 @@ IndiUsbDeviceConnectorT::~IndiUsbDeviceConnectorT() {
 
 // NOTE: This call is blocking - until success or timeout
 void IndiUsbDeviceConnectorT::connectInternal() {
+  using namespace std::chrono_literals;
+  
 	std::string deviceName = mIndiBaseDevice->getDeviceName();
 
 	LOG(debug) << "IndiUsbDeviceConnectorT::connectInternal... deviceName='"
@@ -92,6 +94,8 @@ void IndiUsbDeviceConnectorT::connect() {
 
 // NOTE: This call is blocking - until success or timeout
 void IndiUsbDeviceConnectorT::disconnectInternal() {
+    using namespace std::chrono_literals;
+
 	std::string deviceName = mIndiBaseDevice->getDeviceName();
 
 	LOG(debug) << "IndiUsbDeviceConnectorT::disconnectInternal... deviceName='"

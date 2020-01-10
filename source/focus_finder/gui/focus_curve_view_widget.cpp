@@ -73,8 +73,9 @@ void FocusCurveViewWidgetT::drawFocusCurveRecordSet(QPainter * p, const std::vec
 	    
     // Transform coordinates
     QPointF center = transformToScreenCoordinates(focusPos, focusMeasure);
-    
-    LOG(debug) << "FocusCurveViewWidgetT::drawFocusCurveRecordSet... focusPos=" << focusPos << ", focusMeasure=" << focusMeasure << ", width=" << width() << ", draw point (x, y)=" << center.x() << ", " << center.y() << ")." << std::endl;
+
+    // NOTE: This one produces a lot of output...
+    // LOG(debug) << "FocusCurveViewWidgetT::drawFocusCurveRecordSet... focusPos=" << focusPos << ", focusMeasure=" << focusMeasure << ", width=" << width() << ", draw point (x, y)=" << center.x() << ", " << center.y() << ")." << std::endl;
     
     p->setPen(QPen(QBrush(color), 1, Qt::SolidLine));
     p->setBrush(QBrush(QColor(255, 255, 255, 0)));
@@ -102,13 +103,13 @@ void FocusCurveViewWidgetT::drawFocusCurveRecordSets(QPainter * p) {
   if (mFocusCurveHack) {
     const CurveFitSummaryT & curveFitSummary = mFocusCurveHack->getCurveFitSummary();
 
-    LOG(debug) << "FocusCurveViewWidgetT::drawFocusCurveRecordSets... drawing curveFitSummary.matchedDataPoints..." << std::endl;
+    //LOG(debug) << "FocusCurveViewWidgetT::drawFocusCurveRecordSets... drawing curveFitSummary.matchedDataPoints..." << std::endl;
     
     drawFocusCurveRecordSet(p, curveFitSummary.matchedDataPoints, focusFinderProfile, QColor(0, 255, 0, 255));
 
 
     
-    LOG(debug) << "FocusCurveViewWidgetT::drawFocusCurveRecordSets... drawing curveFitSummary.outliers..." << std::endl;
+    //LOG(debug) << "FocusCurveViewWidgetT::drawFocusCurveRecordSets... drawing curveFitSummary.outliers..." << std::endl;
 
     std::vector<PointFT> outlierPoints;
 

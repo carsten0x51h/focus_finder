@@ -1,3 +1,5 @@
+//TODO: Remove hardcoded FocusMeasureType (FWHM_AVERAGE?) and hardcoded LIMIT (12.0?) and LIMIT TYPE!
+
 #include <chrono>
 
 // TODO: Remove, when store() function has been extracted...
@@ -17,6 +19,7 @@
 #include "include/duration_ptree_translator.h"
 
 #include "include/focus_curve_record_builder.h"
+#include "include/image_slicer.h"
 
 FocusCurveRecordT::FocusCurveRecordT(TimestampT creationTimestamp, int currentAbsoluteFocusPos, std::chrono::duration<float> exposureTime, float snr,
 		const FwhmT & fwhmHorz, const FwhmT & fwhmVert, const HfdT & hfd,
@@ -105,104 +108,124 @@ FocusCurveRecordT::print(std::ostream & os, size_t indent) const {
 }
 
 // TODO: This function may be moved out of this class because the dependency to property_tree shoud not be in here... It does not have to be a class member at all! -> Move to a sep. "translator" or "serialization" class... Maybe this should go to a translator function like for the enum? No, because probably this is only for one entry!
-void FocusCurveRecordT::store(const std::filesystem::path & lightFrameDirectoryPath, const FocusCurveRecordT & focusCurveRecord, boost::property_tree::ptree & pt) {
+void FocusCurveRecordT::save(/*const std::filesystem::path & lightFrameDirectoryPath,*/ boost::property_tree::ptree & pt, const FocusCurveRecordT & focusCurveRecord) {
+  boost::property_tree::ptree curveRecordPt;
+  
+  curveRecordPt.put<TimestampT>("<xmlattr>.record_timestamp", focusCurveRecord.getCreationTimestamp());
+  curveRecordPt.put<int>("<xmlattr>.abs_focus_pos", focusCurveRecord.getCurrentAbsoluteFocusPos());
+  //TODO:  curveRecordPt.put<PointFT>("<xmlattr>.star_drift", focusCurveRecord.getDrift());
+  //       -> instead of tuple use pair or create own type for which a translator is/will be defined...
+  curveRecordPt.put<PointFT>("<xmlattr>.abs_star_center_pos", focusCurveRecord.getAbsStarCenterPos());
+  curveRecordPt.put<std::chrono::duration<float> >("<xmlattr>.exposure_time", focusCurveRecord.getExposureTime());
 
+  pt.add_child("curve_record", curveRecordPt);
+  
+
+  
   // // Create directory if it does not exist
   // // TODO: Also the ProfileManager should care about the creation of all required directories... (logic below...)
   // // TODO: Pass std::error_code& ec to handle error instead of throw...
   // std::filesystem::create_directories(lightFrameDirectoryPath);
 
   // // Create frame filename
-  // long msSinceEpoch = std::chrono::duration_cast<std::chrono::milliseconds>(focusCurveRecord.getCreationTimestamp().time_since_epoch()).count();
+  long msSinceEpoch = std::chrono::duration_cast<std::chrono::milliseconds>(focusCurveRecord.getCreationTimestamp().time_since_epoch()).count();
 
-  // std::stringstream ssImgFilename;
-  // ssImgFilename << msSinceEpoch << ".tiff";
+  std::stringstream ssImgFilename;
+  ssImgFilename << msSinceEpoch << ".tiff";
 
+  // TODO: Maybe get rid of the TIFF dependency and store using FITSIO instead. This dependency is there anyway...
   
-  // // Finally, build image file path
-  // std::filesystem::path imgFilePath(lightFrameDirectoryPath);
-  // imgFilePath /= ssImgFilename.str();
-
-  // LOG(debug) << "Storing FocusCurveRecordT image to '" << imgFilePath << "'..." << std::endl;
-
-  // // Save the image
-  // // TODO: Error handling (permissions etc...)
-  // const ImageT & img = focusCurveRecord.getCorrectedStarImage();
-  // img.save_tiff(imgFilePath.string().c_str());
-
   
-  // // Then add the properties to the property tree
-  // pt.put<TimestampT>("curve_record.<xmlattr>.record_timestamp", msSinceEpoch);
-  // pt.put<int>("curve_record.<xmlattr>.abs_focus_pos", focusCurveRecord.getCurrentAbsoluteFocusPos());
-  // // TODO: Store later... -> instead of tuple use pair or create own type for which a translator is/will be defined...
-  // //pt.put<std::tuple<float, float> >("curve_record.<xml_attr>.star_drift", focusCurveRecord.getDrift());
+  // Finally, build image file path
 
-  
-  // // TODO: Why the absolute star center and not the relative one(relative to saved star image?)
-  // // TODO: Is this even required / should this be stored?
-  // //pt.put<PointT<float> >("focus_curve_record.abs_star_center", focusCurveRecord.getAbsStarCenterPos());
+  // HACK!!!! Get this value from the profileMgr... or from the profile itself? Or pass in?...
+  std::string lightFrameDirectoryPath = "/home/devnull/.fofi/profiles/profile_2/calibration/light_frames";
+  // HACK!!!!
+
+  std::filesystem::path imgFilePath(lightFrameDirectoryPath);
+  imgFilePath /= ssImgFilename.str();
+
+  LOG(debug) << "Storing FocusCurveRecordT image to '" << imgFilePath << "'..." << std::endl;
+
+  // Save the image
+  // TODO: Error handling (permissions etc...)
+  const ImageT & img = focusCurveRecord.getCorrectedStarImage();
+  img.save_tiff(imgFilePath.string().c_str());
 }
 
 
 
 std::shared_ptr<FocusCurveRecordT> FocusCurveRecordT::load(const boost::property_tree::ptree & pt /*, const std::filesystem::path & lightFrameDirectoryPath*/) {
 
-    auto record = FocusCurveRecordBuilderT()
-      .setCreationTimestamp(pt.get<TimestampT>("<xmlattr>.record_timestamp"))
-      .setAbsoluteFocusPos(pt.get<int>("<xmlattr>.abs_focus_pos"))
-      .setDrift(pt.get<PointFT>("<xmlattr>.star_drift"))
-      .setAbsStarCenterPos(pt.get<PointFT>("<xmlattr>.abs_star_center_pos"))
-      .setExposureTime(pt.get<std::chrono::duration<float> >("<xmlattr>.exposure_time"))
-      // .setSnr(snr)
-      // .setHorzFwhm(fwhmHorz)
-      // .setVertFwhm(fwhmVert)
-      // .setHfd(hfd)
-      // .setRoiImage(averageCurrentImage) // Take a copy
-      // .setCorrectedStarImage(innerCorrectedSubFrameImg)
-      // .setAbsStarCenterPos(newCentroidAbsRoiCoords)
-      .build();
-
-    // DEBUG START
-    LOG(debug) << "FocusCurveRecordT::load... Loaded FocusCurveRecordT: " << std::endl
-	       << *record
-	       << std::endl;
-    // DEBUG END
-    
-    return record;
+  TimestampT creationTimestamp = pt.get<TimestampT>("<xmlattr>.record_timestamp");
+  
   // Create directory if it does not exist
   // TODO: Also the ProfileManager should care about the creation of all required directories... (logic below...)
   // TODO: Pass std::error_code& ec to handle error instead of throw...
-  //std::filesystem::create_directories(lightFrameDirectoryPath);
-
-
+  //std::filesystem::create_directories(lightFrameDirectoryPath);  
   
   // Create frame filename
-  //long msSinceEpoch = std::chrono::duration_cast<std::chrono::milliseconds>(focusCurveRecord.getDateTime().time_since_epoch()).count();
+  long msSinceEpoch = std::chrono::duration_cast<std::chrono::milliseconds>(creationTimestamp.time_since_epoch()).count();
 
-  // std::stringstream ssImgFilename;
-  // ssImgFilename << msSinceEpoch << ".tiff";
+  std::stringstream ssImgFilename;
+  ssImgFilename << msSinceEpoch << ".tiff";
 
+  // HACK!!!! Get this value from the profileMgr... or from the profile itself? Or pass in?...
+  std::string lightFrameDirectoryPath = "/home/devnull/.fofi/profiles/profile_2/calibration/light_frames";
+  // HACK!!!!
   
   // Finally, build image file path
-  // std::filesystem::path imgFilePath(lightFrameDirectoryPath);
-  // imgFilePath /= ssImgFilename.str();
+  std::filesystem::path imgFilePath(lightFrameDirectoryPath);
+  imgFilePath /= ssImgFilename.str();
 
-  // LOG(debug) << "Storing FocusCurveRecordT image to '" << imgFilePath << "'..." << std::endl;
+  LOG(debug) << "Loading FocusCurveRecordT image from '" << imgFilePath << "'..." << std::endl;
 
-  // // Save the image
-  // // TODO: Error handling (permissions etc...)
-  // ImageT img;eRecord.getCorrectedStarImage();
-  // img.load_tiff(imgFilePath.string().c_str());
+  // Load the image
+  // TODO: Error handling (permissions etc...)
+  ImageT img;
+  try {
+    img.load_tiff(imgFilePath.string().c_str());
+  } catch (cimg_library::CImgIOException & exc) {
+    LOG(error) << "Could not load star image " << imgFilePath.string() << ", problem message: " << exc.what() << std::endl;
+    // TODO: Error reporting.... ReportingT...
+  }
+
+  // Calc FWHMs
+  // NOTE / TODO: This only works if height() is odd
+  size_t centerIdxHorz = std::floor(img.height() / 2);
+  FwhmT fwhmHorz(ImageSlicerT::slice<SliceDirectionT::HORZ>(img, centerIdxHorz));
+
+  // NOTE / TODO: This only works if width() is odd
+  size_t centerIdxVert = std::floor(img.width() / 2);
+  FwhmT fwhmVert(ImageSlicerT::slice<SliceDirectionT::VERT>(img, centerIdxVert));
 
   
-  // Then add the properties to the property tree
-  // TODO: Store later... -> instead of tuple use pair or create own type for which a translator is/will be defined...
-  //pt.put<std::tuple<float, float> >("curve_record.<xml_attr>.star_drift", focusCurveRecord.getDrift());
+  auto record = FocusCurveRecordBuilderT()
+    .setCreationTimestamp(creationTimestamp)
+    .setAbsoluteFocusPos(pt.get<int>("<xmlattr>.abs_focus_pos"))
+    //TODO: .setDrift(pt.get<PointFT>("<xmlattr>.star_drift"))
 
-  
-  // TODO: Why the absolute star center and not the relative one(relative to saved star image?)
-  // TODO: Is this even required / should this be stored?
-  //pt.put<PointT<float> >("focus_curve_record.abs_star_center", focusCurveRecord.getAbsStarCenterPos());
+    // TODO: Why the absolute star center and not the relative one(relative to saved star image?)
+    // TODO: Is this even required / should this be stored?
+    .setAbsStarCenterPos(pt.get<PointFT>("<xmlattr>.abs_star_center_pos"))
+    .setExposureTime(pt.get<std::chrono::duration<float> >("<xmlattr>.exposure_time"))
+
+    .setCorrectedStarImage(img)
+    // .setSnr(snr)
+    .setHorzFwhm(fwhmHorz)
+    .setVertFwhm(fwhmVert)
+    .setHfd(HfdT(img))
+    // .setRoiImage(averageCurrentImage) // Take a copy
+    // .setAbsStarCenterPos(newCentroidAbsRoiCoords)
+    .build();
+
+  // DEBUG START
+  LOG(debug) << "FocusCurveRecordT::load... Loaded FocusCurveRecordT: " << std::endl
+	     << *record
+	     << std::endl;
+  // DEBUG END
+    
+  return record;
 }
 
 

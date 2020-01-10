@@ -25,9 +25,7 @@
 
 DefaultFocusCurveRecorderT::DefaultFocusCurveRecorderT(std::shared_ptr<FocusControllerT> focusController) : FocusCurveRecorderT(focusController),
 													mCancelled(false),
-													mIsRunning(false),
-													mStepSize(1000), // TODO: Not as member, get from profile...
-													mFocusMeasureLimit(12.0F) // TODO: Set from outside! Logic should hold it!
+													mIsRunning(false)
 {
   LOG(debug)
     << "DefaultFocusCurveRecorderT::DefaultFocusCurveRecorderT..." << std::endl;
@@ -67,14 +65,23 @@ FocusMeasureTypeT::TypeE DefaultFocusCurveRecorderT::getCurveFocusMeasureType() 
 }
 
 
+float DefaultFocusCurveRecorderT::getFocusMeasureLimit() const {
+  return getFocusController()->getFocusFinderProfile().getFocusMeasureLimit();
+}
+
+int DefaultFocusCurveRecorderT::getStepSize() const {
+  return getFocusController()->getFocusFinderProfile().getStepSize();
+}
+
+
 CurveHalfT::TypeE DefaultFocusCurveRecorderT::locateStartingPosition() {
   LOG(debug)
     << "DefaultFocusCurveRecorderT::locateStartingPosition..." << std::endl;
 
   SelfOrientationResultT selfOrientationResult = getFocusController()->performSelfOrientation();
-  
-  // Move close to the limiting focus measure (into the determined direction, in steps of size mStepSize)
-  getFocusController()->boundaryScanLinear(selfOrientationResult, mStepSize, mFocusMeasureLimit);
+
+  // Move close to the limiting focus measure (into the determined direction)
+  getFocusController()->boundaryScanLinear(selfOrientationResult, getStepSize(), getFocusMeasureLimit());
 
   return selfOrientationResult.curveHalf;
 }
@@ -87,7 +94,7 @@ std::shared_ptr<FocusCurveRecordSetT> DefaultFocusCurveRecorderT::recordFocusCur
   LOG(debug)
     << "DefaultFocusCurveRecorderT::recordFocusCheckpoints..." << std::endl;
 
-  auto focusCurveRecordSet = std::make_shared<FocusCurveRecordSetT>(getCurveFocusMeasureType(), mFocusMeasureLimit);
+  auto focusCurveRecordSet = std::make_shared<FocusCurveRecordSetT>(getCurveFocusMeasureType(), getFocusMeasureLimit());
 
   // Store recorded focus curve record set
   mFocusCurveRecordSets->push_back(focusCurveRecordSet);
@@ -109,7 +116,7 @@ std::shared_ptr<FocusCurveRecordSetT> DefaultFocusCurveRecorderT::recordFocusCur
   do {
     notifyFocusCurveRecorderRecordSetUpdate(focusCurveRecordSet);
 
-    getFocusController()->moveFocusByBlocking(recordingDirection, mStepSize, 30000ms);
+    getFocusController()->moveFocusByBlocking(recordingDirection, getStepSize(), 30000ms);
     
     notifyFocusCurveRecorderProgressUpdate(-1, "Recording curve...", curveRecord);
 
@@ -123,12 +130,12 @@ std::shared_ptr<FocusCurveRecordSetT> DefaultFocusCurveRecorderT::recordFocusCur
 
     checkCancelled();
 
-    continueRecording = (focusCurveRecordSet->size() < 3 || curveRecord->getFocusMeasure(getLimitFocusMeasureType()) < mFocusMeasureLimit);
+    continueRecording = (focusCurveRecordSet->size() < 3 || curveRecord->getFocusMeasure(getLimitFocusMeasureType()) < getFocusMeasureLimit());
     
     LOG(debug) << "DefaultFocusCurveRecorderT::recordFocusCurveRecordSet - getLimitFocusMeasureType()="
 	       << FocusMeasureTypeT::asStr(getLimitFocusMeasureType())
 	       << ", focusMeasure=" << curveRecord->getFocusMeasure(getLimitFocusMeasureType()) 
-	       << ", mFocusMeasureLimit=" << mFocusMeasureLimit
+	       << ", focusMeasureLimit=" << getFocusMeasureLimit()
 	       << ", continueRecording=" << continueRecording << std::endl;
     
     // Just avoid a stop for the first 2 measurements in case the focus measure limit condition may not be true because of noise. 
