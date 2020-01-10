@@ -1,66 +1,18 @@
-TODO: FOCUS_FINDER
-FoFi - FocusFinder - kleiner Professor dreht an Kurben und sitzt auf Teleskop..
+focus_finder
+============
 
+This project is about an automatic focus finder software for telescopes. It targets the Linux platform in the first run.
 
-----------------------------------------------------------------------------------------------------------------------------
+The software aims to support the amateur astronomer (and especially astrophotographer) with one of the most critical but also most annoying tasks: Finding the best focus position for the camera. The main goal is to provide a free and easy to use software that just does the job - automatically.
 
-astro_tools
-===========
+With a given configuration it should also be possible to execute "FoFi" from the command-line without requiring any user interaction. This way you can include a call to the Focus Finder into a script. This might be useful if the entire observation process should be automatized and you want to re-focus from time to time to compensate the temperature drift. 
 
-TODO
+When starting this project there was the following situation: There was a free piece of software for automatically finding the "best" focus of the telescope: FocusMax. Steve Brady and Larry Weber developed it and offered it to the public in 2001. Meanwhile there is version 4 of this software available but as far as I was able to see it is no longer free. Instead CCDWare now offers it.
 
-Helpful astronomy tools.
+Without understatement this project currently is still in the proof-of-concept phase. That means it is not yet usable. However, if you think this project holds some potential and may be useful for you, or if you maybe work on a similar project, I would be happy to hear your feedback. We might join our efforts and share our experiences and of course any support in the development of this tool is also very welcome!
 
+Please visit my blog https://www.lost-infinity.com for further details. The first article I published about this project can be found here: https://www.lost-infinity.com/fofi-a-free-telescope-focus-finder-software
 
-The idea of astro_tools came up when certain tasks during my
-astrophotography sessions came up again and again. Since I am using
-Linux, the support for certain tools was not yet as good as for windows.
-One thing which was especially interesting was a tool that automatically
-finds the best focus position of the camera plugged to the telescope.
-Furthermore I wanted to have a kind of sequencer where I can script the
-different tasks which are to be done during the night. I liked the idea
-of having an automatic re-focusing from time to time - for example
-between each frame or when the temperature has changed significantly.
-In addition, certain actions should also be available via a commandline
-interface.
-Later I plan do add a Qt and/or web based GUI for this program.
-To control the astronomical devices I use the INDI library.
-For image processing I use CCfits and CIMG.
-
-
-----------------------------------------------------------------------------------------------------------------------------
-
-C++ INDI client library
-
-The library wraps some of the libindi client functionality and extends it by the following features:
-   * TODO
-   *
-   *
-
-Known problems
---------------
-
--Compiling with clang-3.8 results in an undefined reference error (but works with gcc-6.3):
-	  indi_device_test.C:81: undefined reference to `libindiclientpp::VecPropT<libindiclientpp::SwitchTraitsT>
-	  libindiclientpp::IndiDeviceT::getVecProp<libindiclientpp::SwitchTraitsT>(std::__cxx11::basic_string<char,
-	  std::char_traits<char>, std::allocator<char> > const&)'
-
-
-The following directories exist in the project
-  * TODO
-
-
-Development & Build & Install
-
-github:  TODO: clone...
-
-
-Dependencies
-
-For compiling
--libqgis-dev
--TODO: indi...
--TODO: Add libqgis to cmake...
 
 build & install
 ---------------
@@ -114,11 +66,8 @@ build & install
 
 	3. Build the project.
 
-		cmake --build . -- [all|clean|test|doc]
+		cmake --build . -- all
 
-		or
-
-		scan-build cmake --build . -- [all|clean|test|doc]
 
 	4. Run the tests manually (optional)
 	       export LSAN_OPTIONS=suppressions=../suppr.txt
@@ -126,30 +75,17 @@ build & install
 
 	       cd build
 	       cmake --build . -- test
-
-	       TODO: Add LSAN_OPTIONS=suppressions=../suppr.txt somehow to CMakeLists.txt.....
 	       
 
-	5. Install
-	
-	       TODO: make install
-
-
-	6. Create packages (optional)
-	       cd build
-	       cmake --build . -- pack
-	       
-
-Running examples
-----------------
+Running focus_finder
+--------------------
 
 	1. Start indiserver with filter wheel simulator:
 
-	indiserver -vv /usr/bin/indi_simulator_wheel /usr/bin/indi_simulator_telescope /usr/bin/indi_simulator_ccd /usr/bin/indi_simulator_focus
+	indiserver -v /usr/bin/indi_simulator_wheel /usr/bin/indi_simulator_telescope /usr/bin/indi_simulator_ccd /usr/bin/indi_simulator_focus
 
+	2. Run focus finder GUI application from the build directory:
 
-	2. Run the filter wheel client - e.g. from the build directory:
-
-	./filter_wheel_cmdd --device="Filter Simulator" --set=3
+	./focus_finder_guid
 
 

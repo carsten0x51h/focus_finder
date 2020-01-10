@@ -1,8 +1,10 @@
 /*****************************************************************************
  *
- *  FocusFinder
+ *  FoFi - A free, automatic telescope focus finder.
  *
- *  Copyright(C) 2015 Carsten Schmitt <c.schmitt51h@gmail.com>
+ *  Copyright(C) 2019 Carsten Schmitt <c.schmitt51h@gmail.com>
+ *
+ *  More info on https://www.lost-infinity.com
  *
  *  This program is free software ; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by

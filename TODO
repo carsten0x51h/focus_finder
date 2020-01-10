@@ -2,7 +2,7 @@ TODO
 ----
 
 -NEXT
-
+	-Remove Core-Dump at exit (double free)
 	-Store recorded curve on disk (as part of profile)
 	-Impl. operator<< for enums using asStr()?
 	-Handle cancel exception in "focus curve recorder" and "focus finder"
@@ -44,3 +44,39 @@ TODO
 -Implement binning - dummy camera, selection in GUI, etc.
 -3D star profile - see example
     -https://doc.qt.io/qt-5/qtdatavisualization-surface-example.html
+
+-LP
+    -Always display last "corrected" star image im "focus curve recorder"
+    -Remove camera delay hack -> hardcoded 1s exposure time... was 0 for some reason, check if "repeat checkbox" has any effect when recording a curve...
+    -atik driver now has it's own xml file - not only drivers.xml any longer... check INDI...
+    -Camera error handling - e.g. when setting a 0 as exposure time, no obvious feedback is given to the user / progress wheel continues running.... but there was an error message in the log
+    -"Image stretcher" sometimes shows black stars... and linear scaling is more or less useless
+    -Star detection algorithm often shows that there are 7 or 8 stars selected -> max-entropy binarization fails -> clustering does not work reliable
+    -Fails with "Insufficient data points" exc. even before one can press save / apply!
+    -One place to set the "Focus measure limit"! In the GUI! -> profile!
+    -Do not calculate all values (FwhmT & HFD) by default when loading the curve record (and also not when recording). Just calc the one which is/was requested
+    -Display curve problem: change of pos is small, curve appears like a line... -> auto scale...
+
+    -Problematic curve with simulator:
+        --- FocusCurveT ---
+           > Focus measure type: FWHM_AVERAGE
+           > Focus measure limit: 12
+           > Fitting curve type: HYPERBOLIC
+           > Curve parms: A_IDX = 3.05521
+              B_IDX = 0.000517702
+              C_IDX = 40835.7
+              D_IDX = 3.74167
+           > [minPos, maxPos]=[25000, 48000]
+
+After running again, it worked...:
+           [2020-01-07 21:45:53.288767]: Calculated focus curve parameters: 
+           --- FocusCurveT ---
+              > Focus measure type: FWHM_AVERAGE
+              > Focus measure limit: 12
+              > Fitting curve type: HYPERBOLIC
+              > Curve parms: A_IDX = 33060.9
+                 B_IDX = 39.7046
+                 C_IDX = 36493.3
+                 D_IDX = -36.5154
+              > [minPos, maxPos]=[25000, 48000]
+
