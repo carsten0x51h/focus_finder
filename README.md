@@ -17,75 +17,73 @@ Please visit my blog https://www.lost-infinity.com for further details. The firs
 build & install
 ---------------
 
-	1. Go to the build directory (should be empty):
+1. Go to the build directory (should be empty):
 
-	cd libindiclient++/build
+cd focus_finder/build
 
 
-	2. Call cmake .. from the build directory to generate the build environment for your operating system.
-	   The parameter -D allows passing parameters to cmake. They are completely optional.
-	   Below is the lost of the supported options. The first one is always the _default_.
+2. Call cmake .. from the build directory to generate the build environment for your operating system.
+   The parameter -D allows passing parameters to cmake. They are completely optional.
+   Below is the lost of the supported options. The first one is always the _default_.
 
-	   In order to set the desired compiler use your environment variables - for clang e.g.
+   In order to set the desired compiler use your environment variables - for clang e.g.
 	   
-	   export CC=clang
-	   export CXX=clang++
+   export CC=clang
+   export CXX=clang++
 
-	   NOTE: You can use clang "scan-build" in front of the cmake call to perform static code analysis during the build.
-	   	 In this case the environmental variables CCC_CC and CCC_CXX can be set to tell the ccc-analyzer which compiler
-		 should actually be used to build the source (see here: http://btorpey.github.io/blog/2015/04/27/static-analysis-with-clang/).
-		 
-	   cmake .. [-DOPTION_BUILD_DOC = OFF | ON]
-	   	    [-DOPTION_BUILD_TESTS = ON | OFF]
-		    [-DOPTION_BUILD_EXAMPLES = OFF | ON]
-		    [-DBUILD_SHARED_LIBS = ON | OFF]
-	            [-DCMAKE_BUILD_TYPE = RELEASE | DEBUG | COVERAGE | PERF]
-		    [-DCMAKE_VERBOSE_MAKEFILE = OFF | ON]
-		    [-DOPTION_ENABLE_CLANG_TIDY = ON | OFF]
-		    [-DCMAKE_CXX_CLANG_TIDY = "clang-tidy;-checks=-*,readability-*"]
-		    [-DCMAKE_C_COMPILER = clang | gcc]
-		    [-DCMAKE_CXX_COMPILER = clang++ | g++]
-		 
-	   Examples:
+   NOTE: You can use clang "scan-build" in front of the cmake call to perform static code analysis during the build.
+   	 In this case the environmental variables CCC_CC and CCC_CXX can be set to tell the ccc-analyzer which 
+	 compiler should actually be used to build the source (see here: http://btorpey.github.io/blog/2015/04/27/static-analysis-with-clang/).
 
-	      a. Build with debug flags displaying make commands. Furthermore use clang++-7 as C++ compiler and clang-7 as C compiler:
+   cmake .. [-DOPTION_BUILD_DOC = OFF | ON]
+   	    [-DOPTION_BUILD_TESTS = ON | OFF]
+	    [-DOPTION_BUILD_EXAMPLES = OFF | ON]
+	    [-DBUILD_SHARED_LIBS = ON | OFF]
+            [-DCMAKE_BUILD_TYPE = RELEASE | DEBUG | COVERAGE | PERF]
+	    [-DCMAKE_VERBOSE_MAKEFILE = OFF | ON]
+	    [-DOPTION_ENABLE_CLANG_TIDY = ON | OFF]
+	    [-DCMAKE_CXX_CLANG_TIDY = "clang-tidy;-checks=-*,readability-*"]
+	    [-DCMAKE_C_COMPILER = clang | gcc]
+	    [-DCMAKE_CXX_COMPILER = clang++ | g++]
+	 
+   Examples:
+	a. Build with debug flags displaying make commands. Furthermore use clang++-7 as C++ compiler and clang-7 as C compiler:
 
-	            cmake .. -DCMAKE_BUILD_TYPE=DEBUG -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -DCMAKE_CXX_COMPILER=clang++-7 -DCMAKE_C_COMPILER=clang-7
+		cmake .. -DCMAKE_BUILD_TYPE=DEBUG -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -DCMAKE_CXX_COMPILER=clang++-7 -DCMAKE_C_COMPILER=clang-7
 
-		    or
+		or
 
-		    cmake .. -DCMAKE_BUILD_TYPE=DEBUG -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -DCMAKE_CXX_COMPILER=g++-9 -DCMAKE_C_COMPILER=gcc-9
+		cmake .. -DCMAKE_BUILD_TYPE=DEBUG -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -DCMAKE_CXX_COMPILER=g++-9 -DCMAKE_C_COMPILER=gcc-9
 
-	      b. Or, build with "perf" measurment flags
+	b. Or, build with "perf" measurment flags
 
-		    cmake .. -DCMAKE_BUILD_TYPE=PERF
+		cmake .. -DCMAKE_BUILD_TYPE=PERF
 
 
-	      c. Or, build with with examples using g++/gcc
-		    cmake .. -DCMAKE_BUILD_TYPE=DEBUG -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -DOPTION_BUILD_EXAMPLES=ON -DCMAKE_CXX_COMPILER=g++ -DCMAKE_C_COMPILER=gcc
+	c. Or, build with with examples using g++/gcc
 
-	3. Build the project.
+		cmake .. -DCMAKE_BUILD_TYPE=DEBUG -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -DOPTION_BUILD_EXAMPLES=ON -DCMAKE_CXX_COMPILER=g++ -DCMAKE_C_COMPILER=gcc
+
+3. Build the project.
 
 		cmake --build . -- all
 
 
-	4. Run the tests manually (optional)
-	       export LSAN_OPTIONS=suppressions=../suppr.txt
-	       export ASAN_SYMBOLIZER_PATH=/usr/bin/llvm-symbolizer
+4. Run the tests manually (optional)
+	export LSAN_OPTIONS=suppressions=../suppr.txt
+	export ASAN_SYMBOLIZER_PATH=/usr/bin/llvm-symbolizer
 
-	       cd build
-	       cmake --build . -- test
+	cd build
+	cmake --build . -- test
 	       
 
 Running focus_finder
 --------------------
 
-	1. Start indiserver with filter wheel simulator:
+1. Start indiserver with filter wheel simulator:
 
-	indiserver -v /usr/bin/indi_simulator_wheel /usr/bin/indi_simulator_telescope /usr/bin/indi_simulator_ccd /usr/bin/indi_simulator_focus
+indiserver -v /usr/bin/indi_simulator_wheel /usr/bin/indi_simulator_telescope /usr/bin/indi_simulator_ccd /usr/bin/indi_simulator_focus
 
-	2. Run focus finder GUI application from the build directory:
+2. Run focus finder GUI application from the build directory:
 
-	./focus_finder_guid
-
-
+./focus_finder_guid
