@@ -151,8 +151,9 @@ void FocusCurveRecorderProgressDetailsPanelT::setButtonIcon(int /*frame*/)
   m_ui->lblFocusingAnimation->setPixmap(mMovie->currentPixmap());
 }
 
-void FocusCurveRecorderProgressDetailsPanelT::setCorrectedStarImage(const QString & totalProgressText)
-{
-  m_ui->lblCorrectedStarImage->...; Or use HfdViewPanelT? Or create a more generic StarViewPanelT? Which is used by HfdViewPanelT? Two different cases for HFD and FWHM? - at least only show the one which is used... otherwise it is confusing... So: For FWHM, show both FWHMs and the star image. For HFD just show the "all-in-one HFD" panel... 
-}
+// TODO
+// void FocusCurveRecorderProgressDetailsPanelT::setCorrectedStarImage(const QString & totalProgressText)
+// {
+//   m_ui->lblCorrectedStarImage->...; Or use HfdViewPanelT? Or create a more generic StarViewPanelT? Which is used by HfdViewPanelT? Two different cases for HFD and FWHM? - at least only show the one which is used... otherwise it is confusing... So: For FWHM, show both FWHMs and the star image. For HFD just show the "all-in-one HFD" panel... 
+// }
 
