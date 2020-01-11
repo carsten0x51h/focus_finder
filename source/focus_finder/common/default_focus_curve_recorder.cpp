@@ -55,7 +55,32 @@ DefaultFocusCurveRecorderT::DefaultFocusCurveRecorderT(std::shared_ptr<FocusCont
     << "DefaultFocusCurveRecorderT::DefaultFocusCurveRecorderT..." << std::endl;
 
   mFocusCurveRecordSets = std::make_shared<FocusCurveRecordSetContainerT>();
+
+
+  // Hand focus controller events through
+  getFocusController()->registerFocusControllerProgressUpdateListener(
+								      boost::bind(&DefaultFocusCurveRecorderT::onFocusControllerProgressUpdate,
+										  this, _1, _2, _3)
+								      );
+  getFocusController()->registerFocusControllerNewRecordListener(boost::bind(&DefaultFocusCurveRecorderT::onFocusControllerNewRecord,
+									     this, _1)
+								 );
 }
+    
+void DefaultFocusCurveRecorderT::onFocusControllerProgressUpdate(float progress,
+								 const std::string & msg, std::shared_ptr<FocusCurveRecordT> focusCurveRecord)
+{
+  LOG(debug) << "DefaultFocusCurveRecorderT::onFocusControllerProgressUpdate... handing through FocusControllerProgressUpdate..." << std::endl;
+
+  notifyFocusCurveRecorderProgressUpdate(progress, msg, focusCurveRecord);
+}
+
+void DefaultFocusCurveRecorderT::onFocusControllerNewRecord(std::shared_ptr<FocusCurveRecordT> focusCurveRecord) {
+  LOG(debug) << "DefaultFocusCurveRecorderT::onFocusControllerNewRecord... handing through FocusControllerNewRecord..." << std::endl;
+
+  notifyFocusCurveRecorderNewRecord(focusCurveRecord);
+}
+
 
 std::string DefaultFocusCurveRecorderT::getName() const {
 	return "DefaultFocusCurveRecorderT";

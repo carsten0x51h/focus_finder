@@ -33,7 +33,6 @@
 
 #include "../include/hfd_view_widget.h"
 
-#include "../../common/include/focus_finder_logic.h"
 #include "../../common/include/hfd.h"
 
 namespace Ui {
@@ -52,7 +51,7 @@ public:
     *  @brief
     *    Constructor
     */
-	HfdViewPanelT(QWidget * parent, FocusFinderLogicT & ffl);
+	HfdViewPanelT(QWidget * parent);
 
     /**
     *  @brief
@@ -71,7 +70,6 @@ protected:
 	const QScopedPointer<Ui::HfdViewPanel> m_ui;
 
 private:
-	FocusFinderLogicT & mFfl;
 	HfdViewWidgetT * mHfdWidget;
 };
 

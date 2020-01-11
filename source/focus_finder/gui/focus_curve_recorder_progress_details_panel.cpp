@@ -28,9 +28,11 @@
 #include <QMovie>
 
 #include "include/focus_curve_recorder_progress_details_panel.h"
+#include "include/hfd_view_panel.h"
 
 #include "../common/include/logging.h"
 #include "../common/include/focus_curve_recorder_logic.h"
+#include "../common/include/focus_curve_record.h"
 
 #include "ui_focus_curve_recorder_progress_details_panel.h"
 
@@ -69,6 +71,11 @@ FocusCurveRecorderProgressDetailsPanelT::FocusCurveRecorderProgressDetailsPanelT
     	connect(mMovie, SIGNAL(finished()), mMovie, SLOT(start()));
     }
 
+
+    // Add focus measure panel
+    // TODO: Not only HFD in the future.... displayed view depends on selected focus measure...
+    mHfdViewPanel = new HfdViewPanelT(m_ui->widgetFocusMeasure);
+    
     
     reset();
 }
@@ -152,8 +159,13 @@ void FocusCurveRecorderProgressDetailsPanelT::setButtonIcon(int /*frame*/)
 }
 
 // TODO
-// void FocusCurveRecorderProgressDetailsPanelT::setCorrectedStarImage(const QString & totalProgressText)
-// {
-//   m_ui->lblCorrectedStarImage->...; Or use HfdViewPanelT? Or create a more generic StarViewPanelT? Which is used by HfdViewPanelT? Two different cases for HFD and FWHM? - at least only show the one which is used... otherwise it is confusing... So: For FWHM, show both FWHMs and the star image. For HFD just show the "all-in-one HFD" panel... 
-// }
+void FocusCurveRecorderProgressDetailsPanelT::setCurrentFocusCurveRecord(std::shared_ptr<FocusCurveRecordT> focusCurveRecord)
+{
+  // For FWHM, show both FWHMs and the star image. For HFD just show the "all-in-one HFD" panel...
+  // A representation which combines all would be a 3D rep.
+  // TODO: Not only HFD in the future.... displayed view depends on selected focus measure...
+  if (focusCurveRecord != nullptr) {
+    mHfdViewPanel->setHfd(focusCurveRecord->getHfd());
+  }
+}
 

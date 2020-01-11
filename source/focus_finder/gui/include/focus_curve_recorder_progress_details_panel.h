@@ -34,6 +34,8 @@
 #include <QProgressBar>
 
 class FocusCurveRecorderLogicT;
+class FocusCurveRecordT;
+class HfdViewPanelT;
 
 namespace Ui {
     class FocusCurveRecorderProgressDetailsPanel;
@@ -66,10 +68,11 @@ public:
   void setCurrentIterationProgressText(const QString & currentProgressText);
   void setTotalProgress(int progressPerc);
   void setTotalProgressText(const QString & totalProgressText);
+  void setCurrentFocusCurveRecord(std::shared_ptr<FocusCurveRecordT> focusCurveRecord);
 
   void startAnimation();
   void stopAnimation();
-  
+		      
 public slots:
   // member function that catches the frameChanged signal of the QMovie
   void setButtonIcon(int frame);
@@ -83,7 +86,8 @@ private:
   void setProgress(QProgressBar * progressBar, int progressPerc);
 
   std::shared_ptr<FocusCurveRecorderLogicT> mFocusCurveRecorderLogic;
-   QMovie * mMovie;
+  QMovie * mMovie;
+  HfdViewPanelT * mHfdViewPanel;
 };
 
 #endif /*SOURCE_FOCUS_FINDER_GUI_INCLUDE_FOCUS_CURVE_RECORDER_PROGRESS_DETAILS_PANEL_H_*/

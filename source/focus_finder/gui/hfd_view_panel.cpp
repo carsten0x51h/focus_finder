@@ -36,9 +36,8 @@
 #include "ui_hfd_view_panel.h"
 
 
-HfdViewPanelT::HfdViewPanelT(QWidget * parent, FocusFinderLogicT & ffl) : QWidget(parent),
-	m_ui(new Ui::HfdViewPanel),
-	mFfl(ffl)
+HfdViewPanelT::HfdViewPanelT(QWidget * parent) : QWidget(parent),
+	m_ui(new Ui::HfdViewPanel)
 {
     // Setup UI
     m_ui->setupUi(this);

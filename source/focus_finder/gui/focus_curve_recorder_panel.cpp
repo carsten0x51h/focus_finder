@@ -552,6 +552,8 @@ void FocusCurveRecorderPanelT::onFocusCurveRecorderNewRecord(std::shared_ptr<Foc
 	  << "FocusCurveRecorderPanelT::onFocusCurveRecorderNewRecord..." << std::endl;
 	
 	//mFocusCurveViewPanel->update();
+	
+	mFocusCurveRecorderProgressDetailsPanel->setCurrentFocusCurveRecord(focusCurveRecord);
 }
 
 void FocusCurveRecorderPanelT::onFocusCurveRecorderRecordSetUpdate(std::shared_ptr<FocusCurveRecordSetT> focusCurveRecordSet) {
@@ -572,6 +574,7 @@ void FocusCurveRecorderPanelT::onFocusCurveRecorderProgressUpdate(float progress
 
   mFocusCurveRecorderProgressDetailsPanel->setCurrentIterationProgress(progress);
   mFocusCurveRecorderProgressDetailsPanel->setCurrentIterationProgressText(msg);
+  mFocusCurveRecorderProgressDetailsPanel->setCurrentFocusCurveRecord(focusCurveRecord);
 }
 
 void FocusCurveRecorderPanelT::onFocusCurveRecorderCancelled() {

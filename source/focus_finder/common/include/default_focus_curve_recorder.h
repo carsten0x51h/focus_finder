@@ -38,6 +38,7 @@
 
 // TODO / IDEA: Maybe HfdT and FwhmT should both implement a generic inteface "FocusMeasureT" which just hast "float getValue()".
 
+class FocusCurveRecordT;
 class FocusCurveRecordSetT;
 class FocusControllerT;
 
@@ -57,6 +58,9 @@ private:
   CurveHalfT::TypeE locateStartingPosition();
   std::shared_ptr<FocusCurveRecordSetT> recordFocusCurveRecordSet(CurveHalfT::TypeE curveHalf);
 
+  void onFocusControllerProgressUpdate(float progress, const std::string & msg, std::shared_ptr<FocusCurveRecordT> focusCurveRecord = nullptr);
+  void onFocusControllerNewRecord(std::shared_ptr<FocusCurveRecordT> focusCurveRecord);
+  
   std::atomic<bool> mCancelled; // TODO: Still required?
   std::atomic<bool> mIsRunning;
 

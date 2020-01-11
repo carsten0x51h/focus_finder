@@ -325,7 +325,7 @@ void MainWindow::createHfdViewPanel() {
 	QDockWidget *dock = new QDockWidget(tr("HFD View"), this);
 	dock->setAllowedAreas(Qt::RightDockWidgetArea);
 
-	mHfdViewPanel = new HfdViewPanelT(dock, mFfl);
+	mHfdViewPanel = new HfdViewPanelT(dock);
 
 	// See https://www.qtcentre.org/threads/64634-Add-QWidget-to-QDockWidget
 	dock->setWidget(mHfdViewPanel);
