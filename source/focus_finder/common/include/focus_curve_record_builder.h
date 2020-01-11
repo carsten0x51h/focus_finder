@@ -41,19 +41,17 @@ private:
   TimestampT mCreationTimestamp;
   int mCurrentFocusPos;
   std::tuple<float, float> mDrift;
-  PointFT mAbsStarCenterPos;
   std::chrono::duration<float> mExposureTime;
 
   float mSnr;
   FwhmT mFwhmHorz;
   FwhmT mFwhmVert;
   HfdT mHfd;
-  ImageT mRoiImage;
   ImageT mCorrectedStarImage;
   
 public:
 	FocusCurveRecordBuilderT() :
-			mCurrentFocusPos(0), mSnr(0), mAbsStarCenterPos(0, 0), mDrift(0, 0) {
+			mCurrentFocusPos(0), mSnr(0), mDrift(0, 0) {
 		// TODO: Automatically sets the creation date and time (?)
 	}
 
@@ -95,21 +93,9 @@ public:
 		return (*this);
 	}
 
-	FocusCurveRecordBuilderT & setRoiImage(const ImageT & roiImage) {
-		mRoiImage = roiImage;
-		return (*this);
-	}
-
 	FocusCurveRecordBuilderT & setCorrectedStarImage(
 			const ImageT & correctedStarImage) {
 		mCorrectedStarImage = correctedStarImage;
-		return (*this);
-	}
-
-	// In abs coords for UI to set cross / ROI frame...
-	FocusCurveRecordBuilderT & setAbsStarCenterPos(
-			const PointFT & absStarCenterPos) {
-		mAbsStarCenterPos = absStarCenterPos;
 		return (*this);
 	}
 
@@ -129,8 +115,8 @@ public:
   
 	std::shared_ptr<FocusCurveRecordT> build() const {
 	  return std::make_shared<FocusCurveRecordT>(mCreationTimestamp, mCurrentFocusPos, mExposureTime, mSnr,
-				mFwhmHorz, mFwhmVert, mHfd, mRoiImage, mCorrectedStarImage,
-				mAbsStarCenterPos, mDrift);
+				mFwhmHorz, mFwhmVert, mHfd, mCorrectedStarImage,
+				mDrift);
 	}
 
 };

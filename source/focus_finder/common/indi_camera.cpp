@@ -379,9 +379,7 @@ std::chrono::milliseconds IndiCameraT::getMaxExposureTime() const {
 // Exposure related properties
 void IndiCameraT::startExposure() {
 
-  std::chrono::milliseconds dura( 2000 );
-  std::this_thread::sleep_for( dura );
-  
+  // TODO / BUG: When "Loop" is enabled, an "Exposure already running" exception is thrown...
 	if (DeviceConnectionStateT::CONNECTED
 			!= mIndiConnector->getConnectionState()) {
 		// TODO: Maybe better reporting? + return

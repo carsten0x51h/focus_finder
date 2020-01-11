@@ -46,35 +46,31 @@ private:
   TimestampT mCreationTimestamp;
   int mCurrentAbsoluteFocusPos;
   std::tuple<float, float> mDrift;
-  PointFT mAbsStarCenterPos;
   std::chrono::duration<float> mExposureTime;
 
   float mSnr;
   FwhmT mFwhmHorz;
   FwhmT mFwhmVert;
   HfdT mHfd;
-  ImageT mRoiImage;
   ImageT mCorrectedStarImage;
 
 public:
   FocusCurveRecordT(TimestampT creationTimestamp, int currentAbsoluteFocusPos, std::chrono::duration<float> exposureTime, float snr,
 			const FwhmT & fwhmHorz, const FwhmT & fwhmVert, const HfdT & hfd,
-			const ImageT & roiImage, const ImageT & correctedStarImage, const PointFT & absStarCenterPos, const std::tuple<float,float> & drift);
+			const ImageT & correctedStarImage, const std::tuple<float,float> & drift);
 
   TimestampT getCreationTimestamp() const;
   int getCurrentAbsoluteFocusPos() const;
   std::chrono::duration<float> getExposureTime() const;
 
-  // TODO: Do not store those as members but only calc if required ... based on RoiImage(?) or correctedStarImage...?
+  // TODO: Do not store those as members but only calc if required ... based on correctedStarImage...?
   // -> Even store "focus measure" in curve record?? 
   float getSnr() const;
 	const FwhmT & getFwhmHorz() const;
 	const FwhmT & getFwhmVert() const;
 	const HfdT & getHfd() const;
   
-	const ImageT & getRoiImage() const;
 	const ImageT & getCorrectedStarImage() const;
-	const PointFT & getAbsStarCenterPos() const;
 	const std::tuple<float, float> & getDrift() const;
 
   static float getFocusMeasure(std::shared_ptr<FocusCurveRecordT> focusCurveRecord, FocusMeasureTypeT::TypeE focusMeasureType);

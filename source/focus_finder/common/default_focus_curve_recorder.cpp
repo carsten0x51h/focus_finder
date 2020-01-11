@@ -445,9 +445,7 @@ void DefaultFocusCurveRecorderT::run() {
   // 				.setHorzFwhm(fwhmHorz)
   // 				.setVertFwhm(fwhmVert)
   // 				.setHfd(hfd)
-  // 				.setRoiImage(*mCurrentImage) // Take a copy
   // 				.setCorrectedStarImage(innerCorrectedSubFrameImg)
-  // 				.setAbsStarCenterPos(newCentroidAbsRoiCoords)
   // 				.build();
 
   // 		// Notify about FoFi update...

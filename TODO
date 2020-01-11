@@ -2,6 +2,7 @@ TODO
 ----
 
 -NEXT
+	-TODO / BUG: When "Loop" is enabled, an "Exposure already running" exception is thrown... (see indi_camera.cpp) -> setLoopMode(false) in recorder?
 	-Remove Core-Dump at exit (double free)
 	-Store recorded curve on disk (as part of profile)
 	-Impl. operator<< for enums using asStr()?

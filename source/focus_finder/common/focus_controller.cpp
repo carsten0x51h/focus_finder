@@ -178,9 +178,13 @@ std::shared_ptr<FocusCurveRecordT> FocusControllerT::measureFocus() {
       LOG(debug) << "FocusControllerT::measureFocus... starting exposure..." << std::endl;
 
       size_t numSamples = 3;
-      size_t sampleNo = 0;
+      size_t sampleNo = 1;
       ImageT sumImg;
-
+      ImageT averageCurrentImage;
+      float sumDriftX = 0.0f;
+      float sumDriftY = 0.0f;
+      std::tuple<float, float> averageDrift;
+  
       // TODO: Better pass in the exposure time as parameter? Because Using the following function limits the more generic measureFocus() function to the context of curve recording...
 
       auto expTime = getFocusFinderProfile().getExposureTime();
@@ -189,134 +193,195 @@ std::shared_ptr<FocusCurveRecordT> FocusControllerT::measureFocus() {
       LOG(debug) << "FocusControllerT::measureFocus... expTime: " << expTime.count() << " -> inMs: " << inMs.count() << std::endl;
 
       
-      while (sampleNo < numSamples) {
+      while (sampleNo <= numSamples) {
 	runExposureBlocking(inMs);
+
+	// Calc center of subframe
+	PointT<unsigned int> centerOuterSubframe(
+						 std::ceil(mCurrentImage->width() / 2),
+						 std::ceil(mCurrentImage->height() / 2));
+
+	LOG(debug)
+	  << "FocusControllerT::run - centerOuterSubframe="
+	  << centerOuterSubframe << std::endl;
+
+	// In outer subframe (mCurrentImage) coordinates
+	auto innerRoi = RectT<unsigned int>::fromCenterPoint(
+							     centerOuterSubframe,
+							     getFocusFinderProfile().getStarWindowSize());
+
+	LOG(debug)
+	  << "FocusControllerT::run - calculated inner ROI=" << innerRoi
+	  << std::endl;
+
+	// get_crop() from mCurrentImage using innerRoi
+	ImageT innerSubFrameImg = mCurrentImage->get_crop(innerRoi.x() /*x0*/,
+							  innerRoi.y() /*y0*/, innerRoi.x() + innerRoi.width() - 1/*x1*/,
+							  innerRoi.y() + innerRoi.height() - 1/*y1*/
+							  );
+
+	LOG(debug)
+	  << "FocusControllerT::run - innerSubFrameImg size - w="
+	  << innerSubFrameImg.width() << ", h="
+	  << innerSubFrameImg.height() << std::endl;
+
+	// Determine SNR of recorded area to check if there could be a star around.
+	checkIfStarIsThere(innerSubFrameImg);
+
+	ImageT newCenterImage; // TODO: newCenterImage is written by CentroidT::caclulate() but it is never used later on! 
+
+	// TODO: Do not hardcode IWC, do not hardcode "sub mean"
+	auto newCentroidOpt = CentroidT::calculate(innerSubFrameImg,
+						   CentroidTypeT::IWC, true /*sub mean*/, & newCenterImage);
+
+	if (!newCentroidOpt) {
+	  // TODO: Improve logging? ReportingT?
+	  LOG(error)
+	    << "Unable to determine new centroid." << std::endl;
+
+	  // TODO: Retry? Or just cancel? For now we cancel...
+	  throw FocusControllerCancelledExceptionT();
+	}
+
+	// NOTE: Those coordinates are in coordinates of the inner subframe! We need them in "outer sub frame" coordinates!
+	int deltaX = (outerRoi.width() - innerRoi.width()) / 2;
+	int deltaY = (outerRoi.height() - innerRoi.height()) / 2;
+
+	LOG(debug)
+	  << "FocusControllerT::run - deltaX=" << deltaX << ", deltaY="
+	  << deltaY << std::endl;
+
+	PointFT newCentroidInnerRoiCoords = *newCentroidOpt;
+	PointFT newCentroidOuterRoiCoords(
+					  newCentroidInnerRoiCoords.x() + deltaX,
+					  newCentroidInnerRoiCoords.y() + deltaY);
+
+	LOG(debug)
+	  << "FocusControllerT::run - new centroid (inner frame)="
+	  << newCentroidInnerRoiCoords << std::endl;
+	LOG(debug)
+	  << "FocusControllerT::run - new centroid (outer frame)="
+	  << newCentroidOuterRoiCoords << std::endl;
+
+	// Use newly calculated center (newCentroidOuterRoiCoords) to again get sub-frame from mCurrentImage
+	// TODO: Currently we just round() the float position to the closest int. This may be
+	//       improved by introducing sub-pixel accurracy...
+	// TODO: We may introduce a round() function for conversion from PointTF to PointT...?
+	PointT<unsigned int> newCentroidRoundedToNextInt(
+							 std::round(newCentroidOuterRoiCoords.x()),
+							 std::round(newCentroidOuterRoiCoords.y()));
+
+	LOG(debug)
+	  << "FocusControllerT::run - new centroid rounded to next int="
+	  << newCentroidRoundedToNextInt << std::endl;
+
+	auto innerCorrectedRoi = RectT<unsigned int>::fromCenterPoint(
+								      newCentroidRoundedToNextInt,
+								      getFocusFinderProfile().getStarWindowSize());
+
+	LOG(debug)
+	  << "FocusControllerT::run - calculated inner corrected ROI="
+	  << innerCorrectedRoi << std::endl;
+
+	// get_crop() from mCurrentImage using corrected innerRoi
+	ImageT innerCorrectedSubFrameImg = mCurrentImage->get_crop(
+								   innerCorrectedRoi.x() /*x0*/, innerCorrectedRoi.y() /*y0*/,
+								   innerCorrectedRoi.x() + innerCorrectedRoi.width() - 1/*x1*/,
+								   innerCorrectedRoi.y() + innerCorrectedRoi.height() - 1/*y1*/
+								   );
+
+	LOG(debug)
+	  << "FocusControllerT::run - innerCorrectedSubFrameImgsize - w="
+	  << innerCorrectedSubFrameImg.width() << ", h="
+	  << innerCorrectedSubFrameImg.height() << std::endl;
+
+	// Determine SNR of recorded area to check if there could be a star around.
+	float snr;
+	checkIfStarIsThere(innerCorrectedSubFrameImg, & snr);
+
 
 	// TODO: Maybe there is a better way...
 	if (sumImg.width() == 0 || sumImg.height() == 0) {
-	  LOG(debug) << "YYY Assigning image..." << std::endl;
-	  sumImg = *mCurrentImage;
+	  sumImg = innerCorrectedSubFrameImg;
 	} else {
-	  sumImg += *mCurrentImage;
+	  sumImg += innerCorrectedSubFrameImg;
 	}
+
+	averageCurrentImage = sumImg / (float) sampleNo;
+
+
+	// Convert center coordinates to frame coordinates (absolute position within image)
+	PointFT newCentroidAbsRoiCoords(
+					newCentroidOuterRoiCoords.x() + outerRoi.x(),
+					newCentroidOuterRoiCoords.y() + outerRoi.y());
+
+
+	// If star tracking is enabled, set the new last focus star pos
+	bool starTrackingEnabled = getFocusFinderProfile().getEnableStarAutoTracking();
+
+	if (starTrackingEnabled) {
+	  LOG(debug) << "FocusControllerT::measureFocus... Star tracking enabled... setting focus star position to new centroid position " << newCentroidAbsRoiCoords << std::endl;
+	  setLastFocusStarPos(newCentroidAbsRoiCoords);
+	}
+
+
+	// Calculate "drift" (movement of center position since last frame)
+	float dx = newCentroidAbsRoiCoords.x() - lastFocusStarPos.x();
+	float dy = newCentroidAbsRoiCoords.y() - lastFocusStarPos.y();
+
+	sumDriftX += dx;
+	sumDriftY += dy;
+
+	std::get<0>(averageDrift) = sumDriftX  / (float) sampleNo;
+	std::get<1>(averageDrift) = sumDriftY  / (float) sampleNo;
+
+
+	
+	// TODO: Remove again... actually the Hfd and Fwhm should not be calculated in the focus_controller! (and not be part of the record...?!!)
+	HfdT hfd(averageCurrentImage);
+	size_t centerIdxHorz = std::floor(averageCurrentImage.height() / 2);
+	FwhmT fwhmHorz(ImageSlicerT::slice<SliceDirectionT::HORZ>(averageCurrentImage, centerIdxHorz));
+	size_t centerIdxVert = std::floor(averageCurrentImage.width() / 2);
+	FwhmT fwhmVert(ImageSlicerT::slice<SliceDirectionT::VERT>(averageCurrentImage, centerIdxVert));
+	
+	
+	
+	// TODO: Always notify about the new frame, the current "average" image, current snr, the current and the average star drift
+	//std::tuple<float, float> currentDrift(dx, dy);
+	// notify...(innerCorrectedSubFrameImg, averageCurrentImage, snr, currentDrift, averageDrift)
+	record = FocusCurveRecordBuilderT()
+	  .setCreationTimestamp(std::chrono::high_resolution_clock::now())
+	  .setAbsoluteFocusPos(getFocus()->getCurrentPos())
+	  .setDrift(averageDrift) // TODO: Rename setDrift() to setAverageDrift()
+	  .setSnr(snr) // TODO: Rename setSnr() to setAverageSnr()
+	  .setHorzFwhm(fwhmHorz)
+	  .setVertFwhm(fwhmVert)
+	  .setHfd(hfd)
+	  .setCorrectedStarImage(averageCurrentImage)
+	  .setExposureTime(expTime)
+	  // TODO: Add method setNumSamples(numSamples)
+	  .build();
+
+	notifyFocusControllerNewRecord(record);
+
+	
+
 	
 	++sampleNo;
 
-	// TODO: checkCanelled()!!!
+	// TODO: checkCancelled()!!!
 	// TODO: Pass numSamples as function parameter!
       }
-
-      ImageT averageCurrentImage = sumImg / (float) numSamples;
 
       LOG(debug) << "FocusControllerT::measureFocus... exposure finished." << std::endl;
 
 
-      // Calc center of subframe
-      PointT<unsigned int> centerOuterSubframe(
-					       std::ceil(averageCurrentImage.width() / 2),
-					       std::ceil(averageCurrentImage.height() / 2));
+      // Calculate SNR of average image
+      float averageSnr = SnrT::calculate(averageCurrentImage);
 
-      LOG(debug)
-	<< "FocusControllerT::run - centerOuterSubframe="
-	<< centerOuterSubframe << std::endl;
-
-      // In outer subframe (mCurrentImage) coordinates
-      auto innerRoi = RectT<unsigned int>::fromCenterPoint(
-							   centerOuterSubframe,
-							   getFocusFinderProfile().getStarWindowSize());
-
-      LOG(debug)
-	<< "FocusControllerT::run - calculated inner ROI=" << innerRoi
-	<< std::endl;
-
-      // get_crop() from averageCurrentImage using innerRoi
-      ImageT innerSubFrameImg = averageCurrentImage.get_crop(innerRoi.x() /*x0*/,
-							innerRoi.y() /*y0*/, innerRoi.x() + innerRoi.width() - 1/*x1*/,
-							innerRoi.y() + innerRoi.height() - 1/*y1*/
-							);
-
-      LOG(debug)
-	<< "FocusControllerT::run - innerSubFrameImg size - w="
-	<< innerSubFrameImg.width() << ", h="
-	<< innerSubFrameImg.height() << std::endl;
-
-      // Determine SNR of recorded area to check if there could be astar around.
-      checkIfStarIsThere(innerSubFrameImg);
-
-      // TODO: Do not hardcode IWC, do not hardcode "sub mean"
-      ImageT newCenterImage;
-
-      auto newCentroidOpt = CentroidT::calculate(innerSubFrameImg,
-						 CentroidTypeT::IWC, true /*sub mean*/, &newCenterImage);
-
-      if (!newCentroidOpt) {
-	// TODO: Improve logging? ReportingT?
-	LOG(error)
-	  << "Unable to determine new centroid." << std::endl;
-
-	// TODO: Retry? Or just cancel? For now we cancel...
-	throw FocusControllerCancelledExceptionT();
-      }
-
-      // NOTE: Those coordinates are in coordinates of the inner subframe! We need them in "outer sub frame" coordinates!
-      int deltaX = (outerRoi.width() - innerRoi.width()) / 2;
-      int deltaY = (outerRoi.height() - innerRoi.height()) / 2;
-
-      LOG(debug)
-	<< "FocusControllerT::run - deltaX=" << deltaX << ", deltaY="
-	<< deltaY << std::endl;
-
-      PointFT newCentroidInnerRoiCoords = *newCentroidOpt;
-      PointFT newCentroidOuterRoiCoords(
-					newCentroidInnerRoiCoords.x() + deltaX,
-					newCentroidInnerRoiCoords.y() + deltaY);
-
-      LOG(debug)
-	<< "FocusControllerT::run - new centroid (inner frame)="
-	<< newCentroidInnerRoiCoords << std::endl;
-      LOG(debug)
-	<< "FocusControllerT::run - new centroid (outer frame)="
-	<< newCentroidOuterRoiCoords << std::endl;
-
-      // Use newly calculated center (newCentroidOuterRoiCoords) to again get sub-frame from averageCurrentImage
-      // TODO: Currently we just round() the float position to the closest int. This may be
-      //       improved by introducing sub-pixel accurracy...
-      // TODO: We may introduce a round() function for conversion from PointTF to PointT...?
-      PointT<unsigned int> newCentroidRoundedToNextInt(
-						       std::round(newCentroidOuterRoiCoords.x()),
-						       std::round(newCentroidOuterRoiCoords.y()));
-
-      LOG(debug)
-	<< "FocusControllerT::run - new centroid rounded to next int="
-	<< newCentroidRoundedToNextInt << std::endl;
-
-      auto innerCorrectedRoi = RectT<unsigned int>::fromCenterPoint(
-								    newCentroidRoundedToNextInt,
-								    getFocusFinderProfile().getStarWindowSize());
-
-      LOG(debug)
-	<< "FocusControllerT::run - calculated inner corrected ROI="
-	<< innerCorrectedRoi << std::endl;
-
-      // get_crop() from averageCurrentImage using corrected innerRoi
-      ImageT innerCorrectedSubFrameImg = averageCurrentImage.get_crop(
-								 innerCorrectedRoi.x() /*x0*/, innerCorrectedRoi.y() /*y0*/,
-								 innerCorrectedRoi.x() + innerCorrectedRoi.width() - 1/*x1*/,
-								 innerCorrectedRoi.y() + innerCorrectedRoi.height() - 1/*y1*/
-								 );
-
-      LOG(debug)
-	<< "FocusControllerT::run - innerCorrectedSubFrameImgsize - w="
-	<< innerCorrectedSubFrameImg.width() << ", h="
-	<< innerCorrectedSubFrameImg.height() << std::endl;
-
-      // Determine SNR of recorded area to check if there could be a star around.
-      float snr;
-      checkIfStarIsThere(innerCorrectedSubFrameImg, &snr);
       
-
       // Calculate HFD
-      HfdT hfd(innerCorrectedSubFrameImg);
+      HfdT hfd(averageCurrentImage);
       LOG(debug)
 	<< "FocusControllerT::run - HFD: " << hfd.getValue() << std::endl;
 
@@ -328,57 +393,37 @@ std::shared_ptr<FocusCurveRecordT> FocusControllerT::measureFocus() {
 
       // NOTE / TODO: This only works if height() is odd
       size_t centerIdxHorz = std::floor(
-					innerCorrectedSubFrameImg.height() / 2);
+					averageCurrentImage.height() / 2);
 
       FwhmT fwhmHorz(
 		     ImageSlicerT::slice<SliceDirectionT::HORZ>(
-								innerCorrectedSubFrameImg, centerIdxHorz));
+								averageCurrentImage, centerIdxHorz));
 
       // NOTE / TODO: This only works if width() is odd
       size_t centerIdxVert = std::floor(
-					innerCorrectedSubFrameImg.width() / 2);
+					averageCurrentImage.width() / 2);
 
       FwhmT fwhmVert(
 		     ImageSlicerT::slice<SliceDirectionT::VERT>(
-								innerCorrectedSubFrameImg, centerIdxVert));
+								averageCurrentImage, centerIdxVert));
 
       LOG(debug)
 	<< "FocusControllerT::run - FWHM(HORZ): " << fwhmHorz.getValue()
 	<< ", FWHM(VERT): " << fwhmVert.getValue() << std::endl;
 
-      // Convert center coordinates to frame coordinates (absolute position within image)
-      PointFT newCentroidAbsRoiCoords(
-				      newCentroidOuterRoiCoords.x() + outerRoi.x(),
-				      newCentroidOuterRoiCoords.y() + outerRoi.y());
-
-
-      // If star tracking is enabled, set the new last focus star pos
-      bool starTrackingEnabled = getFocusFinderProfile().getEnableStarAutoTracking();
-
-      if (starTrackingEnabled) {
-	LOG(debug) << "FocusControllerT::measureFocus... Star tracking enabbled... setting focus star position to new centroid position " << newCentroidAbsRoiCoords << std::endl;
-	setLastFocusStarPos(newCentroidAbsRoiCoords);
-      }
-
-
-      // Calculate "drift" (movement of center position since last picture
-      std::tuple<float, float> drift(
-				     newCentroidAbsRoiCoords.x() - lastFocusStarPos.x(),
-				     newCentroidAbsRoiCoords.y() - lastFocusStarPos.y());
 
       // Fill all so far collected data into the "FoFi Result Structure"
       record = FocusCurveRecordBuilderT()
  	.setCreationTimestamp(std::chrono::high_resolution_clock::now())
 	.setAbsoluteFocusPos(getFocus()->getCurrentPos())
-	.setDrift(drift)
-	.setSnr(snr)
+	.setDrift(averageDrift) // TODO: Rename setDrift() to setAverageDrift()
+	.setSnr(averageSnr) // TODO: Rename setSnr() to setAverageSnr()
 	.setHorzFwhm(fwhmHorz)
 	.setVertFwhm(fwhmVert)
 	.setHfd(hfd)
-	.setRoiImage(averageCurrentImage) // Take a copy
-	.setCorrectedStarImage(innerCorrectedSubFrameImg)
-	.setAbsStarCenterPos(newCentroidAbsRoiCoords)
+	.setCorrectedStarImage(averageCurrentImage)
 	.setExposureTime(expTime)
+	// TODO: Add method setNumSamples(numSamples)
 	.build();
 
       success = true;

@@ -47,11 +47,11 @@
 
 FocusCurveRecordT::FocusCurveRecordT(TimestampT creationTimestamp, int currentAbsoluteFocusPos, std::chrono::duration<float> exposureTime, float snr,
 		const FwhmT & fwhmHorz, const FwhmT & fwhmVert, const HfdT & hfd,
-		const ImageT & roiImage, const ImageT & correctedStarImage,
-		const PointFT & absStarCenterPos, const std::tuple<float,float> & drift) :
+		const ImageT & correctedStarImage,
+		const std::tuple<float,float> & drift) :
   mCreationTimestamp(creationTimestamp), mCurrentAbsoluteFocusPos(currentAbsoluteFocusPos), mExposureTime(exposureTime), mSnr(snr), mFwhmHorz(
-				fwhmHorz), mFwhmVert(fwhmVert), mHfd(hfd), mRoiImage(roiImage), mCorrectedStarImage(
-				correctedStarImage), mAbsStarCenterPos(absStarCenterPos), mDrift(drift) {
+				fwhmHorz), mFwhmVert(fwhmVert), mHfd(hfd), mCorrectedStarImage(
+				correctedStarImage), mDrift(drift) {
 }
 
 TimestampT FocusCurveRecordT::getCreationTimestamp() const  {
@@ -78,14 +78,8 @@ const FwhmT & FocusCurveRecordT::getFwhmVert() const {
 const HfdT & FocusCurveRecordT::getHfd() const {
 	return mHfd;
 }
-const ImageT & FocusCurveRecordT::getRoiImage() const {
-	return mRoiImage;
-}
 const ImageT & FocusCurveRecordT::getCorrectedStarImage() const {
 	return mCorrectedStarImage;
-}
-const PointFT & FocusCurveRecordT::getAbsStarCenterPos() const {
-	return mAbsStarCenterPos;
 }
 const std::tuple<float, float> & FocusCurveRecordT::getDrift() const {
 	return mDrift;
@@ -120,7 +114,6 @@ FocusCurveRecordT::print(std::ostream & os, size_t indent) const {
   os << prefix << "Creation timestamp: " << mCreationTimestamp << std::endl
      << prefix << "Abs focus pos: " << mCurrentAbsoluteFocusPos << std::endl
      << prefix << "Drift: " << mDrift << std::endl
-     << prefix << "Abs star center: " << mAbsStarCenterPos << std::endl
      << prefix << "Exposure time: " << mExposureTime.count() << "s" << std::endl;
     
      // << prefix << "SNR: " << mSnr << std::endl
@@ -139,7 +132,6 @@ void FocusCurveRecordT::save(/*const std::filesystem::path & lightFrameDirectory
   curveRecordPt.put<int>("<xmlattr>.abs_focus_pos", focusCurveRecord.getCurrentAbsoluteFocusPos());
   //TODO:  curveRecordPt.put<PointFT>("<xmlattr>.star_drift", focusCurveRecord.getDrift());
   //       -> instead of tuple use pair or create own type for which a translator is/will be defined...
-  curveRecordPt.put<PointFT>("<xmlattr>.abs_star_center_pos", focusCurveRecord.getAbsStarCenterPos());
   curveRecordPt.put<std::chrono::duration<float> >("<xmlattr>.exposure_time", focusCurveRecord.getExposureTime());
 
   pt.add_child("curve_record", curveRecordPt);
@@ -231,7 +223,6 @@ std::shared_ptr<FocusCurveRecordT> FocusCurveRecordT::load(const boost::property
 
     // TODO: Why the absolute star center and not the relative one(relative to saved star image?)
     // TODO: Is this even required / should this be stored?
-    .setAbsStarCenterPos(pt.get<PointFT>("<xmlattr>.abs_star_center_pos"))
     .setExposureTime(pt.get<std::chrono::duration<float> >("<xmlattr>.exposure_time"))
 
     .setCorrectedStarImage(img)
@@ -239,8 +230,6 @@ std::shared_ptr<FocusCurveRecordT> FocusCurveRecordT::load(const boost::property
     .setHorzFwhm(fwhmHorz)
     .setVertFwhm(fwhmVert)
     .setHfd(HfdT(img))
-    // .setRoiImage(averageCurrentImage) // Take a copy
-    // .setAbsStarCenterPos(newCentroidAbsRoiCoords)
     .build();
 
   // DEBUG START
