@@ -789,6 +789,7 @@ void FocusControllerT::runExposureBlocking(
   using namespace std::chrono_literals;
 
   // Start exposure
+  getCamera()->setLoopMode(LoopModeT::SINGLE);
   getCamera()->setExposureTime(expTime);
   getCamera()->startExposure();
 
