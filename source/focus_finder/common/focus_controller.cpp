@@ -789,6 +789,7 @@ void FocusControllerT::runExposureBlocking(
   using namespace std::chrono_literals;
 
   // Start exposure
+  LoopModeT::TypeE prevLoopMode = getCamera()->getLoopMode();  
   getCamera()->setLoopMode(LoopModeT::SINGLE);
   getCamera()->setExposureTime(expTime);
   getCamera()->startExposure();
@@ -796,6 +797,9 @@ void FocusControllerT::runExposureBlocking(
   // Use condition variable to wait for finished exposure.
   std::unique_lock<std::mutex> lk(cvMutex);
   cv.wait(lk);
+
+  // Reset the old loop-mode
+  getCamera()->setLoopMode(prevLoopMode);
 
   // If it was cancelled, throw cancel exception
   if (mCancelled) {
