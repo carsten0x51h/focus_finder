@@ -4,7 +4,6 @@ TODO
 -NEXT
 	-Remove Core-Dump at exit (double free)
 	-Store recorded curve on disk (as part of profile)
-	-Impl. operator<< for enums using asStr()?
 	-Handle cancel exception in "focus curve recorder" and "focus finder"
 	-Remove hardcoded exposure times (e.g. in focus curve recorder -> maybe this field should be inegrated also into the focus curve recorder frame!)
 	-Recorder should listen to position events from focuser -> draw a line of current position...
@@ -12,7 +11,7 @@ TODO
 	-Should Hfd, Fwhm vert, Fwhm horz all be calculated right after recording (during the recording process), or just the one which is needed??
 	-AboutDialog -> draw program version on image!
 	-On INDI-Server disconnect (or camera disconnect, or camera device removal), stop exposure
-
+	-Make indi server configurabe - better: make INDI one way to connect to devices
 	-Extend curve fitting so that certain parameters can be "fixed" (-> difficult / more effort)
 
 	-Use boost log to filter out logs by component (-> different channels?), 

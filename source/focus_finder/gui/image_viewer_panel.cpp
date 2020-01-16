@@ -68,7 +68,7 @@ mMoveDelta(0, 0)
 }
 
 ImageViewerPanelT::~ImageViewerPanelT() {
-	delete mSelectableImageWidget;
+  //delete mSelectableImageWidget;
 }
 
 void ImageViewerPanelT::updateProfile() {

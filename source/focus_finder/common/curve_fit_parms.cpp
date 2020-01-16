@@ -51,6 +51,8 @@ CurveFitParmsT::CurveFitParmsT(FittingCurveTypeT::TypeE fittingCurveType, float 
 }
 
 FittingCurveTypeT::TypeE CurveFitParmsT::getFittingCurveType() const {
+
+  std::cerr << mFittingCurveType << std::endl;
   return mFittingCurveType;
 }
 void CurveFitParmsT::setFittingCurveType(FittingCurveTypeT::TypeE fittingCurveType) {

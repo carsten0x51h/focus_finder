@@ -34,8 +34,9 @@ class AnimMenuButtonT : public QToolButton
 {
     Q_OBJECT
 public:
-    explicit AnimMenuButtonT(QWidget *parent = 0);
-
+  explicit AnimMenuButtonT(QWidget *parent = 0);
+  ~AnimMenuButtonT();
+  
     void startAnimation();
     void stopAnimation();
 

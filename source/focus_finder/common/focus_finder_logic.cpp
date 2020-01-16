@@ -127,9 +127,6 @@ FocusFinderLogicT::FocusFinderLogicT() :
 }
 
 FocusFinderLogicT::~FocusFinderLogicT() {
-	std::cerr << "FocusFinderLogicT::~FocusFinderLogicT()..." << std::endl;
-
-	// TODO: return value
 }
 
 std::shared_ptr<CameraT> FocusFinderLogicT::getCurrentCamera() {

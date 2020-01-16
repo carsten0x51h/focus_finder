@@ -71,6 +71,10 @@ AnimMenuButtonT::AnimMenuButtonT(QWidget *parent) :
     				 this, & AnimMenuButtonT::toggleIfDefault);
 }
 
+AnimMenuButtonT::~AnimMenuButtonT() {
+  delete mMovie;
+}
+
 
 // member function that catches the frameChanged signal of the QMovie
 void AnimMenuButtonT::setButtonIcon(int /*frame*/)

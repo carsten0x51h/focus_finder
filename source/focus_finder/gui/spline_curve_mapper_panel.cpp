@@ -48,7 +48,7 @@ SplineCurveMapperPanelT::SplineCurveMapperPanelT(QWidget * parent, FocusFinderLo
 
 SplineCurveMapperPanelT::~SplineCurveMapperPanelT()
 {
-	//delete mSelectableImageWidget;
+  //	delete mSelectableImageWidget;
 }
 
 void SplineCurveMapperPanelT::notifyNewImage() {

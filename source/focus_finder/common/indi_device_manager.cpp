@@ -74,7 +74,9 @@ IndiDeviceManagerT::~IndiDeviceManagerT() {
 	mIndiClient.unregisterRemoveDeviceListener(mRemoveDeviceConnection);
 
 	// TODO: Disconnect server??!!!!
-}
+
+	mIndiClient.disconnectServer();
+  }
 
 void IndiDeviceManagerT::newMessage(INDI::BaseDevice *dp, int messageID) {
 	std::string msgStr = dp->messageQueue(messageID);

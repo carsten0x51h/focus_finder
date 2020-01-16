@@ -105,9 +105,6 @@ ImageConverterPanelT::ImageConverterPanelT(QWidget * parent,
 }
 
 ImageConverterPanelT::~ImageConverterPanelT() {
-	//delete mSelectableImageWidget;
-
-	//std::for_each(mFunctionMapperPanels.begin(), mFunctionMapperPanels.end(), [](QWidget* w){ delete w; });
 }
 
 void ImageConverterPanelT::updateProfile() {

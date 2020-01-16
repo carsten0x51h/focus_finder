@@ -267,5 +267,5 @@ ManageDeviceEntryPanelT::ManageDeviceEntryPanelT(FocusFinderLogicT & ffl,
 }
 
 ManageDeviceEntryPanelT::~ManageDeviceEntryPanelT() {
-	delete mConnectButton;
+  delete mConnectButton;
 }

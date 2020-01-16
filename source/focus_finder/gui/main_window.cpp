@@ -1418,22 +1418,29 @@ void MainWindow::createFocusFinderMainMenuBar() {
 	createManageDeviceProfilesButton();
 	createExposureButton();
 
-	QSpacerItem * spacer = new QSpacerItem(10, 10);
-	getFocusFinderMainMenuBar()->addItem(spacer);
+	QSpacerItem * spacer1 = new QSpacerItem(10, 10);
+	getFocusFinderMainMenuBar()->addItem(spacer1);
 
 	createExposureTimeSelector();
 
-	getFocusFinderMainMenuBar()->addItem(spacer);
+	QSpacerItem * spacer2 = new QSpacerItem(10, 10);
+	getFocusFinderMainMenuBar()->addItem(spacer2);
 
 	createSelectSubFrameButton();
 
-	getFocusFinderMainMenuBar()->addItem(spacer);
+	QSpacerItem * spacer3 = new QSpacerItem(10, 10);
+	getFocusFinderMainMenuBar()->addItem(spacer3);
 
 	createSelectFocusStarButton();
 
-	getFocusFinderMainMenuBar()->addItem(spacer);
-	getFocusFinderMainMenuBar()->addItem(spacer);
-	getFocusFinderMainMenuBar()->addItem(spacer);
+	QSpacerItem * spacer4 = new QSpacerItem(10, 10);
+	getFocusFinderMainMenuBar()->addItem(spacer4);
+
+	QSpacerItem * spacer5 = new QSpacerItem(10, 10);
+	getFocusFinderMainMenuBar()->addItem(spacer5);
+
+	QSpacerItem * spacer6 = new QSpacerItem(10, 10);
+	getFocusFinderMainMenuBar()->addItem(spacer6);
 
 	createStartFocusFinderButton();
 
@@ -1592,9 +1599,9 @@ MainWindow::MainWindow() :
 	createFocusCntlPanel();
 	createFilterCntlPanel();
 
-	// TODO: They take too much space this way - find better way...
-	//createHfdViewPanel();
-	//createFwhmViewPanels();
+	// // TODO: They take too much space this way - find better way...
+	// //createHfdViewPanel();
+	// //createFwhmViewPanels();
 
 	createFocusFinderMainMenuBar();
 	createStatusBar();
@@ -1604,30 +1611,33 @@ MainWindow::MainWindow() :
 }
 
 MainWindow::~MainWindow() {
-	delete mExposureButton;
-	delete mExposureLoopAction;
-	delete mExposureButtonMenu;
+  LOG(debug) << "Entering MainWindow::~MainWindow..." << std::endl;
+  delete mExposureButton;
+  delete mExposureLoopAction;
+  delete mExposureButtonMenu;
 
-	delete mManageDeviceProfilesButton;
-	delete mManageDeviceProfilesDialog;
+  delete mManageDeviceProfilesButton;
+  delete mManageDeviceProfilesDialog;
 
-	delete mSelectSubFrameButton;
-	delete mSelectFocusStarButton;
-	delete mStartFocusFinderButton;
+  delete mSelectSubFrameButton;
 
-    delete mRecalibrationAction;
-    delete mEditCalibrationDataAction;
-    delete mStartFocusFinderButtonMenu;
+  delete mSelectFocusStarButton;
+  delete mStartFocusFinderButton;
+  
+  delete mFocusCntlPanel;
+  delete mRecalibrationAction;
+  delete mEditCalibrationDataAction;
+  delete mStartFocusFinderButtonMenu;
 
-	delete mCameraConnectionStatusLabel;
-	delete mFocusConnectionStatusLabel;
-	delete mFilterConnectionStatusLabel;
+  delete mCameraConnectionStatusLabel;
+  delete mFocusConnectionStatusLabel;
+  delete mFilterConnectionStatusLabel;
 
-	delete mImageViewerPanel;
-	delete mImageConverterPanel;
-	delete mReportingViewerPanel;
+  delete mImageViewerPanel;
+  delete mImageConverterPanel;
+  delete mReportingViewerPanel;
 
-	delete mAboutDialog;
+  delete mAboutDialog;
 }
 
 QHBoxLayout * MainWindow::getFocusFinderMainMenuBar() {

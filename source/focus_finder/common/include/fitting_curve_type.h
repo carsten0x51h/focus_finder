@@ -26,6 +26,7 @@
 #define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FITTING_CURVE_TYPE_H_
 
 
+#include <iostream>
 #include "enum_helper.h"
 
 struct FittingCurveTypeT {
