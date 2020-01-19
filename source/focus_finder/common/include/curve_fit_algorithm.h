@@ -104,15 +104,11 @@ public:
       std::vector<PointWithResidualT> newOutliers;
       LmCurveMatcherSummaryT lmCurveMatcherSummary;
 
-      LOG(debug) << "CurveFitAlgorithmT::fitCurve() - dataPointsToFit.size(): " << dataPointsToFit.size() << "...(1)..."<< std::endl;
-			
       try {
 	// Do the curve fit
 	cp = cm.fit(dataPointsToFit, curveFitParms,
 		    &lmCurveMatcherSummary);
 				
-	LOG(debug) << "CurveFitAlgorithmT::fitCurve() - dataPointsToFit.size(): " << dataPointsToFit.size() << "...(2)..."<< std::endl;
-
 	// Process fit summary
 	summary.numIterationsRequiredTotal +=
 	  lmCurveMatcherSummary.numIterationsRequired;
@@ -146,16 +142,9 @@ public:
 	  summary.outlierBoundary = outlierBoundary;
 	}
 
-	LOG(debug) << "CurveFitAlgorithmT::fitCurve() - dataPointsToFit.size(): " << dataPointsToFit.size() << "...(3)..."<< std::endl;
-
 	// Filter outliers away
 	dataPointsToFit = outlierFilter.filter(pointsWithResiduals); // returns std::vector<PointFT>, destination dataPointsToFit [std::vector<PointFT>]
 
-	LOG(debug) << "CurveFitAlgorithmT::fitCurve() - dataPointsToFit.size(): " << dataPointsToFit.size() << "...(4)..."<< std::endl;
-
-	//std::vector<PointFT> dataPointsToFitNew; 
-	//boost::push_back(dataPointsToFitNew, rng | boost::adaptors::replaced_if(pred, new_value));
-				
 	newOutliers = outlierFilter.getOutliers();
 
 	// Add new outliers
@@ -187,15 +176,11 @@ public:
     // Finally, and only in case of success take a copy of the matched data points (the ones
     // which correspond to the curve parms returned). In case the matching fails, this container
     // is empty.
-    //summary.matchedDataPoints = dataPointsToFit;
     // TODO: Should we call summary.matchedDataPoints.clear() first?
-    //std::copy(dataPointsToFit.begin(), dataPointsToFit.end(), std::back_inserter(summary.matchedDataPoints));
     boost::range::copy(dataPointsToFit, std::back_inserter(summary.matchedDataPoints));
 		
-    //summary.curveDataPoints = dataPointsToFit | boost::adaptors::transformed([&](const auto & p) { return PointFT(p.x(), fc->fx(p.x(), cp)); })		// TODO: Should we call summary.curveDataPoints.clear() first?;
+    // TODO: Should we call summary.curveDataPoints.clear() first?;
     boost::range::copy(dataPointsToFit | boost::adaptors::transformed([&](const auto & p) { return PointFT(p.x(), fc->fx(p.x(), cp)); }), std::back_inserter(summary.curveDataPoints));
-
-
 		
     if (outSummary != nullptr) {
       *outSummary = summary;

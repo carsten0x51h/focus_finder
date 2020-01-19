@@ -110,51 +110,42 @@ bool FocusFinderFastCurveLookupT::isRunning() const {
  * measure()   // Final measurement
  */
 void FocusFinderFastCurveLookupT::run() {
+  LOG(debug) << "FocusFinderFastCurveLookupT::run..." << std::endl;
 
   mIsRunning = true;
-
-  
-  ////////////////////////////////////////////////////////////////////////
-  // HACK! For testing only
-  ////////////////////////////////////////////////////////////////////////
-  // Hyperbolic curve parms 
-  CurveParmsT parms(4);
-  parms[0] = CurveParmT("IDX_A", 15268.2);
-  parms[1] = CurveParmT("IDX_B", 11.074);
-  parms[2] = CurveParmT("IDX_C", 0); // Was 36347.7 - For the calibration curve, previous abs. focus pos. is not relevant -> 0.
-  parms[3] = CurveParmT("IDX_D", -8.40146); // For slope alone it does not matter, but for a given data point 
-
-  // Boundaries -> required? -> Better save dx (from center of curve until boundary in both directions, take max.)...
-  float relFocusStepsBoundary = 20590; // Measured (max.)
-  auto focusCurveFunction = CurveFunctionFactoryT::getInstance(FittingCurveTypeT::HYPERBOLIC, parms);
-
-  ////////////////////////////////////////////////////////////////////////
-
 
   // TODO: Check that device manager is set
   
   // TODO: Check if focus controller is set
+
+  
   auto focusFinderProfile = getFocusController()->getFocusFinderProfile();
+
+  // TODO: Crosscheck if current profile has calibration-data... use hasCalibrationData()...
   
-  // Estimate distance to best focus (focus curve minimum)
+  auto foFiCalibration = focusFinderProfile.getFocusFinderCalibration();
+  std::shared_ptr<FocusCurveT> focusCurve = foFiCalibration->getFocusCurve();
+  FittingCurveTypeT::TypeE curveFittingType = FocusCurveTypeT::toFittingCurve(focusCurve->getFocusCurveType());
+  const CurveParmsT & parms = focusCurve->getCurveParms();
+  
   auto curveFocusMeasureType = focusFinderProfile.getCurveFocusMeasureType();
-  
-  float foFiStepSize = focusFinderProfile.getStepSize();
   float focusMeasureLimit = focusFinderProfile.getFocusMeasureLimit();
-
-  // TODO: curveFocusMeasureType is HFD / FWHM...?
-  // HACK
+  float foFiStepSize = focusFinderProfile.getStepSize();
   std::shared_ptr<FocusCurveRecordSetT> records = std::make_shared<FocusCurveRecordSetT>(curveFocusMeasureType, focusMeasureLimit);
-  //std::vector<std::shared_ptr<FocusCurveRecordT> > records;  
-    
 
-  LOG(debug)
-    << "FocusFinderFastCurveLookupT::run..." << std::endl;
+  LOG(debug) << "FocusFinderFastCurveLookupT::run... Using parameters: " << std::endl
+	     << "  > curveFittingType=" << FittingCurveTypeT::asStr(curveFittingType) << std::endl
+	     << "  > foFiStepSize=" << foFiStepSize << std::endl
+	     << "  > curveFocusMeasureType=" << FocusMeasureTypeT::asStr(curveFocusMeasureType)
+	     << "  > focusMeasureLimit=" << focusMeasureLimit << std::endl
+	     << "  > curve parameters:" << std::endl
+	     << parms
+	     << std::endl;
 
+  auto focusCurveFunction = CurveFunctionFactoryT::getInstance(curveFittingType, parms);
+  
   try {
     using namespace std::chrono_literals;
-
-
 
     // TODO: Check that camera is there  --> use focus controller checkDeviceAvailable() function
     // TODO: Check that focus is there --> use focus controller checkDeviceAvailable() function
@@ -168,6 +159,8 @@ void FocusFinderFastCurveLookupT::run() {
     
     // Read the current focus controller
     mInitialAbsPosition = getFocusController()->getFocus()->getCurrentPos();
+
+    LOG(debug) << "FocusFinderFastCurveLookupT::run... current focus position: " << mInitialAbsPosition << std::endl;
 
     
     // Self orientation
@@ -214,7 +207,7 @@ void FocusFinderFastCurveLookupT::run() {
 
     
     
-    // TODO: This is problematic... e.g. if the seeing is better or worse (compared to when the curve was recorded)... then the curve shifts up/down.... and then the lookup of the measureValue points to a different relatice position ... The only thing that would match would be the slope....
+    // TODO: This is problematic... e.g. if the seeing is better or worse (compared to when the curve was recorded)... then the curve shifts up/down.... and then the lookup of the measureValue points to a different relative position ... The only thing that would match would be the slope....
     //  -> Maybe it is possible to go to the other "curve half" and measure again
     //  -> IDEA: do a curve match with each new measure point for H(x,c,d) where c is the shift
     //           in x direction and d is the shift into y direction. c is the "perfect" focus pos.

@@ -112,7 +112,6 @@ void FocusFinderCalibrationT::setCalibrationData(const FocusCurveRecordSetContai
     // TODO / HACK / NOTE: Read comment above.
     auto firstFocusCurveRecord = mFocusCurveRecordSetContainer.front();
 
-    // TODO: ENABLE
     mFocusCurve = std::make_shared<FocusCurveT>(firstFocusCurveRecord, curveFitParms);
   }
 }

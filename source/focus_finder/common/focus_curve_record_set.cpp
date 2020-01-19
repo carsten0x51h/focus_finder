@@ -72,15 +72,16 @@ void FocusCurveRecordSetT::save(boost::property_tree::ptree & focusCurvesPt, std
 
   // <record_set creation_timestamp="1574134119">
   // TODO: focusCurvesPt.put("record_set.<xmlattr>.creation_timestamp", focusCurveRecordSet);
-
+  // TODO: focusCurvesPt.put("record_set.<xmlattr>.focus_measure_type", ...);
+  // TODO: focusCurvesPt.put("record_set.<xmlattr>.focus_measure_limit", ...);
 }
 
 
 std::shared_ptr<FocusCurveRecordSetT> FocusCurveRecordSetT::load(const boost::property_tree::ptree & pt, const std::filesystem::path & lightFramePath) {
 
   //get<FocusMeasureTypeT>()
-  FocusMeasureTypeT::TypeE focusMeasureType = FocusMeasureTypeT::HFD; // TODO: LOAD
-  float focusMeasureLimit = 18.0F; // TODO: Load
+  FocusMeasureTypeT::TypeE focusMeasureType = FocusMeasureTypeT::FWHM_AVERAGE; // TODO: LOAD
+  float focusMeasureLimit = 12.0F; // TODO: Load
   // TODO: Load creation_timestamp....
   
   auto focusCurveRecordSet = std::make_shared<FocusCurveRecordSetT>(focusMeasureType, focusMeasureLimit);

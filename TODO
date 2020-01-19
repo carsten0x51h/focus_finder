@@ -1,6 +1,6 @@
 TODO
 ----
--NEXT
+-Next steps
         -Remove HACK - FocusCurveRecordSetT - load()
         	//get<FocusMeasureTypeT>()
         	FocusMeasureTypeT::TypeE focusMeasureType = FocusMeasureTypeT::HFD; // TODO: LOAD
@@ -8,7 +8,7 @@ TODO
         	// TODO: Load creation_timestamp....
 
  	-Make use of stored curve in focus finder.
-
+	-Move device deplays to profile (sep. delay for each device?)
 	-Focus-controller: TODO: Should this be configurable? -> Yes, part of profile...?!... Just need a good name...  const float STEP_FACTOR = 3.0F;
 	-Handle cancel exception in "focus curve recorder" and "focus finder"
 	-Remove hardcoded exposure times (e.g. in focus curve recorder -> maybe this field should be inegrated also into the focus curve recorder frame!)
@@ -30,39 +30,38 @@ TODO
 	-Implement New + edit profile -> see libreoffice document...
 		-Extend persistence of boost tree to SizeT, enums etc. 
 	-ProfileManager - Add directory listener to get notified when profile was added or removed (same as renamed). 
-	-Späääter, im cfg dialog hinter jedes Feld ein blaues Info Icon mit Mouse-over text zum Erklären der FUnktion.....?!
-	-Später: Im cfg. Dialog einige Dinge "visualisieren" - z.B. Star window mit Grafik und Stern, das sich je nach Window size verändert....
+	-Idea: add a blue info icon behind each input field which explains the field when hovering over it with the mouse
+	-Idea: Visualize some things in the dialog - e.g. the star window with a graphics and star, which changes depnding on input paramerters
 	-Close ManageDeviceProfilesDialog if MainWindow is closed
 
 -Focus / FocusCntlPanel
-	-Idea! Also mFfl should allow registering to an event that is fired when focus finder process
-	 has started! Then this panel can be disabled (same for camera cntl panel).
-    -IDEA: In focus cntl panel - maybe indicate absolute position of focus by a line and a dot where left is minimu, right is maximum and dot is the current position... but maybe this should go to a sep panel...
-    -Add listener - when temperature has changed...
-    -FocusCntlPanel - listen for up/down arrow key -> move focus up / down 1 step (or maybe 10 steps)... page up, page down also (10x more..)
+	-Idea: Also mFfl should allow registering to an event that is fired when focus finder process has started! Then this panel can be disabled (same for camera cntl panel).
+	-Idea: In focus cntl panel - maybe indicate absolute position of focus by a line and a dot where left is minimu, right is maximum and dot is the current position... but maybe this should go to a sep panel...
+    	-Add listener - when temperature has changed...
+    	-FocusCntlPanel - listen for up/down arrow key -> move focus up / down 1 step (or maybe 10 steps)... page up, page down also (10x more..)
 
--Cooler device simulator
--Integrate into UI
--Finish device dialog to connect devices
--Impl. first indi device against device IF
-
--Implement binning - dummy camera, selection in GUI, etc.
--3D star profile - see example
-    -https://doc.qt.io/qt-5/qtdatavisualization-surface-example.html
+-Others
+	-Cooler device simulator
+	-Integrate into UI
+	-Finish device dialog to connect devices
+	-Impl. first indi device against device IF
+	-Implement binning - dummy camera, selection in GUI, etc.
+	-3D star profile - see example - https://doc.qt.io/qt-5/qtdatavisualization-surface-example.html
 
 -LP
-    -Always display last "corrected" star image im "focus curve recorder"
-    -Remove camera delay hack -> hardcoded 1s exposure time... was 0 for some reason, check if "repeat checkbox" has any effect when recording a curve...
-    -atik driver now has it's own xml file - not only drivers.xml any longer... check INDI...
-    -Camera error handling - e.g. when setting a 0 as exposure time, no obvious feedback is given to the user / progress wheel continues running.... but there was an error message in the log
-    -"Image stretcher" sometimes shows black stars... and linear scaling is more or less useless
-    -Star detection algorithm often shows that there are 7 or 8 stars selected -> max-entropy binarization fails -> clustering does not work reliable
-    -Fails with "Insufficient data points" exc. even before one can press save / apply!
-    -One place to set the "Focus measure limit"! In the GUI! -> profile!
-    -Do not calculate all values (FwhmT & HFD) by default when loading the curve record (and also not when recording). Just calc the one which is/was requested
-    -Display curve problem: change of pos is small, curve appears like a line... -> auto scale...
+	-Always display last "corrected" star image im "focus curve recorder"
+	-Remove camera delay hack -> hardcoded 1s exposure time... was 0 for some reason, check if "repeat checkbox" has any effect when recording a curve...
+    	-atik driver now has it's own xml file - not only drivers.xml any longer... check INDI...
+    	-Camera error handling - e.g. when setting a 0 as exposure time, no obvious feedback is given to the user / progress wheel continues running.... but there was an error message in the log
+    	-"Image stretcher" sometimes shows black stars... and linear scaling is more or less useless
+    	-Star detection algorithm often shows that there are 7 or 8 stars selected -> max-entropy binarization fails -> clustering does not work reliable
+    	-Fails with "Insufficient data points" exc. even before one can press save / apply!
+    	-One place to set the "Focus measure limit"! In the GUI! -> profile!
+    	-Do not calculate all values (FwhmT & HFD) by default when loading the curve record (and also not when recording). Just calc the one which is/was requested
+    	-Display curve problem: change of pos is small, curve appears like a line... -> auto scale...
 
-    -Problematic curve with simulator:
+-DEBUG
+	-Problematic curve with simulator:
         --- FocusCurveT ---
            > Focus measure type: FWHM_AVERAGE
            > Focus measure limit: 12
@@ -73,7 +72,7 @@ TODO
               D_IDX = 3.74167
            > [minPos, maxPos]=[25000, 48000]
 
-After running again, it worked...:
+	   After running again, it worked...:
            [2020-01-07 21:45:53.288767]: Calculated focus curve parameters: 
            --- FocusCurveT ---
               > Focus measure type: FWHM_AVERAGE

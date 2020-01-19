@@ -86,8 +86,6 @@ float LmFittingCurveGaussianT::fx(float x, const gsl_vector * curveParms) const 
 int LmFittingCurveGaussianT::gslFx(const gsl_vector * curveParms, const GslMultiFitParmsT * gslParms,
 		gsl_vector * outResultVec) {
 
-  LOG(debug) << "LmFittingCurveGaussianT::gslFx() - gslParms->size(): " << gslParms->size() << ", outResultVec->size: " << outResultVec->size << std::endl;
-
 	//Execute Levenberg-Marquart on f(x)
 	for (size_t i = 0; i < gslParms->size(); ++i) {
 		const GslMultiFitDataT & gslData = gslParms->at(i);
