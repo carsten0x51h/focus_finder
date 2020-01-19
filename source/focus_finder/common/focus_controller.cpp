@@ -449,7 +449,7 @@ std::shared_ptr<FocusCurveRecordT> FocusControllerT::measureFocus() {
 }
 
 
-void FocusControllerT::waitForFocus(std::chrono::milliseconds timeout) const {
+void FocusControllerT::waitForFocus(std::chrono::milliseconds timeout, bool ignoreCancel) const {
   auto isFocusPositionReachedOrCancelledLambda = [=, this]() -> bool {
 						   LOG(debug) << "current pos=" << getFocus()->getCurrentPos()
 							      << ", target pos=" << getFocus()->getTargetPos()
@@ -459,7 +459,7 @@ void FocusControllerT::waitForFocus(std::chrono::milliseconds timeout) const {
 						   // TODO: focus->getTargetPos() currently is not implemented..
 						   //       not sure if target and/or current position are maintained by INDI focus driver...
 						   //return (focus->getCurrentPos() == focus->getTargetPos() && ! focus->isMoving());
-						   return (! getFocus()->isMoving() || mCancelled.load());
+						   return (! getFocus()->isMoving() || (! ignoreCancel && mCancelled.load()));
 						 };
   wait_for(isFocusPositionReachedOrCancelledLambda, timeout);
 }
@@ -613,8 +613,7 @@ int FocusControllerT::boundaryScanWithFocusCurveSupport(std::shared_ptr<CurveFun
     FocusDirectionT::TypeE dir = selfOrientationResult.focusDirectionToLimit;
       
     if (goalOvershot) {
-      LOG(debug) << "FocusControllerT::boundaryScanWithFocusCurveSupport..."
-		 << "GOAL OVERSHOT (1) !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
+      LOG(debug) << "FocusControllerT::boundaryScanWithFocusCurveSupport...goal overshot... inverting direction..." << std::endl;
 
       // Invert direction
       dir = FocusDirectionT::invert(dir);
@@ -641,12 +640,12 @@ int FocusControllerT::boundaryScanWithFocusCurveSupport(std::shared_ptr<CurveFun
 			   boundaryLoc == BoundaryLocationT::OUTSIDE_BOUNDARY && boundaryLoc2 == BoundaryLocationT::INSIDE_BOUNDARY);
 	
       if (goalOvershot) {
-	LOG(debug) << "FocusControllerT::boundaryScanWithFocusCurveSupport..."
-		   << "OVERSHOT (2) !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
-
 	// Invert direction!
 	dir = FocusDirectionT::invert(dir);
 	stepFinetuneSize = stepFinetuneSize / 2.0F;
+
+	LOG(debug) << "FocusControllerT::boundaryScanWithFocusCurveSupport...goal overshot... inverting direction to " << FocusDirectionT::asStr(dir)
+		   << " and bisect stepSize to " << stepFinetuneSize << std::endl;
       }
 
       // TODO: checkCancelled()!
@@ -672,7 +671,7 @@ int FocusControllerT::boundaryScanWithFocusCurveSupport(std::shared_ptr<CurveFun
 
 void FocusControllerT::checkCancelled() const {
   if (mCancelled.load()) {
-    throw FocusControllerCancelledExceptionT("Focus curve recorder cancelled.");
+    throw FocusControllerCancelledExceptionT("Focus controller was cancelled.");
   }
 }
 
@@ -692,7 +691,7 @@ void FocusControllerT::onImageReceived(RectT<unsigned int> roi,
 }
 
 
-SelfOrientationResultT FocusControllerT::performSelfOrientation() {
+SelfOrientationResultT FocusControllerT::performSelfOrientation(float focusMeasureLimit) {
   using namespace std::chrono_literals;
 
   SelfOrientationResultT selfOrientationResult;
@@ -704,24 +703,28 @@ SelfOrientationResultT FocusControllerT::performSelfOrientation() {
 
   // TODO: Should this be configurable? -> YES, part of profile...?!... Just need a good name...
   const float STEP_FACTOR = 3.0F;
-
+  float selfOrientationStepSize = STEP_FACTOR * mFocusFinderProfile.getStepSize();
+  FocusDirectionT::TypeE initialMovingDirection = FocusDirectionT::INWARD;
+  
   // TODO: Should the FocusControllerT be aware of mFocusFinderProfile? Or should parms be passed?
-  moveFocusByBlocking(FocusDirectionT::INWARD, STEP_FACTOR * mFocusFinderProfile.getStepSize(), 30000ms);
+  moveFocusByBlocking(initialMovingDirection, selfOrientationStepSize, 30000ms);
     
   selfOrientationResult.record2 = measureFocus();
   //Notify about FocusCurve recorder update...
   notifyFocusControllerProgressUpdate(100.0F, "Self orientation finished.", selfOrientationResult.record2);
   notifyFocusControllerNewRecord(selfOrientationResult.record2);
 
-  FocusMeasureTypeT::TypeE curveFocusMeasureType = mFocusFinderProfile.getCurveFocusMeasureType();
+  // TODO: Which one to use for self orientation?
+  // FocusMeasureTypeT::TypeE focusMeasureType = mFocusFinderProfile.getCurveFocusMeasureType();
+  FocusMeasureTypeT::TypeE focusMeasureType = mFocusFinderProfile.getLimitFocusMeasureType();
   
-  float focusMeasure1 = selfOrientationResult.record1->getFocusMeasure(curveFocusMeasureType);
-  float focusMeasure2 = selfOrientationResult.record2->getFocusMeasure(curveFocusMeasureType);
-  
+  float focusMeasure1 = selfOrientationResult.record1->getFocusMeasure(focusMeasureType);
+  float focusMeasure2 = selfOrientationResult.record2->getFocusMeasure(focusMeasureType);
+    
   // TODO: Should a minimum difference be required?
   // TODO / FIXME!! mFocusMeasureLimit no longer defined... the limiting value depends on the FocusMeasureType! So either the appl. has some good defaults ( can calculate them depending on camera and telescope settings etc., or the user can specify default values for all the focus measures in the profile. Furthermore, this value could simply be supplied as a parameter to this function! Then the selfOrientation function does not care if the value comes from the profile, a pre-calculation or a UI....
-  bool aboveFocusMeasureLimit = (focusMeasure2 > 18.0F/*FIXME!!mFocusMeasureLimit*/);
-
+  bool aboveFocusMeasureLimit = (focusMeasure2 > focusMeasureLimit);
+    
   if (focusMeasure2 > focusMeasure1) {
     // We are on the "left" half of the curve
     selfOrientationResult.curveHalf = CurveHalfT::LEFT_HALF;
@@ -741,7 +744,18 @@ SelfOrientationResultT FocusControllerT::performSelfOrientation() {
     // TODO: reporting?
     throw FocusControllerCancelledExceptionT("Unable to determine target focus direction. No difference in focus measure detected.");
   }
-  
+
+  LOG(info) << "Successfully performed self-orientation using parameters: " << std::endl
+	    << " > stepFactor: " << STEP_FACTOR << " -> self orientation step size: " << selfOrientationStepSize << std::endl
+	    << " > initialMovingDirection: " << FocusDirectionT::asStr(initialMovingDirection) << std::endl
+	    << " > focus measure type: " << FocusMeasureTypeT::asStr(focusMeasureType)
+	    << std::endl
+	    << selfOrientationResult
+	    << std::endl
+	    << "Focus measure 1: " << focusMeasure1 << std::endl
+	    << "Focus measure 2: " << focusMeasure2
+	    << std::endl;
+
   return selfOrientationResult;
 }
 
@@ -762,7 +776,7 @@ void FocusControllerT::moveFocusByBlocking(
 }
 
 
-void FocusControllerT::moveFocusToBlocking(int absPos, std::chrono::milliseconds timeout) {
+void FocusControllerT::moveFocusToBlocking(int absPos, std::chrono::milliseconds timeout, bool ignoreCancel) {
 
   if (getFocus() == nullptr) {
     throw FocusControllerFailedExceptionT("No focus device set.");
@@ -771,11 +785,11 @@ void FocusControllerT::moveFocusToBlocking(int absPos, std::chrono::milliseconds
   // Set the target position (abs)
   getFocus()->setTargetPos(absPos);
 
-  waitForFocus(timeout);
+  waitForFocus(timeout, ignoreCancel);
 
   // If it was cancelled, throw cancel exception
-  if (mCancelled) {
-    throw FocusControllerCancelledExceptionT("Unable to determine target focus direction. No difference in focus measure detected.");
+  if (! ignoreCancel && mCancelled) {
+    throw FocusControllerCancelledExceptionT();
   }
 }
 
@@ -852,7 +866,7 @@ void FocusControllerT::cleanup() {
 
   // In any case move the focus to the initial position (if focus device is still available)
   try {
-    moveFocusToBlocking(mInitialFocusPos, 30000ms /*timeout*/);
+    moveFocusToBlocking(mInitialFocusPos, 30000ms /*timeout*/, true /*ignore cancel*/);
   } catch (FocusControllerFailedExceptionT & exc) {
     LOG(error) << "FocusControllerT::cleanup... no focus device set!" << std::endl;
   }

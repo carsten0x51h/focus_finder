@@ -24,6 +24,8 @@
 
 #include <boost/property_tree/ptree.hpp>
 
+#include "include/focus_finder_logic.h"
+#include "include/profile_manager.h"
 #include "include/curve_fit_parms.h"
 #include "include/focus_finder_calibration.h"
 #include "include/focus_curve_record_set.h"
@@ -130,92 +132,61 @@ std::shared_ptr<FocusCurveT> FocusFinderCalibrationT::getFocusCurve() const {
 }
 
 
-void FocusFinderCalibrationT::save(boost::property_tree::ptree & pt, std::shared_ptr<FocusFinderCalibrationT> focusFinderCalibration) {
-  LOG(debug) << "FocusFinderCalibrationT::save... TODO: Implement further..." << std::endl;
+void FocusFinderCalibrationT::save(boost::property_tree::ptree & pt, std::shared_ptr<FocusFinderCalibrationT> focusFinderCalibration, const std::filesystem::path & lightFramePath) {
+  LOG(debug) << "FocusFinderCalibrationT::save..." << std::endl;
 
-  const FocusCurveRecordSetContainerT & focusCurveRecordSets = focusFinderCalibration->getCalibrationData();
-
-  // Store the focusCurveRecordSets...
   boost::property_tree::ptree focusCurvesPt;
+  const FocusCurveRecordSetContainerT & focusCurveRecordSets = focusFinderCalibration->getCalibrationData();  
 
+  // Clean the calibration/light_frame directory which holds the star images of the previous calibration (if any)
+  LOG (debug) << "Removing calibration lightframes from " << lightFramePath.string() << "..." << std::endl;
+    
+  std::error_code errCode;
+  std::uintmax_t numObjRemoved = std::filesystem::remove_all(lightFramePath, errCode);
+
+  if (errCode.value() == 0) {
+    LOG(debug) << "Removed " << numObjRemoved << " lightframes from '" << lightFramePath.string() << "'." << std::endl;
+  } else {
+    LOG(error) << "Removing lightframes from '" << lightFramePath.string() << "' failed. Reason: " << errCode.message() << std::endl;
+    // TODO: throw!
+  }
+
+  // Re-create the light_frames directory
+  std::filesystem::create_directories(lightFramePath, errCode);
+  
+  if (errCode.value() == 0) {
+    LOG(debug) << "Created directory '" << lightFramePath.string() << "'." << std::endl;
+  } else {
+    LOG(error) << "Creating directory '" << lightFramePath.string() << "' failed." << std::endl;
+    // TODO: throw!?
+  }
+  
   for (auto & focusCurveRecordSet : focusCurveRecordSets) {
-    FocusCurveRecordSetT::save(focusCurvesPt, focusCurveRecordSet);
+    FocusCurveRecordSetT::save(focusCurvesPt, focusCurveRecordSet, lightFramePath);
   }
   
   pt.add_child("focus_curves", focusCurvesPt);
   
   LOG(debug) << "Finished storing '" << focusCurveRecordSets.size() << "' focus curve record sets..." << std::endl;
-
-
-  
-    
-  // This is test code moved from CurveRecorderGUI to here... it was used to test the storing of curve data... parts of it may have to be used somewhere here in the save contect - or somewhere else...
-//   // TODO: REMOVE!!!
-// #include <boost/property_tree/ptree.hpp>
-// //#include <boost/property_tree/ini_parser.hpp>
-// #include <boost/property_tree/xml_parser.hpp>
-// // TODO: REMOVE!!!
-//   // TODO: REMOVE
-//   // HACK: Store a FocusCurveRecord as test!
-//   boost::property_tree::ptree pt;
-//   const auto & recorder = mFocusCurveRecorderLogic->getFocusCurveRecorder();
-//   const auto recordSets = recorder->getFocusCurveRecordSets(); // std::shared_ptr<FocusCurveRecordSetContainerT>, FocusCurveRecordSetContainerT = std::list<std::shared_ptr<FocusCurveRecordSetT> >
-//   const auto recordSet1 = recordSets->front(); // std::shared_ptr<std::vector< std::shared_ptr<FocusCurveRecordT> > >
-//   const auto record1 = recordSet1->at(0); // std::shared_ptr<FocusCurveRecordT> >
-//   // TODO: getActiveProfileRootPath(); -> Maybe we need the profile manager here? Or at least the path...
-//   // TODO: HACK!
-
-
-//   // TODO: Create dir if not there... use std::filesystem....
-//   // TODO: Move this path definition out of here -> into the ProfileManager as static function?!
-//   // std::filesystem::path lightFrameDirectoryPath;
-//   // lightFrameDirectoryPath = activeProfileRootPath;
-//   // lightFrameDirectoryPath /= "calibration";
-//   // lightFrameDirectoryPath /= "light_frames";
-
-  
-//   // TODO: What if
-//   mFocusCurveRecorderLogic->getProfileManager()->
-//   auto activeProfileOpt = mFfl.->getActiveProfile();
-
-//   -> Move to FocusFinderProfileT save()
-//   FocusCurveRecordT::store("/home/devnull/.fofi/profiles/profile_1/calibration/light_frames", *record1, pt);
-//   try {
-//     //write_ini("/home/devnull/.fofi/focus_curve.rec", pt);
-//     write_xml("/home/devnull/.fofi/focus_curve.rec", pt);
-//   } catch (boost::property_tree::xml_parser_error & exc) {
-//     //  } catch (boost::property_tree::ini_parser_error & exc) {
-//     // TODO...
-//     LOG(error) << "ERROR WRITING FOCUS CURVE RECORD..." << exc.what() << std::endl;
-//   }
-
-
-  
 }
 
-std::shared_ptr<FocusFinderCalibrationT> FocusFinderCalibrationT::load(const boost::property_tree::ptree & pt, const CurveFitParmsT & curveFitParms) {
-  LOG(debug) << "FocusFinderCalibrationT::load... TODO: Implement..." << std::endl;
+std::shared_ptr<FocusFinderCalibrationT> FocusFinderCalibrationT::load(const boost::property_tree::ptree & pt, const CurveFitParmsT & curveFitParms, const std::filesystem::path & lightFramePath) {
+  LOG(debug) << "FocusFinderCalibrationT::load..." << std::endl;
 
-  auto focusFinderCalibration = std::make_shared<FocusFinderCalibrationT>();
-
-  LOG(debug) << "FocusFinderCalibrationT::load - focusFinderCalibration.size(): " << focusFinderCalibration->numRecordSets() << std::endl;
-  
-  FocusCurveRecordSetContainerT focusCurveRecordSets;
-
-  // Read all elements of a RecordSet... - see https://stackoverflow.com/questions/40393765/accessing-multi-valued-keys-in-property-tree
+  // Read all elements of a RecordSet...
+  // See https://stackoverflow.com/questions/40393765/accessing-multi-valued-keys-in-property-tree
   // Also see https://akrzemi1.wordpress.com/2011/07/13/parsing-xml-with-boost/
   const auto & focusCurvesNode = pt.get_child("focus_curves");
-  
+  FocusCurveRecordSetContainerT focusCurveRecordSets;
+
   for (auto & focusCurveRecordSetPt : focusCurvesNode) {
-    focusCurveRecordSets.push_back(FocusCurveRecordSetT::load(focusCurveRecordSetPt.second));
+    focusCurveRecordSets.push_back(FocusCurveRecordSetT::load(focusCurveRecordSetPt.second, lightFramePath));
   }
   
   LOG(debug) << "Finished loading '" << focusCurveRecordSets.size() << "' focus curve record sets..." << std::endl;
-  
-  focusFinderCalibration->setCalibrationData(focusCurveRecordSets, curveFitParms);
-  // TODO ...
 
-  LOG(debug) << "FocusFinderCalibrationT::load - focusFinderCalibration.size() [2]: " << focusFinderCalibration->numRecordSets() << std::endl;
+  auto focusFinderCalibration = std::make_shared<FocusFinderCalibrationT>();
+  focusFinderCalibration->setCalibrationData(focusCurveRecordSets, curveFitParms);
   
   return focusFinderCalibration;
 }

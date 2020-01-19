@@ -127,7 +127,7 @@ CurveHalfT::TypeE DefaultFocusCurveRecorderT::locateStartingPosition() {
   LOG(debug)
     << "DefaultFocusCurveRecorderT::locateStartingPosition..." << std::endl;
 
-  SelfOrientationResultT selfOrientationResult = getFocusController()->performSelfOrientation();
+  SelfOrientationResultT selfOrientationResult = getFocusController()->performSelfOrientation(getFocusMeasureLimit());
 
   // Move close to the limiting focus measure (into the determined direction)
   getFocusController()->boundaryScanLinear(selfOrientationResult, getStepSize(), getFocusMeasureLimit());

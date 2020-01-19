@@ -39,9 +39,6 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 
-//#include <bits/stdc++.h>
-//#include <boost/algorithm/string.hpp>
-
 using namespace std::chrono_literals;
 
 const std::string FocusFinderProfileT::DEFAULT = "Default";
@@ -298,7 +295,7 @@ bool FocusFinderProfileT::hasCalibrationData() const {
 }
 
 
-FocusFinderProfileT FocusFinderProfileT::load(const std::string & fullProfilePath) {
+FocusFinderProfileT FocusFinderProfileT::load(const std::string & fullProfilePath, const std::filesystem::path & lightFramePath) {
     
   FocusFinderProfileT profile;
 
@@ -396,7 +393,7 @@ FocusFinderProfileT FocusFinderProfileT::load(const std::string & fullProfilePat
      *
      */
 
-    profile.setFocusFinderCalibration(FocusFinderCalibrationT::load(pt.get_child("profile.calibration"), curveFitParms));
+    profile.setFocusFinderCalibration(FocusFinderCalibrationT::load(pt.get_child("profile.calibration"), curveFitParms, lightFramePath));
 
     
     //
@@ -412,7 +409,7 @@ FocusFinderProfileT FocusFinderProfileT::load(const std::string & fullProfilePat
 }
 
 
-void FocusFinderProfileT::save(const std::string & fullProfilePath, const FocusFinderProfileT & profile) {
+void FocusFinderProfileT::save(const std::string & fullProfilePath, const std::filesystem::path & lightFramePath, const FocusFinderProfileT & profile) {
   boost::property_tree::ptree pt;
 
   // TODO: Need translator for std::chrono::duration<float>  --> 1.5s
@@ -505,7 +502,7 @@ void FocusFinderProfileT::save(const std::string & fullProfilePath, const FocusF
      *
      */
     boost::property_tree::ptree calibrationPt;
-    FocusFinderCalibrationT::save(calibrationPt, profile.getFocusFinderCalibration());
+    FocusFinderCalibrationT::save(calibrationPt, profile.getFocusFinderCalibration(), lightFramePath);
     pt.add_child("profile.calibration", calibrationPt);
 
     

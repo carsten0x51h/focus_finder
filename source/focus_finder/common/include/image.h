@@ -28,8 +28,10 @@
 // We do not want X11 dependency
 #define cimg_display 0
 
+// NOTE: In order to use TIFF, enable the following define. This also requires adding
+//       ${TIFF_LIBRARIES} to the CMakeLists.txt file.
 // See https://stackoverflow.com/questions/3021050/write-tiff-float-images-using-cimg
-#define cimg_use_tiff
+//#define cimg_use_tiff
 
 #include <CImg.h>
 

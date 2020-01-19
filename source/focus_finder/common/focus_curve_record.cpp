@@ -33,6 +33,7 @@
 
 
 #include "include/focus_curve_record.h"
+#include "include/cimg_fits_io.h"
 #include "include/fwhm.h"
 #include "include/hfd.h"
 #include "include/image.h"
@@ -125,7 +126,7 @@ FocusCurveRecordT::print(std::ostream & os, size_t indent) const {
 }
 
 // TODO: This function may be moved out of this class because the dependency to property_tree shoud not be in here... It does not have to be a class member at all! -> Move to a sep. "translator" or "serialization" class... Maybe this should go to a translator function like for the enum? No, because probably this is only for one entry!
-void FocusCurveRecordT::save(/*const std::filesystem::path & lightFrameDirectoryPath,*/ boost::property_tree::ptree & pt, const FocusCurveRecordT & focusCurveRecord) {
+void FocusCurveRecordT::save(boost::property_tree::ptree & pt, const FocusCurveRecordT & focusCurveRecord, const std::filesystem::path & lightFramePath) {
   boost::property_tree::ptree curveRecordPt;
   
   curveRecordPt.put<TimestampT>("<xmlattr>.record_timestamp", focusCurveRecord.getCreationTimestamp());
@@ -147,31 +148,26 @@ void FocusCurveRecordT::save(/*const std::filesystem::path & lightFrameDirectory
   long msSinceEpoch = std::chrono::duration_cast<std::chrono::milliseconds>(focusCurveRecord.getCreationTimestamp().time_since_epoch()).count();
 
   std::stringstream ssImgFilename;
-  ssImgFilename << msSinceEpoch << ".tiff";
+  ssImgFilename << msSinceEpoch << ".fits";
 
-  // TODO: Maybe get rid of the TIFF dependency and store using FITSIO instead. This dependency is there anyway...
-  
-  
   // Finally, build image file path
-
-  // HACK!!!! Get this value from the profileMgr... or from the profile itself? Or pass in?...
-  std::string lightFrameDirectoryPath = "/home/devnull/.fofi/profiles/profile_2/calibration/light_frames";
-  // HACK!!!!
-
-  std::filesystem::path imgFilePath(lightFrameDirectoryPath);
+  std::filesystem::path imgFilePath = lightFramePath;
   imgFilePath /= ssImgFilename.str();
 
   LOG(debug) << "Storing FocusCurveRecordT image to '" << imgFilePath << "'..." << std::endl;
 
   // Save the image
-  // TODO: Error handling (permissions etc...)
-  const ImageT & img = focusCurveRecord.getCorrectedStarImage();
-  img.save_tiff(imgFilePath.string().c_str());
+  std::stringstream debugSs;
+
+  // NOTE: Throws FitsIOExceptionT... TODO: Handle here?
+  CImgFitsIOHelperT::writeFits(focusCurveRecord.getCorrectedStarImage(), imgFilePath.string(), & debugSs);
+  
+  LOG(debug) << "FITS storing details: " << debugSs.str() << std::endl;
 }
 
 
 
-std::shared_ptr<FocusCurveRecordT> FocusCurveRecordT::load(const boost::property_tree::ptree & pt /*, const std::filesystem::path & lightFrameDirectoryPath*/) {
+std::shared_ptr<FocusCurveRecordT> FocusCurveRecordT::load(const boost::property_tree::ptree & pt, const std::filesystem::path & lightFramePath) {
 
   TimestampT creationTimestamp = pt.get<TimestampT>("<xmlattr>.record_timestamp");
   
@@ -184,24 +180,24 @@ std::shared_ptr<FocusCurveRecordT> FocusCurveRecordT::load(const boost::property
   long msSinceEpoch = std::chrono::duration_cast<std::chrono::milliseconds>(creationTimestamp.time_since_epoch()).count();
 
   std::stringstream ssImgFilename;
-  ssImgFilename << msSinceEpoch << ".tiff";
-
-  // HACK!!!! Get this value from the profileMgr... or from the profile itself? Or pass in?...
-  std::string lightFrameDirectoryPath = "/home/devnull/.fofi/profiles/profile_2/calibration/light_frames";
-  // HACK!!!!
+  ssImgFilename << msSinceEpoch << ".fits";
   
   // Finally, build image file path
-  std::filesystem::path imgFilePath(lightFrameDirectoryPath);
+  std::filesystem::path imgFilePath = lightFramePath;
   imgFilePath /= ssImgFilename.str();
 
   LOG(debug) << "Loading FocusCurveRecordT image from '" << imgFilePath << "'..." << std::endl;
 
-  // Load the image
-  // TODO: Error handling (permissions etc...)
+  // Load the star image
   ImageT img;
   try {
-    img.load_tiff(imgFilePath.string().c_str());
-  } catch (cimg_library::CImgIOException & exc) {
+    std::stringstream debugSs;
+    long bitPix; // TODO: Add to CImg somehow? Or is it contained already?
+
+    // NOTE: Throws FitsIOExceptionT
+    CImgFitsIOHelperT::readFits(& img, imgFilePath.string(), & bitPix, & debugSs);
+    LOG(debug) << "FITS loading details: " << debugSs.str() << std::endl;    
+  } catch (FitsIOExceptionT & exc) {
     LOG(error) << "Could not load star image " << imgFilePath.string() << ", problem message: " << exc.what() << std::endl;
     // TODO: Error reporting.... ReportingT...
   }

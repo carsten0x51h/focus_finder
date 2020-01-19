@@ -55,7 +55,7 @@ std::shared_ptr<ProfileManagerT> FocusCurveRecorderLogicT::getProfileManager() c
   //if (!activeProfileOpt) {
   //}
 
-void FocusCurveRecorderLogicT::resetFocusCurveRecorder(FocusCurveRecorderTypeT::TypeE focusCurveRecorderType) {
+void FocusCurveRecorderLogicT::resetFocusCurveRecorder(FocusCurveRecorderTypeT::TypeE focusCurveRecorderType, const FocusFinderProfileT & focusFinderProfile) {
 
   auto focusController = std::make_shared<FocusControllerT>(mFfl.getCurrentCamera(), mFfl.getCurrentFocus(), mFfl.getCurrentFilter());
   auto lastFocusStarPosOpt = mFfl.getLastFocusStarPos();
@@ -66,13 +66,14 @@ void FocusCurveRecorderLogicT::resetFocusCurveRecorder(FocusCurveRecorderTypeT::
   focusController->setLastFocusStarPos(lastFocusStarPosOpt.value());
 
 
-  auto activeProfileOpt = mFfl.getProfileManager()->getActiveProfile();
+  //auto activeProfileOpt = mFfl.getProfileManager()->getActiveProfile();
 
   // TODO: Make sure that activeProfile is set...
   //if (!activeProfileOpt) {
   //}
-  focusController->setFocusFinderProfile(activeProfileOpt.value());
-
+  //focusController->setFocusFinderProfile(activeProfileOpt.value());
+  
+  focusController->setFocusFinderProfile(focusFinderProfile);
   
   mFocusCurveRecorder = FocusCurveRecorderFactoryT::getInstance(
 								focusCurveRecorderType,

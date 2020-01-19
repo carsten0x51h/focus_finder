@@ -74,7 +74,7 @@ private:
   FocusControllerNewRecordListenersT mFocusControllerNewRecordListeners;
 
     
-  void waitForFocus(std::chrono::milliseconds timeout) const;
+  void waitForFocus(std::chrono::milliseconds timeout, bool ignoreCancel = false) const;
   void onImageReceived(RectT<unsigned int> roi, std::shared_ptr<const ImageT> image, bool lastFrame);
   BoundaryLocationT::TypeE determineBoundaryLoc(float lowerFocusMeasure, float upperFocusMeasure, float focusMeasure) const;
 
@@ -133,11 +133,11 @@ public:
   void checkIfStarIsThere(const ImageT & img, float * outSnr = 0) const;
   void runExposureBlocking(std::chrono::milliseconds expTime);
   void moveFocusByBlocking(FocusDirectionT::TypeE direction, int ticks, std::chrono::milliseconds timeout);
-  void moveFocusToBlocking(int absPos, std::chrono::milliseconds timeout);
+  void moveFocusToBlocking(int absPos, std::chrono::milliseconds timeout, bool ignoreCancel = false);
   
   void checkCancelled() const;
   
-  SelfOrientationResultT performSelfOrientation();
+  SelfOrientationResultT performSelfOrientation(float focusMeasureLimit);
 
   // TODO: Could there also be a "binary search" to be faster than "boundaryScanLinear" even without having a curve?!
   void boundaryScanLinear(const SelfOrientationResultT & selfOrientationResult, float stepSize, float focusMeasureLimit);

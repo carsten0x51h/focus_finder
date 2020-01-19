@@ -145,7 +145,8 @@ private:
     void updateFocusFinderMainMenuBar();
 
     // Business logic
-    FocusFinderLogicT mFfl;
+  //TODO: Make it static ?!?!? in main... independent from GUI!?
+    FocusFinderLogicT & mFfl;
 
     // Image viewer
     ImageViewerPanelT * mImageViewerPanel;

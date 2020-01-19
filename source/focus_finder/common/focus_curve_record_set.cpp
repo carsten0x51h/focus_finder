@@ -60,13 +60,13 @@ std::pair<int, int> FocusCurveRecordSetT::minmaxFocusPos() const {
 }
 
 
-void FocusCurveRecordSetT::save(boost::property_tree::ptree & focusCurvesPt, std::shared_ptr<FocusCurveRecordSetT> focusCurveRecordSet) {
+void FocusCurveRecordSetT::save(boost::property_tree::ptree & focusCurvesPt, std::shared_ptr<FocusCurveRecordSetT> focusCurveRecordSet, const std::filesystem::path & lightFramePath) {
   LOG(debug) << "FocusCurveRecordSetT::save... Storing " << focusCurveRecordSet->size() << " records..." << std::endl;
 
   boost::property_tree::ptree recordSetPt;
 
   for (auto & focusCurveRecord : *focusCurveRecordSet) {
-    FocusCurveRecordT::save(recordSetPt, *focusCurveRecord);    
+    FocusCurveRecordT::save(recordSetPt, *focusCurveRecord, lightFramePath);
   }
   focusCurvesPt.add_child("record_set", recordSetPt);
 
@@ -76,7 +76,7 @@ void FocusCurveRecordSetT::save(boost::property_tree::ptree & focusCurvesPt, std
 }
 
 
-std::shared_ptr<FocusCurveRecordSetT> FocusCurveRecordSetT::load(const boost::property_tree::ptree & pt) {
+std::shared_ptr<FocusCurveRecordSetT> FocusCurveRecordSetT::load(const boost::property_tree::ptree & pt, const std::filesystem::path & lightFramePath) {
 
   //get<FocusMeasureTypeT>()
   FocusMeasureTypeT::TypeE focusMeasureType = FocusMeasureTypeT::HFD; // TODO: LOAD
@@ -95,7 +95,7 @@ std::shared_ptr<FocusCurveRecordSetT> FocusCurveRecordSetT::load(const boost::pr
 	       // << " - abs_focus_pos: " << focusCurveRecordNode.second.get<int>("<xmlattr>.abs_focus_pos", 0)
 	       // << std::endl;
       // NOTE: Other than the name suggests, focusCurveRecordSets is a std::vector...
-      focusCurveRecordSet->push_back(FocusCurveRecordT::load(focusCurveRecordNode.second));
+      focusCurveRecordSet->push_back(FocusCurveRecordT::load(focusCurveRecordNode.second, lightFramePath));
     }
 
   }

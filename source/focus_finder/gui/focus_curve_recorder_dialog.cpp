@@ -29,7 +29,7 @@
 #include <QAbstractButton>
 #include <QDoubleSpinBox>
 
-#include "include/focus_curve_recorder_panel.h"
+#include "include/focus_curve_recorder_dialog.h"
 #include "include/focus_curve_view_panel.h"
 #include "include/focus_curve_recorder_progress_details_panel.h"
 #include "include/focus_curve_recorder_curve_details_panel.h"
@@ -49,7 +49,7 @@
 #include "../common/include/focus_measure_type.h"
 #include "../common/include/fitting_curve_type.h"
 
-#include "ui_focus_curve_recorder_panel.h"
+#include "ui_focus_curve_recorder_dialog.h"
 
 Q_DECLARE_METATYPE(FocusMeasureTypeT::TypeE)
 Q_DECLARE_METATYPE(FittingCurveTypeT::TypeE)
@@ -59,7 +59,7 @@ Q_DECLARE_METATYPE(std::shared_ptr<FocusCurveRecordSetT>)
 
 
 // TODO: Actually this is duplicated code - see main_window.cpp...
-void FocusCurveRecorderPanelT::setBtnIcon(QAbstractButton * btn,
+void FocusCurveRecorderDialogT::setBtnIcon(QAbstractButton * btn,
 		const std::string & filename) {
 	QIcon icon;
 
@@ -71,13 +71,15 @@ void FocusCurveRecorderPanelT::setBtnIcon(QAbstractButton * btn,
 	btn->setIconSize(QSize(48, 48));
 }
 
-FocusCurveRecorderPanelT::FocusCurveRecorderPanelT(QWidget * parent, std::shared_ptr<FocusCurveRecorderLogicT> focusCurveRecorderLogic) : QWidget(parent),
-                                                                                        m_ui(new Ui::FocusCurveRecorderPanel),
+FocusCurveRecorderDialogT::FocusCurveRecorderDialogT(QWidget * parent, std::shared_ptr<FocusCurveRecorderLogicT> focusCurveRecorderLogic) : QDialog(parent),
+                                                                                        m_ui(new Ui::FocusCurveRecorderDialog),
                                                                                         mFocusCurveRecorderLogic(focusCurveRecorderLogic)
 {
     // Setup UI
     m_ui->setupUi(this);
 
+    setupButtonBox();
+    
     createMainToolBar();
 //    QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 //    sizePolicy.setHorizontalStretch(100);
@@ -104,7 +106,7 @@ FocusCurveRecorderPanelT::FocusCurveRecorderPanelT(QWidget * parent, std::shared
     /////////////////////////////
 
     connect(m_ui->cbxFocusCurveType, QOverload<int>::of(&QComboBox::currentIndexChanged),
-	    this, &FocusCurveRecorderPanelT::onFocusCurveTypeSelectionChanged);
+	    this, &FocusCurveRecorderDialogT::onFocusCurveTypeSelectionChanged);
 
     
     // Add progress details panel
@@ -136,34 +138,34 @@ FocusCurveRecorderPanelT::FocusCurveRecorderPanelT(QWidget * parent, std::shared
 
 
     // Add change listeners
-    connect(m_ui->spinFocusMeasureLimit, QOverload<double>::of(& QDoubleSpinBox::valueChanged), this, & FocusCurveRecorderPanelT::onSpinFocusMeasureLimitValueChanged);
+    connect(m_ui->spinFocusMeasureLimit, QOverload<double>::of(& QDoubleSpinBox::valueChanged), this, & FocusCurveRecorderDialogT::onSpinFocusMeasureLimitValueChanged);
 
-    connect(m_ui->spinNumFocusCurvesToRecord, QOverload<int>::of(& QSpinBox::valueChanged), this, & FocusCurveRecorderPanelT::onSpinNumFocusCurvesToRecordValueChanged);
+    connect(m_ui->spinNumFocusCurvesToRecord, QOverload<int>::of(& QSpinBox::valueChanged), this, & FocusCurveRecorderDialogT::onSpinNumFocusCurvesToRecordValueChanged);
 
     
     
     // HACK - REMOVE LATER!
-    connect(m_ui->pushButton, & QPushButton::pressed, this, & FocusCurveRecorderPanelT::onPushButtonPressed);
+    connect(m_ui->pushButton, & QPushButton::pressed, this, & FocusCurveRecorderDialogT::onPushButtonPressed);
 
     
     reset();
 }
 
-void FocusCurveRecorderPanelT::onSpinFocusMeasureLimitValueChanged(double value) {
-  LOG(debug) << "FocusCurveRecorderPanelT::onSpinFocusMeasureLimitValueChanged... value=" << value << std::endl;
+void FocusCurveRecorderDialogT::onSpinFocusMeasureLimitValueChanged(double value) {
+  LOG(debug) << "FocusCurveRecorderDialogT::onSpinFocusMeasureLimitValueChanged... value=" << value << std::endl;
 
   mActiveProfileTmp.setFocusMeasureLimit(value);
 }
 
-void FocusCurveRecorderPanelT::onSpinNumFocusCurvesToRecordValueChanged(int value) {
-  LOG(debug) << "FocusCurveRecorderPanelT::onSpinNumFocusCurvesToRecordValueChanged... value=" << value << std::endl;
+void FocusCurveRecorderDialogT::onSpinNumFocusCurvesToRecordValueChanged(int value) {
+  LOG(debug) << "FocusCurveRecorderDialogT::onSpinNumFocusCurvesToRecordValueChanged... value=" << value << std::endl;
 
   mActiveProfileTmp.setNumberCurvesToRecord(value);
 }
 
-void FocusCurveRecorderPanelT::selectDetailView(FocusCurveRecorderDetailViewE detailView)
+void FocusCurveRecorderDialogT::selectDetailView(FocusCurveRecorderDetailViewE detailView)
 {
-  LOG(debug) << "FocusCurveRecorderPanelT::selectDetailView... detailView=" << detailView << std::endl;
+  LOG(debug) << "FocusCurveRecorderDialogT::selectDetailView... detailView=" << detailView << std::endl;
   
   switch (detailView) {
   case SUMMARY:
@@ -196,7 +198,7 @@ void FocusCurveRecorderPanelT::selectDetailView(FocusCurveRecorderDetailViewE de
   }
 }
 
-void FocusCurveRecorderPanelT::onPushButtonPressed()
+void FocusCurveRecorderDialogT::onPushButtonPressed()
 { 
   static int idx = 0;
   
@@ -206,11 +208,11 @@ void FocusCurveRecorderPanelT::onPushButtonPressed()
   selectDetailView(detailView);  
 }
 
-void FocusCurveRecorderPanelT::onFocusCurveTypeSelectionChanged() {
+void FocusCurveRecorderDialogT::onFocusCurveTypeSelectionChanged() {
   QVariant cbxData = m_ui->cbxFocusCurveType->currentData();
   auto focusCurveType = cbxData.value<FocusCurveTypeT::TypeE>();
 
-  LOG(debug) << "FocusCurveRecorderPanelT::onFocusCurveTypeSelectionChanged...focusCurveType=" << FocusCurveTypeT::asStr(focusCurveType) << std::endl;
+  LOG(debug) << "FocusCurveRecorderDialogT::onFocusCurveTypeSelectionChanged...focusCurveType=" << FocusCurveTypeT::asStr(focusCurveType) << std::endl;
 
   CurveFitParmsT curveFitParms = mActiveProfileTmp.getFocusCurveMatchingParms();
   
@@ -220,12 +222,12 @@ void FocusCurveRecorderPanelT::onFocusCurveTypeSelectionChanged() {
 }
 
 
-FocusCurveRecorderPanelT::~FocusCurveRecorderPanelT()
+FocusCurveRecorderDialogT::~FocusCurveRecorderDialogT()
 {
   delete mFocusCurveRecordButton; // TODO: Ok?
 }
 
-void FocusCurveRecorderPanelT::reset() {
+void FocusCurveRecorderDialogT::reset() {
 
   // Set focus measure limit
   m_ui->spinFocusMeasureLimit->setValue(mActiveProfileTmp.getFocusMeasureLimit());
@@ -254,46 +256,72 @@ void FocusCurveRecorderPanelT::reset() {
   // Select the entry from the profile...
   int idxToSelect = m_ui->cbxFocusCurveType->findText(QString::fromStdString(FocusCurveTypeT::asStr(focusCurveTypeToSelect)));
   
-  m_ui->cbxFocusCurveType->setCurrentIndex(idxToSelect);
+  m_ui->cbxFocusCurveType->setCurrentIndex(idxToSelect);  
+}
 
 
+QPushButton * FocusCurveRecorderDialogT::getOkButton() {
+  return m_ui->buttonBox->button(QDialogButtonBox::Ok);
+}
+
+QPushButton * FocusCurveRecorderDialogT::getApplyButton() {
+  return m_ui->buttonBox->button(QDialogButtonBox::Apply);
+}
+
+void FocusCurveRecorderDialogT::setupButtonBox() {
+  getOkButton()->setDefault(true);
+  getOkButton()->setShortcut(Qt::CTRL | Qt::Key_Return);
+
+  connect(m_ui->buttonBox, & QDialogButtonBox::accepted, this, & FocusCurveRecorderDialogT::accept);
+  connect(m_ui->buttonBox, & QDialogButtonBox::rejected, this, & FocusCurveRecorderDialogT::reject);
+  connect(m_ui->buttonBox, & QDialogButtonBox::clicked, this, & FocusCurveRecorderDialogT::buttonBoxClicked);
+}
+
+void FocusCurveRecorderDialogT::applyAction() {
+  LOG(debug) << "FocusCurveRecorderDialogT::applyAction..." << std::endl;
+
+  auto profileManager = mFocusCurveRecorderLogic->getProfileManager();
   
+  profileManager->updateProfile(profileManager->getActiveProfileDirectoryName() /*profileDirectoryName*/,
+				mActiveProfileTmp);
 }
 
-void FocusCurveRecorderPanelT::on_buttonBox_clicked(QAbstractButton *button)
-{
-  if(button == m_ui->buttonBox->button(QDialogButtonBox::Apply) ){
-    LOG(debug) << "FocusCurveRecorderPanelT::on_buttonBox_clicked... APPLY pressed..." << std::endl;
-    // TODO: Store but don't close
-
-    //TODO: Save it and set it as active profile?! or vice versa?
-    //mActiveProfileTmp
-    auto profileManager = mFocusCurveRecorderLogic->getProfileManager();
-    //auto activeProfileOpt = mFocusCurveRecorderLogic->getActiveProfile();
-
-    LOG(debug) << "Updating profile '" << profileManager->getActiveProfileDirectoryName() << "'...";
-
-    profileManager->updateProfile(profileManager->getActiveProfileDirectoryName() /*profileDirectoryName*/,
-				  mActiveProfileTmp);
-  }
-  else if(button == m_ui->buttonBox->button(QDialogButtonBox::Ok)) {
-    LOG(debug) << "FocusCurveRecorderPanelT::on_buttonBox_clicked... OK pressed..." << std::endl;
-    // TODO: Store and close
-  }
-  else if (button == m_ui->buttonBox->button(QDialogButtonBox::Cancel)) {
-    LOG(debug) << "FocusCurveRecorderPanelT::on_buttonBox_clicked... CANCEL pressed..." << std::endl;
-    // TODO: Don't store and close
+void FocusCurveRecorderDialogT::rejectAction() {
+  if (mRecorderExec->isRunning()) {
+    mRecorderExec->cancel();
   }
 }
 
-void FocusCurveRecorderPanelT::onFocusCurveRecordPressed(bool isChecked) {
-  LOG(debug) << "FocusCurveRecorderPanelT::onFocusCurveRecordPressed... mFocusCurveRecordButton->isChecked(): " << isChecked << std::endl;
+void FocusCurveRecorderDialogT::accept() {
+  LOG(debug) << "FocusCurveRecorderDialogT::accept..." << std::endl;
+  applyAction();
+  QDialog::accept();
+}
+
+void FocusCurveRecorderDialogT::reject() {
+  LOG(debug) << "FocusCurveRecorderDialogT::reject..." << std::endl;
+  rejectAction();
+  QDialog::reject();
+}
+
+void FocusCurveRecorderDialogT::buttonBoxClicked(QAbstractButton * button) {
+  LOG(debug) << "FocusCurveRecorderDialogT::buttonBoxClicked..." << std::endl;
+  QDialogButtonBox::ButtonRole buttonRole = m_ui->buttonBox->buttonRole(button);
+
+  if(buttonRole == QDialogButtonBox::ApplyRole) {
+    LOG(debug) << "FocusCurveRecorderDialogT::buttonBoxClicked... APPLY clicked..." << std::endl;
+    applyAction();
+  }
+}
+
+void FocusCurveRecorderDialogT::onFocusCurveRecordPressed(bool isChecked) {
+  LOG(debug) << "FocusCurveRecorderDialogT::onFocusCurveRecordPressed... mFocusCurveRecordButton->isChecked(): " << isChecked << std::endl;
 
   if (isChecked) {
     // HACK / TODO: For now we create always a new instance...
     // TODO: Do not create here?! -> Factory?
-    mFocusCurveRecorderLogic->resetFocusCurveRecorder(FocusCurveRecorderTypeT::DEFAULT);
-    
+    mFocusCurveRecorderLogic->resetFocusCurveRecorder(FocusCurveRecorderTypeT::DEFAULT, mActiveProfileTmp);
+
     auto focusCurveRecorder = mFocusCurveRecorderLogic->getFocusCurveRecorder();
 
     try {
@@ -434,9 +462,9 @@ void FocusCurveRecorderPanelT::onFocusCurveRecordPressed(bool isChecked) {
   // //updateFocusFinderMainMenuBar();
 }
 
-// void FocusCurveRecorderPanelT::setFocusCurveRecordButtonState(bool isRunning) {
+// void FocusCurveRecorderDialogT::setFocusCurveRecordButtonState(bool isRunning) {
 // 	LOG(debug)
-// 	<< "FocusCurveRecorderPanelT::setFocusCurveRecordButtonState...isRunning=" << isRunning
+// 	<< "FocusCurveRecorderDialogT::setFocusCurveRecordButtonState...isRunning=" << isRunning
 // 			<< std::endl;
 
 // 	if (isRunning) {
@@ -450,9 +478,9 @@ void FocusCurveRecorderPanelT::onFocusCurveRecordPressed(bool isChecked) {
 // 		setBtnIcon(mFocusCurveRecordButton, ":/res/record_focus_curve_64x64.png");
 // 	}
 // }
-void FocusCurveRecorderPanelT::onFocusCurveRecorderRecordSetFinished(std::shared_ptr<FocusCurveRecordSetT> focusCurveRecordSet) {
+void FocusCurveRecorderDialogT::onFocusCurveRecorderRecordSetFinished(std::shared_ptr<FocusCurveRecordSetT> focusCurveRecordSet) {
 	LOG(debug)
-	<< "FocusCurveRecorderPanelT::onFocusCurveRecorderRecordSetFinished..." << std::endl;
+	<< "FocusCurveRecorderDialogT::onFocusCurveRecorderRecordSetFinished..." << std::endl;
 
 
 	// // TODO: Remove / replace by real values...
@@ -525,9 +553,9 @@ void FocusCurveRecorderPanelT::onFocusCurveRecorderRecordSetFinished(std::shared
 	mFocusCurveViewPanel->update();
 }
 
-void FocusCurveRecorderPanelT::onFocusCurveRecorderFinished(std::shared_ptr<const FocusCurveRecordSetContainerT> focusCurveRecordSetContainer) {
+void FocusCurveRecorderDialogT::onFocusCurveRecorderFinished(std::shared_ptr<const FocusCurveRecordSetContainerT> focusCurveRecordSetContainer) {
 	LOG(debug)
-	<< "FocusCurveRecorderPanelT::onFocusCurveRecorderFinished..." << std::endl;
+	<< "FocusCurveRecorderDialogT::onFocusCurveRecorderFinished..." << std::endl;
 
 	mFocusCurveRecordButton->stopAnimation();
 
@@ -545,20 +573,23 @@ void FocusCurveRecorderPanelT::onFocusCurveRecorderFinished(std::shared_ptr<cons
 	mFocusCurveViewPanel->update();
 
 	mFocusCurveRecorderProgressDetailsPanel->stopAnimation();
+
+	getOkButton()->setEnabled(true);
+	getApplyButton()->setEnabled(true);
 }
 
-void FocusCurveRecorderPanelT::onFocusCurveRecorderNewRecord(std::shared_ptr<FocusCurveRecordT> focusCurveRecord) {
+void FocusCurveRecorderDialogT::onFocusCurveRecorderNewRecord(std::shared_ptr<FocusCurveRecordT> focusCurveRecord) {
 	LOG(debug)
-	  << "FocusCurveRecorderPanelT::onFocusCurveRecorderNewRecord..." << std::endl;
+	  << "FocusCurveRecorderDialogT::onFocusCurveRecorderNewRecord..." << std::endl;
 	
 	//mFocusCurveViewPanel->update();
 	
 	mFocusCurveRecorderProgressDetailsPanel->setCurrentFocusCurveRecord(focusCurveRecord);
 }
 
-void FocusCurveRecorderPanelT::onFocusCurveRecorderRecordSetUpdate(std::shared_ptr<FocusCurveRecordSetT> focusCurveRecordSet) {
+void FocusCurveRecorderDialogT::onFocusCurveRecorderRecordSetUpdate(std::shared_ptr<FocusCurveRecordSetT> focusCurveRecordSet) {
 	LOG(debug)
-	  << "FocusCurveRecorderPanelT::onFocusCurveRecorderRecordSetUpdate..." << std::endl;
+	  << "FocusCurveRecorderDialogT::onFocusCurveRecorderRecordSetUpdate..." << std::endl;
 
 	// TODO: Refactor...
 	//mFocusCurveViewPanel->setFocusCurve(focusCurveRecordSet);
@@ -566,7 +597,7 @@ void FocusCurveRecorderPanelT::onFocusCurveRecorderRecordSetUpdate(std::shared_p
 }
 
 
-void FocusCurveRecorderPanelT::onFocusCurveRecorderProgressUpdate(float progress, const QString & msg, std::shared_ptr<FocusCurveRecordT> focusCurveRecord) {
+void FocusCurveRecorderDialogT::onFocusCurveRecorderProgressUpdate(float progress, const QString & msg, std::shared_ptr<FocusCurveRecordT> focusCurveRecord) {
   LOG(debug) << focusCurveRecord << std::endl;
 
   // TODO: Somewhere else...
@@ -577,9 +608,9 @@ void FocusCurveRecorderPanelT::onFocusCurveRecorderProgressUpdate(float progress
   mFocusCurveRecorderProgressDetailsPanel->setCurrentFocusCurveRecord(focusCurveRecord);
 }
 
-void FocusCurveRecorderPanelT::onFocusCurveRecorderCancelled() {
+void FocusCurveRecorderDialogT::onFocusCurveRecorderCancelled() {
 	LOG(debug)
-	<< "FocusCurveRecorderPanelT::onFocusCurveRecorderCancelled..." << std::endl;
+	<< "FocusCurveRecorderDialogT::onFocusCurveRecorderCancelled..." << std::endl;
 
 	mFocusCurveRecordButton->stopAnimation();
 
@@ -590,55 +621,62 @@ void FocusCurveRecorderPanelT::onFocusCurveRecorderCancelled() {
 
 	//    updateFocusFinderMainMenuBar();
 	mFocusCurveRecorderProgressDetailsPanel->stopAnimation();
+
+	getOkButton()->setEnabled(true);
+	getApplyButton()->setEnabled(true);
 }
 
-void FocusCurveRecorderPanelT::onFocusCurveRecorderStarted() {
+void FocusCurveRecorderDialogT::onFocusCurveRecorderStarted() {
 	LOG(debug)
-	<< "FocusCurveRecorderPanelT::onFocusCurveRecorderStarted..." << std::endl;
+	<< "FocusCurveRecorderDialogT::onFocusCurveRecorderStarted..." << std::endl;
+
+	getOkButton()->setEnabled(false);
+	getApplyButton()->setEnabled(false);
+	  
 	mFocusCurveRecordButton->startAnimation();
 	mFocusCurveRecorderProgressDetailsPanel->startAnimation();
 }
 
-void FocusCurveRecorderPanelT::createFocusCurveRecordButton() {
+void FocusCurveRecorderDialogT::createFocusCurveRecordButton() {
   mFocusCurveRecordButton = new AnimMenuButtonT;
   mFocusCurveRecordButton->setCheckable(true);
 
   setBtnIcon(mFocusCurveRecordButton, ":/res/record_focus_curve_64x64.png");
 
   connect(mFocusCurveRecordButton, &QToolButton::clicked, this,
-	  &FocusCurveRecorderPanelT::onFocusCurveRecordPressed);
+	  &FocusCurveRecorderDialogT::onFocusCurveRecordPressed);
   
   getMainToolBar()->addWidget(mFocusCurveRecordButton);
 
   //setFocusCurveRecordButtonState(false);
 
   // Connect focus curve recorder events with exposure button
-  connect(this, &FocusCurveRecorderPanelT::focusCurveRecorderStartedSignal, this,
-	  &FocusCurveRecorderPanelT::onFocusCurveRecorderStarted);
+  connect(this, &FocusCurveRecorderDialogT::focusCurveRecorderStartedSignal, this,
+	  &FocusCurveRecorderDialogT::onFocusCurveRecorderStarted);
 
-  connect(this, &FocusCurveRecorderPanelT::focusCurveRecorderNewRecordSignal, this,
-	  &FocusCurveRecorderPanelT::onFocusCurveRecorderNewRecord);
+  connect(this, &FocusCurveRecorderDialogT::focusCurveRecorderNewRecordSignal, this,
+	  &FocusCurveRecorderDialogT::onFocusCurveRecorderNewRecord);
 
-  connect(this, &FocusCurveRecorderPanelT::focusCurveRecorderRecordSetUpdateSignal, this,
-	  &FocusCurveRecorderPanelT::onFocusCurveRecorderRecordSetUpdate);
+  connect(this, &FocusCurveRecorderDialogT::focusCurveRecorderRecordSetUpdateSignal, this,
+	  &FocusCurveRecorderDialogT::onFocusCurveRecorderRecordSetUpdate);
   
-  connect(this, &FocusCurveRecorderPanelT::focusCurveRecorderProgressUpdateSignal, this,
-	  &FocusCurveRecorderPanelT::onFocusCurveRecorderProgressUpdate);
+  connect(this, &FocusCurveRecorderDialogT::focusCurveRecorderProgressUpdateSignal, this,
+	  &FocusCurveRecorderDialogT::onFocusCurveRecorderProgressUpdate);
   
-  connect(this, &FocusCurveRecorderPanelT::focusCurveRecorderRecordSetFinishedSignal, this,
-	  &FocusCurveRecorderPanelT::onFocusCurveRecorderRecordSetFinished);
+  connect(this, &FocusCurveRecorderDialogT::focusCurveRecorderRecordSetFinishedSignal, this,
+	  &FocusCurveRecorderDialogT::onFocusCurveRecorderRecordSetFinished);
  
-  connect(this, &FocusCurveRecorderPanelT::focusCurveRecorderFinishedSignal, this,
-	  &FocusCurveRecorderPanelT::onFocusCurveRecorderFinished);
+  connect(this, &FocusCurveRecorderDialogT::focusCurveRecorderFinishedSignal, this,
+	  &FocusCurveRecorderDialogT::onFocusCurveRecorderFinished);
   
-  connect(this, &FocusCurveRecorderPanelT::focusCurveRecorderCancelledSignal, this,
-	  &FocusCurveRecorderPanelT::onFocusCurveRecorderCancelled);
+  connect(this, &FocusCurveRecorderDialogT::focusCurveRecorderCancelledSignal, this,
+	  &FocusCurveRecorderDialogT::onFocusCurveRecorderCancelled);
   
   
   // TODO: Handle camera disconnect (see main_window...)
 }
 
-void FocusCurveRecorderPanelT::createMainToolBar() {
+void FocusCurveRecorderDialogT::createMainToolBar() {
   createFocusCurveRecordButton();
   
   // QSpacerItem * spacer = new QSpacerItem(10, 10);
@@ -647,6 +685,6 @@ void FocusCurveRecorderPanelT::createMainToolBar() {
   getMainToolBar()->addStretch();
 }
 
-QHBoxLayout * FocusCurveRecorderPanelT::getMainToolBar() {
+QHBoxLayout * FocusCurveRecorderDialogT::getMainToolBar() {
   return m_ui->layMainToolBar;
 }

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>FocusCurveRecorderPanel</class>
- <widget class="QWidget" name="FocusCurveRecorderPanel">
+ <class>FocusCurveRecorderDialog</class>
+ <widget class="QWidget" name="FocusCurveRecorderDialog">
   <property name="windowModality">
    <enum>Qt::NonModal</enum>
   </property>
@@ -26,7 +26,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string>Focus curve recorder</string>
   </property>
   <property name="autoFillBackground">
    <bool>false</bool>

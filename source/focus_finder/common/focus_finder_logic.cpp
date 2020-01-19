@@ -49,6 +49,25 @@
 #include "include/task_executor.h"
 #include "include/focus_curve_recorder_logic.h"
 
+FocusFinderLogicT* FocusFinderLogicT::sSelf = nullptr;
+
+void FocusFinderLogicT::init() {
+  sSelf = new FocusFinderLogicT;
+
+  logging::trivial::severity_level sev = logging::trivial::debug;
+  LoggingT::init(sev, true /*console*/, true /*log file*/);
+
+}
+
+void FocusFinderLogicT::close() {
+  delete sSelf;
+  sSelf = 0;
+}
+
+FocusFinderLogicT * FocusFinderLogicT::get() {
+  return sSelf;
+}
+
 FocusFinderLogicT::FocusFinderLogicT() :
 	mCameraDevice(nullptr)
 {

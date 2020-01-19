@@ -81,8 +81,8 @@ public:
 
   
   // TODO: Those functions may be moved out of this class because the dependency to property_tree shoud not be in here... It does not have to be a class member at all!
-  static std::shared_ptr<FocusCurveRecordT> load(const boost::property_tree::ptree & pt);
-  static void save(/*const std::filesystem::path & lightFrameDirectoryPath,*/ boost::property_tree::ptree & pt, const FocusCurveRecordT & focusCurveRecord);
+  static std::shared_ptr<FocusCurveRecordT> load(const boost::property_tree::ptree & pt, const std::filesystem::path & lightFramePath);
+  static void save(boost::property_tree::ptree & pt, const FocusCurveRecordT & focusCurveRecord, const std::filesystem::path & lightFramePath);
 };
 
 #endif /*SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FOCUS_FINDER_RECORD_H_*/

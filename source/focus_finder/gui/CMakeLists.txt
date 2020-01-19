@@ -265,9 +265,9 @@ set(sources
   about_dialog.ui
   profile_settings_dialog.ui
   reporting_viewer_panel.ui
-  include/focus_curve_recorder_panel.h
-  focus_curve_recorder_panel.cpp
-  focus_curve_recorder_panel.ui
+  include/focus_curve_recorder_dialog.h
+  focus_curve_recorder_dialog.cpp
+  focus_curve_recorder_dialog.ui
   include/focus_curve_recorder_progress_details_panel.h
   focus_curve_recorder_progress_details_panel.cpp
   focus_curve_recorder_progress_details_panel.ui
@@ -352,12 +352,11 @@ target_link_libraries(${target}
     indi
     indiclient
     z
-    ${TIFF_LIBRARIES}
     ${DEFAULT_LINKER_OPTIONS}
     ${Boost_REGEX_LIBRARY}
+#    ${TIFF_LIBRARIES}
 )
 
-#   cfitsio
  
 # 
 # Compile definitions

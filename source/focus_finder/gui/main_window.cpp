@@ -38,7 +38,7 @@
 
 #include "include/anim_menu_button.h"
 
-#include "include/focus_curve_recorder_panel.h"
+#include "include/focus_curve_recorder_dialog.h"
 #include "include/focus_curve_view_panel.h"
 #include "include/image_viewer_panel.h"
 #include "include/focus_cntl_panel.h"
@@ -62,6 +62,7 @@
 #include "../common/include/dummy_filter.h"
 #include "../common/include/dummy_device_manager.h"
 #include "../common/include/focus_finder.h"
+#include "../common/include/focus_finder_logic.h"
 #include "../common/include/focus_curve_record.h"
 #include "../common/include/focus_curve_record_set.h" // TODO: Required?
 #include "../common/include/task_executor.h"
@@ -1198,26 +1199,10 @@ void MainWindow::onFocusFinderProgressUpdate(float progress,
 void MainWindow::onRecalibrationPressed() {
     LOG(debug) << "MainWindow::onRecalibrationPressed..." << std::endl;
 
-    QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    sizePolicy.setHorizontalStretch(100);
-    sizePolicy.setVerticalStretch(100);
+    FocusCurveRecorderDialogT * focusCurveRecorderDialog = new FocusCurveRecorderDialogT(this, mFfl.getFocusCurveRecorderLogic());
+    focusCurveRecorderDialog->exec();
 
-    QGridLayout * gridLayout = new QGridLayout;
-
-    QDialog * containerDialog = new QDialog(this);
-    containerDialog->setLayout(gridLayout);
-    containerDialog->setSizePolicy(sizePolicy);
-    containerDialog->setWindowTitle(tr("Focus Curve Recorder"));
-    containerDialog->setModal(true);
-
-    FocusCurveRecorderPanelT * focusCurveRecorderPanel = new FocusCurveRecorderPanelT(containerDialog, mFfl.getFocusCurveRecorderLogic());
-    containerDialog->setMinimumSize(focusCurveRecorderPanel->minimumSize());
-    gridLayout->addWidget(focusCurveRecorderPanel, 0, 0, 1, 1);
-
-    containerDialog->exec();
-
-    delete focusCurveRecorderPanel; // TODO: Will probably be deleted when containerDialog is deleted...
-    delete containerDialog;
+    delete focusCurveRecorderDialog; // TODO: Will probably be deleted when containerDialog is deleted...
 }
 
 void MainWindow::onEditCalibrationDataPressed() {
@@ -1583,10 +1568,12 @@ void MainWindow::onUpdateProfileSlot() {
 
 MainWindow::MainWindow() :
 		m_ui(new Ui::MainWindow), mCameraDevice(nullptr), mFocusDevice(nullptr), mFilterDevice(
-				nullptr) {
+												       nullptr),
+		mFfl(*FocusFinderLogicT::get())	// TODO: Remove mFfl... directly use static function...
+{
 	// Setup UI
 	m_ui->setupUi(this);
-
+	
 	mManageDeviceProfilesDialog = new ManageDeviceProfilesDialogT(mFfl);
 
 	// Register at profile manager to get notified if selected profile / device changes...

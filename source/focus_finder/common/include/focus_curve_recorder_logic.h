@@ -48,7 +48,7 @@ class FocusCurveRecorderLogicT {
   std::shared_ptr<ProfileManagerT> getProfileManager() const;
   
   std::shared_ptr<FocusCurveRecorderT> getFocusCurveRecorder();
-  void resetFocusCurveRecorder(FocusCurveRecorderTypeT::TypeE focusCurveRecorderType);
+  void resetFocusCurveRecorder(FocusCurveRecorderTypeT::TypeE focusCurveRecorderType, const FocusFinderProfileT & focusFinderProfile);
 
 };
 

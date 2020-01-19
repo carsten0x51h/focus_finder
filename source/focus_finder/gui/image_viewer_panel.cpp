@@ -108,14 +108,16 @@ void ImageViewerPanelT::clearSelection() {
 }
 
 void ImageViewerPanelT::keyPressEvent(QKeyEvent *ev) {
-	LOG(debug)
+  static const int plusSignAscii = 43;
+  static const int minusSignAscii = 45;
+  LOG(debug)
 	<< "You Pressed key: " << ev->key() << std::endl;
 
 	switch (ev->key()) {
-	case 43: // +
+	case plusSignAscii: // +
 		mSelectableImageWidget->zoomIn();
 		break;
-	case 45: // -
+	case minusSignAscii: // -
 		mSelectableImageWidget->zoomOut();
 		break;
 	default:

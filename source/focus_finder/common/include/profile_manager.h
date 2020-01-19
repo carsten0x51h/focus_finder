@@ -58,10 +58,20 @@ private:
   // TODO: std::string proposeProfileFilename(const std::string & profileName);
 
   /**
+   * Concats the directory path to the given profile.
+   */
+  std::filesystem::path composeFullProfileDirectory(const std::string & profileDirectoryName) const;
+  
+  /**
    * Concats root path with filename.
    */
-  std::filesystem::path composeFullPath(const std::string & profileDirectoryName) const;
+  std::filesystem::path composeFullProfileFilePath(const std::string & profileDirectoryName) const;
 
+  /**
+   * Concats path to light frame directory of given profile.
+   */
+  std::filesystem::path composeFullLightFrameDirectory(const std::string & profileDirectoryName) const;
+  
   /**
    * Holds the active profile (if any).
    */
@@ -93,8 +103,6 @@ public:
    */
   std::optional<FocusFinderProfileT> getActiveProfile() const;
 
-
-  std::string getActiveProfileDirectoryName() const;
   
   /**
    * If there is an active profile, returns the filename of the
@@ -106,16 +114,33 @@ public:
 
   /**
    * Return the root path to the profile directory.
-   * 
+   * Example: ~/.fofi/profiles
    */
   static std::filesystem::path getProfilesRootDirectory();
+
+  /**
+   * Return the directory name of the currently active profile.
+   * If there is no active profile, an empty string is returned.
+   * Example: profile_1
+   */
+  std::string getActiveProfileDirectoryName() const;
   
   /**
    * Return the path to the currently active profile directory.
    * If there is no active profile, an empty string is returned.
-   * Example: ~/.fofi/profile_1
+   *
+   * Example: ~/.fofi/profiles/profile_1
    */
-  std::string getActiveProfileDirectory() const;
+  std::optional<std::filesystem::path> getActiveProfileDirectory() const;
+
+  /**
+   * Optionally returns the active profile lightframe directory where the
+   * star images of the calibration are stored. If there is no active
+   * profile, the empty string is returned.
+   *
+   * Example: ~/.fofi/profile_1/calibration/light_frames
+   */
+  std::optional<std::filesystem::path> getActiveProfileLightFrameDirectory() const;
 
   /**
    * Remove active profile so that no profile is active any longer.
@@ -170,6 +195,12 @@ public:
    * The function looks for directories under 'getActiveProfileDirectory()'
    * for the file profile.cfg. If it is found, the containing directory is
    * added. Otherwise, the directory is ignored.
+   *
+   * Example:
+   *
+   * profile_1
+   * profile_2
+   * profile_3
    */
   std::vector<std::string> getProfileDirectoryNames() const;
 

@@ -77,16 +77,16 @@ private:
   static const double SIGMA_TO_FWHM;
 
   CurveParmsT fitValues(const std::vector<PointFT> & imgValues,
-			double inEpsAbs = 1e-2, double inEpsRel = 1e-2);
+			double inEpsAbs = 1e-1, double inEpsRel = 1e-1);
   void calcIsValid();
   void throwIfNotValid() const;
 
 public:
   FwhmT();
-  FwhmT(const std::vector<float> & inValues, double inEpsAbs = 1e-2,
-	     double inEpsRel = 1e-2, bool inThrowIfNotValid = true);
-  void set(const std::vector<float> & inValues, double inEpsAbs = 1e-2,
-	   double inEpsRel = 1e-2, bool inThrowIfNotValid = true);
+  FwhmT(const std::vector<float> & inValues, double inEpsAbs = 1e-1,
+	     double inEpsRel = 1e-1, bool inThrowIfNotValid = true);
+  void set(const std::vector<float> & inValues, double inEpsAbs = 1e-1,
+	   double inEpsRel = 1e-1, bool inThrowIfNotValid = true);
 
   bool valid() const;
   void reset();

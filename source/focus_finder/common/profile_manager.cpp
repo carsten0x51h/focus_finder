@@ -38,16 +38,37 @@
 const std::string ProfileManagerT::PROFILE_CFG_FILENAME = "profile.cfg";
 
 
-std::filesystem::path ProfileManagerT::composeFullPath(
-		const std::string & profileDirectoryName) const {
+std::filesystem::path ProfileManagerT::composeFullProfileDirectory(const std::string & profileDirectoryName) const {
 
   std::filesystem::path fullPath = ProfileManagerT::getProfilesRootDirectory();
 
   fullPath /= profileDirectoryName;
+  
+  return fullPath;
+}
+
+
+std::filesystem::path ProfileManagerT::composeFullProfileFilePath(
+		const std::string & profileDirectoryName) const {
+
+  std::filesystem::path fullPath = ProfileManagerT::composeFullProfileDirectory(profileDirectoryName);
+
   fullPath /= PROFILE_CFG_FILENAME;
   
   return fullPath;
 }
+
+std::filesystem::path ProfileManagerT::composeFullLightFrameDirectory(const std::string & profileDirectoryName) const {
+
+  std::filesystem::path fullPath = ProfileManagerT::composeFullProfileDirectory(profileDirectoryName);
+
+  fullPath /= "calibration";
+  fullPath /= "light_frames";
+  
+  return fullPath;
+}
+
+
 
 ProfileManagerT::ProfileManagerT() :
   mActiveProfile(std::nullopt)
@@ -80,8 +101,11 @@ void ProfileManagerT::clearActiveProfile() {
 
 void ProfileManagerT::activateProfile(const std::string & profileDirectoryName) {
   try {
+    std::string fullPathToProfileFile = composeFullProfileFilePath(profileDirectoryName).string();
+    std::filesystem::path fullLightFrameDirectory = composeFullLightFrameDirectory(profileDirectoryName);
+    
     mActiveProfile.emplace(
-			   FocusFinderProfileT::load(composeFullPath(profileDirectoryName).string())
+			   FocusFinderProfileT::load(fullPathToProfileFile, fullLightFrameDirectory)
 			   );
     
     LOG(debug) << "Active profile: " << std::endl;
@@ -109,7 +133,7 @@ void ProfileManagerT::deleteProfile(const std::string & profileDirectoryName) {
 	}
 
 	std::error_code ec;
-	std::string fullPathToProfileFile = composeFullPath(profileDirectoryName).string();
+	std::string fullPathToProfileFile = composeFullProfileFilePath(profileDirectoryName).string();
 
 	// Check if file exists
 	bool exists = std::filesystem::exists(fullPathToProfileFile, ec);
@@ -153,7 +177,7 @@ void ProfileManagerT::addProfile(const std::string & profileDirectoryName,
 
 	// Check if file is there already (how to handle?)
 	std::error_code ec;
-	std::string fullPathToProfileFile = composeFullPath(profileDirectoryName).string();
+	std::string fullPathToProfileFile = composeFullProfileFilePath(profileDirectoryName).string();
 
 	// Check if file exists
 	bool exists = std::filesystem::exists(fullPathToProfileFile, ec);
@@ -167,9 +191,15 @@ void ProfileManagerT::addProfile(const std::string & profileDirectoryName,
 		throw ProfileManagerExceptionT("Profile file already exists.");
 	}
 
+
+	std::filesystem::path fullLightFrameDirectory = composeFullLightFrameDirectory(profileDirectoryName);
+
+	
+	// TODO: Create light_frame directory if not yet there
+	
 	// Store to file
 	try {
-		FocusFinderProfileT::save(fullPathToProfileFile, newProfile);
+	  FocusFinderProfileT::save(fullPathToProfileFile, fullLightFrameDirectory, newProfile);
 	} catch (FocusFinderProfileExceptionT & exc) {
 		throw ProfileManagerExceptionT(exc.what());
 	}
@@ -184,11 +214,12 @@ void ProfileManagerT::updateProfile(const std::string & profileDirectoryName,
 		throw ProfileManagerExceptionT("No profile directory name specified.");
 	}
 
-	std::string fullPathToProfileFile = composeFullPath(profileDirectoryName).string();
-
+	std::string fullPathToProfileFile = composeFullProfileFilePath(profileDirectoryName).string();
+	std::filesystem::path fullLightFrameDirectory = composeFullLightFrameDirectory(profileDirectoryName);
+	  
 	// Store to file
 	try {
-		FocusFinderProfileT::save(fullPathToProfileFile, modifiedProfile);
+	  FocusFinderProfileT::save(fullPathToProfileFile, fullLightFrameDirectory, modifiedProfile);
 	} catch (FocusFinderProfileExceptionT & exc) {
 		throw ProfileManagerExceptionT(exc.what());
 	}
@@ -204,12 +235,12 @@ void ProfileManagerT::updateProfile(const std::string & profileDirectoryName,
 	}
 }
 
-std::string ProfileManagerT::getActiveProfileDirectory() const {
-  std::filesystem::path activeProfileDirectory = ProfileManagerT::getProfilesRootDirectory();
+std::optional<std::filesystem::path> ProfileManagerT::getActiveProfileDirectory() const {
+  return (! mActiveProfileDirectoryName.empty() ? std::optional<std::filesystem::path> { ProfileManagerT::composeFullProfileDirectory(mActiveProfileDirectoryName) } : std::nullopt);
+}
 
-  activeProfileDirectory /= mActiveProfileDirectoryName;
-  
-  return activeProfileDirectory;
+std::optional<std::filesystem::path> ProfileManagerT::getActiveProfileLightFrameDirectory() const {
+  return (! mActiveProfileDirectoryName.empty() ? std::optional<std::filesystem::path> { ProfileManagerT::composeFullLightFrameDirectory(mActiveProfileDirectoryName) } : std::nullopt);
 }
 
 std::filesystem::path ProfileManagerT::getProfilesRootDirectory() {

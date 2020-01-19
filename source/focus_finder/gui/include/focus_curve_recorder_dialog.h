@@ -22,20 +22,18 @@
  *
  ****************************************************************************/
 
-#ifndef SOURCE_FOCUS_FINDER_GUI_INCLUDE_FOCUS_CURVE_RECORDER_PANEL_H_
-#define SOURCE_FOCUS_FINDER_GUI_INCLUDE_FOCUS_CURVE_RECORDER_PANEL_H_
+#ifndef SOURCE_FOCUS_FINDER_GUI_INCLUDE_FOCUS_CURVE_RECORDER_DIALOG_H_
+#define SOURCE_FOCUS_FINDER_GUI_INCLUDE_FOCUS_CURVE_RECORDER_DIALOG_H_
 
 // std includes
 
 // Qt includes
-#include <QWidget>
+#include <QDialog>
 #include <QPixmap>
 #include <QHBoxLayout>
 #include <QAbstractButton>
 
 #include "anim_menu_button.h"
-
-#include "../include/focus_curve_recorder_panel.h"
 
 #include "../../common/include/focus_finder_logic.h"
 #include "../../common/include/focus_finder_profile.h"
@@ -48,7 +46,7 @@ class FocusCurveRecorderPointDetailsPanelT;
 class FocusCurveRecorderSummaryDetailsPanelT;
 
 namespace Ui {
-    class FocusCurveRecorderPanel;
+    class FocusCurveRecorderDialog;
 }
 
 enum FocusCurveRecorderDetailViewE { SUMMARY, CURVE, POINT, PROGRESS };
@@ -56,7 +54,7 @@ enum FocusCurveRecorderDetailViewE { SUMMARY, CURVE, POINT, PROGRESS };
 /**
 *  @brief
 */
-class FocusCurveRecorderPanelT : public QWidget
+class FocusCurveRecorderDialogT : public QDialog
 {
     Q_OBJECT
 
@@ -65,13 +63,13 @@ public:
    *  @brief
    *    Constructor
    */
-  FocusCurveRecorderPanelT(QWidget * parent, std::shared_ptr<FocusCurveRecorderLogicT> focusCurveRecorderLogic);
+  FocusCurveRecorderDialogT(QWidget * parent, std::shared_ptr<FocusCurveRecorderLogicT> focusCurveRecorderLogic);
 
   /**
    *  @brief
    *    Destructor
    */
-  virtual ~FocusCurveRecorderPanelT();
+  virtual ~FocusCurveRecorderDialogT();
 
   void reset();
   void selectDetailView(FocusCurveRecorderDetailViewE detailView);
@@ -88,19 +86,31 @@ signals:
 					  
 protected slots:
   void onPushButtonPressed();
-  void on_buttonBox_clicked(QAbstractButton *button);
+  //void on_buttonBox_clicked(QAbstractButton *button);
   void onSpinFocusMeasureLimitValueChanged(double value);
   void onSpinNumFocusCurvesToRecordValueChanged(int value);
   
 protected:
-    const QScopedPointer<Ui::FocusCurveRecorderPanel> m_ui;
+  //void closeEvent(QCloseEvent *event) override;
+
+  virtual void accept() override;
+  virtual void reject() override;
+
+  void buttonBoxClicked(QAbstractButton * button);
+
+  const QScopedPointer<Ui::FocusCurveRecorderDialog> m_ui;
+							  
 protected slots:
   // Setting elements
   void onFocusCurveTypeSelectionChanged();
 
 private:
-  FocusFinderProfileT mActiveProfileTmp;
+  void applyAction();
+  void rejectAction();
 
+  QPushButton * getOkButton();
+  QPushButton * getApplyButton();
+  void setupButtonBox();
   QHBoxLayout * getMainToolBar();
 
   //void initFocusMeasureCombobox();
@@ -123,6 +133,7 @@ private:
   void onFocusCurveRecordPressed(bool isChecked);
 
   
+  FocusFinderProfileT mActiveProfileTmp;
   
   AnimMenuButtonT * mFocusCurveRecordButton;
 
@@ -137,4 +148,4 @@ private:
   FocusCurveRecorderSummaryDetailsPanelT * mFocusCurveRecorderSummaryDetailsPanel;
 };
 
-#endif /*SOURCE_FOCUS_FINDER_GUI_INCLUDE_FOCUS_CURVE_RECORDER_PANEL_H_*/
+#endif /*SOURCE_FOCUS_FINDER_GUI_INCLUDE_FOCUS_CURVE_RECORDER_DIALOG_H_*/

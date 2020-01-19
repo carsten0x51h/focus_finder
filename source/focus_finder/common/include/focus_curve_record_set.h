@@ -48,8 +48,8 @@ public:
   float getFocusMeasureLimit() const;
   std::pair<int, int> minmaxFocusPos() const;
 
-  static std::shared_ptr<FocusCurveRecordSetT> load(const boost::property_tree::ptree & pt);
-  static void save(boost::property_tree::ptree & pt, std::shared_ptr<FocusCurveRecordSetT> focusCurveRecordSet);
+  static std::shared_ptr<FocusCurveRecordSetT> load(const boost::property_tree::ptree & pt, const std::filesystem::path & lightFramePath);
+  static void save(boost::property_tree::ptree & pt, std::shared_ptr<FocusCurveRecordSetT> focusCurveRecordSet, const std::filesystem::path & lightFramePath);
   
   std::ostream & print(std::ostream & os, size_t indent = 0) const;
   friend std::ostream & operator<<(std::ostream & os, const FocusCurveRecordSetT & focusCurveRecordSet);

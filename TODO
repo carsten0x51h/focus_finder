@@ -1,9 +1,39 @@
 TODO
 ----
-
 -NEXT
-	-Remove Core-Dump at exit (double free)
-	-Store recorded curve on disk (as part of profile)
+        -Remove HACK - FocusCurveRecordSetT - load()
+        	//get<FocusMeasureTypeT>()
+        	FocusMeasureTypeT::TypeE focusMeasureType = FocusMeasureTypeT::HFD; // TODO: LOAD
+        	float focusMeasureLimit = 18.0F; // TODO: Load
+        	// TODO: Load creation_timestamp....
+
+	-Fix memory leaks
+Indirect leak of 264 byte(s) in 1 object(s) allocated from:
+    #0 0x7f598e15e19f in operator new(unsigned long) (/usr/lib/x86_64-linux-gnu/libasan.so.5+0x10919f)
+    #1 0x7f598be8eb86 in QMovie::QMovie(QString const&, QByteArray const&, QObject*) (/usr/lib/x86_64-linux-gnu/libQt5Gui.so.5+0x1bfb86)
+    #2 0x55c60389468a in FocusCurveRecorderDialogT::FocusCurveRecorderDialogT(QWidget*, std::shared_ptr<FocusCurveRecorderLogicT>) /home/devnull/workspace/fofi_git/fofi/source/focus_finder/gui/focus_curve_recorder_dialog.cpp:116
+    #3 0x55c6037b3b07 in MainWindow::onRecalibrationPressed() /home/devnull/workspace/fofi_git/fofi/source/focus_finder/gui/main_window.cpp:1201
+    #4 0x55c6037e363b in QtPrivate::FunctorCall<QtPrivate::IndexesList<>, QtPrivate::List<>, void, void (MainWindow::*)()>::call(void (MainWindow::*)(), MainWindow*, void**) /usr/include/x86_64-linux-gnu/qt5/QtCore/qobjectdefs_impl.h:152
+    #5 0x55c6037e20f6 in void QtPrivate::FunctionPointer<void (MainWindow::*)()>::call<QtPrivate::List<>, void>(void (MainWindow::*)(), MainWindow*, void**) /usr/include/x86_64-linux-gnu/qt5/QtCore/qobjectdefs_impl.h:185
+    #6 0x55c6037e0933 in QtPrivate::QSlotObject<void (MainWindow::*)(), QtPrivate::List<>, void>::impl(int, QtPrivate::QSlotObjectBase*, QObject*, void**, bool*) /usr/include/x86_64-linux-gnu/qt5/QtCore/qobjectdefs_impl.h:414
+    #7 0x7f598ba3d527 in QMetaObject::activate(QObject*, int, int, void**) (/usr/lib/x86_64-linux-gnu/libQt5Core.so.5+0x2a7527)
+    #8 0x7f598db2b811 in QAction::triggered(bool) (/usr/lib/x86_64-linux-gnu/libQt5Widgets.so.5+0x15b811)
+
+
+Indirect leak of 16 byte(s) in 1 object(s) allocated from:
+    #0 0x7f598e15e19f in operator new(unsigned long) (/usr/lib/x86_64-linux-gnu/libasan.so.5+0x10919f)
+    #1 0x55c6038c20d6 in FocusCurveRecorderProgressDetailsPanelT::FocusCurveRecorderProgressDetailsPanelT(QWidget*, std::shared_ptr<FocusCurveRecorderLogicT>) /home/devnull/workspace/fofi_git/fofi/source/focus_finder/gui/focus_curve_recorder_progress_details_panel.cpp:64
+    #2 0x55c60389468a in FocusCurveRecorderDialogT::FocusCurveRecorderDialogT(QWidget*, std::shared_ptr<FocusCurveRecorderLogicT>) /home/devnull/workspace/fofi_git/fofi/source/focus_finder/gui/focus_curve_recorder_dialog.cpp:116
+    #3 0x55c6037b3b07 in MainWindow::onRecalibrationPressed() /home/devnull/workspace/fofi_git/fofi/source/focus_finder/gui/main_window.cpp:1201
+    #4 0x55c6037e363b in QtPrivate::FunctorCall<QtPrivate::IndexesList<>, QtPrivate::List<>, void, void (MainWindow::*)()>::call(void (MainWindow::*)(), MainWindow*, void**) /usr/include/x86_64-linux-gnu/qt5/QtCore/qobjectdefs_impl.h:152
+    #5 0x55c6037e20f6 in void QtPrivate::FunctionPointer<void (MainWindow::*)()>::call<QtPrivate::List<>, void>(void (MainWindow::*)(), MainWindow*, void**) /usr/include/x86_64-linux-gnu/qt5/QtCore/qobjectdefs_impl.h:185
+    #6 0x55c6037e0933 in QtPrivate::QSlotObject<void (MainWindow::*)(), QtPrivate::List<>, void>::impl(int, QtPrivate::QSlotObjectBase*, QObject*, void**, bool*) /usr/include/x86_64-linux-gnu/qt5/QtCore/qobjectdefs_impl.h:414
+    #7 0x7f598ba3d527 in QMetaObject::activate(QObject*, int, int, void**) (/usr/lib/x86_64-linux-gnu/libQt5Core.so.5+0x2a7527)
+    #8 0x7f598db2b811 in QAction::triggered(bool) (/usr/lib/x86_64-linux-gnu/libQt5Widgets.so.5+0x15b811)
+
+
+	-Focus-controller: TODO: Should this be configurable? -> Yes, part of profile...?!... Just need a good name...  const float STEP_FACTOR = 3.0F;
+        -Store recorded curve on disk (as part of profile)
 	-Handle cancel exception in "focus curve recorder" and "focus finder"
 	-Remove hardcoded exposure times (e.g. in focus curve recorder -> maybe this field should be inegrated also into the focus curve recorder frame!)
 	-Recorder should listen to position events from focuser -> draw a line of current position...

@@ -162,12 +162,13 @@ public:
   /**
    * Throws if not found.
    */
-  static FocusFinderProfileT load(const std::string & fullProfilePath);
+  static FocusFinderProfileT load(const std::string & fullProfilePath, const std::filesystem::path & lightFramePath);
 
   /**
    * Throws if save fails.
    */
   static void save(const std::string & fullProfilePath,
+		   const std::filesystem::path & lightFramePath,
 		   const FocusFinderProfileT & profile);
 
   std::ostream & print(std::ostream & os, size_t ident = 0) const;

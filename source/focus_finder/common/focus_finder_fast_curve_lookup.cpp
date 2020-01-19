@@ -138,9 +138,9 @@ void FocusFinderFastCurveLookupT::run() {
   
   // Estimate distance to best focus (focus curve minimum)
   auto curveFocusMeasureType = focusFinderProfile.getCurveFocusMeasureType();
-
-  float foFiStepSize = 10; // TODO: Use value from focusFinderProfile...
-  float focusMeasureLimit = 18.0F; // TODO: Use value from focusFinderProfile...
+  
+  float foFiStepSize = focusFinderProfile.getStepSize();
+  float focusMeasureLimit = focusFinderProfile.getFocusMeasureLimit();
 
   // TODO: curveFocusMeasureType is HFD / FWHM...?
   // HACK
@@ -174,7 +174,7 @@ void FocusFinderFastCurveLookupT::run() {
     LOG(debug)
       << "FocusFinderFastCurveLookupT::run - Self orientation..." << std::endl;
     
-    SelfOrientationResultT selfOrientationResult = getFocusController()->performSelfOrientation();
+    SelfOrientationResultT selfOrientationResult = getFocusController()->performSelfOrientation(focusMeasureLimit);
 
     LOG(debug)
       << "FocusFinderFastCurveLookupT::run - Self orientation result:"

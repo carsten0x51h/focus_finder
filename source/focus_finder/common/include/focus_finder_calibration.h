@@ -46,8 +46,8 @@ class FocusFinderCalibrationT {
   std::shared_ptr<FocusCurveT> getFocusCurve() const;
   size_t numRecordSets() const;
   
-  static void save(boost::property_tree::ptree & pt, std::shared_ptr<FocusFinderCalibrationT> focusFinderCalibration);
-  static std::shared_ptr<FocusFinderCalibrationT> load(const boost::property_tree::ptree & pt, const CurveFitParmsT & curveFitParms);
+  static void save(boost::property_tree::ptree & pt, std::shared_ptr<FocusFinderCalibrationT> focusFinderCalibration, const std::filesystem::path & lightFramePath);
+  static std::shared_ptr<FocusFinderCalibrationT> load(const boost::property_tree::ptree & pt, const CurveFitParmsT & curveFitParms, const std::filesystem::path & lightFramePath);
 
   std::ostream & print(std::ostream & os, size_t indent = 0) const;
 
