@@ -82,6 +82,7 @@ FocusCurveRecorderProgressDetailsPanelT::FocusCurveRecorderProgressDetailsPanelT
 
 FocusCurveRecorderProgressDetailsPanelT::~FocusCurveRecorderProgressDetailsPanelT()
 {
+  delete mMovie;
 }
 
 void FocusCurveRecorderProgressDetailsPanelT::reset()
