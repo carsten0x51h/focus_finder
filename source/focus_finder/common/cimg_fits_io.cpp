@@ -60,7 +60,7 @@ void CImgFitsIOHelperT::readFits(ImageT * outImg,
 				1 /*1 color*/);
 
 		// HACK / FIXME: At this point we assume that there is only 1 layer!
-		std::valarray<unsigned long> imgData;
+		std::valarray<float> imgData;
 		image.read(imgData);
 
 		// For now we create a copy... maybe there is a better way to directly read data into CImg, later...
@@ -102,7 +102,7 @@ void CImgFitsIOHelperT::writeFits(const ImageT & inImg,
 		long nelements = std::accumulate(&naxes[0], &naxes[naxis], 1,
 				std::multiplies<long>());
 
-		std::valarray<int> array(nelements);
+		std::valarray<float> array(nelements);
 
 		cimg_forXY(inImg, x, y)
 		{

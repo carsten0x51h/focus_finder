@@ -1,6 +1,7 @@
 TODO
 ----
 -Next steps
+        -When storing FITS images, floating part of the image value is lost... -> ok, readFits should use "type of" ImageT!!! Manually set to float... but to be changed again... -> TEST
         -Remove HACK - FocusCurveRecordSetT - load()
         	//get<FocusMeasureTypeT>()
         	FocusMeasureTypeT::TypeE focusMeasureType = FocusMeasureTypeT::HFD; // TODO: LOAD
