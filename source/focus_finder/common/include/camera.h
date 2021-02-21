@@ -206,7 +206,10 @@ public:
 protected:
 	// To be used by startExposure, cancelExposure and actual device implementation.
 	void notifyExposureCycleFinished(RectT<unsigned int> roiRect, std::shared_ptr<const ImageT> resultImage, bool lastExposure) const { mExposureCycleFinishedListeners(roiRect, resultImage, lastExposure); }
-	void notifyExposureCancelled() const { mExposureCancelledListeners(); }
+	void notifyExposureCancelled() const {
+	  // HACK: Does not compile...
+	  //  mExposureCancelledListeners();
+	}
 	void notifyExposureTimerUpd(double t) const { mExposureTimerUpdListeners(t); }
 	void notifyExposureDelayTimerUpd(double t) const { mExposureDelayTimerUpdListeners(t); }
 	void notifyFrameTransferUpd(double percentage) const { mFrameTransferUpdListeners(percentage); }

@@ -25,6 +25,7 @@
 #ifndef SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FOCUS_ANALYZER_H_
 #define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FOCUS_ANALYZER_H_
 
+#include <atomic>
 #include <list>
 #include <memory>
 #include <functional>

@@ -72,6 +72,9 @@ public:
   
   const SizeT<float> & getCameraPixelSize() const;
   void setCameraPixelSize(const SizeT<float> & cameraPixelSize);
+
+  // TODO: Map of "custom" device specific properties which should be set to a corresponding value - e.g. PORT of an USB device...
+
   
   /**
    * Focus settings

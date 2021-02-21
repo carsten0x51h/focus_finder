@@ -51,6 +51,8 @@ DefaultFocusCurveRecorderT::DefaultFocusCurveRecorderT(std::shared_ptr<FocusCont
 													mCancelled(false),
 													mIsRunning(false)
 {
+  using namespace std::placeholders;
+
   LOG(debug)
     << "DefaultFocusCurveRecorderT::DefaultFocusCurveRecorderT..." << std::endl;
 
@@ -60,10 +62,10 @@ DefaultFocusCurveRecorderT::DefaultFocusCurveRecorderT(std::shared_ptr<FocusCont
   // Hand focus controller events through
   getFocusController()->registerFocusControllerProgressUpdateListener(
 								      boost::bind(&DefaultFocusCurveRecorderT::onFocusControllerProgressUpdate,
-										  this, _1, _2, _3)
+										  this, boost::placeholders::_1, boost::placeholders::_2, boost::placeholders::_3)
 								      );
   getFocusController()->registerFocusControllerNewRecordListener(boost::bind(&DefaultFocusCurveRecorderT::onFocusControllerNewRecord,
-									     this, _1)
+									     this, boost::placeholders::_1)
 								 );
 }
     
@@ -221,7 +223,7 @@ void DefaultFocusCurveRecorderT::run() {
     // // NOTE / TODO: For some reason std::bind did not compile....
     // mCameraExposureFinishedConnection =
     //   getCamera()->registerExposureCycleFinishedListener(
-    // 							 boost::bind(&DefaultFocusCurveRecorderT::onImageReceived,
+    // 							 std::bind(&DefaultFocusCurveRecorderT::onImageReceived,
     // 								     this, _1, _2, _3));
 
     

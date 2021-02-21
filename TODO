@@ -1,7 +1,16 @@
 TODO
 ----
 -Next steps
-        -Remove HACK - FocusCurveRecordSetT - load()
+-TODO: Build error?
+-TODO: Deprecated cmake message?
+-TODO: mIcon... missing (mail...)?
+-TODO: Dep. to QGIS required?
+ [ 58%] Building CXX object source/focus_finder/gui/CMakeFiles/focus_finder_gui.dir/profile_settings_dialog.cpp.o
+/home/devnull/workspace/fofi_git/fofi/build/source/focus_finder/gui/focus_finder_gui_autogen/include/ui_profile_settings_dialog.h:28:10: error: 'qgscollapsiblegroupbox.h' file not found [clang-diagnostic-error]
+#include "qgscollapsiblegroupbox.h"
+ --> Get rid of this dep.?
+ 
+-Remove HACK - FocusCurveRecordSetT - load()
         	//get<FocusMeasureTypeT>()
         	FocusMeasureTypeT::TypeE focusMeasureType = FocusMeasureTypeT::HFD; // TODO: LOAD
         	float focusMeasureLimit = 18.0F; // TODO: Load

@@ -56,7 +56,7 @@ void IndiUsbDeviceConnectorT::connectInternal() {
 	mIndiClient->connectDevice(deviceName.c_str());
 
 	auto isConnOrCancel =
-			[=]() -> bool {
+	  [=, this]() -> bool {
 				try {
 					LOG(debug) << "mCancelConnectFlag:" << mCancelConnectFlag.load()
 					<< ", getConnectionStateInternal() == DeviceConnectionStateT::CONNECTED: "

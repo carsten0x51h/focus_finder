@@ -162,7 +162,8 @@ public:
   
 protected:
   void notifyFocusCurveRecorderStarted() const {
-    mFocusCurveRecorderStartedListeners();
+    // HACK: Does not compile...
+    //mFocusCurveRecorderStartedListeners();
   }
   void notifyFocusCurveRecorderRecordSetFinished(std::shared_ptr<FocusCurveRecordSetT> focusCurveRecordSet) const {
     LOG(debug) << "FocusCurveRecorderT::notifyFocusCurveRecorderRecordSetFinished..." << std::endl;
@@ -172,7 +173,7 @@ protected:
   void notifyFocusCurveRecorderFinished(std::shared_ptr<const FocusCurveRecordSetContainerT> focusCurveRecordSetContainer) const {
     mFocusCurveRecorderFinishedListeners(focusCurveRecordSetContainer);
   }
-  void notifyFocusCurveRecorderCancelled() const {
+  void notifyFocusCurveRecorderCancelled() {
     mFocusCurveRecorderCancelledListeners();
   }
 
@@ -182,7 +183,9 @@ protected:
 
   void notifyFocusCurveRecorderRecordSetUpdate(std::shared_ptr<FocusCurveRecordSetT> focusCurveRecordSet) {
     LOG(debug) << "FocusCurveRecorderT::notifyFocusCurveRecorderRecordSetUpdate..." << std::endl;
-    mFocusCurveRecorderRecordSetUpdateListeners(focusCurveRecordSet);
+
+    // HACK! Does not compile...
+    //mFocusCurveRecorderRecordSetUpdateListeners(focusCurveRecordSet);
   }
 
   void notifyFocusCurveRecorderProgressUpdate(float progress,

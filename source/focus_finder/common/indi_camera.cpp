@@ -43,26 +43,28 @@
 IndiCameraT::IndiCameraT(INDI::BaseDevice *dp, IndiClientT * indiClient) :
 		mIndiBaseDevice(dp), mIndiClient(indiClient), cancelExposureFlag(false), mIsExposureRunning(false), mLoopMode(
 				LoopModeT::SINGLE), mExposureDelay(0s), mExposureTime(1s) {
-
+  
 	LOG(debug) << "IndiCameraT::IndiCameraT..." << std::endl;
 
 	mDeviceType = DeviceTypeT::CAMERA;
 
 	mIndiConnector = std::make_shared < IndiUsbDeviceConnectorT > (dp, indiClient);
 
+ TODO: mIndiConnector->setUsbDevicePort();
+	
 	// Register number
 	mNewNumberConnection = mIndiClient->registerNewNumberListener(
-			boost::bind(&IndiCameraT::newNumber, this, _1));
+			boost::bind(&IndiCameraT::newNumber, this, boost::placeholders::_1));
 
 	// Register on image recipient event
-	mNewBlobConnection = mIndiClient->registerNewBlobListener(
-			boost::bind(&IndiCameraT::newBlob, this, _1));
+  	mNewBlobConnection = mIndiClient->registerNewBlobListener(
+       		boost::bind(&IndiCameraT::newBlob, this, boost::placeholders::_1));
 
     mIndiClient->setBLOBMode(B_ALSO, mIndiBaseDevice->getDeviceName(), nullptr);
 
     // Register switch
     mNewSwitchConnection = mIndiClient->registerNewSwitchListener(
-            boost::bind(&IndiCameraT::newSwitch, this, _1));
+          boost::bind(&IndiCameraT::newSwitch, this, boost::placeholders::_1));
 }
 
 IndiCameraT::~IndiCameraT() {

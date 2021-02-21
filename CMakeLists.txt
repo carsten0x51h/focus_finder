@@ -128,7 +128,12 @@ include(cmake/FindQGIS.cmake)
 #find_package (X11 REQUIRED)
 #find_package (ZLIB REQUIRED)
 
-find_package(Boost COMPONENTS log system log thread REQUIRED)
+find_package(Boost COMPONENTS log system regex thread REQUIRED)
+
+#find_package(Boost 1.73 REQUIRED COMPONENTS log)
+#find_library(loglib libboost_log.a 3rdparty/boost_1_73_0/stage/lib)
+#target_link_libraries(Boost::log INTERFACE ${loglib})
+
 
 ADD_DEFINITIONS(-DBOOST_LOG_DYN_LINK)
 INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIR})

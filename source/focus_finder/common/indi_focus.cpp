@@ -40,7 +40,7 @@ IndiFocusT::IndiFocusT(INDI::BaseDevice *dp, IndiClientT * indiClient) :
 
 	// Register number
 	mNewNumberConnection = mIndiClient->registerNewNumberListener(
-			boost::bind(&IndiFocusT::newNumber, this, _1));
+			boost::bind(&IndiFocusT::newNumber, this, boost::placeholders::_1));
 }
 
 IndiFocusT::~IndiFocusT() {

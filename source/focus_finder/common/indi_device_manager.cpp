@@ -52,11 +52,11 @@ IndiDeviceManagerT::IndiDeviceManagerT() {
 
 	// Register to listners of IndiClient
 	mNewDeviceConnection = mIndiClient.registerNewDeviceListener(
-			boost::bind(&IndiDeviceManagerT::newDevice, this, _1));
+			boost::bind(&IndiDeviceManagerT::newDevice, this, boost::placeholders::_1));
 	mRemoveDeviceConnection = mIndiClient.registerRemoveDeviceListener(
-			boost::bind(&IndiDeviceManagerT::removeDevice, this, _1));
+			boost::bind(&IndiDeviceManagerT::removeDevice, this, boost::placeholders::_1));
 	mNewMessageConnection = mIndiClient.registerNewMessageListener(
-			boost::bind(&IndiDeviceManagerT::newMessage, this, _1, _2));
+			boost::bind(&IndiDeviceManagerT::newMessage, this, boost::placeholders::_1, boost::placeholders::_2));
 
 	//boost::signals2::connection registerNewDeviceListener(const NewDeviceListenersT::slot_type & inCallBack) {
 

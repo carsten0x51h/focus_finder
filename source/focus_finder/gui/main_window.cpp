@@ -188,7 +188,7 @@ void MainWindow::onStartFocusFinderPressed() {
 	  qRegisterMetaType < std::shared_ptr<FocusCurveRecordT> > ("FocusCurveRecordPtrT");
 	  
 	  // HACK: Move up!?
-	  // qRegisterMetaType < std::shared_ptr<FocusCurveRecordSetT> > ("FocusCurveRecordSetPtrT");
+	  qRegisterMetaType < std::shared_ptr<FocusCurveRecordSetT> > ("FocusCurveRecordSetPtrT");
 	  // TODO / FIXME: For some reason the following line is required HERE - it is not sufficient to use the MACRO above. Furthermore it is not sufficient to register this type in the focus_curve_recorder_panel...
 	  qRegisterMetaType < std::shared_ptr<const FocusCurveRecordSetContainerT> > ("FocusCurveRecordSetContainerPtrT");
 	  

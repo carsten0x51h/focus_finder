@@ -68,7 +68,7 @@ FocusControllerT::FocusControllerT(std::shared_ptr<CameraT> camera, std::shared_
     mCameraExposureFinishedConnection =
       getCamera()->registerExposureCycleFinishedListener(
 							 boost::bind(&FocusControllerT::onImageReceived,
-								     this, _1, _2, _3));
+								     this, boost::placeholders::_1, boost::placeholders::_2, boost::placeholders::_3));
 
   mInitialFocusPos = getFocus()->getCurrentPos();
 }
