@@ -122,11 +122,13 @@ set(Boost_NO_BOOST_CMAKE ON) #  Don't do a find_package in config mode before se
 #
 # Look for QGIS (Geograhic Information System extension for QT - see https://qgis.org/de/site/)
 #
-include(cmake/FindQGIS.cmake)
+#include(cmake/FindQGIS.cmake)
 
 #find_package (Threads REQUIRED)
 #find_package (X11 REQUIRED)
 #find_package (ZLIB REQUIRED)
+
+#TODO: Add finder for CCFits!
 
 find_package(Boost COMPONENTS log system regex thread REQUIRED)
 

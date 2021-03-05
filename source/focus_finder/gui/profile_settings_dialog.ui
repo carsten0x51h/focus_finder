@@ -663,6 +663,43 @@
               <string>Focus curve matching</string>
              </property>
              <layout class="QGridLayout" name="gridLayout_18">
+              <item row="2" column="0">
+               <layout class="QGridLayout" name="gridLayout_5">
+                <item row="0" column="2">
+                 <widget class="QSpinBox" name="spinBox_10"/>
+                </item>
+                <item row="1" column="2">
+                 <widget class="QSpinBox" name="spinBox_11"/>
+                </item>
+                <item row="0" column="0">
+                 <widget class="QLabel" name="label_12">
+                  <property name="text">
+                   <string>Outlier boundary factor</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="1">
+                 <spacer name="horizontalSpacer_7">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item row="1" column="0">
+                 <widget class="QLabel" name="label_29">
+                  <property name="text">
+                   <string>Max. accepted outliers</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
               <item row="0" column="0">
                <layout class="QGridLayout" name="gridLayout_17" rowstretch="0,0,0" columnstretch="0,0,0">
                 <property name="leftMargin">
@@ -723,52 +760,10 @@
                </layout>
               </item>
               <item row="1" column="0">
-               <widget class="QgsCollapsibleGroupBox" name="mGroupBox">
-                <property name="title">
+               <widget class="QCheckBox" name="checkBox">
+                <property name="text">
                  <string>Outlier detection</string>
                 </property>
-                <property name="checkable">
-                 <bool>true</bool>
-                </property>
-                <layout class="QGridLayout" name="gridLayout_22">
-                 <item row="0" column="0">
-                  <layout class="QGridLayout" name="gridLayout_5">
-                   <item row="0" column="2">
-                    <widget class="QSpinBox" name="spinBox_10"/>
-                   </item>
-                   <item row="1" column="2">
-                    <widget class="QSpinBox" name="spinBox_11"/>
-                   </item>
-                   <item row="0" column="0">
-                    <widget class="QLabel" name="label_12">
-                     <property name="text">
-                      <string>Outlier boundary factor</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="0" column="1">
-                    <spacer name="horizontalSpacer_7">
-                     <property name="orientation">
-                      <enum>Qt::Horizontal</enum>
-                     </property>
-                     <property name="sizeHint" stdset="0">
-                      <size>
-                       <width>40</width>
-                       <height>20</height>
-                      </size>
-                     </property>
-                    </spacer>
-                   </item>
-                   <item row="1" column="0">
-                    <widget class="QLabel" name="label_29">
-                     <property name="text">
-                      <string>Max. accepted outliers</string>
-                     </property>
-                    </widget>
-                   </item>
-                  </layout>
-                 </item>
-                </layout>
                </widget>
               </item>
              </layout>
@@ -807,14 +802,6 @@
    </item>
   </layout>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>QgsCollapsibleGroupBox</class>
-   <extends>QGroupBox</extends>
-   <header>qgscollapsiblegroupbox.h</header>
-   <container>1</container>
-  </customwidget>
- </customwidgets>
  <resources>
   <include location="../../../resources/res.qrc"/>
  </resources>

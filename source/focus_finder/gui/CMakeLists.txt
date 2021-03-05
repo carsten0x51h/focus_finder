@@ -321,7 +321,7 @@ target_include_directories(${target}
     ${INDI_INCLUDE_DIR}
     ${DEFAULT_INCLUDE_DIRECTORIES}
     ${CMAKE_CURRENT_BINARY_DIR}
-    ${QGIS_INCLUDE_DIR}
+#    ${QGIS_INCLUDE_DIR}
     ${PROJECT_BINARY_DIR}/source/include
 )
 
@@ -339,7 +339,7 @@ target_link_libraries(${target}
     Qt5::Core
     Qt5::Gui
     Qt5::Widgets
-    ${QGIS_GUI_LIBRARY}
+#    ${QGIS_GUI_LIBRARY}
     ${Boost_LOG_LIBRARY}
     ${Boost_LOG_SETUP_LIBRARY}
     ${Boost_THREAD_LIBRARY}
@@ -349,7 +349,6 @@ target_link_libraries(${target}
     CCfits
     gsl
     gslcblas
-    indi
     indiclient
     z
     ${DEFAULT_LINKER_OPTIONS}

@@ -50,7 +50,7 @@ IndiCameraT::IndiCameraT(INDI::BaseDevice *dp, IndiClientT * indiClient) :
 
 	mIndiConnector = std::make_shared < IndiUsbDeviceConnectorT > (dp, indiClient);
 
- TODO: mIndiConnector->setUsbDevicePort();
+	//TODO: mIndiConnector->setUsbDevicePort();
 	
 	// Register number
 	mNewNumberConnection = mIndiClient->registerNewNumberListener(
