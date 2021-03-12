@@ -30,6 +30,8 @@
 #include <memory>
 #include <boost/signals2.hpp>
 
+#include "device_manager_type.h"
+
 class CameraT;
 class FocusT;
 class CoolerT;
@@ -38,7 +40,13 @@ class DeviceT;
 
 
 class DeviceManagerT {
+private:
+  
 public:
+  virtual DeviceManagerTypeT::TypeE getDeviceManagerType() const = 0;
+
+  virtual bool isReady() = 0;
+  
 	virtual std::shared_ptr<DeviceT> getDevice(const std::string & deviceName) const = 0;
 
 	virtual std::vector<std::string> getCameraList() const = 0;

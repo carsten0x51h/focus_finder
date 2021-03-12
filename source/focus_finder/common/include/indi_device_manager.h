@@ -40,12 +40,16 @@ public:
 	static const std::string sDefaultIndiHostname;
 	static const int sDefaultIndiPort;
 
-
 	IndiDeviceManagerT();
 	virtual ~IndiDeviceManagerT();
 
+  DeviceManagerTypeT::TypeE getDeviceManagerType() const;
+  
 	std::shared_ptr<DeviceT> getDevice(const std::string & deviceName) const;
 
+  bool isReady();
+  IndiClientT & getIndiClient();
+  
 	std::vector<std::string> getCameraList() const;
 	std::shared_ptr<CameraT> getCamera(const std::string & cameraName) const;
 
@@ -62,16 +66,12 @@ public:
 	void setPort(unsigned int port);
 	unsigned int getPort() const;
 
-	// TODO: Need connect/disconect logic to server (+error handling) and listners (events)
-	//void connectServer();
-	bool connectServer();
-	//bool disconnectServer();
-
+  
 protected:
 	void newDevice(INDI::BaseDevice *dp);
 	void removeDevice(INDI::BaseDevice *dp);
 	void newMessage(INDI::BaseDevice *dp, int messageID);
-
+  
 private:
 	std::vector<std::string> getDeviceList(DeviceTypeT::TypeE deviceType) const;
 
@@ -83,7 +83,7 @@ private:
     boost::signals2::connection mRemoveDeviceConnection;
     boost::signals2::connection mNewDeviceConnection;
     boost::signals2::connection mNewMessageConnection;
-
+  
     std::map<std::string, std::shared_ptr<DeviceT> > mDeviceMap;
 };
 

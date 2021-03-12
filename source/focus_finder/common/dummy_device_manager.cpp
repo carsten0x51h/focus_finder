@@ -58,6 +58,14 @@ DummyDeviceManagerT::~DummyDeviceManagerT() {
 
 }
 
+bool DummyDeviceManagerT::isReady() {
+  return true;
+}
+
+DeviceManagerTypeT::TypeE DummyDeviceManagerT::getDeviceManagerType() const {
+  return DeviceManagerTypeT::DUMMY;
+}
+
 std::shared_ptr<DeviceT> DummyDeviceManagerT::getDevice(const std::string & deviceName) const {
 	LOG(debug) << "DummyDeviceManagerT::getDevice - deviceName: " << deviceName << std::endl;
 	//list.push_back(std::make_shared<Test>());

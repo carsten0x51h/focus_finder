@@ -103,7 +103,9 @@ protected:
     const QScopedPointer<Ui::MainWindow> m_ui;
 
 private:
-    void setExposureButtonState(bool isRunning); // Helper
+  void showDeviceManagerConfigDialog();
+  
+  void setExposureButtonState(bool isRunning); // Helper
 
     void updateCurrentCameraConnectionStateUI();
     void updateCurrentFocusConnectionStateUI();
@@ -158,6 +160,7 @@ private:
 	ReportingViewerPanelT * mReportingViewerPanel;
 
     // Manage device profiles
+  std::shared_ptr<QDialog> mDeviceManagerDialog;
     QPushButton * mManageDeviceProfilesButton;
 	ManageDeviceProfilesDialogT * mManageDeviceProfilesDialog;
 

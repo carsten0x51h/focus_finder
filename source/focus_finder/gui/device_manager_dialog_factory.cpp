@@ -22,41 +22,28 @@
  *
  ****************************************************************************/
 
-//#include <stdio.h>
+#include <memory>
 
-#include <QApplication>
-#include <QString>
-#include <QFile>
+#include <QDialog>
 
-#include "../common/include/focus_finder_logic.h"
+#include "include/device_manager_dialog_factory.h"
+#include "include/indi_device_manager_dialog.h"
 
-#include "include/main_window.h"
+#include "../common/include/indi_device_manager.h"
+#include "../common/include/device_manager_type.h"
 
+std::shared_ptr<QDialog> DeviceManagerDialogFactoryT::getInstance(QWidget * parent,
+								  std::shared_ptr<DeviceManagerT> deviceManager) {
 
-
-int main(int argc, char *argv[])
-{
-  FocusFinderLogicT::init();
+  DeviceManagerTypeT::TypeE deviceManagerType = deviceManager->getDeviceManagerType();
   
-  QApplication application(argc, argv);
-
-
-  // See https://stackoverflow.com/questions/4448236/how-could-qt-apply-style-from-an-external-qt-stylesheet-file
-  QFile styleSheetFile(":/res/style.qss");
-  styleSheetFile.open(QFile::ReadOnly);
-  QString styleSheet = QLatin1String(styleSheetFile.readAll());
-
-  application.setStyleSheet(styleSheet);
-
-
-  // We may pass the Logic here... however, since it is currently static,
-  // it can be accessed from everywhere in the app without passing it everywhere...
-  MainWindow mainWindow;
-  mainWindow.show();
-  
-  int rc = QApplication::exec();
-
-  FocusFinderLogicT::close();
-
-  return rc;
+  // TODO: Add ASCOM? Dummy?
+  switch (deviceManagerType) {
+  case DeviceManagerTypeT::INDI: {
+    std::shared_ptr<IndiDeviceManagerT> indiDeviceManager = std::static_pointer_cast<IndiDeviceManagerT>(deviceManager);
+    return std::make_shared<IndiDeviceManagerDialogT>(parent, indiDeviceManager);
+  }
+  default:
+    return nullptr;
+  }
 }

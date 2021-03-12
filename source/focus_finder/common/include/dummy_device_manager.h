@@ -30,34 +30,38 @@
 class DummyDeviceManagerT : public DeviceManagerT {
 
 public:
-	DummyDeviceManagerT();
-	virtual ~DummyDeviceManagerT();
+  DummyDeviceManagerT();
+  virtual ~DummyDeviceManagerT();
 
-	// set dev profile... -> TODO: sep. class for this?
-	// get dev profile... -> TODO: sep. class for this?
+  // set dev profile... -> TODO: sep. class for this?
+  // get dev profile... -> TODO: sep. class for this?
 
-	std::shared_ptr<DeviceT> getDevice(const std::string & deviceName) const;
+  bool isReady();
+  
+  DeviceManagerTypeT::TypeE getDeviceManagerType() const;
 
-	std::vector<std::string> getCameraList() const;
-	std::shared_ptr<CameraT> getCamera(const std::string & cameraName) const;
+  std::shared_ptr<DeviceT> getDevice(const std::string & deviceName) const;
 
-	std::vector<std::string> getFocusList() const;
-	std::shared_ptr<FocusT> getFocus(const std::string & focusName) const;
+  std::vector<std::string> getCameraList() const;
+  std::shared_ptr<CameraT> getCamera(const std::string & cameraName) const;
 
-	std::vector<std::string> getFilterList() const;
-	std::shared_ptr<FilterT> getFilter(const std::string & filterName) const;
+  std::vector<std::string> getFocusList() const;
+  std::shared_ptr<FocusT> getFocus(const std::string & focusName) const;
+
+  std::vector<std::string> getFilterList() const;
+  std::shared_ptr<FilterT> getFilter(const std::string & filterName) const;
 
 private:
-	// TODO/HACK
-	std::shared_ptr<CameraT> mCamera1;
-	std::shared_ptr<CameraT> mCamera2;
-	std::shared_ptr<CameraT> mCamera3;
-    std::shared_ptr<FocusT> mFocus1;
-    std::shared_ptr<FocusT> mFocus2;
-    std::shared_ptr<FocusT> mFocus3;
-    std::shared_ptr<FilterT> mFilter1;
-    std::shared_ptr<FilterT> mFilter2;
-    std::shared_ptr<FilterT> mFilter3;
+  // TODO/HACK
+  std::shared_ptr<CameraT> mCamera1;
+  std::shared_ptr<CameraT> mCamera2;
+  std::shared_ptr<CameraT> mCamera3;
+  std::shared_ptr<FocusT> mFocus1;
+  std::shared_ptr<FocusT> mFocus2;
+  std::shared_ptr<FocusT> mFocus3;
+  std::shared_ptr<FilterT> mFilter1;
+  std::shared_ptr<FilterT> mFilter2;
+  std::shared_ptr<FilterT> mFilter3;
 };
 
 

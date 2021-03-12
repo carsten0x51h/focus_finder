@@ -33,6 +33,8 @@
 #include "baseclient.h"
 //#include "basedevice.h"
 
+#include "indi_server_connection_state.h"
+
 #include <boost/signals2.hpp>
 
 class IndiClientT : public INDI::BaseClient {
@@ -68,9 +70,17 @@ private:
 	typedef boost::signals2::signal<void (INDI::BaseDevice *dp, int messageID)> NewMessageListenersT;
 	NewMessageListenersT mNewMessageListeners;
 
-	typedef boost::signals2::signal<void (bool connected)> ServerConnectionStateChangedListenersT;
+	typedef boost::signals2::signal<void (IndiServerConnectionStateT::TypeE indiServerConnectionState)> ServerConnectionStateChangedListenersT;
 	ServerConnectionStateChangedListenersT mServerConectionStateChangedListeners;
+  
+	typedef boost::signals2::signal<void ()> ServerConnectionFailedListenersT;
+	ServerConnectionFailedListenersT mServerConectionFailedListeners;
 
+  
+  void connectToIndiServerBlocking();
+  
+  std::thread mIndiConnectServerThread;
+  
 	// We do not want device copies
 	IndiClientT(const IndiClientT &);
 	IndiClientT & operator=(const IndiClientT &);
@@ -168,7 +178,20 @@ public:
 		inCallBack.disconnect();
 	}
 
+	boost::signals2::connection registerServerConnectionFailedListener(const ServerConnectionFailedListenersT::slot_type & inCallBack) {
+		return mServerConectionFailedListeners.connect(inCallBack);
+	}
 
+	template <class T> void unregisterServerConnectionFailedListener(const T & inCallBack) {
+		inCallBack.disconnect();
+	}
+
+  
+  void connect();
+  void disconnect();
+  bool isConnected() const;
+
+  
 protected:
 	void notifyNewDevice(INDI::BaseDevice *dp) { mNewDeviceListeners(dp); }
 	void notifyRemoveDevice(INDI::BaseDevice *dp) { mRemoveDeviceListeners(dp); }
@@ -182,8 +205,9 @@ protected:
 	void notifyNewLight(ILightVectorProperty *lvp) { mNewLightListeners(lvp); }
 	void notifyNewBlob(IBLOB *bp) { mNewBlobListeners(bp); }
 	void notifyNewMessage(INDI::BaseDevice *dp, int messageID) { mNewMessageListeners(dp, messageID); }
-	void notifyServerConnectionStateChanged(bool connected) { mServerConectionStateChangedListeners(connected); }
-
+  void notifyServerConnectionStateChanged(IndiServerConnectionStateT::TypeE indiServerConectionState) { mServerConectionStateChangedListeners(indiServerConectionState); }
+	void notifyServerConnectionFailed() { mServerConectionFailedListeners(); }
+  
 
 	/////////////////////////////////////////////////////////
 	// Implement the base device methods

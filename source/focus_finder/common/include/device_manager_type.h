@@ -22,41 +22,32 @@
  *
  ****************************************************************************/
 
-//#include <stdio.h>
+#ifndef SOURCE_FOCUS_FINDER_COMMON_INCLUDE_DEVICE_MANAGER_TYPE_H_
+#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_DEVICE_MANAGER_TYPE_H_
 
-#include <QApplication>
-#include <QString>
-#include <QFile>
+#include "enum_helper.h"
 
-#include "../common/include/focus_finder_logic.h"
-
-#include "include/main_window.h"
-
-
-
-int main(int argc, char *argv[])
-{
-  FocusFinderLogicT::init();
+struct DeviceManagerTypeT {
+  enum TypeE {
+	      INDI,
+	      ASCOM,
+	      DUMMY,
+	      _Count
+  };
   
-  QApplication application(argc, argv);
+		static const char * asStr(const TypeE & inType) {
+			switch (inType) {
+			case INDI:
+			  return "INDI";
+			case ASCOM:
+			  return "ASCOM";
+			case DUMMY:
+			  return "DUMMY";
+			default:
+			  return "<?>";
+		}
+	}
+	MAC_AS_TYPE(Type, E, _Count);
+};
 
-
-  // See https://stackoverflow.com/questions/4448236/how-could-qt-apply-style-from-an-external-qt-stylesheet-file
-  QFile styleSheetFile(":/res/style.qss");
-  styleSheetFile.open(QFile::ReadOnly);
-  QString styleSheet = QLatin1String(styleSheetFile.readAll());
-
-  application.setStyleSheet(styleSheet);
-
-
-  // We may pass the Logic here... however, since it is currently static,
-  // it can be accessed from everywhere in the app without passing it everywhere...
-  MainWindow mainWindow;
-  mainWindow.show();
-  
-  int rc = QApplication::exec();
-
-  FocusFinderLogicT::close();
-
-  return rc;
-}
+#endif /* SOURCE_FOCUS_FINDER_COMMON_INCLUDE_DEVICE_MANAGER_TYPE_H_ */

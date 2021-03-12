@@ -48,6 +48,16 @@ IndiDeviceManagerT::IndiDeviceManagerT() {
 			<< std::endl;
 
 	// TODO: Read cfg?!?!?!?
+	// TODO: Read config, maybe supply path? Or ask static instance? Maybe move this config part into sep. function?
+	// indiDeviceMgr->setHostname("localhost");
+	// indiDeviceMgr->setPort(7624);
+
+	// // Connect - should this be here??
+	// indiDeviceMgr->connectServer();
+
+
+	
+	
 	mIndiClient.setServer(sDefaultIndiHostname.c_str(), sDefaultIndiPort);
 
 	// Register to listners of IndiClient
@@ -57,7 +67,7 @@ IndiDeviceManagerT::IndiDeviceManagerT() {
 			boost::bind(&IndiDeviceManagerT::removeDevice, this, boost::placeholders::_1));
 	mNewMessageConnection = mIndiClient.registerNewMessageListener(
 			boost::bind(&IndiDeviceManagerT::newMessage, this, boost::placeholders::_1, boost::placeholders::_2));
-
+	
 	//boost::signals2::connection registerNewDeviceListener(const NewDeviceListenersT::slot_type & inCallBack) {
 
 	// Connect to server here??!?!?!
@@ -73,10 +83,12 @@ IndiDeviceManagerT::~IndiDeviceManagerT() {
 	mIndiClient.unregisterNewDeviceListener(mNewDeviceConnection);
 	mIndiClient.unregisterRemoveDeviceListener(mRemoveDeviceConnection);
 
-	// TODO: Disconnect server??!!!!
-
-	mIndiClient.disconnectServer();
+	
+	// Disconnect the INDI client since this INDI device manager owns the INDI client.
+	mIndiClient.disconnect();
   }
+
+
 
 void IndiDeviceManagerT::newMessage(INDI::BaseDevice *dp, int messageID) {
 	std::string msgStr = dp->messageQueue(messageID);
@@ -93,6 +105,8 @@ void IndiDeviceManagerT::newDevice(INDI::BaseDevice *dp) {
 	// TODO: Based on the entries in the XML file, classify the different devices and
 	// create the respecitve device objects. (lookup by name? -> Group name -> type)
 
+// TODO / FIXME: Stop reading the drivers.xml file. Instead use the driver information (driver device type or similar - see code from PHD2...) - indi_config.cpp
+	
 	std::string deviceName = dp->getDeviceName();
 
 	auto it = mDeviceMap.find(deviceName);
@@ -111,6 +125,16 @@ void IndiDeviceManagerT::newDevice(INDI::BaseDevice *dp) {
 void IndiDeviceManagerT::removeDevice(INDI::BaseDevice *dp) {
 	LOG(debug) << "IndiDeviceManagerT::removeDevice... device: '"
 			<< dp->getDeviceName() << "'" << std::endl;
+
+	// TODO...
+}
+
+DeviceManagerTypeT::TypeE IndiDeviceManagerT::getDeviceManagerType() const {
+  return DeviceManagerTypeT::INDI;
+}
+
+IndiClientT & IndiDeviceManagerT::getIndiClient() {
+  return mIndiClient;
 }
 
 std::shared_ptr<DeviceT> IndiDeviceManagerT::getDevice(
@@ -214,10 +238,7 @@ unsigned int IndiDeviceManagerT::getPort() const {
 	return const_cast<IndiClientT*>(&mIndiClient)->getPort();
 }
 
-bool IndiDeviceManagerT::connectServer() {
-	return mIndiClient.connectServer();
+bool IndiDeviceManagerT::isReady() {
+  // TODO: Avoid connect if already connected...
+  return mIndiClient.connectServer();
 }
-
-//bool IndiDeviceManagerT::disconnectServer() {
-//	mIndiClient.disconnectServer();
-//}

@@ -52,7 +52,9 @@
 
 #include "include/main_window.h"
 
+#include "include/device_manager_dialog_factory.h"
 #include "include/manage_device_profiles_dialog.h"
+
 
 #include "../common/include/image.h"
 #include "../common/include/size.h"
@@ -1572,7 +1574,8 @@ MainWindow::MainWindow() :
 		mFfl(*FocusFinderLogicT::get())	// TODO: Remove mFfl... directly use static function...
 {
 	// Setup UI
-	m_ui->setupUi(this);
+	m_ui->setupUi(this);						     
+
 	
 	mManageDeviceProfilesDialog = new ManageDeviceProfilesDialogT(mFfl);
 
@@ -1595,6 +1598,10 @@ MainWindow::MainWindow() :
 	createAboutDialog();
 
 	updateProfile();
+
+
+
+	showDeviceManagerConfigDialog();
 }
 
 MainWindow::~MainWindow() {
@@ -1641,4 +1648,21 @@ void MainWindow::on_about() {
 //        "Version:   " + LIBINDICLIENTPP_VERSION + "\n";
 //
 	mAboutDialog->show();
+}
+
+// TODO: Find better name for this method...
+void MainWindow::showDeviceManagerConfigDialog() {
+  // Create INDI config dialog (modal)...
+  std::shared_ptr<DeviceManagerT> deviceManager = FocusFinderLogicT::get()->getDeviceManager();
+
+  LOG(debug) << "Using DeviceManager: " << DeviceManagerTypeT::asStr(deviceManager->getDeviceManagerType()) << std::endl;
+
+  mDeviceManagerDialog = DeviceManagerDialogFactoryT::getInstance(this, deviceManager);
+
+  if (! deviceManager->isReady()) {
+    LOG(info) << "Device manager connection failed. Bringing up config dialog..." << std::endl;
+    
+    //mDeviceManagerDialog->setModal(true);
+    mDeviceManagerDialog->open(); // TODO: Check QDialog::Accepted...
+  }
 }

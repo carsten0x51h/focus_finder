@@ -28,11 +28,13 @@
 
 #include "include/focus_finder_logic.h"
 
-#include "include/indi_device_manager.h"
+#include "include/device_manager.h"
+#include "include/device_manager_type.h"
+#include "include/device_manager_factory.h"
 
-
-#include "include/dummy_device_manager.h"
 #include "include/dummy_camera.h"
+#include "include/fofi_config_manager.h"
+#include "include/global_config_manager.h"
 #include "include/profile_manager.h"
 #include "include/focus_finder_profile.h"
 #include "include/logging.h"
@@ -56,7 +58,6 @@ void FocusFinderLogicT::init() {
 
   logging::trivial::severity_level sev = logging::trivial::debug;
   LoggingT::init(sev, true /*console*/, true /*log file*/);
-
 }
 
 void FocusFinderLogicT::close() {
@@ -74,9 +75,10 @@ FocusFinderLogicT::FocusFinderLogicT() :
 	LOG(debug)
 	<< "FocusFinderLogicT::FocusFinderLogicT()..." << std::endl;
 
-	// Create profile manager
-	// TODO: Maybe also pass path to profile files...
-	mProfileManager = std::make_shared<ProfileManagerT>();
+
+	mFoFiConfigManager = std::make_shared<FoFiConfigManagerT>();
+
+	
 
 	// Create the device manager
 	//mDeviceManager = std::make_shared<DummyDeviceManagerT>();
@@ -91,18 +93,29 @@ FocusFinderLogicT::FocusFinderLogicT() :
 	//          between the different OSs. There the one or the other DeviceManager could be
 	//          instantiated and also configured.
 	//
-	// TODO: Port and hostname should not be hardcoded...  
-	auto indiDeviceMgr = std::make_shared<IndiDeviceManagerT>();
+	// TODO: Port and hostname should not be hardcoded...
+	//
 
-	indiDeviceMgr->setHostname("localhost");
-	indiDeviceMgr->setPort(7624);
+	  // IDEA: Maybe just pass the DeviceManager from outside... because
+	//       which devicwe manager we use here does not matter. The configuration
+	//       of the device manager should happen outside this class and the required
+	//       parameters may also vary. They may come from a CMD lin app or from aGUI
+	//       or from a web-app or whatever...
 
-	// Connect - should this be here??
-	// TODO: return value
-	indiDeviceMgr->connectServer();
 
-	mDeviceManager = indiDeviceMgr;
 
+	// TODO: Allow e.g. a CMD line program to pass in the device manager type as cmd line param?  -> yes, then a GlobalFofiConfig object will just be manipulated (as part of mFoFiConfigManager...)
+	// But how to handle device manager specific params - e.g. INDI params? Will there also be an IndiGlobalConfigT object?? - just as a generic object list / map? Or maybe .. static_cast<>
+	// from a gneric DeviceManagerConfigT to an IndiDeviceManagerConfigT inside IndiDeviceManager?? This object may be created from the config file and may also be overwritten by cmdline params...
+	// Since this overriding only can take place as part of the CMD line app, the rsepective config object must not be generated in here!
+	//TODO...
+	  
+	DeviceManagerTypeT::TypeE deviceManagerType = mFoFiConfigManager->getGlobalConfigManager()->getConfig().getDeviceManagerType();
+
+	LOG(debug) << "DeviceManagerType configured: " << DeviceManagerTypeT::asStr(deviceManagerType) << std::endl;
+	
+	mDeviceManager = DeviceManagerFactoryT::getInstance(deviceManagerType);
+	//mDeviceManager->configure(fullFilePath.....???);
 
 
 	// DEBUG START
@@ -127,7 +140,7 @@ FocusFinderLogicT::FocusFinderLogicT() :
 	updateProfile();
 
 	// Register at profile manager to get notified if selected profile / device changes...
-	mProfileManager->registerActiveProfileChangedListener(std::bind(&FocusFinderLogicT::updateProfile, this));
+	mFoFiConfigManager->getProfileManager()->registerActiveProfileChangedListener(std::bind(&FocusFinderLogicT::updateProfile, this));
 
 
 	initImageMappers();
@@ -149,7 +162,7 @@ FocusFinderLogicT::~FocusFinderLogicT() {
 }
 
 std::shared_ptr<CameraT> FocusFinderLogicT::getCurrentCamera() {
-	auto activeProfile = mProfileManager->getActiveProfile();
+	auto activeProfile = mFoFiConfigManager->getProfileManager()->getActiveProfile();
 
 	return (activeProfile ?
 			mDeviceManager->getCamera(activeProfile->getCameraDeviceName()) :
@@ -157,7 +170,7 @@ std::shared_ptr<CameraT> FocusFinderLogicT::getCurrentCamera() {
 }
 
 std::shared_ptr<FocusT> FocusFinderLogicT::getCurrentFocus() {
-	auto activeProfile = mProfileManager->getActiveProfile();
+	auto activeProfile = mFoFiConfigManager->getProfileManager()->getActiveProfile();
 
 	return (activeProfile ?
 			mDeviceManager->getFocus(activeProfile->getFocusDeviceName()) :
@@ -165,7 +178,7 @@ std::shared_ptr<FocusT> FocusFinderLogicT::getCurrentFocus() {
 }
 
 std::shared_ptr<FilterT> FocusFinderLogicT::getCurrentFilter() {
-	auto activeProfile = mProfileManager->getActiveProfile();
+	auto activeProfile = mFoFiConfigManager->getProfileManager()->getActiveProfile();
 
 	return (activeProfile ?
 			mDeviceManager->getFilter(activeProfile->getFilterDeviceName()) :
@@ -177,7 +190,7 @@ std::shared_ptr<DeviceManagerT> FocusFinderLogicT::getDeviceManager() const {
 }
 
 std::shared_ptr<ProfileManagerT> FocusFinderLogicT::getProfileManager() const {
-	return mProfileManager;
+	return mFoFiConfigManager->getProfileManager();
 }
 
 void FocusFinderLogicT::updateProfile() {
@@ -282,7 +295,7 @@ std::optional<PointT<float> > FocusFinderLogicT::findFocusStar(
 
 	PointT<int> poi = poiFloat.to<int>();
 
-	auto activeProfile = mProfileManager->getActiveProfile();
+	auto activeProfile = mFoFiConfigManager->getProfileManager()->getActiveProfile();
 
 	if (! activeProfile) {
 		LOG(warning) << "No active profile set!" << std::endl;

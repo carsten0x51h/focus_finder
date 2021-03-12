@@ -45,6 +45,7 @@ class MapperFunctionT;
 class ImageConverter16To8T;
 class FocusFinderT;
 class FocusCurveRecorderLogicT;
+class FoFiConfigManagerT;
 
 class FocusFinderLogicT
 {
@@ -103,7 +104,7 @@ private:
   std::shared_ptr<DeviceManagerT> mDeviceManager;
 
   // TODO: Not yet sure, if sep. of DeviceManager and ProfileManager is a good idea...
-  std::shared_ptr<ProfileManagerT> mProfileManager;
+  std::shared_ptr<FoFiConfigManagerT> mFoFiConfigManager;
 
   std::shared_ptr<CameraT> mCameraDevice;
 

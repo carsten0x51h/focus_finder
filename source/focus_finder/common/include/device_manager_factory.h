@@ -22,41 +22,20 @@
  *
  ****************************************************************************/
 
-//#include <stdio.h>
+#ifndef SOURCE_FOCUS_FINDER_COMMON_INCLUDE_DEVICE_MANAGER_FACTORY_H_
+#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_DEVICE_MANAGER_FACTORY_H_
 
-#include <QApplication>
-#include <QString>
-#include <QFile>
+#include <memory>
 
-#include "../common/include/focus_finder_logic.h"
+#include "device_manager_type.h"
+#include "enum_helper.h"
 
-#include "include/main_window.h"
+class DeviceManagerT;
 
-
-
-int main(int argc, char *argv[])
-{
-  FocusFinderLogicT::init();
-  
-  QApplication application(argc, argv);
+class DeviceManagerFactoryT {
+public:
+	static std::shared_ptr<DeviceManagerT> getInstance(const DeviceManagerTypeT::TypeE & type);
+};
 
 
-  // See https://stackoverflow.com/questions/4448236/how-could-qt-apply-style-from-an-external-qt-stylesheet-file
-  QFile styleSheetFile(":/res/style.qss");
-  styleSheetFile.open(QFile::ReadOnly);
-  QString styleSheet = QLatin1String(styleSheetFile.readAll());
-
-  application.setStyleSheet(styleSheet);
-
-
-  // We may pass the Logic here... however, since it is currently static,
-  // it can be accessed from everywhere in the app without passing it everywhere...
-  MainWindow mainWindow;
-  mainWindow.show();
-  
-  int rc = QApplication::exec();
-
-  FocusFinderLogicT::close();
-
-  return rc;
-}
+#endif /* SOURCE_FOCUS_FINDER_COMMON_INCLUDE_DEVICE_MANAGER_FACTORY_H_ */

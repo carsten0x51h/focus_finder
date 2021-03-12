@@ -22,9 +22,14 @@
  *
  ****************************************************************************/
 
+#include <thread>
+#include <pthread.h>
+
+
+#include <chrono> // TODO: Remove
+
 #include "include/indi_client.h"
 #include "include/logging.h"
-
 #include "indiproperty.h"
 #include "basedevice.h"
 
@@ -94,11 +99,60 @@ void IndiClientT::newMessage(INDI::BaseDevice *dp, int messageID) {
 // TODO: We may have to change the connection logic - INDI client API blocks??!
 void IndiClientT::serverConnected() {
 	LOG(debug) << "IndiClientT::serverConnected..." << std::endl;
-	notifyServerConnectionStateChanged(true /*connected*/);
+	notifyServerConnectionStateChanged(IndiServerConnectionStateT::CONNECTED);
 }
 
 void IndiClientT::serverDisconnected(int /*exit_code*/) {
 	// TODO: Do we need the exit code?...
 	LOG(debug) << "IndiClientT::serverDisconnected..." << std::endl;
-	notifyServerConnectionStateChanged(false /*disconnected*/);
+	notifyServerConnectionStateChanged(IndiServerConnectionStateT::DISCONNECTED);
 }
+
+void IndiClientT::connectToIndiServerBlocking() {
+
+  LOG(debug) << "IndiClientT::connectToIndiServerBlocking()... Trying to connecto to INDI server... blocking call..." << std::endl;
+
+  // This function is blocking and therefore needs to be in a separate thread
+  bool connectIndiServerResult = this->connectServer();
+
+  LOG(debug) << "IndiClientT::connectToIndiServerBlocking()... connectIndiServerResult=" << connectIndiServerResult  << std::endl;
+
+  if (! connectIndiServerResult) {
+    // Emit a failure signal...
+    LOG(debug) << "IndiClientT::connectToIndiServerBlocking()... INDI server connection failed..." << std::endl;
+    
+    notifyServerConnectionFailed();
+  }
+  else {
+    // Do not emit a success signal since this will already happen from within the INDI server...
+  }
+}
+
+void IndiClientT::connect() {
+  LOG(debug) << "IndiClientT::connect..." << std::endl;
+
+  // TODO: Use setConnectionTimeout(uint32_t seconds, uint32_t microseconds) from base class to set the INDI server connection timeout (default is 3 seconds).
+  
+  if (! this->isServerConnected()) {
+    notifyServerConnectionStateChanged(IndiServerConnectionStateT::CONNECTING);
+
+    mIndiConnectServerThread = std::move(std::thread(& IndiClientT::connectToIndiServerBlocking, this));
+    mIndiConnectServerThread.detach();
+  }
+}
+
+void IndiClientT::disconnect() {
+  LOG(debug) << "IndiClientT::disconnect..." << std::endl;
+
+  notifyServerConnectionStateChanged(IndiServerConnectionStateT::DISCONNECTING);
+
+  if (this->isServerConnected()) {
+    this->disconnectServer();
+  }
+
+}
+
+bool IndiClientT::isConnected() const {
+  return this->isServerConnected();
+}
+

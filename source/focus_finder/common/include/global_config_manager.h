@@ -22,41 +22,55 @@
  *
  ****************************************************************************/
 
-//#include <stdio.h>
+#ifndef SOURCE_FOCUS_FINDER_COMMON_INCLUDE_GLOBAL_CONFIG_MANAGER_H_
+#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_GLOBAL_CONFIG_MANAGER_H_
 
-#include <QApplication>
-#include <QString>
-#include <QFile>
+#include <string>
+#include <optional>
+#include <filesystem>
 
-#include "../common/include/focus_finder_logic.h"
-
-#include "include/main_window.h"
-
+#include "exception.h"
+#include "global_focus_finder_config.h"
 
 
-int main(int argc, char *argv[])
-{
-  FocusFinderLogicT::init();
+DEF_Exception(GlobalConfigManager);
+
+/**
+ *
+ */
+class GlobalConfigManagerT {
   
-  QApplication application(argc, argv);
-
-
-  // See https://stackoverflow.com/questions/4448236/how-could-qt-apply-style-from-an-external-qt-stylesheet-file
-  QFile styleSheetFile(":/res/style.qss");
-  styleSheetFile.open(QFile::ReadOnly);
-  QString styleSheet = QLatin1String(styleSheetFile.readAll());
-
-  application.setStyleSheet(styleSheet);
-
-
-  // We may pass the Logic here... however, since it is currently static,
-  // it can be accessed from everywhere in the app without passing it everywhere...
-  MainWindow mainWindow;
-  mainWindow.show();
+private:
+  static const std::string GLOBAL_CFG_FILENAME;
   
-  int rc = QApplication::exec();
+  /**
+   *
+   */
+  static std::filesystem::path composeFullGlobalConfigFilePath();
 
-  FocusFinderLogicT::close();
+  /**
+   *
+   */
+  GlobalFocusFinderConfigT mGlobalFocusFinderConfig;
 
-  return rc;
-}
+
+public:
+  GlobalConfigManagerT();
+
+  /**
+   *
+   */
+  static std::filesystem::path getGlobalConfigRootDirectory();
+
+  /**
+   *
+   */
+  GlobalFocusFinderConfigT getConfig() const;
+
+  /**
+   *
+   */
+  void setConfig(const GlobalFocusFinderConfigT & modifiedGlobalConfig);
+};
+
+#endif /* SOURCE_FOCUS_FINDER_COMMON_INCLUDE_GLOBAL_CONFIG_MANAGER_H_ */

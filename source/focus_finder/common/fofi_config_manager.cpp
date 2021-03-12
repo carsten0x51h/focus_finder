@@ -22,41 +22,20 @@
  *
  ****************************************************************************/
 
-//#include <stdio.h>
-
-#include <QApplication>
-#include <QString>
-#include <QFile>
-
-#include "../common/include/focus_finder_logic.h"
-
-#include "include/main_window.h"
+#include "include/fofi_config_manager.h"
+#include "include/global_config_manager.h"
+#include "include/profile_manager.h"
 
 
+FoFiConfigManagerT::FoFiConfigManagerT() {
+  mGlobalConfigManager = std::make_shared<GlobalConfigManagerT>();
+  mProfileManager = std::make_shared<ProfileManagerT>();
+}
 
-int main(int argc, char *argv[])
-{
-  FocusFinderLogicT::init();
-  
-  QApplication application(argc, argv);
+std::shared_ptr<GlobalConfigManagerT> FoFiConfigManagerT::getGlobalConfigManager() {
+  return mGlobalConfigManager;
+}
 
-
-  // See https://stackoverflow.com/questions/4448236/how-could-qt-apply-style-from-an-external-qt-stylesheet-file
-  QFile styleSheetFile(":/res/style.qss");
-  styleSheetFile.open(QFile::ReadOnly);
-  QString styleSheet = QLatin1String(styleSheetFile.readAll());
-
-  application.setStyleSheet(styleSheet);
-
-
-  // We may pass the Logic here... however, since it is currently static,
-  // it can be accessed from everywhere in the app without passing it everywhere...
-  MainWindow mainWindow;
-  mainWindow.show();
-  
-  int rc = QApplication::exec();
-
-  FocusFinderLogicT::close();
-
-  return rc;
+std::shared_ptr<ProfileManagerT> FoFiConfigManagerT::getProfileManager() {
+  return mProfileManager;
 }

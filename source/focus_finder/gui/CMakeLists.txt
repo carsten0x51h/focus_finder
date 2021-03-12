@@ -209,6 +209,16 @@ set(sources
   ../common/focus_finder_factory.cpp
   ../common/include/profile_manager.h
   ../common/profile_manager.cpp
+  ../common/device_manager_factory.cpp
+  ../common/fofi_config_manager.cpp
+  ../common/global_config_manager.cpp
+  ../common/global_focus_finder_config.cpp
+  ../common/include/device_manager_factory.h
+  ../common/include/device_manager_type.h
+  ../common/include/device_manager_type_ptree_translator.h
+  ../common/include/fofi_config_manager.h
+  ../common/include/global_config_manager.h
+  ../common/include/global_focus_finder_config.h
   focus_finder_gui_app.cpp
   include/anim_menu_button.h
   anim_menu_button.cpp
@@ -266,6 +276,8 @@ set(sources
   profile_settings_dialog.ui
   reporting_viewer_panel.ui
   include/focus_curve_recorder_dialog.h
+  device_manager_dialog_factory.cpp
+  include/device_manager_dialog_factory.h
   focus_curve_recorder_dialog.cpp
   focus_curve_recorder_dialog.ui
   include/focus_curve_recorder_progress_details_panel.h
@@ -280,6 +292,9 @@ set(sources
   include/focus_curve_recorder_summary_details_panel.h
   focus_curve_recorder_summary_details_panel.cpp
   focus_curve_recorder_summary_details_panel.ui
+  include/indi_device_manager_dialog.h
+  indi_device_manager_dialog.cpp
+  indi_device_manager_dialog.ui  
 )
 
 
