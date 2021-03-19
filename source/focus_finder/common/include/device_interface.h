@@ -22,45 +22,45 @@
  *
  ****************************************************************************/
 
-#ifndef SOURCE_FOCUS_FINDER_COMMON_INCLUDE_DEVICE_TYPE_H_
-#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_DEVICE_TYPE_H_
+#ifndef SOURCE_FOCUS_FINDER_COMMON_INCLUDE_DEVICE_H_
+#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_DEVICE_H_
 
-#include "enum_helper.h"
+#include <memory>
+#include <set>
 
-struct DeviceTypeT {
-		enum TypeE {
-			TELESCOPE,
-			CAMERA,
-			FILTER,
-			FOCUS,
-			DOMES,
-			WEATHER,
-			AUXILIARY,
-			_Count
-		};
+#include "device_connector.h"
+#include "device_interface_type.h"
 
-		static const char * asStr(const TypeE & inType) {
-			switch (inType) {
-			case TELESCOPE:
-				return "TELESCOPE";
-			case CAMERA:
-				return "CAMERA";
-			case FILTER:
-				return "FILTER";
-			case FOCUS:
-				return "FOCUS";
-			case DOMES:
-				return "DOMES";
-			case WEATHER:
-				return "WEATHER";
-			case AUXILIARY:
-				return "AUXILIARY";
-		default:
-			return "<?>";
-		}
-	}
-	MAC_AS_TYPE(Type, E, _Count);
+class DeviceInterfaceT {
+private:
+	// We do not want device copies
+	DeviceInterfaceT(const DeviceInterfaceT &);
+	DeviceInterfaceT & operator=(const DeviceInterfaceT &);
+
+protected:
+	//DeviceInterfaceTypeT::TypeE;
+
+public:
+	static const std::string NONE;
+
+	DeviceInterfaceT() {}
+
+	virtual std::string getName() const = 0;
+	virtual std::shared_ptr<DeviceConnectorT> getConnector() const = 0;
+	virtual ~DeviceInterfaceT() { };
+
+
+	/**
+	 * A bit-mask would of course be more efficient but as interface
+	 * function a set of the supported interface types is more intuitive
+	 * for less experienced developers.
+	 *
+	 * TODO: If it turns out to be unpractical, convert this to a uint16_t as bit-mask...
+	 *
+	 * @return
+	 */
+	std::set<DeviceInterfaceTypeT::TypeE> getSupportedInferfaces() const = 0;
 };
 
-#endif /* SOURCE_FOCUS_FINDER_COMMON_INCLUDE_DEVICE_TYPE_H_ */
 
+#endif /* SOURCE_FOCUS_FINDER_COMMON_INCLUDE_DEVICE_H_ */

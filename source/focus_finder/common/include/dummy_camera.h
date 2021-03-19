@@ -34,11 +34,11 @@
 #include <utility>
 #include <list>
 
-#include "camera.h"
+#include "camera_interface.h"
 #include "logging.h"
 #include "rect.h"
 #include "device_connector.h"
-#include "dummy_device_connector.h"
+#include "dummy_device.h"
 
 using namespace boost; // TODO: REMOVE!
 using namespace std::chrono_literals;
@@ -47,7 +47,7 @@ using namespace std::chrono_literals;
 enum GenImageTypeE { NOISE, CCD_SIM };
 
 // https://stackoverflow.com/questions/9404884/implementing-interfaces-in-c-with-inherited-concrete-classes
-class DummyCameraT : virtual public CameraT {
+class DummyCameraT : virtual public CameraInterfaceT {
 
 public:
 	DummyCameraT();
@@ -95,7 +95,7 @@ public:
 	void setGenImageType(GenImageTypeE genImageType);
 
 private:
-	std::shared_ptr<DummyDeviceConnectorT> mDummyConnector;
+	std::shared_ptr<DummyDeviceT> mDummyConnector;
 
 	bool delayedExposueTimer();
 	bool exposureTimer();

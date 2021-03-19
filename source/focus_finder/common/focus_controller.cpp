@@ -51,14 +51,14 @@
 #include "include/boundary_location.h"
 #include "include/curve_function.h"
 
-#include "include/camera.h"
-#include "include/focus.h"
-#include "include/filter.h"
+#include "include/camera_interface.h"
+#include "include/focus_interface.h"
+#include "include/filter_interface.h"
 
 #include "include/focus_controller.h"
 
 
-FocusControllerT::FocusControllerT(std::shared_ptr<CameraT> camera, std::shared_ptr<FocusT> focus, std::shared_ptr<FilterT> filter) : mCancelled(false), mCamera(camera), mFocus(focus), mFilter(filter) {
+FocusControllerT::FocusControllerT(std::shared_ptr<CameraInterfaceT> camera, std::shared_ptr<FocusInterfaceT> focus, std::shared_ptr<FilterInterfaceT> filter) : mCancelled(false), mCamera(camera), mFocus(focus), mFilter(filter) {
 
   // TODO: Check if require devices are != nullptr?! Or pass by reference?
   
@@ -79,29 +79,29 @@ FocusControllerT::~FocusControllerT()
 }
 
 
-std::shared_ptr<CameraT> FocusControllerT::getCamera() const
+std::shared_ptr<CameraInterfaceT> FocusControllerT::getCamera() const
 {
   return mCamera;
 }
-// void FocusControllerT::setCamera(std::shared_ptr<CameraT> camera)
+// void FocusControllerT::setCamera(std::shared_ptr<CameraInterfaceT> camera)
 // {
 //   mCamera = camera;
 // }
 
-std::shared_ptr<FocusT> FocusControllerT::getFocus() const
+std::shared_ptr<FocusInterfaceT> FocusControllerT::getFocus() const
 {
   return mFocus;
 }
-// void FocusControllerT::setFocus(std::shared_ptr<FocusT> focus)
+// void FocusControllerT::setFocus(std::shared_ptr<FocusInterfaceT> focus)
 // {
 //   mFocus = focus;
 // }
 
-std::shared_ptr<FilterT> FocusControllerT::getFilter() const
+std::shared_ptr<FilterInterfaceT> FocusControllerT::getFilter() const
 {
   return mFilter;
 }
-// void FocusControllerT::setFilter(std::shared_ptr<FilterT> filter)
+// void FocusControllerT::setFilter(std::shared_ptr<FilterInterfaceT> filter)
 // {
 //   mFilter = filter;
 // }
@@ -798,7 +798,7 @@ void FocusControllerT::moveFocusToBlocking(int absPos, std::chrono::milliseconds
 void FocusControllerT::runExposureBlocking(
 						     std::chrono::milliseconds expTime) {
 
-  // TODO: Check if getCamera() is set...
+  // TODO: Check if getCameraInterface() is set...
   
   using namespace std::chrono_literals;
 
@@ -872,7 +872,7 @@ void FocusControllerT::cleanup() {
   }
 
   // NOTE: Re-register?!?! -> no... cleanup() should only be called at the end-of-life of the FocusController object.
-  // TODO: Check if getCamera() still returns valid device...
+  // TODO: Check if getCameraInterface() still returns valid device...
   getCamera()->unregisterExposureCycleFinishedListener(mCameraExposureFinishedConnection);
 }
 

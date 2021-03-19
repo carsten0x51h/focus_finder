@@ -28,15 +28,17 @@
 #include <thread>
 #include <chrono>
 #include <string>
+#include <set>
 
 #include "logging.h"
-#include "device_connector.h"
+#include "device.h"
+#include "device_connection_state.h"
 
-class DummyDeviceConnectorT : public DeviceConnectorT {
+class DummyDeviceT : public DeviceT {
 
 public:
-	DummyDeviceConnectorT();
-	virtual ~DummyDeviceConnectorT();
+	DummyDeviceT();
+	virtual ~DummyDeviceT();
 
 	void connect();
 	void disconnect();
@@ -49,10 +51,7 @@ public:
 
 	DeviceConnectionStateT::TypeE getConnectionState() const;
 
-
-	bool supportsDevicePort() const;
-	std::string getDevicePort() const;
-	void setDevicePort(const std::string & inDevicePort);
+    std::set<DeviceInterfaceTypeT::TypeE> getSupportedInferfaces() const;
 
 private:
 	void connectSimulation();
@@ -60,8 +59,6 @@ private:
 	std::thread connectThread;
 	std::atomic<DeviceConnectionStateT::TypeE> mConnectionState;
 	std::atomic<bool> cancelConnectFlag;
-
-	std::string mDevicePort;
 };
 
 #endif /* SOURCE_FOCUS_FINDER_COMMON_DUMMY_DEVICE_CONNECTOR_H_ */

@@ -38,7 +38,7 @@
 
 
 class AbstractMapperPanelT;
-class CameraT;
+class CameraInterfaceT;
 
 namespace Ui {
     class ImageConverterPanel;
@@ -77,7 +77,7 @@ private:
 
 	FocusFinderLogicT & mFfl;
 	int mPrevIdx;
-	std::shared_ptr<CameraT> mCameraDevice;
+	std::shared_ptr<CameraInterfaceT> mCameraDevice;
 	boost::signals2::connection mExposureCycleFinishedConnection;
 };
 

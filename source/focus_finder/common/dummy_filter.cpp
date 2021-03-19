@@ -43,7 +43,7 @@ DummyFilterT::DummyFilterT() :
 	mMovementAborted(false),
 	mMovementRunning(false) {
 
-	mDummyConnector = std::make_shared<DummyDeviceConnectorT>();
+	mDummyConnector = std::make_shared<DummyDeviceT>();
 
 	// Read connection status etc. from driver?
 

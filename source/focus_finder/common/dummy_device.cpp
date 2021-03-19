@@ -23,24 +23,24 @@
  ****************************************************************************/
 
 #include <thread>
-#include <atomic>
+//#include <atomic>
 #include <chrono>
 
-#include "include/dummy_device_connector.h"
+#include "include/dummy_device.h"
 
 using namespace std::chrono_literals;
 
-DummyDeviceConnectorT::DummyDeviceConnectorT() :
+DummyDeviceT::DummyDeviceT() :
 	mConnectionState(DeviceConnectionStateT::DISCONNECTED),
-	cancelConnectFlag(false),
-	mDevicePort("/dev/ttyUSB0") {
+	cancelConnectFlag(false)
+{
 	// Read connection status etc. from driver?
 }
 
-DummyDeviceConnectorT::~DummyDeviceConnectorT() {
+DummyDeviceT::~DummyDeviceT() {
 }
 
-void DummyDeviceConnectorT::connect() {
+void DummyDeviceT::connect() {
 
 	// Start connection emulator thread...
 	if (isConnected() || isConnecting()) {
@@ -52,12 +52,12 @@ void DummyDeviceConnectorT::connect() {
 
 	cancelConnectFlag = false;
 
-	connectThread = std::thread(&DummyDeviceConnectorT::connectSimulation, this);
+	connectThread = std::thread(&DummyDeviceT::connectSimulation, this);
 	connectThread.detach();
 }
 
 // Expected to be non-blocking
-void DummyDeviceConnectorT::disconnect() {
+void DummyDeviceT::disconnect() {
 	// Start disconnection emulator thread... (?)
 	cancelConnectFlag = true;
 
@@ -66,36 +66,24 @@ void DummyDeviceConnectorT::disconnect() {
 	notifyDeviceDisconnected();
 }
 
-bool DummyDeviceConnectorT::isConnected() const {
+bool DummyDeviceT::isConnected() const {
 	return (mConnectionState.load() == DeviceConnectionStateT::CONNECTED);
 }
 
-bool DummyDeviceConnectorT::isConnecting() const {
+bool DummyDeviceT::isConnecting() const {
 	return (mConnectionState.load() == DeviceConnectionStateT::CONNECTING);
 }
 
-bool DummyDeviceConnectorT::isDisconnected() const {
+bool DummyDeviceT::isDisconnected() const {
 	return (mConnectionState.load() == DeviceConnectionStateT::DISCONNECTED);
 }
 
-bool DummyDeviceConnectorT::isDisconnecting() const {
+bool DummyDeviceT::isDisconnecting() const {
 	return (mConnectionState.load() == DeviceConnectionStateT::DISCONNECTING);
 }
 
-DeviceConnectionStateT::TypeE DummyDeviceConnectorT::getConnectionState() const {
+DeviceConnectionStateT::TypeE DummyDeviceT::getConnectionState() const {
 	return mConnectionState;
-}
-
-bool DummyDeviceConnectorT::supportsDevicePort() const {
-	return true; // TODO...
-}
-
-std::string DummyDeviceConnectorT::getDevicePort() const {
-	return mDevicePort;
-}
-
-void DummyDeviceConnectorT::setDevicePort(const std::string & inDevicePort) {
-	mDevicePort = inDevicePort;
 }
 
 /**
@@ -104,7 +92,7 @@ void DummyDeviceConnectorT::setDevicePort(const std::string & inDevicePort) {
  * -notifyDeviceDisconnected()
  * -notifyDeviceConnectionTimeout()
  */
-void DummyDeviceConnectorT::connectSimulation() {
+void DummyDeviceT::connectSimulation() {
 
 	int simulationConnectTime = 2;
 
@@ -129,4 +117,9 @@ void DummyDeviceConnectorT::connectSimulation() {
 	mConnectionState = DeviceConnectionStateT::CONNECTED;
 
 	notifyDeviceConnected();
+}
+
+std::set<DeviceInterfaceTypeT::TypeE> DummyDeviceT::getSupportedInferfaces() const {
+    // TODO: Implement...
+    return std::set<DeviceInterfaceTypeT::TypeE>();
 }

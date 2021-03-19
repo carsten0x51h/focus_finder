@@ -22,28 +22,28 @@
  *
  ****************************************************************************/
 
-#ifndef SOURCE_FOCUS_FINDER_COMMON_INDI_FOCUS_H_
-#define SOURCE_FOCUS_FINDER_COMMON_INDI_FOCUS_H_
+#ifndef SOURCE_FOCUS_FINDER_COMMON_INDI_FOCUS_INTERFACE_H_
+#define SOURCE_FOCUS_FINDER_COMMON_INDI_FOCUS_INTERFACE_H_
 
 #include <memory>
 
 #include <boost/signals2.hpp>
 
-#include "focus.h"
+#include "focus_interface.h"
 #include "logging.h"
 #include "device_connector.h"
-#include "indi_usb_device_connector.h"
+#include "indi_device.h"
 #include "indi_client.h"
 
 // INDI
 #include "basedevice.h"
 
 // https://stackoverflow.com/questions/9404884/implementing-interfaces-in-c-with-inherited-concrete-classes
-class IndiFocusT : virtual public FocusT {
+class IndiFocusInterfaceT : virtual public FocusInterfaceT {
 
 public:
-	IndiFocusT(INDI::BaseDevice *dp, IndiClientT * indiClient);
-	virtual ~IndiFocusT();
+	IndiFocusInterfaceT(INDI::BaseDevice *dp, IndiClientT * indiClient);
+	virtual ~IndiFocusInterfaceT();
 
 	std::string getName() const;
 	std::shared_ptr<DeviceConnectorT> getConnector() const;
@@ -73,8 +73,8 @@ private:
 	int getMaxAbsPosInternal() const;
 
 	// TODO: This will probably later be IndiDeviceConnectorT - a super
-	//       class of IndiUsbDeviceConnectorT and IndiEthernetDeviceConnectorT.
-	std::shared_ptr<IndiUsbDeviceConnectorT> mIndiConnector;
+	//       class of IndiDeviceT and IndiEthernetDeviceConnectorT.
+	std::shared_ptr<IndiDeviceT> mIndiConnector;
 
 	void newNumber(INumberVectorProperty * nvp);
 
@@ -84,4 +84,4 @@ private:
 	boost::signals2::connection mNewNumberConnection;
 };
 
-#endif /* SOURCE_FOCUS_FINDER_COMMON_INDI_FOCUS_H_ */
+#endif /* SOURCE_FOCUS_FINDER_COMMON_INDI_FOCUS_INTERFACE_H_ */

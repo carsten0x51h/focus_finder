@@ -34,9 +34,9 @@
 
 #include "exception.h"
 
-#include "camera.h"
-#include "focus.h"
-#include "filter.h"
+#include "camera_interface.h"
+#include "focus_interface.h"
+#include "filter_interface.h"
 
 #include "focus_measure_type.h"
 #include "focus_finder_profile.h"
@@ -59,9 +59,9 @@ private:
   FocusControllerT(const FocusControllerT &);
   FocusControllerT & operator=(const FocusControllerT &);
 
-  std::shared_ptr<CameraT> mCamera;
-  std::shared_ptr<FocusT> mFocus;
-  std::shared_ptr<FilterT> mFilter;
+  std::shared_ptr<CameraInterfaceT> mCamera;
+  std::shared_ptr<FocusInterfaceT> mFocus;
+  std::shared_ptr<FilterInterfaceT> mFilter;
 
   PointFT mLastFocusStarPos;
   FocusFinderProfileT mFocusFinderProfile;
@@ -107,19 +107,19 @@ private:
 
 public:
   //FocusControllerT();
-  FocusControllerT(std::shared_ptr<CameraT> camera, std::shared_ptr<FocusT> focus, std::shared_ptr<FilterT> filter);
+  FocusControllerT(std::shared_ptr<CameraInterfaceT> camera, std::shared_ptr<FocusInterfaceT> focus, std::shared_ptr<FilterInterfaceT> filter);
   ~FocusControllerT();
 
   void cancel();
   
-  std::shared_ptr<CameraT> getCamera() const;
-  //  void setCamera(std::shared_ptr<CameraT> camera);
+  std::shared_ptr<CameraInterfaceT> getCamera() const;
+  //  void setCamera(std::shared_ptr<CameraInterfaceT> camera);
 
-  std::shared_ptr<FocusT> getFocus() const;
-  //  void setFocus(std::shared_ptr<FocusT> focus);
+  std::shared_ptr<FocusInterfaceT> getFocus() const;
+  //  void setFocus(std::shared_ptr<FocusInterfaceT> focus);
 
-  std::shared_ptr<FilterT> getFilter() const;
-  //  void setFilter(std::shared_ptr<FilterT> filter);
+  std::shared_ptr<FilterInterfaceT> getFilter() const;
+  //  void setFilter(std::shared_ptr<FilterInterfaceT> filter);
   
   // TODO: Maybe we find a better name?!
   void setLastFocusStarPos(PointFT lastFocusStarPos);

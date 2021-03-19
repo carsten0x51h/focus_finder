@@ -30,53 +30,60 @@
 
 #include "device.h"
 #include "device_manager.h"
+#include "exception.h"
 
 #include "indi_client.h"
-#include "indi_device_factory.h"
+
+DEF_Exception(IndiDevceManager);
 
 class IndiDeviceManagerT : public DeviceManagerT {
 
 public:
+    // TODO: Instead of specific properties maybe bettwer use one key-value "Properties" object...
 	static const std::string sDefaultIndiHostname;
 	static const int sDefaultIndiPort;
+
 
 	IndiDeviceManagerT();
 	virtual ~IndiDeviceManagerT();
 
   DeviceManagerTypeT::TypeE getDeviceManagerType() const;
-  
-	std::shared_ptr<DeviceT> getDevice(const std::string & deviceName) const;
 
-  bool isReady();
-  IndiClientT & getIndiClient();
-  
-	std::vector<std::string> getCameraList() const;
-	std::shared_ptr<CameraT> getCamera(const std::string & cameraName) const;
 
-	std::vector<std::string> getFocusList() const;
-	std::shared_ptr<FocusT> getFocus(const std::string & focusName) const;
+  bool isReady() const;
 
-	std::vector<std::string> getFilterList() const;
-	std::shared_ptr<FilterT> getFilter(const std::string & filterName) const;
+  std::shared_ptr<DeviceT> getDevice(const std::string & deviceName);
+  std::vector<std::shared_ptr<DeviceT> > getDevices(DeviceInterfaceTypeT::TypeE interfaceType) const;
+  std::vector<std::string> getDeviceNames(DeviceInterfaceTypeT::TypeE interfaceType) const;
+
+
+
+//	std::vector<std::string> getCameraInterfaceList() const;
+//	std::shared_ptr<CameraInterfaceT> getCameraInterface(const std::string & cameraName) const;
+//
+//	std::vector<std::string> getFocusInterfaceList() const;
+//	std::shared_ptr<FocusInterfaceT> getFocusInterface(const std::string & focusName) const;
+//
+//	std::vector<std::string> getFilterInterfaceList() const;
+//	std::shared_ptr<FilterInterfaceT> getFilterInterface(const std::string & filterName) const;
 
 	// INDI specific settings
+	// TODO: Maybe introduce a generic setup(Properties props), setProperty(), getProperty() functions instead of specific functions...
 	void setHostname(const std::string & hostname);
 	std::string getHostname() const;
 
 	void setPort(unsigned int port);
 	unsigned int getPort() const;
 
-  
+    IndiClientT & getIndiClient();
+
+
 protected:
 	void newDevice(INDI::BaseDevice *dp);
 	void removeDevice(INDI::BaseDevice *dp);
 	void newMessage(INDI::BaseDevice *dp, int messageID);
   
 private:
-	std::vector<std::string> getDeviceList(DeviceTypeT::TypeE deviceType) const;
-
-	IndiDeviceFactoryT mIndiDeviceFactory;
-
     // INDI specific properties
     IndiClientT mIndiClient;
 
@@ -85,6 +92,7 @@ private:
     boost::signals2::connection mNewMessageConnection;
   
     std::map<std::string, std::shared_ptr<DeviceT> > mDeviceMap;
+    mutable std::mutex mDeviceMapMutex;
 };
 
 

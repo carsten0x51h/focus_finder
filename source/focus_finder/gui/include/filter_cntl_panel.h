@@ -33,7 +33,7 @@
 
 #include "../../common/include/focus_finder_logic.h"
 
-class FilterT;
+class FilterInterfaceT;
 class QMovie;
 
 namespace Ui {
@@ -83,7 +83,7 @@ protected:
 
 private:
 	void updateProfile();
-	std::shared_ptr<FilterT> getFilter() const;
+	std::shared_ptr<FilterInterfaceT> getFilter() const;
 
 	void startAnimation();
 	void stopAnimation();
@@ -91,7 +91,7 @@ private:
 	QMovie * mMovie;
 
 	FocusFinderLogicT & mFfl;
-	std::shared_ptr<FilterT> mFilterDevice;
+	std::shared_ptr<FilterInterfaceT> mFilterDevice;
 
 	boost::signals2::connection mDeviceConnectedConnection;
 	boost::signals2::connection mDeviceDisconnectedConnection;

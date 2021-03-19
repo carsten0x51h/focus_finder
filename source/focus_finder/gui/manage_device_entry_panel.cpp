@@ -59,12 +59,9 @@ void ManageDeviceEntryPanelT::updateDevice(const std::string & deviceName) {
 		LOG(debug) << "ManageDeviceEntryPanelT::updateDevice... unregistering from old device." << std::endl;
 
 		// There was already an old device - unregister listener and register to the new one.
-		mDevice->getConnector()->unregisterDeviceConnectingListener(
-				mDeviceConnectingConnection);
-		mDevice->getConnector()->unregisterDeviceConnectedListener(
-				mDeviceConnectedConnection);
-		mDevice->getConnector()->unregisterDeviceDisconnectedListener(
-				mDeviceDisconnectedConnection);
+		mDevice->unregisterDeviceConnectingListener(mDeviceConnectingConnection);
+		mDevice->unregisterDeviceConnectedListener(mDeviceConnectedConnection);
+		mDevice->unregisterDeviceDisconnectedListener(mDeviceDisconnectedConnection);
 	}
 
 	// Register to new device
@@ -130,11 +127,11 @@ void ManageDeviceEntryPanelT::onDeviceConnectClicked(bool checked) {
 		LOG(debug)
 		<< "Cancel connect / disconnect ... / " << std::endl;
 		mConnectButton->setEnabled(false);
-		mDevice->getConnector()->disconnect();
+		mDevice->disconnect();
 	} else {
 		LOG(debug)
 		<< "Connect ..." << std::endl;
-		mDevice->getConnector()->connect();
+		mDevice->connect();
 	}
 }
 
@@ -146,7 +143,7 @@ void ManageDeviceEntryPanelT::updateConnectButton() {
 	bool hasDevice = (mDevice != nullptr);
 
 	if (hasDevice) {
-		setButtonConnectionState(mDevice->getConnector()->getConnectionState());
+		setButtonConnectionState(mDevice->getConnectionState());
 		mConnectButton->setEnabled(true);
 	} else {
 		setButtonConnectionState(DeviceConnectionStateT::DISCONNECTED);

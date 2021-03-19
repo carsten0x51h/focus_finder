@@ -36,13 +36,13 @@
 #include "anim_menu_button.h"
 
 #include "../../common/include/focus_finder_logic.h"
-#include "../../common/include/device_connector.h"
+#include "../../common/include/device.h"
 
 namespace Ui {
     class ManageDeviceEntryPanel;
 }
 
-class DeviceT;
+class DeviceInterfaceT;
 
 /**
 *  @brief

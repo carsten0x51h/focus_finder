@@ -37,6 +37,7 @@
 
 #include <boost/signals2.hpp>
 
+// TODO: Maybe better inherit protected...
 class IndiClientT : public INDI::BaseClient {
 private:
 
@@ -191,7 +192,8 @@ public:
   void disconnect();
   bool isConnected() const;
 
-  
+  INDI::BaseDevice * getDevice(const std::string & deviceName) const;
+
 protected:
 	void notifyNewDevice(INDI::BaseDevice *dp) { mNewDeviceListeners(dp); }
 	void notifyRemoveDevice(INDI::BaseDevice *dp) { mRemoveDeviceListeners(dp); }

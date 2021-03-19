@@ -38,7 +38,7 @@
 #include "curve_fit_algorithm.h"
 #include "focus_controller.h"
 #include "boundary_location.h"
-#include "focus.h"
+#include "focus_interface.h"
 
 class CurveFunctionT;
 

@@ -31,12 +31,14 @@
 #include "include/reporting.h"
 #include "include/reporting_dataset.h"
 
-#include "include/camera.h"
-#include "include/focus.h"
-#include "include/filter.h"
+#include "include/camera_interface.h"
+#include "include/focus_interface.h"
+#include "include/filter_interface.h"
 #include "include/cooler.h"
 
-#include "include/indi_device_factory.h"
+#include "include/indi_camera_interface.h"
+#include "include/indi_focus_interface.h"
+//#include "include/indi_interface_filter.h"
 
 #include "basedevice.h"
 
@@ -47,8 +49,7 @@ IndiDeviceManagerT::IndiDeviceManagerT() {
 	LOG(debug) << "IndiDeviceManagerT::IndiDeviceManagerT()..."
 			<< std::endl;
 
-	// TODO: Read cfg?!?!?!?
-	// TODO: Read config, maybe supply path? Or ask static instance? Maybe move this config part into sep. function?
+	// TODO: Use passed "Properties" key value object.... --> setup()...
 	// indiDeviceMgr->setHostname("localhost");
 	// indiDeviceMgr->setPort(7624);
 
@@ -56,8 +57,6 @@ IndiDeviceManagerT::IndiDeviceManagerT() {
 	// indiDeviceMgr->connectServer();
 
 
-	
-	
 	mIndiClient.setServer(sDefaultIndiHostname.c_str(), sDefaultIndiPort);
 
 	// Register to listners of IndiClient
@@ -83,12 +82,9 @@ IndiDeviceManagerT::~IndiDeviceManagerT() {
 	mIndiClient.unregisterNewDeviceListener(mNewDeviceConnection);
 	mIndiClient.unregisterRemoveDeviceListener(mRemoveDeviceConnection);
 
-	
 	// Disconnect the INDI client since this INDI device manager owns the INDI client.
 	mIndiClient.disconnect();
   }
-
-
 
 void IndiDeviceManagerT::newMessage(INDI::BaseDevice *dp, int messageID) {
 	std::string msgStr = dp->messageQueue(messageID);
@@ -99,34 +95,60 @@ void IndiDeviceManagerT::newMessage(INDI::BaseDevice *dp, int messageID) {
 }
 
 void IndiDeviceManagerT::newDevice(INDI::BaseDevice *dp) {
+
+    std::string indiDeviceName = dp->getDeviceName();
+
 	LOG(debug) << "IndiDeviceManagerT::newDevice... device: '"
-			<< dp->getDeviceName() << "'" << std::endl;
+		<< indiDeviceName << "'" << std::endl;
 
-	// TODO: Based on the entries in the XML file, classify the different devices and
-	// create the respecitve device objects. (lookup by name? -> Group name -> type)
+    // Protect with mutex...
+    std::lock_guard<std::mutex> lock(mDeviceMapMutex);
 
-// TODO / FIXME: Stop reading the drivers.xml file. Instead use the driver information (driver device type or similar - see code from PHD2...) - indi_config.cpp
-	
-	std::string deviceName = dp->getDeviceName();
+    auto deviceEntry = mDeviceMap.find(indiDeviceName); // std::map<...>::iterator
+    bool deviceAlreadyExists = (deviceEntry != mDeviceMap.end());
 
-	auto it = mDeviceMap.find(deviceName);
-
-	if (it == mDeviceMap.end()) {
-		auto device = mIndiDeviceFactory.createDevice(dp,
-				const_cast<IndiClientT*>(&mIndiClient));
-
-		LOG(debug) << "Adding new device '" << deviceName << "', device="
-				<< device << std::endl;
-
-		mDeviceMap.insert(std::make_pair(deviceName, device));
-	}
+    // Add/update device object in map that device was (re)added on the server side... -> set device "active"....
+    if (! deviceAlreadyExists) {
+        // INDI device is new, just create a device wrapper and add it...
+        mDeviceMap.insert(std::make_pair(indiDeviceName, std::make_shared<IndiDeviceT>(dp, & mIndiClient)));
+    }
+    else {
+        // Device already exists, update base device handle and set it active again ...
+        auto existingDevice = deviceEntry->second;
+        existingDevice->setAvailable(true);
+    }
+    //TODO: Call event listener to notify about new device! Question is of generic DeviceManagerT should have a callback for newDevice()
+    // and/or removeDevice()...
 }
 
 void IndiDeviceManagerT::removeDevice(INDI::BaseDevice *dp) {
-	LOG(debug) << "IndiDeviceManagerT::removeDevice... device: '"
-			<< dp->getDeviceName() << "'" << std::endl;
 
-	// TODO...
+    std::string indiDeviceName = dp->getDeviceName();
+
+	LOG(debug) << "IndiDeviceManagerT::removeDevice... device: '"
+			<< indiDeviceName << "'" << std::endl;
+
+    std::lock_guard<std::mutex> lock(mDeviceMapMutex);
+
+    auto deviceEntry = mDeviceMap.find(indiDeviceName); // std::map<...>::iterator
+    bool deviceExists = (deviceEntry != mDeviceMap.end());
+
+    if (deviceExists) {
+        LOG(debug) << "IndiDeviceManagerT::removeDevice... Setting device '" << indiDeviceName << "' to unavailable." << std::endl;
+
+        auto existingDevice = deviceEntry->second;
+        existingDevice->setAvailable(false);
+    }
+    else {
+        // Someting went wrong... actually we should know this device...
+        LOG(warning) << "IndiDeviceManagerT::removeDevice... Device '" << indiDeviceName << "' not found in local device map (but should be there). Ignoring..." << std::endl;
+    }
+
+    // TODO: Notify device object in map that devie was removed on the server side... -> set device "inavtice"
+    // TODO: Protect with mutex...
+
+    //TODO: Call event listener to notify about removed device! Question is of generic DeviceManagerT should have a callback for newDevice()
+    // and/or removeDevice()...
 }
 
 DeviceManagerTypeT::TypeE IndiDeviceManagerT::getDeviceManagerType() const {
@@ -137,88 +159,47 @@ IndiClientT & IndiDeviceManagerT::getIndiClient() {
   return mIndiClient;
 }
 
-std::shared_ptr<DeviceT> IndiDeviceManagerT::getDevice(
-		const std::string & deviceName) const {
-	LOG(debug) << "IndiDeviceManagerT::getDevice - deviceName: "
-			<< deviceName << std::endl;
+//std::shared_ptr<DeviceInterfaceT> IndiDeviceManagerT::getDeviceInterface(const std::string & deviceName, DeviceInterfaceTypeT::TypeE deviceInterfaceType) const {
+//
+//    const uint16_t indiDeviceInterfaceMask = getIndiDeviceInterfaceMaskByDeviceType(deviceInterfaceType);
+//
+//    INDI::BaseDevice * indiBaseDevice = mIndiClient.getDeviceInterface(deviceName);
+//
+//    indiBaseDevice
+//
+//    auto foundDevice = std::find_if(indiDeviceList.begin(),
+//                                    indiDeviceList.end(),
+//                                    [deviceName, indiDeviceInterfaceMask](INDI::BaseDevice * indiBaseDevice) {
+//                                        return std::strcmp(indiBaseDevice->getDeviceName(), deviceName.c_str()) && (indiBaseDevice->getDriverInterface() & indiDeviceInterfaceMask);
+//                                    }
+//    );
+//
+//    return (foundDevice != indiDeviceList.end() ?
+//            IndiDeviceInterfaceFactoryT::create(*foundDevice, const_cast<IndiClientT *>(& mIndiClient), indiDeviceInterfaceMask) :
+//            nullptr);
+//}
 
-	// DEBUG BEGIN
-	LOG(trace) << "DeviceMap" << std::endl;
-	for (const auto & e : mDeviceMap) {
-		LOG(trace) << "  -> DeviceName: " << e.first << " -> device: "
-				<< e.second << std::endl;
-	}
-	// DEBUG END
 
-	// TODO: Lookup device in mDeviceMap
-	auto it = mDeviceMap.find(deviceName);
-
-	return (it != mDeviceMap.end() ? it->second : nullptr);
-}
-
-std::vector<std::string> IndiDeviceManagerT::getDeviceList(
-		DeviceTypeT::TypeE deviceType) const {
-	std::vector < std::string > res;
-
-	boost::copy(
-			mDeviceMap
-					| boost::adaptors::map_values // -> DeviceT
-					| boost::adaptors::filtered(
-							[](const auto & device) {return device != nullptr;})
-					| boost::adaptors::filtered(
-							[=](const auto & device) {return device->getDeviceType() == deviceType;})
-					| boost::adaptors::transformed(
-							[](const auto & device) {return device->getName();}),
-			std::back_inserter(res));
-
-	return res;
-}
-
-std::vector<std::string> IndiDeviceManagerT::getCameraList() const {
-	// TODO / IDEA: We could return all devices of that type which are in the INDI drivers.xml file.
-	//              and in addition a flag if this device is currently available (loaded by the INDI server),
-	//              Then the CBX in the UI could disable the non available entries.
-	//return mIndiDeviceFactory.getDevicesByType("CCDs");
-	return getDeviceList(DeviceTypeT::CAMERA);
-}
-
-// NOTE: Returns nullptr if the device is not available
-std::shared_ptr<CameraT> IndiDeviceManagerT::getCamera(
-		const std::string & cameraName) const {
-	LOG(debug) << "IndiDeviceManagerT::getCamera - cameraName: "
-			<< cameraName << std::endl;
-	return std::static_pointer_cast < CameraT > (getDevice(cameraName));
-}
-
-std::vector<std::string> IndiDeviceManagerT::getFocusList() const {
-	// TODO / IDEA: We could return all devices of that type which are in the INDI drivers.xml file.
-	//              and in addition a flag if this device is currently available (loaded by the INDI server),
-	//              Then the CBX in the UI could disable the non available entries.
-	//return mIndiDeviceFactory.getDevicesByType("Focusers");
-	return getDeviceList(DeviceTypeT::FOCUS);
-}
-
-std::shared_ptr<FocusT> IndiDeviceManagerT::getFocus(
-		const std::string & focusName) const {
-	LOG(debug) << "IndiDeviceManagerT::getFocus - focusName: " << focusName
-			<< std::endl;
-	return std::static_pointer_cast < FocusT > (getDevice(focusName));
-}
-
-std::vector<std::string> IndiDeviceManagerT::getFilterList() const {
-	// TODO / IDEA: We could return all devices of that type which are in the INDI drivers.xml file.
-	//              and in addition a flag if this device is currently available (loaded by the INDI server),
-	//              Then the CBX in the UI could disable the non available entries.
-	//return mIndiDeviceFactory.getDevicesByType("Filter Wheels");
-	return getDeviceList(DeviceTypeT::FILTER);
-}
-
-std::shared_ptr<FilterT> IndiDeviceManagerT::getFilter(
-		const std::string & filterName) const {
-	LOG(debug) << "IndiDeviceManagerT::getFilter - filterName: "
-			<< filterName << std::endl;
-	return std::static_pointer_cast < FilterT > (getDevice(filterName));
-}
+//std::vector<std::string> IndiDeviceManagerT::getDeviceList(
+//        DeviceInterfaceTypeT::TypeE deviceType) const {
+//	std::vector < std::string > res;
+//
+//    const std::vector<INDI::BaseDevice *> indiDeviceList = mIndiClient.getDevices();
+//    const uint16_t indiDeviceInterfaceMask = getIndiDeviceInterfaceMaskByDeviceType(deviceType);
+//
+//    boost::copy(
+//            indiDeviceList
+//                    | boost::adaptors::filtered(
+//                            [indiDeviceInterfaceMask](INDI::BaseDevice * indiBaseDevice) {return indiBaseDevice->getDriverInterface() & indiDeviceInterfaceMask;}
+//                        )
+//					| boost::adaptors::transformed(
+//					        [](INDI::BaseDevice * indiBaseDevice) {return indiBaseDevice->getDeviceName();}
+//					    ),
+//            std::back_inserter(res)
+//    );
+//
+//	return res;
+//}
 
 void IndiDeviceManagerT::setHostname(const std::string & hostname) {
 	// TODO: Is it a good idea to change the connection settings while connected???
@@ -238,7 +219,67 @@ unsigned int IndiDeviceManagerT::getPort() const {
 	return const_cast<IndiClientT*>(&mIndiClient)->getPort();
 }
 
-bool IndiDeviceManagerT::isReady() {
-  // TODO: Avoid connect if already connected...
-  return mIndiClient.connectServer();
+bool IndiDeviceManagerT::isReady() const {
+  // TODO: connect automatically? Actually a "isReady()" function should not do any "action"...
+  //return mIndiClient.connectServer();
+  return mIndiClient.isConnected();
+}
+
+
+
+
+
+//    INDI::BaseDevice * indiBaseDevice = mIndiClient.getDevice(deviceName.c_str());
+//
+//    return ((indiBaseDevice != nullptr && indiBaseDevice->getDriverInterface() & deviceInterfaceType) ?
+//            std::make_shared<IndiCameraInterfaceT>(indiBaseDevice, const_cast<IndiClientT *>(& mIndiClient)) :
+//            nullptr);
+//TODO
+
+std::shared_ptr<DeviceT> IndiDeviceManagerT::getDevice(const std::string & deviceName) {
+
+    // Protect device map against async changes by INDI while reading...
+    std::lock_guard<std::mutex> lock(mDeviceMapMutex);
+
+    auto deviceMapEntry = mDeviceMap.find(deviceName);
+    bool deviceMapEntryFound = (deviceMapEntry != mDeviceMap.end());
+
+    return (deviceMapEntryFound ? deviceMapEntry->second : nullptr);
+}
+
+
+std::vector< std::shared_ptr<DeviceT> > IndiDeviceManagerT::getDevices(DeviceInterfaceTypeT::TypeE interfaceType) const {
+
+    // Protect device map against async changes by INDI while reading...
+    std::lock_guard<std::mutex> lock(mDeviceMapMutex);
+
+	std::vector < std::shared_ptr<DeviceT> > devices;
+
+    boost::copy(
+            mDeviceMap
+                    | boost::adaptors::map_values // -> DeviceT
+                    | boost::adaptors::filtered(
+                            [interfaceType](shared_ptr<IndiDeviceT> indiDevice) {return indiDevice->isInterfaceSupported(interfaceType); }
+                       ),
+            std::back_inserter(devices)
+    );
+
+    return devices;
+}
+
+
+std::vector<std::string> IndiDeviceManagerT::getDeviceNames(DeviceInterfaceTypeT::TypeE interfaceType) const {
+
+    std::vector< std::shared_ptr<DeviceT> > devices = getDevices(interfaceType);
+    std::vector < std::string > deviceNames;
+
+    boost::copy(
+            devices
+                | boost::adaptors::transformed(
+                        [](auto device) { return device->getName(); }
+                  ),
+            std::back_inserter(deviceNames)
+    );
+
+    return deviceNames;
 }

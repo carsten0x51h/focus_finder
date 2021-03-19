@@ -26,33 +26,33 @@
 
 #include "include/indi_helper.h"
 
-#include "include/indi_focus.h"
+#include "include/indi_focus_interface.h"
 
-IndiFocusT::IndiFocusT(INDI::BaseDevice *dp, IndiClientT * indiClient) :
+IndiFocusInterfaceT::IndiFocusInterfaceT(INDI::BaseDevice *dp, IndiClientT * indiClient) :
 		mIndiBaseDevice(dp), mIndiClient(indiClient) {
 
-	LOG(debug) << "IndiFocusT::IndiFocusT..." << std::endl;
+	LOG(debug) << "IndiFocusInterfaceT::IndiFocusInterfaceT..." << std::endl;
 
-	mDeviceType = (DeviceTypeT::FOCUS);
+	mDeviceType = (DeviceInterfaceTypeT::FOCUS);
 
-	mIndiConnector = std::make_shared < IndiUsbDeviceConnectorT
+	mIndiConnector = std::make_shared < IndiDeviceT
 			> (dp, indiClient);
 
 	// Register number
 	mNewNumberConnection = mIndiClient->registerNewNumberListener(
-			boost::bind(&IndiFocusT::newNumber, this, boost::placeholders::_1));
+			boost::bind(&IndiFocusInterfaceT::newNumber, this, boost::placeholders::_1));
 }
 
-IndiFocusT::~IndiFocusT() {
-	LOG(debug) << "IndiFocusT::~IndiFocusT..." << std::endl;
+IndiFocusInterfaceT::~IndiFocusInterfaceT() {
+	LOG(debug) << "IndiFocusInterfaceT::IndiFocusInterfaceTnterfaceT..." << std::endl;
 
 	mIndiClient->unregisterNewNumberListener(mNewNumberConnection);
 }
 
-void IndiFocusT::newNumber(INumberVectorProperty * nvp) {
+void IndiFocusInterfaceT::newNumber(INumberVectorProperty * nvp) {
 	if (strcmp(nvp->device, getName().c_str()) == 0) {
 
-		LOG(debug) << "IndiFocusT::newNumber... " << nvp->name
+		LOG(debug) << "IndiFocusInterfaceT::newNumber... " << nvp->name
 				<< " has changed..., status="
 				<< IndiHelperT::propStateAsStr(nvp->s) << std::endl;
 
@@ -89,23 +89,23 @@ void IndiFocusT::newNumber(INumberVectorProperty * nvp) {
 /////////////////////////////////////////////////
 // Device
 /////////////////////////////////////////////////
-std::string IndiFocusT::getName() const {
+std::string IndiFocusInterfaceT::getName() const {
 	return mIndiBaseDevice->getDeviceName();
 }
 
-std::shared_ptr<DeviceConnectorT> IndiFocusT::getConnector() const {
+std::shared_ptr<DeviceConnectorT> IndiFocusInterfaceT::getConnector() const {
 	return mIndiConnector;
 }
 
 /**
  * Temperature
  */
-bool IndiFocusT::isTemperatureSupported() const {
+bool IndiFocusInterfaceT::isTemperatureSupported() const {
 	//TODO
 	return false;
 }
 
-float IndiFocusT::getTemperature() const {
+float IndiFocusInterfaceT::getTemperature() const {
 	// TODO: Throw if not supported?
 	// TODO: Add listener - when temperature has changed...
 	return 0;
@@ -115,7 +115,7 @@ float IndiFocusT::getTemperature() const {
  * TODO: Is this a reasonable implementation? Maybe there is a
  *       better way to find out if a focus is currently moving...
  */
-bool IndiFocusT::isMoving() const {
+bool IndiFocusInterfaceT::isMoving() const {
 
   bool isRelPosBusy;
   bool isAbsPosBusy;
@@ -146,7 +146,7 @@ bool IndiFocusT::isMoving() const {
 /**
  * Positioning
  */
-bool IndiFocusT::isAbsPosSupported() const {
+bool IndiFocusInterfaceT::isAbsPosSupported() const {
 	try {
 		INumberVectorProperty * absPosVecProp = IndiHelperT::getNumberVec(
 				mIndiBaseDevice, "ABS_FOCUS_POSITION");
@@ -160,7 +160,7 @@ bool IndiFocusT::isAbsPosSupported() const {
 	}
 }
 
-int IndiFocusT::getCurrentPosInternal() const {
+int IndiFocusInterfaceT::getCurrentPosInternal() const {
 	INumberVectorProperty * absPosVecProp = IndiHelperT::getNumberVec(
 			mIndiBaseDevice, "ABS_FOCUS_POSITION");
 
@@ -172,7 +172,7 @@ int IndiFocusT::getCurrentPosInternal() const {
 	return absPos->value;
 }
 
-int IndiFocusT::getCurrentPos() const {
+int IndiFocusInterfaceT::getCurrentPos() const {
 	try {
 		return getCurrentPosInternal();
 	} catch (IndiExceptionT & exc) {
@@ -182,14 +182,14 @@ int IndiFocusT::getCurrentPos() const {
 	}
 }
 
-int IndiFocusT::getTargetPos() const {
+int IndiFocusInterfaceT::getTargetPos() const {
 	// TODO: Does the Indi focuser save the target position??
 	return 0;
 	//return mTargetPos;
 }
 
 
-int IndiFocusT::clipTicks(int ticks, FocusDirectionT::TypeE direction) const {
+int IndiFocusInterfaceT::clipTicks(int ticks, FocusDirectionT::TypeE direction) const {
 
 	// TODO - sep. function - clipPosDelta()...?
 	int minAbsPos = getMinAbsPosInternal();
@@ -221,10 +221,10 @@ int IndiFocusT::clipTicks(int ticks, FocusDirectionT::TypeE direction) const {
 
 
 // TODO: Maybe a better name to indicate "delta" / "relative" movement...
-void IndiFocusT::setTargetPos(unsigned int ticks,
-		FocusDirectionT::TypeE direction) {
+void IndiFocusInterfaceT::setTargetPos(unsigned int ticks,
+									   FocusDirectionT::TypeE direction) {
 
-	LOG(debug) << "IndiFocusT::setTargetPos...inTicks=" << ticks
+	LOG(debug) << "IndiFocusInterfaceT::setTargetPos...inTicks=" << ticks
 			<< ", direction=" << FocusDirectionT::asStr(direction) << std::endl;
 
 
@@ -291,7 +291,7 @@ void IndiFocusT::setTargetPos(unsigned int ticks,
 
 }
 
-void IndiFocusT::setTargetPos(int inAbsPos) {
+void IndiFocusInterfaceT::setTargetPos(int inAbsPos) {
 	try {
 		INumberVectorProperty * absPosVecProp = IndiHelperT::getNumberVec(
 				mIndiBaseDevice, "ABS_FOCUS_POSITION");
@@ -312,12 +312,12 @@ void IndiFocusT::setTargetPos(int inAbsPos) {
 	}
 }
 
-void IndiFocusT::resetPositionCounter() {
+void IndiFocusInterfaceT::resetPositionCounter() {
 	// TODO
 	//mTargetPos = 0;
 }
 
-int IndiFocusT::getMinAbsPosInternal() const {
+int IndiFocusInterfaceT::getMinAbsPosInternal() const {
 	INumberVectorProperty * absPosVecProp = IndiHelperT::getNumberVec(
 			mIndiBaseDevice, "ABS_FOCUS_POSITION");
 
@@ -329,7 +329,7 @@ int IndiFocusT::getMinAbsPosInternal() const {
 	return absPos->min;
 }
 
-int IndiFocusT::getMinAbsPos() const {
+int IndiFocusInterfaceT::getMinAbsPos() const {
 	try {
 		return getMinAbsPosInternal();
 	} catch (IndiExceptionT & exc) {
@@ -339,7 +339,7 @@ int IndiFocusT::getMinAbsPos() const {
 	}
 }
 
-int IndiFocusT::getMaxAbsPosInternal() const {
+int IndiFocusInterfaceT::getMaxAbsPosInternal() const {
 	INumberVectorProperty * absPosVecProp = IndiHelperT::getNumberVec(
 			mIndiBaseDevice, "ABS_FOCUS_POSITION");
 
@@ -351,7 +351,7 @@ int IndiFocusT::getMaxAbsPosInternal() const {
 	return absPos->max;
 }
 
-int IndiFocusT::getMaxAbsPos() const {
+int IndiFocusInterfaceT::getMaxAbsPos() const {
 	try {
 		return getMaxAbsPosInternal();
 	} catch (IndiExceptionT & exc) {
@@ -361,12 +361,12 @@ int IndiFocusT::getMaxAbsPos() const {
 	}
 }
 
-bool IndiFocusT::isAbortSupported() const {
+bool IndiFocusInterfaceT::isAbortSupported() const {
 	// TODO
 	return true;
 }
 
-void IndiFocusT::abortMotion() {
+void IndiFocusInterfaceT::abortMotion() {
 	// TODO
 //	mMovementAborted = true;
 }

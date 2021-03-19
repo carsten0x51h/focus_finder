@@ -33,7 +33,7 @@
 
 #include "../../common/include/focus_finder_logic.h"
 
-class FocusT;
+class FocusInterfaceT;
 class QMovie;
 
 namespace Ui {
@@ -84,7 +84,7 @@ protected:
 private:
 	void updateCurrentPos(int absPos);
 	void updateProfile();
-	std::shared_ptr<FocusT> getFocus() const;
+	std::shared_ptr<FocusInterfaceT> getFocus() const;
 
 	void startAnimation();
 	void stopAnimation();
@@ -93,7 +93,7 @@ private:
 
 	FocusFinderLogicT & mFfl;
 	QSignalMapper * mStepSignalMapper;
-	std::shared_ptr<FocusT> mFocusDevice;
+	std::shared_ptr<FocusInterfaceT> mFocusDevice;
 
 	boost::signals2::connection mDeviceConnectedConnection;
 	boost::signals2::connection mDeviceDisconnectedConnection;

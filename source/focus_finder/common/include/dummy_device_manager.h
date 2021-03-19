@@ -40,28 +40,28 @@ public:
   
   DeviceManagerTypeT::TypeE getDeviceManagerType() const;
 
-  std::shared_ptr<DeviceT> getDevice(const std::string & deviceName) const;
+  std::shared_ptr<DeviceInterfaceT> getDeviceInterface(const std::string & deviceName) const;
 
-  std::vector<std::string> getCameraList() const;
-  std::shared_ptr<CameraT> getCamera(const std::string & cameraName) const;
+  std::vector<std::string> getCameraInterfaceList() const;
+  std::shared_ptr<CameraInterfaceT> getCameraInterface(const std::string & cameraName) const;
 
-  std::vector<std::string> getFocusList() const;
-  std::shared_ptr<FocusT> getFocus(const std::string & focusName) const;
+  std::vector<std::string> getFocusInterfaceList() const;
+  std::shared_ptr<FocusInterfaceT> getFocusInterface(const std::string & focusName) const;
 
-  std::vector<std::string> getFilterList() const;
-  std::shared_ptr<FilterT> getFilter(const std::string & filterName) const;
+  std::vector<std::string> getFilterInterfaceList() const;
+  std::shared_ptr<FilterInterfaceT> getFilterInterface(const std::string & filterName) const;
 
 private:
   // TODO/HACK
-  std::shared_ptr<CameraT> mCamera1;
-  std::shared_ptr<CameraT> mCamera2;
-  std::shared_ptr<CameraT> mCamera3;
-  std::shared_ptr<FocusT> mFocus1;
-  std::shared_ptr<FocusT> mFocus2;
-  std::shared_ptr<FocusT> mFocus3;
-  std::shared_ptr<FilterT> mFilter1;
-  std::shared_ptr<FilterT> mFilter2;
-  std::shared_ptr<FilterT> mFilter3;
+  std::shared_ptr<CameraInterfaceT> mCamera1;
+  std::shared_ptr<CameraInterfaceT> mCamera2;
+  std::shared_ptr<CameraInterfaceT> mCamera3;
+  std::shared_ptr<FocusInterfaceT> mFocus1;
+  std::shared_ptr<FocusInterfaceT> mFocus2;
+  std::shared_ptr<FocusInterfaceT> mFocus3;
+  std::shared_ptr<FilterInterfaceT> mFilter1;
+  std::shared_ptr<FilterInterfaceT> mFilter2;
+  std::shared_ptr<FilterInterfaceT> mFilter3;
 };
 
 

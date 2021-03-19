@@ -22,24 +22,27 @@
  *
  ****************************************************************************/
 
-#include <memory>
+#ifndef FOFI_DEVICE_CONNECTION_STATE_H
+#define FOFI_DEVICE_CONNECTION_STATE_H
 
-#include "include/device_manager_factory.h"
-#include "include/indi_device_manager.h"
-#include "include/dummy_device_manager.h"
+struct DeviceConnectionStateT {
+    typedef enum {
+        DISCONNECTED,
+        CONNECTING,
+        CONNECTED,
+        DISCONNECTING,
+        _Count
+    } TypeE;
 
-std::shared_ptr<DeviceManagerT> DeviceManagerFactoryT::getInstance(
-		const DeviceManagerTypeT::TypeE & type) {
+    static const char * asStr(const TypeE & inType) {
+        switch (inType) {
+            case DISCONNECTED: return "DISCONNECTED";
+            case CONNECTING: return "CONNECTING";
+            case CONNECTED: return "CONNECTED";
+            case DISCONNECTING: return "DISCONNECTING";
+            default: return "<?>";
+        }
+    }
+};
 
-	switch (type) {
-	case DeviceManagerTypeT::INDI:
-        IndiDeviceManagerT m = new IndiDeviceManagerT();
-		return std::make_shared<IndiDeviceManagerT>();
-		
-	case DeviceManagerTypeT::DUMMY:
-		return std::make_shared<DummyDeviceManagerT>();
-
-	default:
-		return nullptr;
-	}
-}
+#endif //FOFI_DEVICE_CONNECTION_STATE_H

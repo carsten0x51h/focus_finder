@@ -119,16 +119,16 @@ FocusFinderLogicT::FocusFinderLogicT() :
 
 
 	// DEBUG START
-	LOG(debug) << "CAMERA LIST" << std::endl;
-	for (const auto & s : mDeviceManager->getCameraList()) {
+	LOG(debug) << "CCD LIST" << std::endl;
+	for (const auto & s : mDeviceManager->getCameraInterfaceList()) {
 		LOG(debug) << s << std::endl;
 	}
 	LOG(debug) << "FILTER LIST" << std::endl;
-	for (const auto & s : mDeviceManager->getFilterList()) {
+	for (const auto & s : mDeviceManager->getFilterInterfaceList()) {
 		LOG(debug) << s << std::endl;
 	}
 	LOG(debug) << "FOCUS LIST" << std::endl;
-	for (const auto & s : mDeviceManager->getFocusList()) {
+	for (const auto & s : mDeviceManager->getFocusInterfaceList()) {
 		LOG(debug) << s << std::endl;
 	}
 	// DEBUG END
@@ -161,27 +161,27 @@ FocusFinderLogicT::FocusFinderLogicT() :
 FocusFinderLogicT::~FocusFinderLogicT() {
 }
 
-std::shared_ptr<CameraT> FocusFinderLogicT::getCurrentCamera() {
+std::shared_ptr<CameraInterfaceT> FocusFinderLogicT::getCurrentCamera() {
 	auto activeProfile = mFoFiConfigManager->getProfileManager()->getActiveProfile();
 
 	return (activeProfile ?
-			mDeviceManager->getCamera(activeProfile->getCameraDeviceName()) :
+            mDeviceManager->getCameraInterface(activeProfile->getCameraDeviceName()) :
 			nullptr);
 }
 
-std::shared_ptr<FocusT> FocusFinderLogicT::getCurrentFocus() {
+std::shared_ptr<FocusInterfaceT> FocusFinderLogicT::getCurrentFocus() {
 	auto activeProfile = mFoFiConfigManager->getProfileManager()->getActiveProfile();
 
 	return (activeProfile ?
-			mDeviceManager->getFocus(activeProfile->getFocusDeviceName()) :
+            mDeviceManager->getFocusInterface(activeProfile->getFocusDeviceName()) :
 			nullptr);
 }
 
-std::shared_ptr<FilterT> FocusFinderLogicT::getCurrentFilter() {
+std::shared_ptr<FilterInterfaceT> FocusFinderLogicT::getCurrentFilter() {
 	auto activeProfile = mFoFiConfigManager->getProfileManager()->getActiveProfile();
 
 	return (activeProfile ?
-			mDeviceManager->getFilter(activeProfile->getFilterDeviceName()) :
+            mDeviceManager->getFilterInterface(activeProfile->getFilterDeviceName()) :
 			nullptr);
 }
 
@@ -246,7 +246,7 @@ void FocusFinderLogicT::setSelectedRoi(const RectT<unsigned int> & roi) {
 			<< std::get<0>(roi) << ", " << std::get<1>(roi) << ", w: "
 			<< std::get<2>(roi) << ", h: " << std::get<3>(roi) << std::endl;
 
-	std::shared_ptr<CameraT> camera = getCurrentCamera();
+	std::shared_ptr<CameraInterfaceT> camera = getCurrentCamera();
 
 	if (camera->isRoiSupported()) {
 		camera->setRoi(roi);
@@ -260,7 +260,7 @@ void FocusFinderLogicT::clearSelectedRoi() {
 	<< "FocusFinderLogicT::clearSelectedRoi()..." << std::endl;
 	mSelectedRoi.clear();
 
-	std::shared_ptr<CameraT> camera = getCurrentCamera();
+	std::shared_ptr<CameraInterfaceT> camera = getCurrentCamera();
 
 	if (camera->isRoiSupported()) {
 		camera->clearRoi();

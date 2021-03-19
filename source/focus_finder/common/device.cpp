@@ -24,4 +24,24 @@
 
 #include "include/device.h"
 
-const std::string DeviceT::NONE = "None";
+//const std::string DeviceT::NONE = "None";
+
+DeviceT::DeviceT() : mIsAvailable(true) {
+
+}
+
+DeviceT::~DeviceT() {
+
+}
+
+bool DeviceT::isAvailable() const {
+    return mIsAvailable;
+}
+
+void DeviceT::setAvailable(bool isAvailable) {
+    mIsAvailable = isAvailable;
+}
+
+bool DeviceT::isInterfaceSupported(DeviceInterfaceTypeT::TypeE interfaceType) const {
+    return getSupportedInferfaces().contains(interfaceType);
+}

@@ -32,7 +32,7 @@
 #include "../common/include/logging.h"
 #include "../common/include/device_manager.h"
 #include "../common/include/profile_manager.h"
-#include "../common/include/filter.h"
+#include "../common/include/filter_interface.h"
 
 #include "ui_filter_cntl_panel.h"
 

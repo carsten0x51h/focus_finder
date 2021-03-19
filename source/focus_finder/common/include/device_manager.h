@@ -31,13 +31,7 @@
 #include <boost/signals2.hpp>
 
 #include "device_manager_type.h"
-
-class CameraT;
-class FocusT;
-class CoolerT;
-class FilterT;
-class DeviceT;
-
+#include "device.h"
 
 class DeviceManagerT {
 private:
@@ -45,34 +39,32 @@ private:
 public:
   virtual DeviceManagerTypeT::TypeE getDeviceManagerType() const = 0;
 
-  virtual bool isReady() = 0;
-  
-	virtual std::shared_ptr<DeviceT> getDevice(const std::string & deviceName) const = 0;
+  virtual bool isReady() const = 0;
 
-	virtual std::vector<std::string> getCameraList() const = 0;
-	virtual std::shared_ptr<CameraT> getCamera(const std::string & cameraName) const = 0;
+  /**
+   * Get device object ptr by name.
+   *
+   * @param deviceName Name of the device
+   * @return Returns nullptr if not found.
+   */
+   virtual std::shared_ptr<DeviceT> getDevice(const std::string & deviceName) = 0;
 
-	virtual std::vector<std::string> getFocusList() const = 0;
-	virtual std::shared_ptr<FocusT> getFocus(const std::string & focusName) const = 0;
+    /**
+     * Get list of device object ptrs by interface type.
+     *
+     * @param interfaceType Type of the device interface
+     * @return Returns empty vector if no devices with given interface type found.
+     */
+   virtual std::vector<std::shared_ptr<DeviceT> > getDevices(DeviceInterfaceTypeT::TypeE interfaceType) const = 0;
 
-	virtual std::vector<std::string> getFilterList() const = 0;
-	virtual std::shared_ptr<FilterT> getFilter(const std::string & filterName) const = 0;
-
-
-//	signals2::connection registerExposureCycleFinishedListener(const ExposureCycleFinishedListenersT::slot_type & inCallBack) {
-//		return mExposureCycleFinishedListeners.connect(inCallBack);
-//	}
-//	template <class T> void unregisterExposureFinishedListener(const T & inCallBack) {
-//		//mExposureCycleFinishedListeners.disconnect(inCallBack);
-//  	inCallBack.disconnect();
-//	}
-//
-//protected:
-//	void notifyExposureCycleFinished(RectT<unsigned int> roiRect, std::shared_ptr<const ImageT> resultImage, bool lastExposure) { mExposureCycleFinishedListeners(roiRect, resultImage, lastExposure); }
-//
-//private:
-//	typedef signals2::signal<void (DeviceTypeT::TypeE, )> DeviceConnectionChangedListenersT;
-//	DeviceConnectionChangedListenersT mDeviceConnectionChangedListeners;
+    // Convenience functions...
+    /**
+     * Get list of all device names for a given interface type.
+     *
+     * @param interfaceType
+     * @return Returns list of all devices (names) which support the given interface type.
+     */
+    virtual std::vector<std::string> getDeviceNames(DeviceInterfaceTypeT::TypeE interfaceType) const = 0;
 };
 
 #endif /* SOURCE_FOCUS_FINDER_COMMON_INCLUDE_DEVICE_MANAGER_H_ */

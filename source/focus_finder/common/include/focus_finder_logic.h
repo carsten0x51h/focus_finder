@@ -36,9 +36,9 @@
 #include "size.h"
 #include "task_executor.h"
 
-class CameraT;
-class FocusT;
-class FilterT;
+class CameraInterfaceT;
+class FocusInterfaceT;
+class FilterInterfaceT;
 class DeviceManagerT;
 class ProfileManagerT;
 class MapperFunctionT;
@@ -53,9 +53,9 @@ public:
   FocusFinderLogicT();
   ~FocusFinderLogicT();
 
-  std::shared_ptr<CameraT> getCurrentCamera();
-  std::shared_ptr<FocusT> getCurrentFocus();
-  std::shared_ptr<FilterT> getCurrentFilter();
+  std::shared_ptr<CameraInterfaceT> getCurrentCamera();
+  std::shared_ptr<FocusInterfaceT> getCurrentFocus();
+  std::shared_ptr<FilterInterfaceT> getCurrentFilter();
 
   std::shared_ptr<DeviceManagerT> getDeviceManager() const;
   std::shared_ptr<ProfileManagerT> getProfileManager() const;
@@ -106,7 +106,7 @@ private:
   // TODO: Not yet sure, if sep. of DeviceManager and ProfileManager is a good idea...
   std::shared_ptr<FoFiConfigManagerT> mFoFiConfigManager;
 
-  std::shared_ptr<CameraT> mCameraDevice;
+  std::shared_ptr<CameraInterfaceT> mCameraDevice;
 
 
   RectT<unsigned int> mSelectedRoi; // TODO: Question is if this should be stored here or directly or only inside the camera device...

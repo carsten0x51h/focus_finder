@@ -28,9 +28,9 @@
 
 #include "include/logging.h"
 
-#include "include/camera.h"
-#include "include/focus.h"
-#include "include/filter.h"
+#include "include/camera_interface.h"
+#include "include/focus_interface.h"
+#include "include/filter_interface.h"
 #include "include/cooler.h"
 
 #include "include/dummy_camera.h"
@@ -66,8 +66,8 @@ DeviceManagerTypeT::TypeE DummyDeviceManagerT::getDeviceManagerType() const {
   return DeviceManagerTypeT::DUMMY;
 }
 
-std::shared_ptr<DeviceT> DummyDeviceManagerT::getDevice(const std::string & deviceName) const {
-	LOG(debug) << "DummyDeviceManagerT::getDevice - deviceName: " << deviceName << std::endl;
+std::shared_ptr<DeviceInterfaceT> DummyDeviceManagerT::getDeviceInterface(const std::string & deviceName) const {
+	LOG(debug) << "DummyDeviceManagerT::getDeviceInterface - deviceName: " << deviceName << std::endl;
 	//list.push_back(std::make_shared<Test>());
 
 	// HACK!!!
@@ -96,45 +96,45 @@ std::shared_ptr<DeviceT> DummyDeviceManagerT::getDevice(const std::string & devi
 		return nullptr;
 }
 
-std::vector<std::string> DummyDeviceManagerT::getCameraList() const {
+std::vector<std::string> DummyDeviceManagerT::getCameraInterfaceList() const {
 	std::vector<std::string> cameras = {"Camera 1", "Camera 2", "Camera 3"};
 	return cameras;
 }
 
-std::shared_ptr<CameraT> DummyDeviceManagerT::getCamera(const std::string & cameraName) const {
-	LOG(debug) << "DummyDeviceManagerT::getCamera - cameraName: " << cameraName << std::endl;
+std::shared_ptr<CameraInterfaceT> DummyDeviceManagerT::getCameraInterface(const std::string & cameraName) const {
+	LOG(debug) << "DummyDeviceManagerT::getCameraInterface - cameraName: " << cameraName << std::endl;
 	//list.push_back(std::make_shared<Test>());
 
 	// TODO / HACK
-	return std::static_pointer_cast<CameraT>(getDevice(cameraName));
+	return std::static_pointer_cast<CameraInterfaceT>(getDeviceInterface(cameraName));
 }
 
 
-std::vector<std::string> DummyDeviceManagerT::getFocusList() const {
+std::vector<std::string> DummyDeviceManagerT::getFocusInterfaceList() const {
 	std::vector<std::string> focuses = {"Focus 1", "Focus 2", "Focus 3"};
 	return focuses;
 }
 
-std::shared_ptr<FocusT> DummyDeviceManagerT::getFocus(const std::string & focusName) const {
-	LOG(debug) << "DummyDeviceManagerT::getFocus - focusName: " << focusName << std::endl;
+std::shared_ptr<FocusInterfaceT> DummyDeviceManagerT::getFocusInterface(const std::string & focusName) const {
+	LOG(debug) << "DummyDeviceManagerT::getFocusInterface - focusName: " << focusName << std::endl;
 	//list.push_back(std::make_shared<Test>());
 
 	// TODO / HACK
-	return std::static_pointer_cast<FocusT>(getDevice(focusName));
+	return std::static_pointer_cast<FocusInterfaceT>(getDeviceInterface(focusName));
 }
 
 
-std::vector<std::string> DummyDeviceManagerT::getFilterList() const {
+std::vector<std::string> DummyDeviceManagerT::getFilterInterfaceList() const {
 	std::vector<std::string> filters = { "Filter 1", "Filter 2", "Filter 3" };
 	return filters;
 }
 
-std::shared_ptr<FilterT> DummyDeviceManagerT::getFilter(const std::string & filterName) const {
-	LOG(debug) << "DummyDeviceManagerT::getFilter - filterName: " << filterName << std::endl;
+std::shared_ptr<FilterInterfaceT> DummyDeviceManagerT::getFilterInterface(const std::string & filterName) const {
+	LOG(debug) << "DummyDeviceManagerT::getFilterInterface - filterName: " << filterName << std::endl;
 	//list.push_back(std::make_shared<Test>());
 
 	// TODO / HACK
-	return std::static_pointer_cast<FilterT>(getDevice(filterName));
+	return std::static_pointer_cast<FilterInterfaceT>(getDeviceInterface(filterName));
 }
 
 // TODO: Same for Filter and Cooler...

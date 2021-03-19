@@ -22,8 +22,8 @@
  *
  ****************************************************************************/
 
-#ifndef SOURCE_FOCUS_FINDER_COMMON_INCLUDE_CAMERA_H_
-#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_CAMERA_H_
+#ifndef SOURCE_FOCUS_FINDER_COMMON_INCLUDE_CAMERA_INTERFACE_H_
+#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_CAMERA_INTERFACE_H_
 
 #include <chrono>
 #include <tuple>
@@ -89,7 +89,12 @@ struct LoopModeT {
 
 using namespace boost;
 
-class CameraT : public DeviceT {
+TODO: Should not inherrit from DeviceInterfaceT... -> create a nee class DeviceInterfaceT...
+        std::set<DeviceInterfaceTypeT::TypeE> getSupportedInferfaces() const; --> IndiDeviceT -> impl. DeviceInterfaceT...
+....
+
+
+class CameraInterfaceT : public DeviceInterfaceT {
 private:
 	typedef signals2::signal<void (double /*secs. left*/)> ExposureDelayTimerUpdListenersT;
 	typedef signals2::signal<void (double /*secs. left*/)> ExposureTimerUpdListenersT;
@@ -104,12 +109,12 @@ private:
 	ExposureCycleFinishedListenersT mExposureCycleFinishedListeners;
 
 	// We do not want device copies
-	CameraT(const CameraT &);
-	CameraT & operator=(const CameraT &);
+	CameraInterfaceT(const CameraInterfaceT &);
+	CameraInterfaceT & operator=(const CameraInterfaceT &);
 
 
 public:
-	CameraT() {}
+	CameraInterfaceT() {}
 
 	// Hardware properties
 	virtual unsigned int getBitsPerPixel() const = 0;
@@ -215,4 +220,4 @@ protected:
 	void notifyFrameTransferUpd(double percentage) const { mFrameTransferUpdListeners(percentage); }
 };
 
-#endif /* SOURCE_FOCUS_FINDER_COMMON_INCLUDE_CAMERA_H_ */
+#endif /* SOURCE_FOCUS_FINDER_COMMON_INCLUDE_CAMERA_INTERFACE_H_ */

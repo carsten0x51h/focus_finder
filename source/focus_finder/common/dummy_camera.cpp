@@ -42,7 +42,7 @@ DummyCameraT::DummyCameraT() :
 		cancelExposureFlag(false), mLoopMode(LoopModeT::SINGLE), mExposureDelay(
 				1s), mGenImageType(CCD_SIM) {
 
-	mDummyConnector = std::make_shared<DummyDeviceConnectorT>();
+	mDummyConnector = std::make_shared<DummyDeviceT>();
 }
 
 DummyCameraT::~DummyCameraT() {

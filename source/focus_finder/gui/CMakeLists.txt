@@ -92,21 +92,18 @@ set(sources
   ../common/focus_curve_recorder_factory.cpp
   ../common/include/image_slicer.h
   ../common/include/wait_for.h
-  ../common/include/indi_driver_info.h
-  ../common/include/reporting_dataset.h
+        ../common/include/reporting_dataset.h
   ../common/reporting_dataset.cpp
   ../common/include/reporting.h
   ../common/reporting.cpp
   ../common/include/indi_client.h
   ../common/indi_client.cpp
-  ../common/include/indi_device_factory.h
-  ../common/indi_device_factory.cpp
-  ../common/include/indi_usb_device_connector.h
-  ../common/indi_usb_device_connector.cpp
-  ../common/include/indi_camera.h
-  ../common/indi_camera.cpp
-  ../common/include/indi_focus.h
-  ../common/indi_focus.cpp
+        ../common/include/indi_device.h
+        ../common/indi_device.cpp
+        ../common/include/indi_camera_interface.h
+        ../common/indi_camera_interface.cpp
+        ../common/include/indi_focus_interface.h
+        ../common/indi_focus_interface.cpp
   ../common/include/indi_helper.h
   ../common/indi_helper.cpp
   ../common/include/indi_device_manager.h
@@ -171,14 +168,14 @@ set(sources
   ../common/image_converter_16to8.cpp
   ../common/include/rect.h
   ../common/include/binning.h
-  ../common/include/camera.h
-  ../common/include/device_type.h
-  ../common/include/device.h
-  ../common/device.cpp
-  ../common/include/camera.h
+        ../common/include/camera_interface.h
+        ../common/include/device_interface_type.h
+        ../common/include/device.h
+        ../common/device.cpp
+        ../common/include/camera_interface.h
   ../common/include/cooler.h
-  ../common/include/filter.h
-  ../common/include/focus.h
+        ../common/include/filter_interface.h
+        ../common/include/focus_interface.h
   ../common/include/frame.h
   ../common/include/enum_helper.h
   ../common/frame.cpp
@@ -186,8 +183,8 @@ set(sources
   ../common/centroid.cpp
   ../common/include/centroid_view.h
   ../common/centroid_view.cpp
-  ../common/include/dummy_device_connector.h
-  ../common/dummy_device_connector.cpp
+        ../common/include/dummy_device.h
+        ../common/dummy_device.cpp
   ../common/dummy_camera.cpp
   ../common/include/dummy_focus.h
   ../common/dummy_focus.cpp

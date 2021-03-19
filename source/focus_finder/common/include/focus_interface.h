@@ -22,8 +22,8 @@
  *
  ****************************************************************************/
 
-#ifndef SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FOCUS_H_
-#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FOCUS_H_
+#ifndef SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FOCUS_INTERFACE_H_
+#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FOCUS_INTERFACE_H_
 
 #include <boost/signals2.hpp>
 
@@ -34,7 +34,7 @@
 DEF_Exception(Focus);
 
 
-class FocusT : public DeviceT {
+class FocusInterfaceT : public DeviceInterfaceT {
 private:
 	typedef boost::signals2::signal<void (int /*target pos*/)> TargetPositionReachedListenersT;
 	typedef boost::signals2::signal<void (int /*new pos*/)> FocusPositionChangedListenersT;
@@ -45,11 +45,11 @@ private:
 	FocusMovementAbortedListenersT mFocusMovementAbortedListeners;
 
 	// We do not want device copies
-	FocusT(const FocusT &);
-	FocusT & operator=(const FocusT &);
+	FocusInterfaceT(const FocusInterfaceT &);
+	FocusInterfaceT & operator=(const FocusInterfaceT &);
 
 public:
-	FocusT() {}
+	FocusInterfaceT() {}
 
 	/**
 	 * Temperature
@@ -126,4 +126,4 @@ protected:
 };
 
 
-#endif /* SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FOCUS_H_ */
+#endif /* SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FOCUS_INTERFACE_H_ */

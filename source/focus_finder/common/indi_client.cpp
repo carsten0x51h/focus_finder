@@ -156,3 +156,6 @@ bool IndiClientT::isConnected() const {
   return this->isServerConnected();
 }
 
+INDI::BaseDevice * IndiClientT::getDevice(const std::string & deviceName) const {
+    return const_cast<INDI::BaseClient *>((const INDI::BaseClient *) this)->getDevice(deviceName.c_str());
+}

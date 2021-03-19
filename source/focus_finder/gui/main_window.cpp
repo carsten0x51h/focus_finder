@@ -1663,6 +1663,6 @@ void MainWindow::showDeviceManagerConfigDialog() {
     LOG(info) << "Device manager connection failed. Bringing up config dialog..." << std::endl;
     
     //mDeviceManagerDialog->setModal(true);
-    mDeviceManagerDialog->open(); // TODO: Check QDialog::Accepted...
+    mDeviceManagerDialog->open();
   }
 }

@@ -11,7 +11,7 @@
 # 
 
 # Target name
-set(target focus_finder_cmd)
+set(target focus_finder_cmd ../common/include/device_connection_state.h)
 
 # Exit here if required dependencies are not met
 message(STATUS "Example ${target}")

@@ -37,9 +37,9 @@
 #include "../common/include/profile_manager.h"
 #include "../common/include/focus_finder_profile.h"
 #include "../common/include/device.h"
-#include "../common/include/camera.h"
-#include "../common/include/focus.h"
-#include "../common/include/filter.h"
+#include "../common/include/camera_interface.h"
+#include "../common/include/focus_interface.h"
+#include "../common/include/filter_interface.h"
 
 #include "ui_manage_device_profiles_dialog.h"
 
@@ -93,18 +93,18 @@ void ManageDeviceProfilesDialogT::addDevices() {
 	auto activeProfile = mFfl.getProfileManager()->getActiveProfile();
 
 	mCameraPanel = new ManageDeviceEntryPanelT(mFfl, "Camera",
-			(activeProfile ? activeProfile->getCameraDeviceName() : DeviceT::NONE));
+			(activeProfile ? activeProfile->getCameraDeviceName() : DeviceInterfaceT::NONE));
 
 	addDevicePanel(mCameraPanel);
 
 	mFocusPanel = new ManageDeviceEntryPanelT(mFfl, "Focus",
-			(activeProfile ? activeProfile->getFocusDeviceName() : DeviceT::NONE));
+			(activeProfile ? activeProfile->getFocusDeviceName() : DeviceInterfaceT::NONE));
 
 	addDevicePanel(mFocusPanel);
 
 
 	mFilterPanel = new ManageDeviceEntryPanelT(mFfl, "Filter",
-			(activeProfile ? activeProfile->getFilterDeviceName() : DeviceT::NONE));
+			(activeProfile ? activeProfile->getFilterDeviceName() : DeviceInterfaceT::NONE));
 
 	addDevicePanel(mFilterPanel);
 }

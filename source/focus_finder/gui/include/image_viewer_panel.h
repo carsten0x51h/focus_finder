@@ -45,7 +45,7 @@ namespace Ui {
     class ImageViewerPanel;
 }
 
-class DeviceT;
+class DeviceInterfaceT;
 
 
 class ImageViewerPanelT : public QWidget

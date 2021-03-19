@@ -28,21 +28,24 @@
 #include <string>
 #include <atomic>
 #include <thread>
+#include <set>
 
 #include "logging.h"
-#include "device_connector.h"
+#include "device.h"
 #include "indi_client.h"
 
 // libindi
 #include "basedevice.h"
 
-class IndiUsbDeviceConnectorT : public DeviceConnectorT {
+class IndiDeviceT : public DeviceT {
 
 public:
-	IndiUsbDeviceConnectorT(INDI::BaseDevice *dp, IndiClientT * indiClient);
-	virtual ~IndiUsbDeviceConnectorT();
+	IndiDeviceT(INDI::BaseDevice *dp, IndiClientT * indiClient);
+	virtual ~IndiDeviceT();
 
-	void connect();
+    std::string getName() const;
+
+    void connect();
 	void disconnect();
 	bool isConnected() const;
 	bool isConnecting() const;
@@ -51,11 +54,18 @@ public:
 
 	DeviceConnectionStateT::TypeE getConnectionState() const;
 
-	// USB
-	std::string getUsbDevicePort() const; // e.g. /dev/ttyUSB0 - TODO: How is this handled in Windows?
-	void setUsbDevicePort(const std::string & usbDevicePort);
+    std::set<DeviceInterfaceTypeT::TypeE> getSupportedInferfaces() const;
+
+    // USB
+    // TODO: Instead of the specific methods below, set a generic key-value config object like the Java "Properties" or similar...
+    // This can be implemented in the DeviceT base class...
+	//std::string getUsbDevicePort() const; // e.g. /dev/ttyUSB0 - TODO: How is this handled in Windows?
+	//void setUsbDevicePort(const std::string & usbDevicePort);
 
 private:
+    static uint16_t getIndiDeviceInterfaceMaskByDeviceType(DeviceInterfaceTypeT::TypeE deviceType);
+
+
 	DeviceConnectionStateT::TypeE getConnectionStateInternal() const;
 	void connectInternal();
 	void disconnectInternal();

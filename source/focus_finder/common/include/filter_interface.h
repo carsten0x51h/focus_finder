@@ -22,8 +22,8 @@
  *
  ****************************************************************************/
 
-#ifndef SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FILTER_H_
-#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FILTER_H_
+#ifndef SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FILTER_INTERFACE_H_
+#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FILTER_INTERFACE_H_
 
 #include <boost/signals2.hpp>
 
@@ -31,7 +31,7 @@
 #include "device.h"
 #include "enum_helper.h"
 
-class FilterT : public DeviceT {
+class FilterInterfaceT : public DeviceInterfaceT {
 private:
 	typedef boost::signals2::signal<void (int /*new pos*/)> FilterPositionChangedListenersT;
 	typedef boost::signals2::signal<void (int /*target pos*/)> TargetPositionReachedListenersT;
@@ -42,11 +42,11 @@ private:
 	FilterMovementAbortedListenersT mFilterMovementAbortedListeners;
 
 	// We do not want device copies
-	FilterT(const FilterT &);
-	FilterT & operator=(const FilterT &);
+	FilterInterfaceT(const FilterInterfaceT &);
+	FilterInterfaceT & operator=(const FilterInterfaceT &);
 
 public:
-	FilterT() {}
+	FilterInterfaceT() {}
 
 	/**
 	 * Filter position
@@ -114,4 +114,4 @@ protected:
 	void notifyFilterMovementAborted(int currentPosition) const { mFilterMovementAbortedListeners(currentPosition); }
 };
 
-#endif /* SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FILTER_H_ */
+#endif /* SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FILTER_INTERFACE_H_ */

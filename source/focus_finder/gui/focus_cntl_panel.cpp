@@ -32,7 +32,7 @@
 #include "../common/include/logging.h"
 #include "../common/include/device_manager.h"
 #include "../common/include/profile_manager.h"
-#include "../common/include/focus.h"
+#include "../common/include/focus_interface.h"
 
 #include "ui_focus_cntl_panel.h"
 

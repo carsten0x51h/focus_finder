@@ -255,7 +255,7 @@ void FocusFinderFastCurveLookupT::run() {
     // float distToLimit1 = xLimitRel - relEstimatedPos1;
     // float distToLimit2 = xLimitRel - relEstimatedPos2;
 
-    // float currAbsPos = getFocusController()->getFocus()->getCurrentPos();
+    // float currAbsPos = getFocusController()->getFocusInterface()->getCurrentPos();
     
     // // Average out the error in the xrel (resulting from moise in the focus measures) which implicitly lead to estimation/lookup errors (xrel).
     // float dxRel1;

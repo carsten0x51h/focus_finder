@@ -222,7 +222,7 @@ void DefaultFocusCurveRecorderT::run() {
     // // Register on camera
     // // NOTE / TODO: For some reason std::bind did not compile....
     // mCameraExposureFinishedConnection =
-    //   getCamera()->registerExposureCycleFinishedListener(
+    //   getCameraInterface()->registerExposureCycleFinishedListener(
     // 							 std::bind(&DefaultFocusCurveRecorderT::onImageReceived,
     // 								     this, _1, _2, _3));
 
@@ -263,7 +263,7 @@ void DefaultFocusCurveRecorderT::run() {
   // 		moveFocusByBlocking(FocusDirectionT::INWARD, 1000, 30000ms);
 
   // 		// This is the focus position for which a star image wil be taken
-  // 		int currentFocusPos = getFocus()->getCurrentPos();
+  // 		int currentFocusPos = getFocusInterface()->getCurrentPos();
 
   // 		PointT<unsigned int> lastFocusStarPos = getLastFocusStarPos().to<
   // 				unsigned int>();
@@ -296,7 +296,7 @@ void DefaultFocusCurveRecorderT::run() {
   // 				<< std::endl;
 
   // 		// Set ROI based on last focus star position
-  // 		getCamera()->setRoi(outerRoi);
+  // 		getCameraInterface()->setRoi(outerRoi);
 
   // 		// Take a picture
   // 		runExposureBlocking(1000ms /*TODO: Set exp time*/);
@@ -604,7 +604,7 @@ void DefaultFocusCurveRecorderT::run() {
 //     LOG(error) << "DefaultFocusCurveRecorderT::cleanup... no focus device set!" << std::endl;
 //   }
 
-//   getCamera()->unregisterExposureCycleFinishedListener(mCameraExposureFinishedConnection);
+//   getCameraInterface()->unregisterExposureCycleFinishedListener(mCameraExposureFinishedConnection);
 // }
 
 void DefaultFocusCurveRecorderT::cancel() {

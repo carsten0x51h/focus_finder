@@ -33,13 +33,13 @@
 #include <utility>
 #include <list>
 
-#include "filter.h"
+#include "filter_interface.h"
 #include "logging.h"
 #include "device_connector.h"
-#include "dummy_device_connector.h"
+#include "dummy_device.h"
 
 
-class DummyFilterT : virtual public FilterT {
+class DummyFilterT : virtual public FilterInterfaceT {
 
 public:
 	DummyFilterT();
@@ -73,7 +73,7 @@ private:
 	bool mMovementAborted; // TODO: ATOMIC?!
 	bool mMovementRunning; // TODO: ATOMIC?!
 
-	std::shared_ptr<DummyDeviceConnectorT> mDummyConnector;
+	std::shared_ptr<DummyDeviceT> mDummyConnector;
 };
 
 #endif /* SOURCE_FOCUS_FINDER_COMMON_DUMMY_FILTER_H_ */
