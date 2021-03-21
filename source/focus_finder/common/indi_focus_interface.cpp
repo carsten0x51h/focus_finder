@@ -33,8 +33,6 @@ IndiFocusInterfaceT::IndiFocusInterfaceT(INDI::BaseDevice *dp, IndiClientT * ind
 
 	LOG(debug) << "IndiFocusInterfaceT::IndiFocusInterfaceT..." << std::endl;
 
-	mDeviceType = (DeviceInterfaceTypeT::FOCUS);
-
 	mIndiConnector = std::make_shared < IndiDeviceT
 			> (dp, indiClient);
 
@@ -91,10 +89,6 @@ void IndiFocusInterfaceT::newNumber(INumberVectorProperty * nvp) {
 /////////////////////////////////////////////////
 std::string IndiFocusInterfaceT::getName() const {
 	return mIndiBaseDevice->getDeviceName();
-}
-
-std::shared_ptr<DeviceConnectorT> IndiFocusInterfaceT::getConnector() const {
-	return mIndiConnector;
 }
 
 /**

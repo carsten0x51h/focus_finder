@@ -69,7 +69,7 @@ public:
 	virtual ~ManageDeviceProfilesDialogT();
 
 signals:
-	void activeProfileChangedSignal();
+	void activeProfileChangedSignal(std::optional<FocusFinderProfileT> oldProfile, std::optional<FocusFinderProfileT> newProfile);
 	void profileListChangedSignal();
 
 protected slots:
@@ -78,7 +78,7 @@ protected slots:
 	void onSettingsProfileActionTriggeredSlot();
 
 	void onProfileSelectionChangedSlot(const QString & selectedProfileNameQtStr);
-	void onActiveProfileChangedSlot();
+	void onActiveProfileChangedSlot(std::optional<FocusFinderProfileT> oldProfile, std::optional<FocusFinderProfileT> newProfile);
 	void onProfileListChangedSlot();
 
 protected:

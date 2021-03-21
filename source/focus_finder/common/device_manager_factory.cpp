@@ -26,18 +26,13 @@
 
 #include "include/device_manager_factory.h"
 #include "include/indi_device_manager.h"
-#include "include/dummy_device_manager.h"
 
 std::shared_ptr<DeviceManagerT> DeviceManagerFactoryT::getInstance(
 		const DeviceManagerTypeT::TypeE & type) {
 
 	switch (type) {
 	case DeviceManagerTypeT::INDI:
-        IndiDeviceManagerT m = new IndiDeviceManagerT();
 		return std::make_shared<IndiDeviceManagerT>();
-		
-	case DeviceManagerTypeT::DUMMY:
-		return std::make_shared<DummyDeviceManagerT>();
 
 	default:
 		return nullptr;

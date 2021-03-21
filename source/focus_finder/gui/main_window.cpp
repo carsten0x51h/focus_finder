@@ -56,13 +56,10 @@
 #include "include/manage_device_profiles_dialog.h"
 
 
+#include "../common/include/device_interface_type.h"
 #include "../common/include/image.h"
 #include "../common/include/size.h"
 #include "../common/include/logging.h"
-#include "../common/include/dummy_camera.h"
-#include "../common/include/dummy_focus.h"
-#include "../common/include/dummy_filter.h"
-#include "../common/include/dummy_device_manager.h"
 #include "../common/include/focus_finder.h"
 #include "../common/include/focus_finder_logic.h"
 #include "../common/include/focus_curve_record.h"
@@ -80,8 +77,14 @@
 Q_DECLARE_METATYPE(std::chrono::milliseconds)
 Q_DECLARE_METATYPE(std::shared_ptr<FocusCurveRecordT>)
 Q_DECLARE_METATYPE(std::shared_ptr<const FocusCurveRecordSetContainerT>)
+Q_DECLARE_METATYPE(std::optional<FocusFinderProfileT>)
 
 using namespace std::chrono_literals;
+
+std::shared_ptr<CameraInterfaceT> MainWindow::getCurrentCamera() {
+    return FocusFinderLogicT::get()->getCurrentCamera();
+}
+
 
 void MainWindow::onManageDeviceProfiles() {
 	LOG(debug)
@@ -576,9 +579,9 @@ void MainWindow::setExposureButtonState(bool isRunning) {
 	}
 
 	// Set loop mode (is part of the exposure button...)
-	if (mCameraDevice) {
+	if (getCurrentCamera()) {
 		mExposureLoopAction->setChecked(
-				mCameraDevice->getLoopMode() == LoopModeT::LOOP);
+                getCurrentCamera()->getLoopMode() == LoopModeT::LOOP);
 	}
 }
 
@@ -710,7 +713,9 @@ void MainWindow::createExposureButton() {
 
 void MainWindow::updateExposureTime() {
 
-	if (mCameraDevice) {
+    auto currentCamera = getCurrentCamera();
+
+	if (currentCamera) {
 		QVariant data = mExposureTimeCbx->currentData();
 
 		auto t = data.value<std::chrono::milliseconds>();
@@ -719,7 +724,7 @@ void MainWindow::updateExposureTime() {
 		<< "MainWindow::updateExposureTime - t=" << t.count() << "ms"
 				<< std::endl;
 
-		mCameraDevice->setExposureTime(t);
+        currentCamera->setExposureTime(t);
 
 
 		// Also store the respective value in the profile
@@ -747,20 +752,22 @@ void MainWindow::updateExposureTimeSelector() {
   // LOG(debug)
   // << "MainWindow::updateExposureTimeSelector..." << std::endl;
 
-	mExposureTimeCbx->blockSignals(true);
+    auto currentCamera = getCurrentCamera();
+
+
+    mExposureTimeCbx->blockSignals(true);
 
 	mExposureTimeCbx->clear();
 
 
     auto activeProfile = mFfl.getProfileManager()->getActiveProfile();
-    auto currentCamera = mFfl.getCurrentCamera();
     bool focusFinderRunning = mFfl.getFocusFinderExecutor()->isRunning();
 
     bool hasActiveProfile = activeProfile.has_value();
     bool cameraSelected = (currentCamera != nullptr);
     bool cameraConnected =
             (currentCamera ?
-             currentCamera->getConnector()->isConnected() : false);
+             currentCamera->getParentDevice()->isConnected() : false);
 
     bool exposureRunning = (currentCamera ? currentCamera->isExposureRunning() : false);
     bool enableExposureTimeSelector = hasActiveProfile && cameraSelected && cameraConnected && ! exposureRunning && ! focusFinderRunning;
@@ -771,7 +778,7 @@ void MainWindow::updateExposureTimeSelector() {
 	// Fill in exposure time values. Those depend on the abilities of the camera.
 	// Get min possible exposure time from camera. Use this value to limit the values
 	// in the cbx.
-	if (mCameraDevice && mCameraDevice->getConnector()->isConnected()) {
+	if (currentCamera && currentCamera->getParentDevice()->isConnected()) {
 
 		std::vector<std::chrono::milliseconds> exposureTimes { 10ms, 50ms,
 				100ms, 500ms, 1000ms, 1500ms, 2000ms, 3000ms, 4000ms, 5000ms,
@@ -780,7 +787,7 @@ void MainWindow::updateExposureTimeSelector() {
 		std::chrono::milliseconds minExposureTimeMillisecs;
 
 		try {
-			minExposureTimeMillisecs = mCameraDevice->getMinExposureTime();
+			minExposureTimeMillisecs = currentCamera->getMinExposureTime();
 		} catch (CameraExceptionT & exc) {
 			minExposureTimeMillisecs = exposureTimes.at(0);
 		}
@@ -846,8 +853,10 @@ void MainWindow::createExposureTimeSelector() {
 }
 
 void MainWindow::updateCurrentCameraConnectionStateUI() {
-	if (mCameraDevice) {
-		auto connState = mCameraDevice->getConnector()->getConnectionState();
+    auto currentCamera = getCurrentCamera();
+
+	if (currentCamera) {
+		auto connState = currentCamera->getParentDevice()->getConnectionState();
 		switch (connState) {
 		case DeviceConnectionStateT::CONNECTED: {
 			setStatusIcon(mCameraConnectionStatusLabel,
@@ -868,8 +877,8 @@ void MainWindow::updateCurrentCameraConnectionStateUI() {
 					":/res/red_dot_64x64.png", "Camera disconnected");
 
 			// Update the UI - get exposure status from new camera and set the exposure button accordingly
-			if (mCameraDevice) {
-				setExposureButtonState(mCameraDevice->isExposureRunning());
+			if (currentCamera) {
+				setExposureButtonState(currentCamera->isExposureRunning());
 			}
 
 			updateFocusFinderMainMenuBar();
@@ -880,8 +889,8 @@ void MainWindow::updateCurrentCameraConnectionStateUI() {
 					":/res/red_dot_64x64.png", "Camera disconnected");
 
 			// Update the UI - get exposure status from new camera and set the exposure button accordingly
-			if (mCameraDevice) {
-				setExposureButtonState(mCameraDevice->isExposureRunning());
+			if (currentCamera) {
+				setExposureButtonState(currentCamera->isExposureRunning());
 			}
 
 			updateFocusFinderMainMenuBar();
@@ -893,91 +902,112 @@ void MainWindow::updateCurrentCameraConnectionStateUI() {
 				"Camera disconnected");
 
 		// Update the UI - get exposure status from new camera and set the exposure button accordingly
-		if (mCameraDevice) {
-			setExposureButtonState(mCameraDevice->isExposureRunning());
+		if (currentCamera) {
+			setExposureButtonState(currentCamera->isExposureRunning());
 		}
 
 		updateFocusFinderMainMenuBar();
 	}
 }
 
-void MainWindow::updateCameraDevice() {
-	auto newCameraDevice = mFfl.getCurrentCamera();
-	bool hasOldCamera = (mCameraDevice != nullptr);
+/**
+TODO: What does the user select in the profile?? A device? Or an interface?? ->
+       --> User selects a device interface and this way implicitly a device!
 
-	if (mCameraDevice == newCameraDevice) {
+Problem: When a device is switched (other dialog), we are notified here... But...
+         we have registered our listeners at the "old"  device! that means
+         the "old" device carries a part of our "state"! which is still relevant.
+         This increases complexity a lot...
+         The registered listeners could be "autocleaned" when switched by the dialog or
+         even better by the program logic behind... mybe a switchDevice() or updateDevice() function
+         which does the job...
+//auto newCameraDevice = FocusFinderLogicT::get()->getCurrentCamera();
+//
+ //        TODO: Currently I track devices which may change and update the members accordingly. Is this correct? Can devices AND/OR interfaces change?
+//
+//		TODO.... --> Problem: This way the cameraInterface also holds a state: The listeners!
+//		       --> The device should own its existing device interfaces!
+//		       --> Maybe storing the state of each device in here is not required? -> use DeviceManagerT::getCurrentCameraDevice()...?
+ */
+void MainWindow::updateCameraDevice(std::shared_ptr<CameraInterfaceT> oldCameraInterface, std::shared_ptr<CameraInterfaceT> newCameraInterface) {
+
+	if (oldCameraInterface == newCameraInterface) {
 		return;
 	}
 
-	if (hasOldCamera) {
+    bool hasOldCameraInterface = (oldCameraInterface != nullptr);
+
+	if (hasOldCameraInterface) {
+        auto oldCameraDevice = oldCameraInterface->getParentDevice();
+
 		LOG(debug)
 		<< "MainWindow::updateCameraDevice... unregistering from old camera..."
-				<< mCameraDevice->getName() << std::endl;
+				<< oldCameraDevice->getName() << std::endl;
 
 		// There was already an old device - unregister listener and register to the new one.
-		mCameraDevice->getConnector()->unregisterDeviceConnectedListener(
+        oldCameraDevice->unregisterDeviceConnectedListener(
 				mCameraDeviceConnectedConnection);
-		mCameraDevice->getConnector()->unregisterDeviceConnectingListener(
+        oldCameraDevice->unregisterDeviceConnectingListener(
 				mCameraDeviceConnectingConnection);
-		mCameraDevice->getConnector()->unregisterDeviceDisconnectedListener(
+        oldCameraDevice->unregisterDeviceDisconnectedListener(
 				mCameraDeviceDisconnectedConnection);
 
-		mCameraDevice->unregisterExposureCycleFinishedListener(
+        // There was already an old device interface - unregister listener and register to the new one.
+        oldCameraInterface->unregisterExposureCycleFinishedListener(
 				mExposureCycleFinishedConnection);
-		mCameraDevice->unregisterExposureCancelledListener(
+        oldCameraInterface->unregisterExposureCancelledListener(
 				mExposureCancelledConnection);
-		mCameraDevice->unregisterFrameTransferUpdListener(
+        oldCameraInterface->unregisterFrameTransferUpdListener(
 				mFrameTransferUpdConnection);
-		mCameraDevice->unregisterExposureTimerUpdListener(
+        oldCameraInterface->unregisterExposureTimerUpdListener(
 				mFrameExposureTimerUpdConnection);
-		mCameraDevice->unregisterExposureDelayTimerUpdListener(
+        oldCameraInterface->unregisterExposureDelayTimerUpdListener(
 				mFrameExposureDelayTimerUpdConnection);
 	}
 
 	// Register to new device
-	if (newCameraDevice) {
+	if (newCameraInterface) {
+        auto newCameraDevice = newCameraInterface->getParentDevice();
 
 		LOG(debug)
 		<< "MainWindow::updateCameraDevice... registering to new camera..."
 				<< newCameraDevice->getName() << std::endl;
 
 		mCameraDeviceConnectedConnection =
-				newCameraDevice->getConnector()->registerDeviceConnectedListener(
+				newCameraDevice->registerDeviceConnectedListener(
 						[&]() {emit cameraDeviceConnectedSignal();});
 		mCameraDeviceConnectingConnection =
-				newCameraDevice->getConnector()->registerDeviceConnectingListener(
+				newCameraDevice->registerDeviceConnectingListener(
 						[&]() {emit cameraDeviceConnectingSignal();});
 		mCameraDeviceDisconnectedConnection =
-				newCameraDevice->getConnector()->registerDeviceDisconnectedListener(
+				newCameraDevice->registerDeviceDisconnectedListener(
 						[&]() {emit cameraDeviceDisconnectedSignal();});
 
 		mExposureCycleFinishedConnection =
-				newCameraDevice->registerExposureCycleFinishedListener(
+				newCameraInterface->registerExposureCycleFinishedListener(
 						[&](RectT<unsigned int> /*roiRect*/, std::shared_ptr<const ImageT> /*resultImage*/, bool lastExposure) {
 							emit exposureCycleFinishedSignal(lastExposure);
 						});
 		mExposureCancelledConnection =
-				newCameraDevice->registerExposureCancelledListener(
+                newCameraInterface->registerExposureCancelledListener(
 						[&]() {emit exposureCancelledSignal();});
 		mFrameTransferUpdConnection =
-				newCameraDevice->registerFrameTransferUpdListener(
+                newCameraInterface->registerFrameTransferUpdListener(
 						[&](double percentage) {emit frameTransferUpdSignal(percentage);});
 		mFrameExposureTimerUpdConnection =
-				newCameraDevice->registerExposureTimerUpdListener(
+                newCameraInterface->registerExposureTimerUpdListener(
 						[&](double t) {emit exposureTimerUpdSignal(t);});
 		mFrameExposureDelayTimerUpdConnection =
-				newCameraDevice->registerExposureDelayTimerUpdListener(
+                newCameraInterface->registerExposureDelayTimerUpdListener(
 						[&](double t) {emit exposureDelayTimerUpdSignal(t);});
 	}
-
-	mCameraDevice = newCameraDevice;
 
 	updateCurrentCameraConnectionStateUI();
 }
 
 void MainWindow::updateCurrentFocusConnectionStateUI() {
 	if (mFocusDevice) {
-		auto connState = mFocusDevice->getConnector()->getConnectionState();
+		auto connState = mFocusDevice->getConnectionState();
 		switch (connState) {
 		case DeviceConnectionStateT::CONNECTED: {
 			setStatusIcon(mFocusConnectionStatusLabel,
@@ -1011,44 +1041,45 @@ void MainWindow::updateCurrentFocusConnectionStateUI() {
 }
 
 void MainWindow::updateFocusDevice() {
-	auto newFocusDevice = mFfl.getCurrentFocus();
-	bool hasOldFocus = (mFocusDevice != nullptr);
-
-	if (mFocusDevice == newFocusDevice) {
-		return;
-	}
-
-	if (hasOldFocus) {
-		// There was already an old device - unregister listener and register to the new one.
-		mFocusDevice->getConnector()->unregisterDeviceConnectedListener(
-				mFocusDeviceConnectedConnection);
-		mFocusDevice->getConnector()->unregisterDeviceConnectingListener(
-				mFocusDeviceConnectingConnection);
-		mFocusDevice->getConnector()->unregisterDeviceDisconnectedListener(
-				mFocusDeviceDisconnectedConnection);
-	}
-
-	// Register to new device
-	if (newFocusDevice) {
-		mFocusDeviceConnectedConnection =
-				newFocusDevice->getConnector()->registerDeviceConnectedListener(
-						[&]() {emit focusDeviceConnectedSignal();});
-		mFocusDeviceConnectingConnection =
-				newFocusDevice->getConnector()->registerDeviceConnectingListener(
-						[&]() {emit focusDeviceConnectingSignal();});
-		mFocusDeviceDisconnectedConnection =
-				newFocusDevice->getConnector()->registerDeviceDisconnectedListener(
-						[&]() {emit focusDeviceDisconnectedSignal();});
-	}
-
-	mFocusDevice = newFocusDevice;
-
-	updateCurrentFocusConnectionStateUI();
+// TODO: Change similar to updateCameraDevice()...
+//	auto newFocusDevice = mFfl.getCurrentFocus();
+//	bool hasOldFocus = (mFocusDevice != nullptr);
+//
+//	if (mFocusDevice == newFocusDevice) {
+//		return;
+//	}
+//
+//	if (hasOldFocus) {
+//		// There was already an old device - unregister listener and register to the new one
+//		mFocusDevice->unregisterDeviceConnectedListener(
+//				mFocusDeviceConnectedConnection);
+//		mFocusDevice->unregisterDeviceConnectingListener(
+//				mFocusDeviceConnectingConnection);
+//		mFocusDevice->unregisterDeviceDisconnectedListener(
+//				mFocusDeviceDisconnectedConnection);
+//	}
+//
+//	// Register to new device
+//	if (newFocusDevice) {
+//		mFocusDeviceConnectedConnection =
+//				newFocusDevice->registerDeviceConnectedListener(
+//						[&]() {emit focusDeviceConnectedSignal();});
+//		mFocusDeviceConnectingConnection =
+//				newFocusDevice->registerDeviceConnectingListener(
+//						[&]() {emit focusDeviceConnectingSignal();});
+//		mFocusDeviceDisconnectedConnection =
+//				newFocusDevice->registerDeviceDisconnectedListener(
+//						[&]() {emit focusDeviceDisconnectedSignal();});
+//	}
+//
+//	mFocusDevice = newFocusDevice;
+//
+//	updateCurrentFocusConnectionStateUI();
 }
 
 void MainWindow::updateCurrentFilterConnectionStateUI() {
 	if (mFilterDevice) {
-		auto connState = mFilterDevice->getConnector()->getConnectionState();
+		auto connState = mFilterDevice->getConnectionState();
 		switch (connState) {
 		case DeviceConnectionStateT::CONNECTED: {
 			setStatusIcon(mFilterConnectionStatusLabel,
@@ -1088,43 +1119,62 @@ void MainWindow::updateCurrentFilterConnectionStateUI() {
 }
 
 void MainWindow::updateFilterDevice() {
-	auto newFilterDevice = mFfl.getCurrentFilter();
-	bool hasOldFilter = (mFilterDevice != nullptr);
+// TODO / HACK / FIXME: Change similar to updateCameraDevice()...
 
-	if (mFilterDevice == newFilterDevice) {
-		return;
-	}
-
-	if (hasOldFilter) {
-		// There was already an old device - unregister listener and register to the new one.
-		mFilterDevice->getConnector()->unregisterDeviceConnectedListener(
-				mFilterDeviceConnectedConnection);
-		mFilterDevice->getConnector()->unregisterDeviceConnectingListener(
-				mFilterDeviceConnectingConnection);
-		mFilterDevice->getConnector()->unregisterDeviceDisconnectedListener(
-				mFilterDeviceDisconnectedConnection);
-	}
-
-	// Register to new device
-	if (newFilterDevice) {
-		mFilterDeviceConnectedConnection =
-				newFilterDevice->getConnector()->registerDeviceConnectedListener(
-						[&]() {emit filterDeviceConnectedSignal();});
-		mFilterDeviceConnectingConnection =
-				newFilterDevice->getConnector()->registerDeviceConnectingListener(
-						[&]() {emit filterDeviceConnectingSignal();});
-		mFilterDeviceDisconnectedConnection =
-				newFilterDevice->getConnector()->registerDeviceDisconnectedListener(
-						[&]() {emit filterDeviceDisconnectedSignal();});
-	}
-
-	mFilterDevice = newFilterDevice;
-
-	updateCurrentFilterConnectionStateUI();
+//	auto newFilterDevice = mFfl.getCurrentFilter();
+//	bool hasOldFilter = (mFilterDevice != nullptr);
+//
+//	if (mFilterDevice == newFilterDevice) {
+//		return;
+//	}
+//
+//	if (hasOldFilter) {
+//		// There was already an old device - unregister listener and register to the new one.
+//		mFilterDevice->unregisterDeviceConnectedListener(
+//				mFilterDeviceConnectedConnection);
+//		mFilterDevice->unregisterDeviceConnectingListener(
+//				mFilterDeviceConnectingConnection);
+//		mFilterDevice->unregisterDeviceDisconnectedListener(
+//				mFilterDeviceDisconnectedConnection);
+//	}
+//
+//	// Register to new device
+//	if (newFilterDevice) {
+//		mFilterDeviceConnectedConnection =
+//				newFilterDevice->registerDeviceConnectedListener(
+//						[&]() {emit filterDeviceConnectedSignal();});
+//		mFilterDeviceConnectingConnection =
+//				newFilterDevice->registerDeviceConnectingListener(
+//						[&]() {emit filterDeviceConnectingSignal();});
+//		mFilterDeviceDisconnectedConnection =
+//				newFilterDevice->registerDeviceDisconnectedListener(
+//						[&]() {emit filterDeviceDisconnectedSignal();});
+//	}
+//
+//	mFilterDevice = newFilterDevice;
+//
+//	updateCurrentFilterConnectionStateUI();
 }
 
-void MainWindow::updateProfile() {
-	updateCameraDevice();
+void MainWindow::updateProfile(std::optional<FocusFinderProfileT> oldProfile, std::optional<FocusFinderProfileT> newProfile) {
+
+    auto deviceManager = FocusFinderLogicT::get()->getDeviceManager();
+    auto oldCameraDevice = (oldProfile.has_value() ?
+                                deviceManager->getDevice(oldProfile->getCameraDeviceName()) :
+                                nullptr);
+
+    auto oldCameraInterface = (oldCameraDevice != nullptr ? oldCameraDevice->getCameraInterface() : nullptr);
+
+    auto newCameraDevice = (newProfile.has_value() ?
+                            deviceManager->getDevice(newProfile->getCameraDeviceName()) :
+                            nullptr);
+
+    auto newCameraInterface = (newCameraDevice != nullptr ? newCameraDevice->getCameraInterface() : nullptr);
+
+
+	updateCameraDevice(oldCameraInterface, newCameraInterface);
+
+    // TODO: Do the same for focus and filter... - maybe safe some code...
 	updateFocusDevice();
 	updateFilterDevice();
 }
@@ -1438,7 +1488,7 @@ void MainWindow::updateFocusFinderButtonMenuTexts() {
     auto activeProfile = mFfl.getProfileManager()->getActiveProfile();
     bool hasActiveProfile = activeProfile.has_value();
 
-    bool hasCalibrationData = (hasActiveProfile ? activeProfile.value().hasCalibrationData() : false);
+    bool hasCalibrationData = hasActiveProfile && activeProfile.value().hasCalibrationData();
 
     std::string calibrationMenuStr = (hasCalibrationData ? "Recalibrate..." : "Calibrate...");
     std::string calibrationMenuToolTipStr = (hasCalibrationData ? "Replace the existing calibration by a new one." : "Perform an initial calibration.");
@@ -1450,22 +1500,21 @@ void MainWindow::updateFocusFinderMainMenuBar() {
 	LOG(debug)
 	<< "MainWindow::updateFocusFinderMainMenuBar..." << std::endl;
 
+	auto currentCamera = getCurrentCamera();
 	// mExposureButton - enabled if
 	//   -A "focus finder profile" is set
 	//	 -AND camera device is selected
 	//	 -AND camera is connected
 	//	 -Focus finder not running
 	auto activeProfile = mFfl.getProfileManager()->getActiveProfile();
-	auto currentCamera = mFfl.getCurrentCamera();
 	bool focusFinderRunning = mFfl.getFocusFinderExecutor()->isRunning();
 
 	bool hasActiveProfile = activeProfile.has_value();
 	bool cameraSelected = (currentCamera != nullptr);
 	bool cameraConnected =
-			(currentCamera ?
-					currentCamera->getConnector()->isConnected() : false);
+            currentCamera && currentCamera->getParentDevice()->isConnected();
 
-	bool exposureRunning = (currentCamera ? currentCamera->isExposureRunning() : false);
+	bool exposureRunning = currentCamera && currentCamera->isExposureRunning();
 
 LOG(debug) << "exposureRunning: " << exposureRunning << std::endl;
 
@@ -1505,6 +1554,8 @@ LOG(debug) << "exposureRunning: " << exposureRunning << std::endl;
 			hasActiveProfile && cameraSelected && !focusFinderRunning
 					&& !inRoiMode && hasImage && !exposureRunning);
 
+
+
 	// mStartFocusFinderButton - enable when
 	//   -"focus finder profile" is active
 	//   -AND camera device is selected
@@ -1516,8 +1567,11 @@ LOG(debug) << "exposureRunning: " << exposureRunning << std::endl;
 	//   -AND no exposure is currently running
 	auto currentFocus = mFfl.getCurrentFocus();
 	bool focusSelected = (currentFocus != nullptr);
-	bool focusConnected = (
-			currentFocus ? currentFocus->getConnector()->isConnected() : false);
+    // TODO / HACK / FIXME: Re-enable - same way as camera...
+	//bool focusConnected = (
+	//		currentFocus ? currentFocus->getConnector()->isConnected() : false);
+    bool focusConnected = true; // HACK - REMOVE!
+
 	bool validFocusStarSelected = mImageViewerPanel->isPoiSet();
 
     bool readyForCalibration = hasActiveProfile && cameraSelected && cameraConnected
@@ -1559,17 +1613,18 @@ LOG(debug) << "exposureRunning: " << exposureRunning << std::endl;
 	mManageDeviceProfilesButton->setEnabled(!focusFinderRunning);
 }
 
-void MainWindow::onUpdateProfileSlot() {
+void MainWindow::onUpdateProfileSlot(std::optional<FocusFinderProfileT> oldProfile, std::optional<FocusFinderProfileT> newProfile)
+{
 	LOG(debug)
 	<< "MainWindow::onUp"
 			"dateProfileSlot..." << std::endl;
 
-	updateProfile(); // TODO: Is this ok?
+	updateProfile(oldProfile, newProfile);
 	updateFocusFinderMainMenuBar();
 }
 
 MainWindow::MainWindow() :
-		m_ui(new Ui::MainWindow), mCameraDevice(nullptr), mFocusDevice(nullptr), mFilterDevice(
+		m_ui(new Ui::MainWindow), mFocusDevice(nullptr), mFilterDevice(
 												       nullptr),
 		mFfl(*FocusFinderLogicT::get())	// TODO: Remove mFfl... directly use static function...
 {
@@ -1581,7 +1636,7 @@ MainWindow::MainWindow() :
 
 	// Register at profile manager to get notified if selected profile / device changes...
 	mFfl.getProfileManager()->registerActiveProfileChangedListener(
-			std::bind(&MainWindow::onUpdateProfileSlot, this));
+			boost::bind(&MainWindow::onUpdateProfileSlot, this, boost::placeholders::_1, boost::placeholders::_2));
 
 	createImageViewerPanel();
 	createReportingViewerPanel();
@@ -1597,7 +1652,7 @@ MainWindow::MainWindow() :
 	createStatusBar();
 	createAboutDialog();
 
-	updateProfile();
+	updateProfile(std::nullopt, mFfl.getProfileManager()->getActiveProfile());
 
 
 

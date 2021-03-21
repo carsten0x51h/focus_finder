@@ -31,7 +31,6 @@ struct DeviceManagerTypeT {
   enum TypeE {
 	      INDI,
 	      ASCOM,
-	      DUMMY,
 	      _Count
   };
   
@@ -41,8 +40,6 @@ struct DeviceManagerTypeT {
 			  return "INDI";
 			case ASCOM:
 			  return "ASCOM";
-			case DUMMY:
-			  return "DUMMY";
 			default:
 			  return "<?>";
 		}

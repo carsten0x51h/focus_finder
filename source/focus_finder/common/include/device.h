@@ -37,6 +37,8 @@
 
 DEF_Exception(Device);
 
+class DeviceInterfaceT;
+class CameraInterfaceT;
 
 /**
  * TODO: Check mIsAvailable is all the functions.... maybe set the flag atomic as well...
@@ -96,6 +98,20 @@ public:
 	 * @return
 	 */
 	bool isInterfaceSupported(DeviceInterfaceTypeT::TypeE) const;
+
+
+	/**
+	 *
+	 */
+	virtual std::shared_ptr<DeviceInterfaceT> getInterface(DeviceInterfaceTypeT::TypeE interfaceType) = 0;
+
+
+	/**
+	 * Conenience function to get the camera interface.
+	 *
+	 * @return
+	 */
+    std::shared_ptr<CameraInterfaceT> getCameraInterface();
 
 	/**
 	 * DeviceInterfaceT has no state. It is just a wrapper / facade to make access

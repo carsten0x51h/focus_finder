@@ -128,7 +128,7 @@ void FilterCntlPanelT::updateProfile() {
 
 	auto newFilterDevice = mFfl.getCurrentFilter();
 	bool hasOldFilter = (mFilterDevice != nullptr);
-	bool enablePanel = (newFilterDevice ? newFilterDevice->getConnector()->isConnected() : false);
+	bool enablePanel = (newFilterDevice ? newFilterDevice->getParentDevice()->isConnected() : false);
 
 	this->setEnabled(enablePanel);
 
@@ -138,8 +138,8 @@ void FilterCntlPanelT::updateProfile() {
 
 	if (hasOldFilter) {
 		// There was already an old device - unregister listener and register to the new one.
-		mFilterDevice->getConnector()->unregisterDeviceConnectedListener(mDeviceConnectedConnection);
-		mFilterDevice->getConnector()->unregisterDeviceDisconnectedListener(mDeviceDisconnectedConnection);
+		mFilterDevice->getParentDevice()->unregisterDeviceConnectedListener(mDeviceConnectedConnection);
+		mFilterDevice->getParentDevice()->unregisterDeviceDisconnectedListener(mDeviceDisconnectedConnection);
 		mFilterDevice->unregisterFilterPositionChangedListener(mFilterPositionChangedConnection);
 		mFilterDevice->unregisterTargetPositionReachedListener(mTargetPositionReachedConnection);
 		mFilterDevice->unregisterFilterMovementAbortedListener(mFilterMovementAbortedConnection);
@@ -149,8 +149,8 @@ void FilterCntlPanelT::updateProfile() {
 
 	// Register to new device
 	if (newFilterDevice) {
-		mDeviceConnectedConnection = newFilterDevice->getConnector()->registerDeviceConnectedListener([&]() { emit deviceConnectedSignal(); });
-		mDeviceDisconnectedConnection = newFilterDevice->getConnector()->registerDeviceDisconnectedListener([&]() { emit deviceDisconnectedSignal(); });
+		mDeviceConnectedConnection = newFilterDevice->getParentDevice()->registerDeviceConnectedListener([&]() { emit deviceConnectedSignal(); });
+		mDeviceDisconnectedConnection = newFilterDevice->getParentDevice()->registerDeviceDisconnectedListener([&]() { emit deviceDisconnectedSignal(); });
 		mFilterPositionChangedConnection = newFilterDevice->registerFilterPositionChangedListener([&](int currentPos) { emit filterPositionChangedSignal(currentPos); });
 		mTargetPositionReachedConnection = newFilterDevice->registerTargetPositionReachedListener([&](int targetPos) { emit targetPositionReachedSignal(targetPos); });
 		mFilterMovementAbortedConnection = newFilterDevice->registerFilterMovementAbortedListener([&](int currentPos) { emit filterMovementAbortedSignal(currentPos); });

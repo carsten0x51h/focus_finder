@@ -28,10 +28,9 @@
 #include "include/spline_curve_mapper_panel.h"
 
 #include "../common/include/logging.h"
-#include "../common/include/dummy_camera.h"
-#include "../common/include/dummy_device_manager.h"
 #include "../common/include/image_converter_16to8.h"
 #include "../common/include/profile_manager.h"
+#include "../common/include/camera_interface.h"
 
 #include "ui_image_converter_panel.h"
 

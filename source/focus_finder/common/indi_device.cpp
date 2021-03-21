@@ -25,6 +25,10 @@
 #include "include/indi_device.h"
 #include "include/indi_helper.h"
 #include "include/wait_for.h"
+#include "include/throw_if.h"
+
+#include "include/indi_camera_interface.h"
+// TODO: Add further device interface includes...
 
 #include <thread>
 #include <chrono>
@@ -35,9 +39,46 @@ IndiDeviceT::IndiDeviceT(INDI::BaseDevice *dp,
 		mIndiBaseDevice(dp), mIndiClient(indiClient), mCancelConnectFlag(false) {
 
 	// TODO: Read initial connection status etc. from driver
+
+
+	// Initialize interface wrappers
+	initInterfaceMap();
 }
 
 IndiDeviceT::~IndiDeviceT() {
+}
+
+// TODO: May be moved to a sep. factory... IndiDeviceInterfaceFactoryT...
+std::shared_ptr<DeviceInterfaceT> IndiDeviceT::createDeviceInterface(DeviceInterfaceTypeT::TypeE interfaceType) {
+    switch(interfaceType) {
+        case DeviceInterfaceTypeT::CCD: {
+            //std::shared_ptr<DeviceT> dev = std::static_pointer_cast<DeviceT>();
+            auto cameraInterface = std::make_shared<IndiCameraInterfaceT>(this);
+            return std::static_pointer_cast<DeviceInterfaceT>(cameraInterface);
+            // TDO: Implement...
+        }
+        default: {
+            std::stringstream ss;
+            ss << "Cannot create device interface of type '" << DeviceInterfaceTypeT::asStr(interfaceType)
+               << "'. Unknown!" << std::endl;
+            throw new IndiDeviceExceptionT(ss.str());
+        }
+    }
+}
+
+void IndiDeviceT::initInterfaceMap() {
+
+    uint16_t indiInterfaceSupportMask = mIndiBaseDevice->getDriverInterface();
+
+    for (size_t i=0; i < DeviceInterfaceTypeT::_Count; ++i) {
+        auto currentInterfaceType = static_cast<DeviceInterfaceTypeT::TypeE>(i);
+        uint16_t currentInterfaceMask = getIndiDeviceInterfaceMaskByDeviceType(currentInterfaceType);
+
+        if (indiInterfaceSupportMask & currentInterfaceMask) {
+            mInterfaceMap.insert(std::make_pair(currentInterfaceType, createDeviceInterface(currentInterfaceType)));
+        }
+    }
+
 }
 
 std::string IndiDeviceT::getName() const {
@@ -69,7 +110,7 @@ std::string IndiDeviceT::getName() const {
  * @return
  */
 uint16_t
-IndiDeviceManagerT::getIndiDeviceInterfaceMaskByDeviceType(DeviceInterfaceTypeT::TypeE deviceType) {
+IndiDeviceT::getIndiDeviceInterfaceMaskByDeviceType(DeviceInterfaceTypeT::TypeE deviceType) {
     switch (deviceType) {
         case DeviceInterfaceTypeT::CCD:
             return INDI::BaseDevice::CCD_INTERFACE;
@@ -80,7 +121,7 @@ IndiDeviceManagerT::getIndiDeviceInterfaceMaskByDeviceType(DeviceInterfaceTypeT:
         default:
             std::stringstream  ss;
             ss << "Unsupported device interface type '" << DeviceInterfaceTypeT::asStr(deviceType) << "'.";
-            throw IndiDevceManagerExceptionT(ss.str());
+            throw IndiDeviceExceptionT(ss.str());
     }
 }
 
@@ -190,7 +231,7 @@ void IndiDeviceT::disconnectInternal() {
 	if (isDisconnected) {
 		notifyDeviceDisconnected();
 	} else {
-		throw DeviceConnectorExceptionT(
+		throw IndiDeviceExceptionT(
 				"Disconnecting device '" + deviceName + "' failed.");
 	}
 }
@@ -281,13 +322,53 @@ DeviceConnectionStateT::TypeE IndiDeviceT::getConnectionState() const {
 }
 
 std::set<DeviceInterfaceTypeT::TypeE> IndiDeviceT::getSupportedInferfaces() const {
-    // TODO: Implement...
-    return std::set<DeviceInterfaceTypeT::TypeE>();
+
+    THROW_IF(IndiDevice, ! mIndiBaseDevice, "mIndiBaseDevice not set!");
+
+    // TODO: Unse mInterfaceMap instead...
+
+    uint16_t indiInterfaceSupportMask = mIndiBaseDevice->getDriverInterface();
+
+    std::set<DeviceInterfaceTypeT::TypeE> resultSet;
+
+    for (size_t i=0; i < DeviceInterfaceTypeT::_Count; ++i) {
+        auto currentInterfaceType = static_cast<DeviceInterfaceTypeT::TypeE>(i);
+        uint16_t currentInterfaceMask = getIndiDeviceInterfaceMaskByDeviceType(currentInterfaceType);
+
+        if (indiInterfaceSupportMask & currentInterfaceMask) {
+            resultSet.insert(currentInterfaceType);
+        }
+    }
+
+    return resultSet;
 }
-//interfaceType
-//const std::vector<INDI::BaseDevice *> indiDeviceList = mIndiClient.getDevices();
-//const uint16_t indiDeviceInterfaceMask = getIndiDeviceInterfaceMaskByDeviceType(deviceType);
-//  ->getDriverInterface() & indiDeviceInterfaceMask;
+
+std::shared_ptr<DeviceInterfaceT> IndiDeviceT::getInterface(DeviceInterfaceTypeT::TypeE interfaceType) {
+    if (! isInterfaceSupported(interfaceType)) {
+        std::stringstream ss;
+        ss << "Interface '" << DeviceInterfaceTypeT::asStr(interfaceType) << "' not supported by '" << this->getName() << "'." << std::endl;
+        throw IndiDeviceExceptionT(ss.str());
+    }
+
+    auto deviceInterface = mInterfaceMap.find(interfaceType);
+
+    return (deviceInterface != mInterfaceMap.end() ? deviceInterface->second : nullptr);
+}
+
+
+
+void IndiDeviceT::setIndiBaseDevice(INDI::BaseDevice * indiBaseDevice) {
+    LOG(info) << "Updating INDI base device handle..." << std::endl;
+    mIndiBaseDevice = indiBaseDevice;
+}
+
+INDI::BaseDevice * IndiDeviceT::getIndiBaseDevice() {
+    return mIndiBaseDevice;
+}
+
+IndiClientT * IndiDeviceT::getIndiClient() {
+    return mIndiClient;
+}
 
 
 

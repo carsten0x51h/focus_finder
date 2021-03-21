@@ -32,7 +32,6 @@
 #include "include/device_manager_type.h"
 #include "include/device_manager_factory.h"
 
-#include "include/dummy_camera.h"
 #include "include/fofi_config_manager.h"
 #include "include/global_config_manager.h"
 #include "include/profile_manager.h"
@@ -120,15 +119,15 @@ FocusFinderLogicT::FocusFinderLogicT() :
 
 	// DEBUG START
 	LOG(debug) << "CCD LIST" << std::endl;
-	for (const auto & s : mDeviceManager->getCameraInterfaceList()) {
+	for (const auto & s : mDeviceManager->getDeviceNames(DeviceInterfaceTypeT::CCD)) {
 		LOG(debug) << s << std::endl;
 	}
 	LOG(debug) << "FILTER LIST" << std::endl;
-	for (const auto & s : mDeviceManager->getFilterInterfaceList()) {
+	for (const auto & s : mDeviceManager->getDeviceNames(DeviceInterfaceTypeT::FILTER)) {
 		LOG(debug) << s << std::endl;
 	}
 	LOG(debug) << "FOCUS LIST" << std::endl;
-	for (const auto & s : mDeviceManager->getFocusInterfaceList()) {
+	for (const auto & s : mDeviceManager->getDeviceNames(DeviceInterfaceTypeT::FOCUS)) {
 		LOG(debug) << s << std::endl;
 	}
 	// DEBUG END
@@ -165,24 +164,28 @@ std::shared_ptr<CameraInterfaceT> FocusFinderLogicT::getCurrentCamera() {
 	auto activeProfile = mFoFiConfigManager->getProfileManager()->getActiveProfile();
 
 	return (activeProfile ?
-            mDeviceManager->getCameraInterface(activeProfile->getCameraDeviceName()) :
+            mDeviceManager->getDevice(activeProfile->getCameraDeviceName())->getCameraInterface() :
 			nullptr);
 }
 
 std::shared_ptr<FocusInterfaceT> FocusFinderLogicT::getCurrentFocus() {
 	auto activeProfile = mFoFiConfigManager->getProfileManager()->getActiveProfile();
 
-	return (activeProfile ?
-            mDeviceManager->getFocusInterface(activeProfile->getFocusDeviceName()) :
-			nullptr);
+	// TODO / FIXME / HACK: Add getFocusInterface()...
+//	return (activeProfile ?
+//            mDeviceManager->getDevice(activeProfile->getFocusDeviceName())->getFocusInterface() :
+//			nullptr);
+    return nullptr;
 }
 
 std::shared_ptr<FilterInterfaceT> FocusFinderLogicT::getCurrentFilter() {
 	auto activeProfile = mFoFiConfigManager->getProfileManager()->getActiveProfile();
 
-	return (activeProfile ?
-            mDeviceManager->getFilterInterface(activeProfile->getFilterDeviceName()) :
-			nullptr);
+    // TODO / FIXME / HACK: Add getFocusInterface()...
+//	return (activeProfile ?
+//            mDeviceManager->getDevice(activeProfile->getFilterDeviceName())->getFilterInterface() :
+//			nullptr);
+    return nullptr;
 }
 
 std::shared_ptr<DeviceManagerT> FocusFinderLogicT::getDeviceManager() const {

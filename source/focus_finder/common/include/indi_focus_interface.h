@@ -31,7 +31,6 @@
 
 #include "focus_interface.h"
 #include "logging.h"
-#include "device_connector.h"
 #include "indi_device.h"
 #include "indi_client.h"
 
@@ -46,7 +45,6 @@ public:
 	virtual ~IndiFocusInterfaceT();
 
 	std::string getName() const;
-	std::shared_ptr<DeviceConnectorT> getConnector() const;
 
 	// Impl. of focus interface
 	bool isTemperatureSupported() const;

@@ -30,7 +30,6 @@
 #include "../common/include/logging.h"
 
 #include "../common/include/device_manager.h"
-#include "../common/include/device_connector.h"
 #include "../common/include/device.h"
 
 #include "ui_manage_device_entry_panel.h"
@@ -69,13 +68,13 @@ void ManageDeviceEntryPanelT::updateDevice(const std::string & deviceName) {
 		LOG(debug) << "ManageDeviceEntryPanelT::updateDevice... registering to new device." << std::endl;
 
 		mDeviceConnectingConnection =
-				newDevice->getConnector()->registerDeviceConnectingListener(
+				newDevice->registerDeviceConnectingListener(
 						[&]() {emit deviceConnectingSignal();});
 		mDeviceConnectedConnection =
-				newDevice->getConnector()->registerDeviceConnectedListener(
+				newDevice->registerDeviceConnectedListener(
 						[&]() {emit deviceConnectedSignal();});
 		mDeviceDisconnectedConnection =
-				newDevice->getConnector()->registerDeviceDisconnectedListener(
+				newDevice->registerDeviceDisconnectedListener(
 						[&]() {emit deviceDisconnectedSignal();});
 	}
 

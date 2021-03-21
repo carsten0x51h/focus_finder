@@ -36,6 +36,7 @@
 
 // std includes
 #include <memory>
+#include <optional>
 
 
 #include "anim_menu_button.h"
@@ -57,10 +58,12 @@ class FwhmViewPanelT;
 class ManageDeviceProfilesDialogT;
 class AboutDialogT;
 class ReportingViewerPanelT;
+class FocusFinderProfileT;
 
 namespace Ui {
     class MainWindow;
 }
+
 
 /**
 *  @brief
@@ -89,7 +92,8 @@ protected slots:
     void onRoiClearedSlot();
     void onRoiSelectedSlot(const QRect & roiRect, const QImage & roiImage);
     void onPoiSelectedSlot(const QPoint & poi);
-    void onUpdateProfileSlot();
+    //void onUpdateProfileSlot();
+    void onUpdateProfileSlot(std::optional<FocusFinderProfileT> oldProfile, std::optional<FocusFinderProfileT> newProfile);
     void onExposureTimeSelectionChangedSlot();
 
     // Focus finder
@@ -103,6 +107,9 @@ protected:
     const QScopedPointer<Ui::MainWindow> m_ui;
 
 private:
+    std::shared_ptr<CameraInterfaceT> getCurrentCamera();
+
+
   void showDeviceManagerConfigDialog();
   
   void setExposureButtonState(bool isRunning); // Helper
@@ -137,10 +144,10 @@ private:
   	void createStatusBar();
   	void createAboutDialog();
 
-  	void updateCameraDevice();
+  	void updateCameraDevice(std::shared_ptr<CameraInterfaceT> oldCameraInterface, std::shared_ptr<CameraInterfaceT> newCameraInterface);
   	void updateFocusDevice();
   	void updateFilterDevice();
-  	void updateProfile();
+    void updateProfile(std::optional<FocusFinderProfileT> oldProfile, std::optional<FocusFinderProfileT> newProfile);
   	void updateExposureTime();
   	void updateExposureTimeSelector();
     void updateFocusFinderButtonMenuTexts();
@@ -240,9 +247,8 @@ private:
 
     // Store current devices
   // TODO: Why actually storing a ptr? Why not always querying the current one from the focus finder logic? Shouldn't this logic hold pointers to this logic instead? But the problem is: when a device changes (profile change), there might be listeners registerd to this device. -> profile change should call a function which provides old and new device ptr so that each device listener has the chance to be unregister it's listeners. In any case, the respective component (e.g. main window) still needs to react on the device change.The point in time when the callback which informs about the change is very important! This is a bigger change... 
-    std::shared_ptr<CameraInterfaceT> mCameraDevice;
-    std::shared_ptr<FocusInterfaceT> mFocusDevice;
-    std::shared_ptr<FilterInterfaceT> mFilterDevice;
+    std::shared_ptr<DeviceT> mFocusDevice;
+    std::shared_ptr<DeviceT> mFilterDevice;
 
     // Camera listener handles
 	boost::signals2::connection mCameraDeviceConnectedConnection;

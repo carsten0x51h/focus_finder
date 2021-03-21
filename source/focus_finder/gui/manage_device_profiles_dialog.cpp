@@ -93,18 +93,18 @@ void ManageDeviceProfilesDialogT::addDevices() {
 	auto activeProfile = mFfl.getProfileManager()->getActiveProfile();
 
 	mCameraPanel = new ManageDeviceEntryPanelT(mFfl, "Camera",
-			(activeProfile ? activeProfile->getCameraDeviceName() : DeviceInterfaceT::NONE));
+			(activeProfile ? activeProfile->getCameraDeviceName() : "NONE"));
 
 	addDevicePanel(mCameraPanel);
 
 	mFocusPanel = new ManageDeviceEntryPanelT(mFfl, "Focus",
-			(activeProfile ? activeProfile->getFocusDeviceName() : DeviceInterfaceT::NONE));
+			(activeProfile ? activeProfile->getFocusDeviceName() : "NONE"));
 
 	addDevicePanel(mFocusPanel);
 
 
 	mFilterPanel = new ManageDeviceEntryPanelT(mFfl, "Filter",
-			(activeProfile ? activeProfile->getFilterDeviceName() : DeviceInterfaceT::NONE));
+			(activeProfile ? activeProfile->getFilterDeviceName() : "NONE"));
 
 	addDevicePanel(mFilterPanel);
 }
@@ -186,7 +186,7 @@ void ManageDeviceProfilesDialogT::profileToUI(std::optional<FocusFinderProfileT>
 	updateMenuStatus();
 }
 
-void ManageDeviceProfilesDialogT::onActiveProfileChangedSlot() {
+void ManageDeviceProfilesDialogT::onActiveProfileChangedSlot(std::optional<FocusFinderProfileT> oldProfile, std::optional<FocusFinderProfileT> newProfile) {
 
 	LOG(debug) << "ManageDeviceProfilesDialogT::onActiveProfileChangedSlot..." << std::endl;
 
@@ -271,7 +271,7 @@ ManageDeviceProfilesDialogT::ManageDeviceProfilesDialogT(
     connect(this, & ManageDeviceProfilesDialogT::activeProfileChangedSignal, this, & ManageDeviceProfilesDialogT::onActiveProfileChangedSlot);
 
 	mFfl.getProfileManager()->registerActiveProfileChangedListener(
-		[&]() { emit activeProfileChangedSignal(); }
+		[&](std::optional<FocusFinderProfileT> oldProfile, std::optional<FocusFinderProfileT> newProfile) { emit activeProfileChangedSignal(oldProfile, newProfile); }
 	);
 
 	// Regiser at profile manager to get notified in case the list of available profiles changes.

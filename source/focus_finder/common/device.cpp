@@ -23,6 +23,7 @@
  ****************************************************************************/
 
 #include "include/device.h"
+#include "include/camera_interface.h"
 
 //const std::string DeviceT::NONE = "None";
 
@@ -44,4 +45,8 @@ void DeviceT::setAvailable(bool isAvailable) {
 
 bool DeviceT::isInterfaceSupported(DeviceInterfaceTypeT::TypeE interfaceType) const {
     return getSupportedInferfaces().contains(interfaceType);
+}
+
+std::shared_ptr<CameraInterfaceT> DeviceT::getCameraInterface() {
+    return static_pointer_cast<CameraInterfaceT>(getInterface(DeviceInterfaceTypeT::CCD));
 }

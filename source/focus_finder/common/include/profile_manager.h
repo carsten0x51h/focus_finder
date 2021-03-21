@@ -46,7 +46,7 @@ DEF_Exception(ProfileManager);
  */
 class ProfileManagerT {
 private:
-  typedef boost::signals2::signal<void (void)> ActiveProfileChangedListenersT;
+  typedef boost::signals2::signal<void (std::optional<FocusFinderProfileT>, std::optional<FocusFinderProfileT>)> ActiveProfileChangedListenersT;
   ActiveProfileChangedListenersT mActiveProfileChangedListeners;
 
   typedef boost::signals2::signal<void (void)> ProfileListChangedListenersT;
@@ -89,7 +89,7 @@ private:
 
 
 protected:
-  void notifyActiveProfileChanged() { mActiveProfileChangedListeners(); }
+  void notifyActiveProfileChanged(std::optional<FocusFinderProfileT> oldProfile, std::optional<FocusFinderProfileT> newProfile) { mActiveProfileChangedListeners(oldProfile, newProfile); }
   void notifyProfileListChanged() { mProfileListChangedListeners(); }
 
 

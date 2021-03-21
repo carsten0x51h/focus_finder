@@ -89,11 +89,6 @@ struct LoopModeT {
 
 using namespace boost;
 
-TODO: Should not inherrit from DeviceInterfaceT... -> create a nee class DeviceInterfaceT...
-        std::set<DeviceInterfaceTypeT::TypeE> getSupportedInferfaces() const; --> IndiDeviceT -> impl. DeviceInterfaceT...
-....
-
-
 class CameraInterfaceT : public DeviceInterfaceT {
 private:
 	typedef signals2::signal<void (double /*secs. left*/)> ExposureDelayTimerUpdListenersT;
@@ -114,7 +109,9 @@ private:
 
 
 public:
-	CameraInterfaceT() {}
+	CameraInterfaceT() { }
+
+	DeviceInterfaceTypeT::TypeE getType() const { return DeviceInterfaceTypeT::CCD; }
 
 	// Hardware properties
 	virtual unsigned int getBitsPerPixel() const = 0;

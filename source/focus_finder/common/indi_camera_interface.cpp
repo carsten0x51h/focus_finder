@@ -40,39 +40,46 @@
 
 #include "basedevice.h"
 
-IndiCameraInterfaceT::IndiCameraInterfaceT(INDI::BaseDevice *dp, IndiClientT * indiClient) :
-		mIndiBaseDevice(dp), mIndiClient(indiClient), cancelExposureFlag(false), mIsExposureRunning(false), mLoopMode(
+IndiCameraInterfaceT::IndiCameraInterfaceT(IndiDeviceT * indiDevice) : mIndiDevice(indiDevice),
+		cancelExposureFlag(false), mIsExposureRunning(false), mLoopMode(
 				LoopModeT::SINGLE), mExposureDelay(0s), mExposureTime(1s) {
   
 	LOG(debug) << "IndiCameraInterfaceT::IndiCameraInterfaceT..." << std::endl;
 
-	mDeviceType = DeviceInterfaceTypeT::CCD;
+    IndiClientT * indiClient = mIndiDevice->getIndiClient();
 
-	mIndiConnector = std::make_shared < IndiDeviceT > (dp, indiClient);
+	//mIndiConnector = std::make_shared < IndiDeviceT > (dp, indiClient);
 
 	//TODO: mIndiConnector->setUsbDevicePort();
 	
 	// Register number
-	mNewNumberConnection = mIndiClient->registerNewNumberListener(
+
+	mNewNumberConnection = indiClient->registerNewNumberListener(
 			boost::bind(&IndiCameraInterfaceT::newNumber, this, boost::placeholders::_1));
 
 	// Register on image recipient event
-  	mNewBlobConnection = mIndiClient->registerNewBlobListener(
+  	mNewBlobConnection = indiClient->registerNewBlobListener(
        		boost::bind(&IndiCameraInterfaceT::newBlob, this, boost::placeholders::_1));
 
-    mIndiClient->setBLOBMode(B_ALSO, mIndiBaseDevice->getDeviceName(), nullptr);
+    mIndiDevice->getIndiClient()->setBLOBMode(B_ALSO, mIndiDevice->getIndiBaseDevice()->getDeviceName(), nullptr);
 
     // Register switch
-    mNewSwitchConnection = mIndiClient->registerNewSwitchListener(
+    mNewSwitchConnection = indiClient->registerNewSwitchListener(
           boost::bind(&IndiCameraInterfaceT::newSwitch, this, boost::placeholders::_1));
 }
 
 IndiCameraInterfaceT::~IndiCameraInterfaceT() {
 	LOG(debug) << "IndiCameraInterfaceT::IndiCameraInterfaceTnterfaceT..." << std::endl;
 
-	mIndiClient->unregisterNewNumberListener(mNewNumberConnection);
-	mIndiClient->unregisterNewBlobListener(mNewBlobConnection);
-    mIndiClient->unregisterNewSwitchListener(mNewSwitchConnection);
+    IndiClientT * indiClient = mIndiDevice->getIndiClient();
+
+    indiClient->unregisterNewNumberListener(mNewNumberConnection);
+    indiClient->unregisterNewBlobListener(mNewBlobConnection);
+    indiClient->unregisterNewSwitchListener(mNewSwitchConnection);
+}
+
+DeviceT * IndiCameraInterfaceT::getParentDevice() {
+    return mIndiDevice;
 }
 
 /**
@@ -251,18 +258,15 @@ void IndiCameraInterfaceT::newSwitch(ISwitchVectorProperty* svp) {
 // Device
 /////////////////////////////////////////////////
 std::string IndiCameraInterfaceT::getName() const {
-	return mIndiBaseDevice->getDeviceName();
-}
-
-std::shared_ptr<DeviceConnectorT> IndiCameraInterfaceT::getConnector() const {
-	return mIndiConnector;
+	return mIndiDevice->getIndiBaseDevice()->getDeviceName();
 }
 
 // Hardware properties
 unsigned int IndiCameraInterfaceT::getBitsPerPixel() const {
+
 	try {
 		INumberVectorProperty * ccdInfoVecProp = IndiHelperT::getNumberVec(
-				mIndiBaseDevice, "CCD_INFO");
+                mIndiDevice->getIndiBaseDevice(), "CCD_INFO");
 
 		IndiHelperT::requireReadable(ccdInfoVecProp);
 
@@ -280,7 +284,7 @@ unsigned int IndiCameraInterfaceT::getBitsPerPixel() const {
 SizeT<float> IndiCameraInterfaceT::getPixelSize() const {
 	try {
 		INumberVectorProperty * ccdInfoVecProp = IndiHelperT::getNumberVec(
-				mIndiBaseDevice, "CCD_INFO");
+                mIndiDevice->getIndiBaseDevice(), "CCD_INFO");
 
 		IndiHelperT::requireReadable(ccdInfoVecProp);
 
@@ -303,7 +307,7 @@ SizeT<unsigned int> IndiCameraInterfaceT::getMaxResolution() const {
 
 	try {
 		INumberVectorProperty * ccdInfoVecProp = IndiHelperT::getNumberVec(
-				mIndiBaseDevice, "CCD_INFO");
+                mIndiDevice->getIndiBaseDevice(), "CCD_INFO");
 
 		IndiHelperT::requireReadable(ccdInfoVecProp);
 
@@ -323,7 +327,7 @@ std::chrono::milliseconds IndiCameraInterfaceT::getMinExposureTime() const {
 
 	try {
 		INumberVectorProperty * exposureTimeVecProp = IndiHelperT::getNumberVec(
-				mIndiBaseDevice, "CCD_EXPOSURE");
+                mIndiDevice->getIndiBaseDevice(), "CCD_EXPOSURE");
 
 		IndiHelperT::requireReadable(exposureTimeVecProp);
 
@@ -351,7 +355,7 @@ std::chrono::milliseconds IndiCameraInterfaceT::getMinExposureTime() const {
 std::chrono::milliseconds IndiCameraInterfaceT::getMaxExposureTime() const {
 	try {
 		INumberVectorProperty * exposureTimeVecProp = IndiHelperT::getNumberVec(
-				mIndiBaseDevice, "CCD_EXPOSURE");
+                mIndiDevice->getIndiBaseDevice(), "CCD_EXPOSURE");
 
 		IndiHelperT::requireReadable(exposureTimeVecProp);
 
@@ -383,7 +387,7 @@ void IndiCameraInterfaceT::startExposure() {
 
   // TODO / BUG: When "Loop" is enabled, an "Exposure already running" exception is thrown...
 	if (DeviceConnectionStateT::CONNECTED
-			!= mIndiConnector->getConnectionState()) {
+			!= mIndiDevice->getConnectionState()) {
 		// TODO: Maybe better reporting? + return
 		throw CameraExceptionT("Camera not connected.");
 	}
@@ -406,7 +410,7 @@ void IndiCameraInterfaceT::cancelExposure() {
 	try {
 		// Tell camera to cancel...
 		ISwitchVectorProperty * abortExposureVecProp =
-				IndiHelperT::getSwitchVec(mIndiBaseDevice,
+				IndiHelperT::getSwitchVec(mIndiDevice->getIndiBaseDevice(),
 						"CCD_ABORT_EXPOSURE");
 
 		IndiHelperT::requireWritable(abortExposureVecProp);
@@ -415,7 +419,7 @@ void IndiCameraInterfaceT::cancelExposure() {
 				"ABORT");
 		abortExposure->s = ISS_ON;
 
-		mIndiClient->sendNewSwitch(abortExposureVecProp);
+        mIndiDevice->getIndiClient()->sendNewSwitch(abortExposureVecProp);
 
 		// --> generates a newSwitch() event!
 
@@ -560,7 +564,7 @@ bool IndiCameraInterfaceT::delayedExposueTimer() {
 void IndiCameraInterfaceT::setRoiIndi(const RectT<unsigned int> & roi) {
 
 	INumberVectorProperty * frameVecProp = IndiHelperT::getNumberVec(
-			mIndiBaseDevice, "CCD_FRAME");
+            mIndiDevice->getIndiBaseDevice(), "CCD_FRAME");
 
 	IndiHelperT::requireWritable(frameVecProp);
 
@@ -583,7 +587,7 @@ void IndiCameraInterfaceT::setRoiIndi(const RectT<unsigned int> & roi) {
 		pNumHeight->value = maxRes.height();
 	}
 
-	mIndiClient->sendNewNumber(frameVecProp);
+    mIndiDevice->getIndiClient()->sendNewNumber(frameVecProp);
 }
 
 bool IndiCameraInterfaceT::indiExposure() {
@@ -606,7 +610,7 @@ bool IndiCameraInterfaceT::indiExposure() {
 	try {
 
 		INumberVectorProperty * exposureTimeVecProp = IndiHelperT::getNumberVec(
-				mIndiBaseDevice, "CCD_EXPOSURE");
+                mIndiDevice->getIndiBaseDevice(), "CCD_EXPOSURE");
 
 		IndiHelperT::requireWritable(exposureTimeVecProp);
 
@@ -618,7 +622,7 @@ bool IndiCameraInterfaceT::indiExposure() {
 
 		exposureTimeNum->value = seconds.count(); // In seconds
 
-		mIndiClient->sendNewNumber(exposureTimeVecProp);
+        mIndiDevice->getIndiClient()->sendNewNumber(exposureTimeVecProp);
 
 	} catch (IndiExceptionT & exc) {
 		ReportingT::reportMsg(ReportingDatasetT("IndiCamera", "Unable to set exposure time.", exc.what()));

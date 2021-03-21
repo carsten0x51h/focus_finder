@@ -34,13 +34,18 @@ struct DeviceConnectionStateT {
         _Count
     } TypeE;
 
-    static const char * asStr(const TypeE & inType) {
+    static const char *asStr(const TypeE &inType) {
         switch (inType) {
-            case DISCONNECTED: return "DISCONNECTED";
-            case CONNECTING: return "CONNECTING";
-            case CONNECTED: return "CONNECTED";
-            case DISCONNECTING: return "DISCONNECTING";
-            default: return "<?>";
+            case DISCONNECTED:
+                return "DISCONNECTED";
+            case CONNECTING:
+                return "CONNECTING";
+            case CONNECTED:
+                return "CONNECTED";
+            case DISCONNECTING:
+                return "DISCONNECTING";
+            default:
+                return "<?>";
         }
     }
 };

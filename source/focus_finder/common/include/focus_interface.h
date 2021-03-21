@@ -25,6 +25,7 @@
 #ifndef SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FOCUS_INTERFACE_H_
 #define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FOCUS_INTERFACE_H_
 
+#include <memory>
 #include <boost/signals2.hpp>
 
 #include "exception.h"
@@ -49,7 +50,7 @@ private:
 	FocusInterfaceT & operator=(const FocusInterfaceT &);
 
 public:
-	FocusInterfaceT() {}
+    FocusInterfaceT() { }
 
 	/**
 	 * Temperature

@@ -42,7 +42,6 @@
 #include "logging.h"
 #include "rect.h"
 #include "image.h"
-#include "device_connector.h"
 #include "indi_device.h"
 #include "indi_client.h"
 
@@ -57,13 +56,11 @@ using namespace std::chrono_literals;
 class IndiCameraInterfaceT : virtual public CameraInterfaceT {
 
 public:
-	IndiCameraInterfaceT(INDI::BaseDevice *dp, IndiClientT * indiClient);
+	IndiCameraInterfaceT(IndiDeviceT * indiDevice);
 	virtual ~IndiCameraInterfaceT();
 
 	std::string getName() const;
-	std::shared_ptr<DeviceConnectorT> getConnector() const;
-	DeviceInterfaceTypeT getDeviceType() const;
-
+    DeviceT * getParentDevice();
 
 	unsigned int getBitsPerPixel() const;
 	SizeT<float> getPixelSize() const;
@@ -105,7 +102,7 @@ private:
 
 	// TODO: This will probably later be IndiDeviceConnectorT - a super
 	//       class of IndiDeviceT and IndiEthernetDeviceConnectorT.
-	std::shared_ptr<IndiDeviceT> mIndiConnector;
+	//std::shared_ptr<IndiDeviceT> mIndiConnector;
 
 	std::shared_ptr<ImageT> convertIndiBlobToCImg(IBLOB* iblob) const;
 	void newNumber(INumberVectorProperty * nvp);
@@ -119,8 +116,9 @@ private:
 	void expose();
 
 
-	INDI::BaseDevice *mIndiBaseDevice;
-	IndiClientT * mIndiClient;
+	//INDI::BaseDevice *mIndiBaseDevice;
+	//IndiClientT * mIndiClient;
+    IndiDeviceT * mIndiDevice;
 
 	boost::signals2::connection mNewNumberConnection;
 	boost::signals2::connection mNewBlobConnection;

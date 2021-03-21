@@ -25,6 +25,7 @@
 #ifndef SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FILTER_INTERFACE_H_
 #define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FILTER_INTERFACE_H_
 
+#include <memory>
 #include <boost/signals2.hpp>
 
 #include "exception.h"
@@ -46,7 +47,7 @@ private:
 	FilterInterfaceT & operator=(const FilterInterfaceT &);
 
 public:
-	FilterInterfaceT() {}
+    FilterInterfaceT() { }
 
 	/**
 	 * Filter position

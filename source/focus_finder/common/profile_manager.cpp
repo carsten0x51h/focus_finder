@@ -91,19 +91,23 @@ std::string ProfileManagerT::getActiveProfileDirectoryName() const {
 }
 
 void ProfileManagerT::clearActiveProfile() {
+  std::optional<FocusFinderProfileT> oldProfile = mActiveProfile;
+
   mActiveProfile.reset();
   mActiveProfileDirectoryName = ""; // TODO: nullptr? or null?
   
   // Notify all listeners about profile change
   // TODO: Only notify if something has changed?
-  notifyActiveProfileChanged();
+  notifyActiveProfileChanged(oldProfile, mActiveProfile);
 }
 
 void ProfileManagerT::activateProfile(const std::string & profileDirectoryName) {
   try {
     std::string fullPathToProfileFile = composeFullProfileFilePath(profileDirectoryName).string();
     std::filesystem::path fullLightFrameDirectory = composeFullLightFrameDirectory(profileDirectoryName);
-    
+
+    std::optional<FocusFinderProfileT> oldProfile = mActiveProfile;
+
     mActiveProfile.emplace(
 			   FocusFinderProfileT::load(fullPathToProfileFile, fullLightFrameDirectory)
 			   );
@@ -120,7 +124,7 @@ void ProfileManagerT::activateProfile(const std::string & profileDirectoryName) 
     mActiveProfileDirectoryName = profileDirectoryName;
     
     // Notify all listeners about profile change
-    notifyActiveProfileChanged();
+    notifyActiveProfileChanged(oldProfile, mActiveProfile);
     
   } catch (FocusFinderProfileExceptionT & exc) {
     throw ProfileManagerExceptionT(exc.what());
@@ -226,12 +230,14 @@ void ProfileManagerT::updateProfile(const std::string & profileDirectoryName,
 
 	// In case the updated profile is currently the active one, overwrite the active one with the modified one and notify listeners.
 	if (mActiveProfileDirectoryName == profileDirectoryName) {
+        std::optional<FocusFinderProfileT> oldProfile = mActiveProfile;
+
 		// Set new active profile
 		mActiveProfile.emplace(modifiedProfile);
 		mActiveProfileDirectoryName = profileDirectoryName;
 
 		// Notify all listeners about profile change
-		notifyActiveProfileChanged();
+		notifyActiveProfileChanged(oldProfile, mActiveProfile);
 	}
 }
 

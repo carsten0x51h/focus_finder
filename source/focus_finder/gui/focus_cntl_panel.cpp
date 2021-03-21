@@ -165,7 +165,7 @@ void FocusCntlPanelT::updateProfile() {
 	bool hasOldFocus = (mFocusDevice != nullptr);
 	bool enablePanel = (
 			newFocusDevice ?
-					newFocusDevice->getConnector()->isConnected() : false);
+					newFocusDevice->getParentDevice()->isConnected() : false);
 
 	this->setEnabled(enablePanel);
 
@@ -175,9 +175,9 @@ void FocusCntlPanelT::updateProfile() {
 
 	if (hasOldFocus) {
 		// There was already an old device - unregister listener and register to the new one.
-		mFocusDevice->getConnector()->unregisterDeviceConnectedListener(
+		mFocusDevice->getParentDevice()->unregisterDeviceConnectedListener(
 				mDeviceConnectedConnection);
-		mFocusDevice->getConnector()->unregisterDeviceDisconnectedListener(
+		mFocusDevice->getParentDevice()->unregisterDeviceDisconnectedListener(
 				mDeviceDisconnectedConnection);
 		mFocusDevice->unregisterFocusPositionChangedListener(
 				mFocusPositionChangedConnection);
@@ -190,10 +190,10 @@ void FocusCntlPanelT::updateProfile() {
 	// Register to new device
 	if (newFocusDevice) {
 		mDeviceConnectedConnection =
-				newFocusDevice->getConnector()->registerDeviceConnectedListener(
+				newFocusDevice->getParentDevice()->registerDeviceConnectedListener(
 						[&]() {emit deviceConnectedSignal();});
 		mDeviceDisconnectedConnection =
-				newFocusDevice->getConnector()->registerDeviceDisconnectedListener(
+				newFocusDevice->getParentDevice()->registerDeviceDisconnectedListener(
 						[&]() {emit deviceDisconnectedSignal();});
 		mFocusPositionChangedConnection =
 				newFocusDevice->registerFocusPositionChangedListener(

@@ -107,6 +107,7 @@ set(sources
   ../common/include/indi_helper.h
   ../common/indi_helper.cpp
   ../common/include/indi_device_manager.h
+        ../common/include/device_connection_state.h
   ../common/indi_device_manager.cpp
   ../common/include/fitting_curve_type.h
   ../common/include/curve_fit_parms.h
@@ -183,16 +184,6 @@ set(sources
   ../common/centroid.cpp
   ../common/include/centroid_view.h
   ../common/centroid_view.cpp
-        ../common/include/dummy_device.h
-        ../common/dummy_device.cpp
-  ../common/dummy_camera.cpp
-  ../common/include/dummy_focus.h
-  ../common/dummy_focus.cpp
-  ../common/include/dummy_filter.h
-  ../common/dummy_filter.cpp
-  ../common/include/device_manager.h
-  ../common/include/dummy_device_manager.h
-  ../common/dummy_device_manager.cpp
   ../common/include/focus_finder_logic.h
   ../common/focus_finder_logic.cpp
   ../common/include/focus_finder_profile.h

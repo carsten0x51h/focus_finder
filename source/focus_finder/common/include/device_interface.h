@@ -22,45 +22,26 @@
  *
  ****************************************************************************/
 
-#ifndef SOURCE_FOCUS_FINDER_COMMON_INCLUDE_DEVICE_H_
-#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_DEVICE_H_
+#ifndef SOURCE_FOCUS_FINDER_COMMON_INCLUDE_DEVICE_INTERFACE_H_
+#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_DEVICE_INTERFACE_H_
 
 #include <memory>
-#include <set>
-
-#include "device_connector.h"
 #include "device_interface_type.h"
+
+class DeviceT;
 
 class DeviceInterfaceT {
 private:
-	// We do not want device copies
 	DeviceInterfaceT(const DeviceInterfaceT &);
 	DeviceInterfaceT & operator=(const DeviceInterfaceT &);
-
-protected:
-	//DeviceInterfaceTypeT::TypeE;
-
 public:
-	static const std::string NONE;
-
-	DeviceInterfaceT() {}
-
-	virtual std::string getName() const = 0;
-	virtual std::shared_ptr<DeviceConnectorT> getConnector() const = 0;
+	DeviceInterfaceT()  { }
 	virtual ~DeviceInterfaceT() { };
 
+    virtual DeviceInterfaceTypeT::TypeE getType() const = 0;
 
-	/**
-	 * A bit-mask would of course be more efficient but as interface
-	 * function a set of the supported interface types is more intuitive
-	 * for less experienced developers.
-	 *
-	 * TODO: If it turns out to be unpractical, convert this to a uint16_t as bit-mask...
-	 *
-	 * @return
-	 */
-	std::set<DeviceInterfaceTypeT::TypeE> getSupportedInferfaces() const = 0;
+    virtual DeviceT * getParentDevice() = 0;
 };
 
 
-#endif /* SOURCE_FOCUS_FINDER_COMMON_INCLUDE_DEVICE_H_ */
+#endif /* SOURCE_FOCUS_FINDER_COMMON_INCLUDE_DEVICE_INTERFACE_H_ */

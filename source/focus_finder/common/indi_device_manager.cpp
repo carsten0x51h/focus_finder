@@ -104,19 +104,25 @@ void IndiDeviceManagerT::newDevice(INDI::BaseDevice *dp) {
     // Protect with mutex...
     std::lock_guard<std::mutex> lock(mDeviceMapMutex);
 
-    auto deviceEntry = mDeviceMap.find(indiDeviceName); // std::map<...>::iterator
-    bool deviceAlreadyExists = (deviceEntry != mDeviceMap.end());
+    auto deviceMapEntry = mDeviceMap.find(indiDeviceName); // std::map<...>::iterator
+    bool deviceAlreadyExists = (deviceMapEntry != mDeviceMap.end());
 
     // Add/update device object in map that device was (re)added on the server side... -> set device "active"....
     if (! deviceAlreadyExists) {
         // INDI device is new, just create a device wrapper and add it...
-        mDeviceMap.insert(std::make_pair(indiDeviceName, std::make_shared<IndiDeviceT>(dp, & mIndiClient)));
+        auto newDeviceWrapper = std::make_shared<IndiDeviceT>(dp, & mIndiClient);
+        mDeviceMap.insert(std::make_pair(indiDeviceName, newDeviceWrapper));
+        notifyDeviceAdded(newDeviceWrapper);
     }
     else {
         // Device already exists, update base device handle and set it active again ...
-        auto existingDevice = deviceEntry->second;
+        auto existingDevice = deviceMapEntry->second;
+
+        existingDevice->setIndiBaseDevice(dp);
         existingDevice->setAvailable(true);
+        notifyDeviceAdded(existingDevice);
     }
+
     //TODO: Call event listener to notify about new device! Question is of generic DeviceManagerT should have a callback for newDevice()
     // and/or removeDevice()...
 }
@@ -138,17 +144,13 @@ void IndiDeviceManagerT::removeDevice(INDI::BaseDevice *dp) {
 
         auto existingDevice = deviceEntry->second;
         existingDevice->setAvailable(false);
+
+        notifyDeviceRemoved(existingDevice);
     }
     else {
         // Someting went wrong... actually we should know this device...
         LOG(warning) << "IndiDeviceManagerT::removeDevice... Device '" << indiDeviceName << "' not found in local device map (but should be there). Ignoring..." << std::endl;
     }
-
-    // TODO: Notify device object in map that devie was removed on the server side... -> set device "inavtice"
-    // TODO: Protect with mutex...
-
-    //TODO: Call event listener to notify about removed device! Question is of generic DeviceManagerT should have a callback for newDevice()
-    // and/or removeDevice()...
 }
 
 DeviceManagerTypeT::TypeE IndiDeviceManagerT::getDeviceManagerType() const {
@@ -158,48 +160,6 @@ DeviceManagerTypeT::TypeE IndiDeviceManagerT::getDeviceManagerType() const {
 IndiClientT & IndiDeviceManagerT::getIndiClient() {
   return mIndiClient;
 }
-
-//std::shared_ptr<DeviceInterfaceT> IndiDeviceManagerT::getDeviceInterface(const std::string & deviceName, DeviceInterfaceTypeT::TypeE deviceInterfaceType) const {
-//
-//    const uint16_t indiDeviceInterfaceMask = getIndiDeviceInterfaceMaskByDeviceType(deviceInterfaceType);
-//
-//    INDI::BaseDevice * indiBaseDevice = mIndiClient.getDeviceInterface(deviceName);
-//
-//    indiBaseDevice
-//
-//    auto foundDevice = std::find_if(indiDeviceList.begin(),
-//                                    indiDeviceList.end(),
-//                                    [deviceName, indiDeviceInterfaceMask](INDI::BaseDevice * indiBaseDevice) {
-//                                        return std::strcmp(indiBaseDevice->getDeviceName(), deviceName.c_str()) && (indiBaseDevice->getDriverInterface() & indiDeviceInterfaceMask);
-//                                    }
-//    );
-//
-//    return (foundDevice != indiDeviceList.end() ?
-//            IndiDeviceInterfaceFactoryT::create(*foundDevice, const_cast<IndiClientT *>(& mIndiClient), indiDeviceInterfaceMask) :
-//            nullptr);
-//}
-
-
-//std::vector<std::string> IndiDeviceManagerT::getDeviceList(
-//        DeviceInterfaceTypeT::TypeE deviceType) const {
-//	std::vector < std::string > res;
-//
-//    const std::vector<INDI::BaseDevice *> indiDeviceList = mIndiClient.getDevices();
-//    const uint16_t indiDeviceInterfaceMask = getIndiDeviceInterfaceMaskByDeviceType(deviceType);
-//
-//    boost::copy(
-//            indiDeviceList
-//                    | boost::adaptors::filtered(
-//                            [indiDeviceInterfaceMask](INDI::BaseDevice * indiBaseDevice) {return indiBaseDevice->getDriverInterface() & indiDeviceInterfaceMask;}
-//                        )
-//					| boost::adaptors::transformed(
-//					        [](INDI::BaseDevice * indiBaseDevice) {return indiBaseDevice->getDeviceName();}
-//					    ),
-//            std::back_inserter(res)
-//    );
-//
-//	return res;
-//}
 
 void IndiDeviceManagerT::setHostname(const std::string & hostname) {
 	// TODO: Is it a good idea to change the connection settings while connected???
@@ -248,7 +208,7 @@ std::shared_ptr<DeviceT> IndiDeviceManagerT::getDevice(const std::string & devic
 }
 
 
-std::vector< std::shared_ptr<DeviceT> > IndiDeviceManagerT::getDevices(DeviceInterfaceTypeT::TypeE interfaceType) const {
+std::vector< std::shared_ptr<DeviceT> > IndiDeviceManagerT::getDevices(DeviceInterfaceTypeT::TypeE interfaceType) {
 
     // Protect device map against async changes by INDI while reading...
     std::lock_guard<std::mutex> lock(mDeviceMapMutex);
@@ -259,7 +219,7 @@ std::vector< std::shared_ptr<DeviceT> > IndiDeviceManagerT::getDevices(DeviceInt
             mDeviceMap
                     | boost::adaptors::map_values // -> DeviceT
                     | boost::adaptors::filtered(
-                            [interfaceType](shared_ptr<IndiDeviceT> indiDevice) {return indiDevice->isInterfaceSupported(interfaceType); }
+                            [interfaceType](std::shared_ptr<IndiDeviceT> indiDevice) {return indiDevice->isInterfaceSupported(interfaceType); }
                        ),
             std::back_inserter(devices)
     );
@@ -268,7 +228,7 @@ std::vector< std::shared_ptr<DeviceT> > IndiDeviceManagerT::getDevices(DeviceInt
 }
 
 
-std::vector<std::string> IndiDeviceManagerT::getDeviceNames(DeviceInterfaceTypeT::TypeE interfaceType) const {
+std::vector<std::string> IndiDeviceManagerT::getDeviceNames(DeviceInterfaceTypeT::TypeE interfaceType) {
 
     std::vector< std::shared_ptr<DeviceT> > devices = getDevices(interfaceType);
     std::vector < std::string > deviceNames;

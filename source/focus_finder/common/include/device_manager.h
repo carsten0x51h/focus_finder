@@ -55,7 +55,7 @@ public:
      * @param interfaceType Type of the device interface
      * @return Returns empty vector if no devices with given interface type found.
      */
-   virtual std::vector<std::shared_ptr<DeviceT> > getDevices(DeviceInterfaceTypeT::TypeE interfaceType) const = 0;
+   virtual std::vector<std::shared_ptr<DeviceT> > getDevices(DeviceInterfaceTypeT::TypeE interfaceType) = 0;
 
     // Convenience functions...
     /**
@@ -64,7 +64,7 @@ public:
      * @param interfaceType
      * @return Returns list of all devices (names) which support the given interface type.
      */
-    virtual std::vector<std::string> getDeviceNames(DeviceInterfaceTypeT::TypeE interfaceType) const = 0;
+    virtual std::vector<std::string> getDeviceNames(DeviceInterfaceTypeT::TypeE interfaceType) = 0;
 };
 
 #endif /* SOURCE_FOCUS_FINDER_COMMON_INCLUDE_DEVICE_MANAGER_H_ */
