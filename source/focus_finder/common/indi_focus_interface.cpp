@@ -28,23 +28,20 @@
 
 #include "include/indi_focus_interface.h"
 
-IndiFocusInterfaceT::IndiFocusInterfaceT(INDI::BaseDevice *dp, IndiClientT * indiClient) :
-		mIndiBaseDevice(dp), mIndiClient(indiClient) {
+IndiFocusInterfaceT::IndiFocusInterfaceT(IndiDeviceT * indiDevice) :
+		mIndiDevice(indiDevice) {
 
 	LOG(debug) << "IndiFocusInterfaceT::IndiFocusInterfaceT..." << std::endl;
 
-	mIndiConnector = std::make_shared < IndiDeviceT
-			> (dp, indiClient);
-
 	// Register number
-	mNewNumberConnection = mIndiClient->registerNewNumberListener(
+	mNewNumberConnection = mIndiDevice->getIndiClient()->registerNewNumberListener(
 			boost::bind(&IndiFocusInterfaceT::newNumber, this, boost::placeholders::_1));
 }
 
 IndiFocusInterfaceT::~IndiFocusInterfaceT() {
 	LOG(debug) << "IndiFocusInterfaceT::IndiFocusInterfaceTnterfaceT..." << std::endl;
 
-	mIndiClient->unregisterNewNumberListener(mNewNumberConnection);
+    mIndiDevice->getIndiClient()->unregisterNewNumberListener(mNewNumberConnection);
 }
 
 void IndiFocusInterfaceT::newNumber(INumberVectorProperty * nvp) {
@@ -88,7 +85,11 @@ void IndiFocusInterfaceT::newNumber(INumberVectorProperty * nvp) {
 // Device
 /////////////////////////////////////////////////
 std::string IndiFocusInterfaceT::getName() const {
-	return mIndiBaseDevice->getDeviceName();
+    return mIndiDevice->getIndiBaseDevice()->getDeviceName();
+}
+
+DeviceT * IndiFocusInterfaceT::getParentDevice() {
+    return mIndiDevice;
 }
 
 /**
@@ -116,7 +117,7 @@ bool IndiFocusInterfaceT::isMoving() const {
 
 	try {
 		INumberVectorProperty * relPosVecProp = IndiHelperT::getNumberVec(
-				mIndiBaseDevice, "REL_FOCUS_POSITION");
+                mIndiDevice->getIndiBaseDevice(), "REL_FOCUS_POSITION");
 
 		isRelPosBusy = (relPosVecProp->s == IPS_BUSY);
 
@@ -126,7 +127,7 @@ bool IndiFocusInterfaceT::isMoving() const {
 
 	try {
 		INumberVectorProperty * absPosVecProp = IndiHelperT::getNumberVec(
-				mIndiBaseDevice, "ABS_FOCUS_POSITION");
+                mIndiDevice->getIndiBaseDevice(), "ABS_FOCUS_POSITION");
 
 		isAbsPosBusy = (absPosVecProp->s == IPS_BUSY);
 
@@ -143,7 +144,7 @@ bool IndiFocusInterfaceT::isMoving() const {
 bool IndiFocusInterfaceT::isAbsPosSupported() const {
 	try {
 		INumberVectorProperty * absPosVecProp = IndiHelperT::getNumberVec(
-				mIndiBaseDevice, "ABS_FOCUS_POSITION");
+                mIndiDevice->getIndiBaseDevice(), "ABS_FOCUS_POSITION");
 
 		INumber * absPos = IndiHelperT::getNumber(absPosVecProp,
 				"FOCUS_ABSOLUTE_POSITION");
@@ -156,7 +157,7 @@ bool IndiFocusInterfaceT::isAbsPosSupported() const {
 
 int IndiFocusInterfaceT::getCurrentPosInternal() const {
 	INumberVectorProperty * absPosVecProp = IndiHelperT::getNumberVec(
-			mIndiBaseDevice, "ABS_FOCUS_POSITION");
+            mIndiDevice->getIndiBaseDevice(), "ABS_FOCUS_POSITION");
 
 	IndiHelperT::requireReadable(absPosVecProp);
 
@@ -226,7 +227,7 @@ void IndiFocusInterfaceT::setTargetPos(unsigned int ticks,
 		// NOTE: Relative ticks must be greater than 0............
 		// To control direction, use switch FOCUS_MOTION -> FOCUS_INWARD, FOCUS_OUTWARD
 		ISwitchVectorProperty * focusDirectionVecProp =
-				IndiHelperT::getSwitchVec(mIndiBaseDevice, "FOCUS_MOTION");
+				IndiHelperT::getSwitchVec(mIndiDevice->getIndiBaseDevice(), "FOCUS_MOTION");
 
 		IndiHelperT::requireWritable(focusDirectionVecProp);
 
@@ -240,7 +241,7 @@ void IndiFocusInterfaceT::setTargetPos(unsigned int ticks,
 		focusOutward->s = (
 				direction == FocusDirectionT::INWARD ? ISS_OFF : ISS_ON);
 
-		mIndiClient->sendNewSwitch(focusDirectionVecProp);
+        mIndiDevice->getIndiClient()->sendNewSwitch(focusDirectionVecProp);
 
 	} catch (IndiExceptionT & exc) {
 		throw FocusExceptionT(
@@ -266,7 +267,7 @@ void IndiFocusInterfaceT::setTargetPos(unsigned int ticks,
 
 
 		INumberVectorProperty * relPosVecProp = IndiHelperT::getNumberVec(
-				mIndiBaseDevice, "REL_FOCUS_POSITION");
+                mIndiDevice->getIndiBaseDevice(), "REL_FOCUS_POSITION");
 
 		IndiHelperT::requireWritable(relPosVecProp);
 
@@ -275,7 +276,7 @@ void IndiFocusInterfaceT::setTargetPos(unsigned int ticks,
 
 		relPos->value = ticksClipped;
 
-		mIndiClient->sendNewNumber(relPosVecProp);
+        mIndiDevice->getIndiClient()->sendNewNumber(relPosVecProp);
 
 	} catch (IndiExceptionT & exc) {
 		throw FocusExceptionT(
@@ -288,7 +289,7 @@ void IndiFocusInterfaceT::setTargetPos(unsigned int ticks,
 void IndiFocusInterfaceT::setTargetPos(int inAbsPos) {
 	try {
 		INumberVectorProperty * absPosVecProp = IndiHelperT::getNumberVec(
-				mIndiBaseDevice, "ABS_FOCUS_POSITION");
+                mIndiDevice->getIndiBaseDevice(), "ABS_FOCUS_POSITION");
 
 		IndiHelperT::requireWritable(absPosVecProp);
 
@@ -297,7 +298,7 @@ void IndiFocusInterfaceT::setTargetPos(int inAbsPos) {
 
 		absPos->value = inAbsPos;
 
-		mIndiClient->sendNewNumber(absPosVecProp);
+        mIndiDevice->getIndiClient()->sendNewNumber(absPosVecProp);
 
 	} catch (IndiExceptionT & exc) {
 		throw FocusExceptionT(
@@ -313,7 +314,7 @@ void IndiFocusInterfaceT::resetPositionCounter() {
 
 int IndiFocusInterfaceT::getMinAbsPosInternal() const {
 	INumberVectorProperty * absPosVecProp = IndiHelperT::getNumberVec(
-			mIndiBaseDevice, "ABS_FOCUS_POSITION");
+            mIndiDevice->getIndiBaseDevice(), "ABS_FOCUS_POSITION");
 
 	IndiHelperT::requireReadable(absPosVecProp);
 
@@ -335,7 +336,7 @@ int IndiFocusInterfaceT::getMinAbsPos() const {
 
 int IndiFocusInterfaceT::getMaxAbsPosInternal() const {
 	INumberVectorProperty * absPosVecProp = IndiHelperT::getNumberVec(
-			mIndiBaseDevice, "ABS_FOCUS_POSITION");
+            mIndiDevice->getIndiBaseDevice(), "ABS_FOCUS_POSITION");
 
 	IndiHelperT::requireReadable(absPosVecProp);
 

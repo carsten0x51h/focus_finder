@@ -163,25 +163,31 @@ FocusFinderLogicT::~FocusFinderLogicT() {
 std::shared_ptr<CameraInterfaceT> FocusFinderLogicT::getCurrentCamera() {
 	auto activeProfile = mFoFiConfigManager->getProfileManager()->getActiveProfile();
 
-	return (activeProfile ?
-            mDeviceManager->getDevice(activeProfile->getCameraDeviceName())->getCameraInterface() :
+	auto cameraDevice = (activeProfile ?
+            mDeviceManager->getDevice(activeProfile->getCameraDeviceName()) :
 			nullptr);
+
+	return (cameraDevice != nullptr ? cameraDevice->getCameraInterface() : nullptr);
 }
 
 std::shared_ptr<FocusInterfaceT> FocusFinderLogicT::getCurrentFocus() {
 	auto activeProfile = mFoFiConfigManager->getProfileManager()->getActiveProfile();
 
-	return (activeProfile ?
-            mDeviceManager->getDevice(activeProfile->getFocusDeviceName())->getFocusInterface() :
+	auto focusDevice =  (activeProfile ?
+            mDeviceManager->getDevice(activeProfile->getFocusDeviceName()) :
 			nullptr);
+
+    return (focusDevice != nullptr ? focusDevice->getFocusInterface() : nullptr);
 }
 
 std::shared_ptr<FilterInterfaceT> FocusFinderLogicT::getCurrentFilter() {
 	auto activeProfile = mFoFiConfigManager->getProfileManager()->getActiveProfile();
 
-	return (activeProfile ?
-            mDeviceManager->getDevice(activeProfile->getFilterDeviceName())->getFilterInterface() :
+	auto filterDevice = (activeProfile ?
+            mDeviceManager->getDevice(activeProfile->getFilterDeviceName()) :
 			nullptr);
+
+	return (filterDevice != nullptr ? filterDevice->getFilterInterface() : nullptr);
 }
 
 std::shared_ptr<DeviceManagerT> FocusFinderLogicT::getDeviceManager() const {

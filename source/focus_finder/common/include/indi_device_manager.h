@@ -56,19 +56,21 @@ private:
     boost::signals2::connection mRemoveDeviceConnection;
     boost::signals2::connection mNewDeviceConnection;
     boost::signals2::connection mNewMessageConnection;
+    boost::signals2::connection mNewPropertyConnection;
 
     std::map<std::string, std::shared_ptr<IndiDeviceT> > mDeviceMap;
     mutable std::mutex mDeviceMapMutex;
 
+    void addNewDevice(INDI::BaseDevice *dp);
 
 protected:
-    void newDevice(INDI::BaseDevice *dp);
-    void removeDevice(INDI::BaseDevice *dp);
-    void newMessage(INDI::BaseDevice *dp, int messageID);
+    void newDevice(INDI::BaseDevice * dp);
+    void newProperty(INDI::Property * property);
+    void removeDevice(INDI::BaseDevice * dp);
+    void newMessage(INDI::BaseDevice * dp, int messageID);
 
     void notifyDeviceAdded(std::shared_ptr<DeviceT> device) { mDeviceAddedListeners(device); };
     void notifyDeviceRemoved(std::shared_ptr<DeviceT> device) { mDeviceRemovedListeners(device); };
-
 
 public:
     // TODO: Instead of specific properties maybe bettwer use one key-value "Properties" object...

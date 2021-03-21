@@ -53,7 +53,8 @@ void IndiClientT::removeDevice(INDI::BaseDevice *dp) {
 }
 
 void IndiClientT::newProperty(INDI::Property *property) {
-	LOG(debug) << "IndiClientT::newProperty... " << property->getName() << std::endl;
+	LOG(debug) << "IndiClientT::newProperty... " << property->getName() << ", driver interface mask: " << 	property->getBaseDevice()->getDriverInterface() << std::endl;
+
 	notifyNewProperty(property);
 }
 

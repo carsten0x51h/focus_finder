@@ -116,8 +116,6 @@ private:
 	void expose();
 
 
-	//INDI::BaseDevice *mIndiBaseDevice;
-	//IndiClientT * mIndiClient;
     IndiDeviceT * mIndiDevice;
 
 	boost::signals2::connection mNewNumberConnection;

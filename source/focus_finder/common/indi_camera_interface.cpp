@@ -191,7 +191,7 @@ void IndiCameraInterfaceT::newNumber(INumberVectorProperty * nvp) {
 						"CCD_EXPOSURE property reported IPS_ALERT."));
 
 				// Cancel exposure
-				// In any case set cance flag - TODO: Is this a good diea?
+				// In any case set cancel flag - TODO: Is this a good diea?
 				cancelExposureFlag = true;
 
 				cv.notify_all();

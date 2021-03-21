@@ -1595,8 +1595,7 @@ LOG(debug) << "exposureRunning: " << exposureRunning << std::endl;
 	auto currentFocus = mFfl.getCurrentFocus();
 	bool focusSelected = (currentFocus != nullptr);
 
-	bool focusConnected = (
-			currentFocus ? currentFocus->getParentDevice()->isConnected() : false);
+	bool focusConnected = currentFocus && currentFocus->getParentDevice()->isConnected();
 
 	bool validFocusStarSelected = mImageViewerPanel->isPoiSet();
 
@@ -1612,7 +1611,7 @@ LOG(debug) << "exposureRunning: " << exposureRunning << std::endl;
 
     mRecalibrationAction->setEnabled(enableRecalibrationAction);
 
-    bool hasCalibrationData = (hasActiveProfile ? activeProfile.value().hasCalibrationData() : false);
+    bool hasCalibrationData = hasActiveProfile && activeProfile.value().hasCalibrationData();
     bool enableEditCalibrationAction = hasCalibrationData && ! focusFinderRunning;
 
     mEditCalibrationDataAction->setEnabled(enableEditCalibrationAction);

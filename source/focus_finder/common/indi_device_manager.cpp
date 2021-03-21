@@ -66,7 +66,9 @@ IndiDeviceManagerT::IndiDeviceManagerT() {
 			boost::bind(&IndiDeviceManagerT::removeDevice, this, boost::placeholders::_1));
 	mNewMessageConnection = mIndiClient.registerNewMessageListener(
 			boost::bind(&IndiDeviceManagerT::newMessage, this, boost::placeholders::_1, boost::placeholders::_2));
-	
+    mNewPropertyConnection = mIndiClient.registerNewPropertyListener(
+            boost::bind(&IndiDeviceManagerT::newProperty, this, boost::placeholders::_1));
+
 	//boost::signals2::connection registerNewDeviceListener(const NewDeviceListenersT::slot_type & inCallBack) {
 
 	// Connect to server here??!?!?!
@@ -81,25 +83,17 @@ IndiDeviceManagerT::~IndiDeviceManagerT() {
 	mIndiClient.unregisterNewMessageListener(mNewMessageConnection);
 	mIndiClient.unregisterNewDeviceListener(mNewDeviceConnection);
 	mIndiClient.unregisterRemoveDeviceListener(mRemoveDeviceConnection);
+    mIndiClient.unregisterNewPropertyListener(mNewPropertyConnection);
 
 	// Disconnect the INDI client since this INDI device manager owns the INDI client.
 	mIndiClient.disconnect();
-  }
-
-void IndiDeviceManagerT::newMessage(INDI::BaseDevice *dp, int messageID) {
-	std::string msgStr = dp->messageQueue(messageID);
-	ReportingT::reportMsg(
-			ReportingDatasetT("IndiServer",
-					"Message from device: '" + std::string(dp->getDeviceName()) + "'",
-					msgStr));
 }
 
-void IndiDeviceManagerT::newDevice(INDI::BaseDevice *dp) {
-
+void IndiDeviceManagerT::addNewDevice(INDI::BaseDevice *dp) {
     std::string indiDeviceName = dp->getDeviceName();
 
-	LOG(debug) << "IndiDeviceManagerT::newDevice... device: '"
-		<< indiDeviceName << "'" << std::endl;
+    LOG(debug) << "IndiDeviceManagerT::addNewDevice... device: '"
+               << indiDeviceName << "', interfaces mask: " << dp->getDriverInterface() << std::endl;
 
     // Protect with mutex...
     std::lock_guard<std::mutex> lock(mDeviceMapMutex);
@@ -125,6 +119,35 @@ void IndiDeviceManagerT::newDevice(INDI::BaseDevice *dp) {
 
     //TODO: Call event listener to notify about new device! Question is of generic DeviceManagerT should have a callback for newDevice()
     // and/or removeDevice()...
+
+}
+
+void IndiDeviceManagerT::newProperty(INDI::Property * property) {
+
+    if (strcmp(property->getName(), "DRIVER_INFO") == 0) {
+        INDI::BaseDevice * baseDevice = property->getBaseDevice();
+        uint16_t driverInterface = baseDevice->getDriverInterface();
+
+        LOG(info) << "Received DRIVER_INFO property... driver '" << baseDevice->getDeviceName()
+                  << "' interface mask=" << driverInterface << std::endl;
+
+        addNewDevice(baseDevice);
+    }
+}
+
+
+void IndiDeviceManagerT::newMessage(INDI::BaseDevice *dp, int messageID) {
+	std::string msgStr = dp->messageQueue(messageID);
+	ReportingT::reportMsg(
+			ReportingDatasetT("IndiServer",
+					"Message from device: '" + std::string(dp->getDeviceName()) + "'",
+					msgStr));
+}
+
+void IndiDeviceManagerT::newDevice(INDI::BaseDevice *dp) {
+    // The driver interface is not known when this callback is called...
+    // This info is required. Therefore, instead of listening to newDevice(),
+    // newProperty() is used.
 }
 
 void IndiDeviceManagerT::removeDevice(INDI::BaseDevice *dp) {

@@ -28,7 +28,9 @@
 #include "include/throw_if.h"
 
 #include "include/indi_camera_interface.h"
+#include "include/indi_focus_interface.h"
 // TODO: Add further device interface includes...
+//#include "include/indi_filter_interface.h"
 
 #include <thread>
 #include <chrono>
@@ -52,11 +54,25 @@ IndiDeviceT::~IndiDeviceT() {
 std::shared_ptr<DeviceInterfaceT> IndiDeviceT::createDeviceInterface(DeviceInterfaceTypeT::TypeE interfaceType) {
     switch(interfaceType) {
         case DeviceInterfaceTypeT::CCD: {
-            //std::shared_ptr<DeviceT> dev = std::static_pointer_cast<DeviceT>();
             auto cameraInterface = std::make_shared<IndiCameraInterfaceT>(this);
             return std::static_pointer_cast<DeviceInterfaceT>(cameraInterface);
-            // TDO: Implement...
         }
+        case DeviceInterfaceTypeT::GUIDER: {
+            // TODO...
+            return nullptr;
+        }
+        case DeviceInterfaceTypeT::FOCUS: {
+            auto focusInterface = std::make_shared<IndiFocusInterfaceT>(this);
+            return std::static_pointer_cast<DeviceInterfaceT>(focusInterface);
+        }
+        case DeviceInterfaceTypeT::FILTER: {
+            // TODO...
+            //auto filterInterface = std::make_shared<IndiFilterInterfaceT>(this);
+            //return std::static_pointer_cast<DeviceInterfaceT>(filterInterface);
+            return nullptr;
+        }
+        // TODO / FIXME / HACK !!!!!! Add other devices!
+
         default: {
             std::stringstream ss;
             ss << "Cannot create device interface of type '" << DeviceInterfaceTypeT::asStr(interfaceType)
@@ -118,6 +134,32 @@ IndiDeviceT::getIndiDeviceInterfaceMaskByDeviceType(DeviceInterfaceTypeT::TypeE 
             return INDI::BaseDevice::FOCUSER_INTERFACE;
         case DeviceInterfaceTypeT::FILTER:
             return INDI::BaseDevice::FILTER_INTERFACE;
+        case DeviceInterfaceTypeT::TELESCOPE:
+            return INDI::BaseDevice::TELESCOPE_INTERFACE;
+        case DeviceInterfaceTypeT::AO:
+            return INDI::BaseDevice::AO_INTERFACE;
+        case DeviceInterfaceTypeT::AUXILIARY:
+            return INDI::BaseDevice::AUX_INTERFACE;
+        case DeviceInterfaceTypeT::CORRELATOR:
+            return INDI::BaseDevice::CORRELATOR_INTERFACE;
+        case DeviceInterfaceTypeT::DETECTOR:
+            return INDI::BaseDevice::DETECTOR_INTERFACE;
+        case DeviceInterfaceTypeT::DOME:
+            return INDI::BaseDevice::DOME_INTERFACE;
+        case DeviceInterfaceTypeT::DUSTCAP:
+            return INDI::BaseDevice::DUSTCAP_INTERFACE;
+        case DeviceInterfaceTypeT::GPS:
+            return INDI::BaseDevice::GPS_INTERFACE;
+        case DeviceInterfaceTypeT::GUIDER:
+            return INDI::BaseDevice::GUIDER_INTERFACE;
+        case DeviceInterfaceTypeT::LIGHTBOX:
+            return INDI::BaseDevice::LIGHTBOX_INTERFACE;
+        case DeviceInterfaceTypeT::ROTATOR:
+            return INDI::BaseDevice::ROTATOR_INTERFACE;
+        case DeviceInterfaceTypeT::SPECTROGRAPH:
+            return INDI::BaseDevice::SPECTROGRAPH_INTERFACE;
+        case DeviceInterfaceTypeT::WEATHER:
+            return INDI::BaseDevice::WEATHER_INTERFACE;
         default:
             std::stringstream  ss;
             ss << "Unsupported device interface type '" << DeviceInterfaceTypeT::asStr(deviceType) << "'.";

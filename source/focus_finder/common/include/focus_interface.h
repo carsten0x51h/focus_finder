@@ -52,7 +52,9 @@ private:
 public:
     FocusInterfaceT() { }
 
-	/**
+    DeviceInterfaceTypeT::TypeE getType() const { return DeviceInterfaceTypeT::FOCUS; }
+
+    /**
 	 * Temperature
 	 */
 	virtual bool isTemperatureSupported() const = 0;

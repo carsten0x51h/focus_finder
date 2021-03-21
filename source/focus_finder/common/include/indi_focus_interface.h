@@ -41,10 +41,11 @@
 class IndiFocusInterfaceT : virtual public FocusInterfaceT {
 
 public:
-	IndiFocusInterfaceT(INDI::BaseDevice *dp, IndiClientT * indiClient);
+	IndiFocusInterfaceT(IndiDeviceT * indiDevice);
 	virtual ~IndiFocusInterfaceT();
 
 	std::string getName() const;
+    DeviceT * getParentDevice();
 
 	// Impl. of focus interface
 	bool isTemperatureSupported() const;
@@ -70,14 +71,9 @@ private:
 	int getMinAbsPosInternal() const;
 	int getMaxAbsPosInternal() const;
 
-	// TODO: This will probably later be IndiDeviceConnectorT - a super
-	//       class of IndiDeviceT and IndiEthernetDeviceConnectorT.
-	std::shared_ptr<IndiDeviceT> mIndiConnector;
-
 	void newNumber(INumberVectorProperty * nvp);
 
-	INDI::BaseDevice *mIndiBaseDevice;
-	IndiClientT * mIndiClient;
+    IndiDeviceT * mIndiDevice;
 
 	boost::signals2::connection mNewNumberConnection;
 };
