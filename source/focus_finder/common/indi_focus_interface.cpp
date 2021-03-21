@@ -28,33 +28,33 @@
 
 #include "include/indi_focus_interface.h"
 
-IndiFocusInterfaceT::IndiFocusInterfaceT(IndiDeviceT * indiDevice) :
-		mIndiDevice(indiDevice) {
+IndiFocusInterfaceT::IndiFocusInterfaceT(IndiDeviceT *indiDevice) :
+        mIndiDevice(indiDevice) {
 
-	LOG(debug) << "IndiFocusInterfaceT::IndiFocusInterfaceT..." << std::endl;
+    LOG(debug) << "IndiFocusInterfaceT::IndiFocusInterfaceT..." << std::endl;
 
-	// Register number
-	mNewNumberConnection = mIndiDevice->getIndiClient()->registerNewNumberListener(
-			boost::bind(&IndiFocusInterfaceT::newNumber, this, boost::placeholders::_1));
+    // Register number
+    mNewNumberConnection = mIndiDevice->getIndiClient()->registerNewNumberListener(
+            boost::bind(&IndiFocusInterfaceT::newNumber, this, boost::placeholders::_1));
 }
 
 IndiFocusInterfaceT::~IndiFocusInterfaceT() {
-	LOG(debug) << "IndiFocusInterfaceT::IndiFocusInterfaceTnterfaceT..." << std::endl;
+    LOG(debug) << "IndiFocusInterfaceT::IndiFocusInterfaceTnterfaceT..." << std::endl;
 
     mIndiDevice->getIndiClient()->unregisterNewNumberListener(mNewNumberConnection);
 }
 
-void IndiFocusInterfaceT::newNumber(INumberVectorProperty * nvp) {
-	if (strcmp(nvp->device, getName().c_str()) == 0) {
+void IndiFocusInterfaceT::newNumber(INumberVectorProperty *nvp) {
+    if (strcmp(nvp->device, getName().c_str()) == 0) {
 
-		LOG(debug) << "IndiFocusInterfaceT::newNumber... " << nvp->name
-				<< " has changed..., status="
-				<< IndiHelperT::propStateAsStr(nvp->s) << std::endl;
+        LOG(debug) << "IndiFocusInterfaceT::newNumber... " << nvp->name
+                   << " has changed..., status="
+                   << IndiHelperT::propStateAsStr(nvp->s) << std::endl;
 
-		// TODO: Handle ? -> Are we interested in any number update? (especially status changes?!!!)
-		// TODO: Yes... when focus position has changed -> update listener....
-		//
-		// TODO: Should we send update in case of both changes - rel and abs??
+        // TODO: Handle ? -> Are we interested in any number update? (especially status changes?!!!)
+        // TODO: Yes... when focus position has changed -> update listener....
+        //
+        // TODO: Should we send update in case of both changes - rel and abs??
 //		if (strcmp(nvp->name, "REL_FOCUS_POSITION") == 0) {
 //			INumber * relPosition = IndiHelperT::getNumber(nvp,
 //					"FOCUS_RELATIVE_POSITION");
@@ -65,20 +65,20 @@ void IndiFocusInterfaceT::newNumber(INumberVectorProperty * nvp) {
 //				notifyTargetPositionReached(relPosition->value);
 //			}
 //		}
-		if (strcmp(nvp->name, "ABS_FOCUS_POSITION") == 0) {
+        if (strcmp(nvp->name, "ABS_FOCUS_POSITION") == 0) {
 
-			INumber * absPosition = IndiHelperT::getNumber(nvp,
-					"FOCUS_ABSOLUTE_POSITION");
+            INumber *absPosition = IndiHelperT::getNumber(nvp,
+                                                          "FOCUS_ABSOLUTE_POSITION");
 
-			if (nvp->s == IPS_BUSY) {
-				notifyFocusPositionChanged(absPosition->value);
-			} else if (nvp->s == IPS_OK || nvp->s == IPS_IDLE) {
-				notifyTargetPositionReached(absPosition->value);
-			}
-		}
+            if (nvp->s == IPS_BUSY) {
+                notifyFocusPositionChanged(absPosition->value);
+            } else if (nvp->s == IPS_OK || nvp->s == IPS_IDLE) {
+                notifyTargetPositionReached(absPosition->value);
+            }
+        }
 
-		//void notifyFocusMovementAborted(int currentPosition) const { mFocusMovementAbortedListeners(currentPosition); }
-	}
+        //void notifyFocusMovementAborted(int currentPosition) const { mFocusMovementAbortedListeners(currentPosition); }
+    }
 }
 
 /////////////////////////////////////////////////
@@ -88,7 +88,7 @@ std::string IndiFocusInterfaceT::getName() const {
     return mIndiDevice->getIndiBaseDevice()->getDeviceName();
 }
 
-DeviceT * IndiFocusInterfaceT::getParentDevice() {
+DeviceT *IndiFocusInterfaceT::getParentDevice() {
     return mIndiDevice;
 }
 
@@ -96,14 +96,14 @@ DeviceT * IndiFocusInterfaceT::getParentDevice() {
  * Temperature
  */
 bool IndiFocusInterfaceT::isTemperatureSupported() const {
-	//TODO
-	return false;
+    //TODO
+    return false;
 }
 
 float IndiFocusInterfaceT::getTemperature() const {
-	// TODO: Throw if not supported?
-	// TODO: Add listener - when temperature has changed...
-	return 0;
+    // TODO: Throw if not supported?
+    // TODO: Add listener - when temperature has changed...
+    return 0;
 }
 
 /**
@@ -112,256 +112,256 @@ float IndiFocusInterfaceT::getTemperature() const {
  */
 bool IndiFocusInterfaceT::isMoving() const {
 
-  bool isRelPosBusy;
-  bool isAbsPosBusy;
+    bool isRelPosBusy;
+    bool isAbsPosBusy;
 
-	try {
-		INumberVectorProperty * relPosVecProp = IndiHelperT::getNumberVec(
+    try {
+        INumberVectorProperty *relPosVecProp = IndiHelperT::getNumberVec(
                 mIndiDevice->getIndiBaseDevice(), "REL_FOCUS_POSITION");
 
-		isRelPosBusy = (relPosVecProp->s == IPS_BUSY);
+        isRelPosBusy = (relPosVecProp->s == IPS_BUSY);
 
-	} catch (IndiExceptionT & exc) {
-		isRelPosBusy = false;
-	}
+    } catch (IndiExceptionT &exc) {
+        isRelPosBusy = false;
+    }
 
-	try {
-		INumberVectorProperty * absPosVecProp = IndiHelperT::getNumberVec(
+    try {
+        INumberVectorProperty *absPosVecProp = IndiHelperT::getNumberVec(
                 mIndiDevice->getIndiBaseDevice(), "ABS_FOCUS_POSITION");
 
-		isAbsPosBusy = (absPosVecProp->s == IPS_BUSY);
+        isAbsPosBusy = (absPosVecProp->s == IPS_BUSY);
 
-	} catch (IndiExceptionT & exc) {
-		isAbsPosBusy = false;
-	}
+    } catch (IndiExceptionT &exc) {
+        isAbsPosBusy = false;
+    }
 
-	return (isRelPosBusy || isAbsPosBusy);
+    return (isRelPosBusy || isAbsPosBusy);
 }
 
 /**
  * Positioning
  */
 bool IndiFocusInterfaceT::isAbsPosSupported() const {
-	try {
-		INumberVectorProperty * absPosVecProp = IndiHelperT::getNumberVec(
+    try {
+        INumberVectorProperty *absPosVecProp = IndiHelperT::getNumberVec(
                 mIndiDevice->getIndiBaseDevice(), "ABS_FOCUS_POSITION");
 
-		INumber * absPos = IndiHelperT::getNumber(absPosVecProp,
-				"FOCUS_ABSOLUTE_POSITION");
+        INumber *absPos = IndiHelperT::getNumber(absPosVecProp,
+                                                 "FOCUS_ABSOLUTE_POSITION");
 
-		return true;
-	} catch (IndiExceptionT & exc) {
-		return false;
-	}
+        return true;
+    } catch (IndiExceptionT &exc) {
+        return false;
+    }
 }
 
 int IndiFocusInterfaceT::getCurrentPosInternal() const {
-	INumberVectorProperty * absPosVecProp = IndiHelperT::getNumberVec(
+    INumberVectorProperty *absPosVecProp = IndiHelperT::getNumberVec(
             mIndiDevice->getIndiBaseDevice(), "ABS_FOCUS_POSITION");
 
-	IndiHelperT::requireReadable(absPosVecProp);
+    IndiHelperT::requireReadable(absPosVecProp);
 
-	INumber * absPos = IndiHelperT::getNumber(absPosVecProp,
-			"FOCUS_ABSOLUTE_POSITION");
+    INumber *absPos = IndiHelperT::getNumber(absPosVecProp,
+                                             "FOCUS_ABSOLUTE_POSITION");
 
-	return absPos->value;
+    return absPos->value;
 }
 
 int IndiFocusInterfaceT::getCurrentPos() const {
-	try {
-		return getCurrentPosInternal();
-	} catch (IndiExceptionT & exc) {
-		throw FocusExceptionT(
-				"Unable to get current absolute focus position. Details: "
-						+ std::string(exc.what()));
-	}
+    try {
+        return getCurrentPosInternal();
+    } catch (IndiExceptionT &exc) {
+        throw FocusExceptionT(
+                "Unable to get current absolute focus position. Details: "
+                + std::string(exc.what()));
+    }
 }
 
 int IndiFocusInterfaceT::getTargetPos() const {
-	// TODO: Does the Indi focuser save the target position??
-	return 0;
-	//return mTargetPos;
+    // TODO: Does the Indi focuser save the target position??
+    return 0;
+    //return mTargetPos;
 }
 
 
 int IndiFocusInterfaceT::clipTicks(int ticks, FocusDirectionT::TypeE direction) const {
 
-	// TODO - sep. function - clipPosDelta()...?
-	int minAbsPos = getMinAbsPosInternal();
-	int maxAbsPos = getMaxAbsPosInternal();
-	int currentPos = getCurrentPosInternal();
+    // TODO - sep. function - clipPosDelta()...?
+    int minAbsPos = getMinAbsPosInternal();
+    int maxAbsPos = getMaxAbsPosInternal();
+    int currentPos = getCurrentPosInternal();
 
-	// Need to clip the value in to avoid hitting the boundary.
-	int ticksClipped = 0;
+    // Need to clip the value in to avoid hitting the boundary.
+    int ticksClipped = 0;
 
-	if (direction == FocusDirectionT::INWARD) {
+    if (direction == FocusDirectionT::INWARD) {
 
-		int possibleTicks = (currentPos - minAbsPos);
+        int possibleTicks = (currentPos - minAbsPos);
 
-		ticksClipped = (
-				possibleTicks < (int) ticks ? possibleTicks : ticks);
-	} else if (direction == FocusDirectionT::OUTWARD) {
-		int possibleTicks = (maxAbsPos - currentPos);
+        ticksClipped = (
+                possibleTicks < (int) ticks ? possibleTicks : ticks);
+    } else if (direction == FocusDirectionT::OUTWARD) {
+        int possibleTicks = (maxAbsPos - currentPos);
 
-		ticksClipped = (
-				possibleTicks < (int) ticks ? possibleTicks : ticks);
-	}
+        ticksClipped = (
+                possibleTicks < (int) ticks ? possibleTicks : ticks);
+    }
 
-	LOG(debug) << "CurrentPos:" << currentPos << ", maxAbsPos: "
-			<< maxAbsPos << ", minAbsPos: " << minAbsPos
-			<< ", ticksClipped: " << ticksClipped << std::endl;
+    LOG(debug) << "CurrentPos:" << currentPos << ", maxAbsPos: "
+               << maxAbsPos << ", minAbsPos: " << minAbsPos
+               << ", ticksClipped: " << ticksClipped << std::endl;
 
-	return ticksClipped;
+    return ticksClipped;
 }
 
 
 // TODO: Maybe a better name to indicate "delta" / "relative" movement...
 void IndiFocusInterfaceT::setTargetPos(unsigned int ticks,
-									   FocusDirectionT::TypeE direction) {
+                                       FocusDirectionT::TypeE direction) {
 
-	LOG(debug) << "IndiFocusInterfaceT::setTargetPos...inTicks=" << ticks
-			<< ", direction=" << FocusDirectionT::asStr(direction) << std::endl;
+    LOG(debug) << "IndiFocusInterfaceT::setTargetPos...inTicks=" << ticks
+               << ", direction=" << FocusDirectionT::asStr(direction) << std::endl;
 
 
-	try {
-		// NOTE: Relative ticks must be greater than 0............
-		// To control direction, use switch FOCUS_MOTION -> FOCUS_INWARD, FOCUS_OUTWARD
-		ISwitchVectorProperty * focusDirectionVecProp =
-				IndiHelperT::getSwitchVec(mIndiDevice->getIndiBaseDevice(), "FOCUS_MOTION");
+    try {
+        // NOTE: Relative ticks must be greater than 0............
+        // To control direction, use switch FOCUS_MOTION -> FOCUS_INWARD, FOCUS_OUTWARD
+        ISwitchVectorProperty *focusDirectionVecProp =
+                IndiHelperT::getSwitchVec(mIndiDevice->getIndiBaseDevice(), "FOCUS_MOTION");
 
-		IndiHelperT::requireWritable(focusDirectionVecProp);
+        IndiHelperT::requireWritable(focusDirectionVecProp);
 
-		ISwitch * focusInward = IndiHelperT::getSwitch(focusDirectionVecProp,
-				"FOCUS_INWARD");
-		ISwitch * focusOutward = IndiHelperT::getSwitch(focusDirectionVecProp,
-				"FOCUS_OUTWARD");
+        ISwitch *focusInward = IndiHelperT::getSwitch(focusDirectionVecProp,
+                                                      "FOCUS_INWARD");
+        ISwitch *focusOutward = IndiHelperT::getSwitch(focusDirectionVecProp,
+                                                       "FOCUS_OUTWARD");
 
-		focusInward->s = (
-				direction == FocusDirectionT::INWARD ? ISS_ON : ISS_OFF);
-		focusOutward->s = (
-				direction == FocusDirectionT::INWARD ? ISS_OFF : ISS_ON);
+        focusInward->s = (
+                direction == FocusDirectionT::INWARD ? ISS_ON : ISS_OFF);
+        focusOutward->s = (
+                direction == FocusDirectionT::INWARD ? ISS_OFF : ISS_ON);
 
         mIndiDevice->getIndiClient()->sendNewSwitch(focusDirectionVecProp);
 
-	} catch (IndiExceptionT & exc) {
-		throw FocusExceptionT(
-				"Unable to set focus direction. Details: "
-						+ std::string(exc.what()));
-	}
+    } catch (IndiExceptionT &exc) {
+        throw FocusExceptionT(
+                "Unable to set focus direction. Details: "
+                + std::string(exc.what()));
+    }
 
 
-	// TODO / IDEA: Always use relative position since this is the minimum property each focuser should have.
-	try {
+    // TODO / IDEA: Always use relative position since this is the minimum property each focuser should have.
+    try {
 
-		int ticksClipped = clipTicks(ticks, direction);
+        int ticksClipped = clipTicks(ticks, direction);
 
-		if (ticksClipped <= 0) {
-			LOG(warning) << "Boundary reached. Not moving." << std::endl;
+        if (ticksClipped <= 0) {
+            LOG(warning) << "Boundary reached. Not moving." << std::endl;
 
-			int currentPos = getCurrentPosInternal();
+            int currentPos = getCurrentPosInternal();
 
-			notifyTargetPositionReached(currentPos);
+            notifyTargetPositionReached(currentPos);
 
-			return;
-		}
+            return;
+        }
 
 
-		INumberVectorProperty * relPosVecProp = IndiHelperT::getNumberVec(
+        INumberVectorProperty *relPosVecProp = IndiHelperT::getNumberVec(
                 mIndiDevice->getIndiBaseDevice(), "REL_FOCUS_POSITION");
 
-		IndiHelperT::requireWritable(relPosVecProp);
+        IndiHelperT::requireWritable(relPosVecProp);
 
-		INumber * relPos = IndiHelperT::getNumber(relPosVecProp,
-				"FOCUS_RELATIVE_POSITION");
+        INumber *relPos = IndiHelperT::getNumber(relPosVecProp,
+                                                 "FOCUS_RELATIVE_POSITION");
 
-		relPos->value = ticksClipped;
+        relPos->value = ticksClipped;
 
         mIndiDevice->getIndiClient()->sendNewNumber(relPosVecProp);
 
-	} catch (IndiExceptionT & exc) {
-		throw FocusExceptionT(
-				"Unable to set relative position. Details: "
-						+ std::string(exc.what()));
-	}
+    } catch (IndiExceptionT &exc) {
+        throw FocusExceptionT(
+                "Unable to set relative position. Details: "
+                + std::string(exc.what()));
+    }
 
 }
 
 void IndiFocusInterfaceT::setTargetPos(int inAbsPos) {
-	try {
-		INumberVectorProperty * absPosVecProp = IndiHelperT::getNumberVec(
+    try {
+        INumberVectorProperty *absPosVecProp = IndiHelperT::getNumberVec(
                 mIndiDevice->getIndiBaseDevice(), "ABS_FOCUS_POSITION");
 
-		IndiHelperT::requireWritable(absPosVecProp);
+        IndiHelperT::requireWritable(absPosVecProp);
 
-		INumber * absPos = IndiHelperT::getNumber(absPosVecProp,
-				"FOCUS_ABSOLUTE_POSITION");
+        INumber *absPos = IndiHelperT::getNumber(absPosVecProp,
+                                                 "FOCUS_ABSOLUTE_POSITION");
 
-		absPos->value = inAbsPos;
+        absPos->value = inAbsPos;
 
         mIndiDevice->getIndiClient()->sendNewNumber(absPosVecProp);
 
-	} catch (IndiExceptionT & exc) {
-		throw FocusExceptionT(
-				"Unable to set new absolute focus position. Details: "
-						+ std::string(exc.what()));
-	}
+    } catch (IndiExceptionT &exc) {
+        throw FocusExceptionT(
+                "Unable to set new absolute focus position. Details: "
+                + std::string(exc.what()));
+    }
 }
 
 void IndiFocusInterfaceT::resetPositionCounter() {
-	// TODO
-	//mTargetPos = 0;
+    // TODO
+    //mTargetPos = 0;
 }
 
 int IndiFocusInterfaceT::getMinAbsPosInternal() const {
-	INumberVectorProperty * absPosVecProp = IndiHelperT::getNumberVec(
+    INumberVectorProperty *absPosVecProp = IndiHelperT::getNumberVec(
             mIndiDevice->getIndiBaseDevice(), "ABS_FOCUS_POSITION");
 
-	IndiHelperT::requireReadable(absPosVecProp);
+    IndiHelperT::requireReadable(absPosVecProp);
 
-	INumber * absPos = IndiHelperT::getNumber(absPosVecProp,
-			"FOCUS_ABSOLUTE_POSITION");
+    INumber *absPos = IndiHelperT::getNumber(absPosVecProp,
+                                             "FOCUS_ABSOLUTE_POSITION");
 
-	return absPos->min;
+    return absPos->min;
 }
 
 int IndiFocusInterfaceT::getMinAbsPos() const {
-	try {
-		return getMinAbsPosInternal();
-	} catch (IndiExceptionT & exc) {
-		throw FocusExceptionT(
-				"Unable to get absolute minimum focus position. Details: "
-						+ std::string(exc.what()));
-	}
+    try {
+        return getMinAbsPosInternal();
+    } catch (IndiExceptionT &exc) {
+        throw FocusExceptionT(
+                "Unable to get absolute minimum focus position. Details: "
+                + std::string(exc.what()));
+    }
 }
 
 int IndiFocusInterfaceT::getMaxAbsPosInternal() const {
-	INumberVectorProperty * absPosVecProp = IndiHelperT::getNumberVec(
+    INumberVectorProperty *absPosVecProp = IndiHelperT::getNumberVec(
             mIndiDevice->getIndiBaseDevice(), "ABS_FOCUS_POSITION");
 
-	IndiHelperT::requireReadable(absPosVecProp);
+    IndiHelperT::requireReadable(absPosVecProp);
 
-	INumber * absPos = IndiHelperT::getNumber(absPosVecProp,
-			"FOCUS_ABSOLUTE_POSITION");
+    INumber *absPos = IndiHelperT::getNumber(absPosVecProp,
+                                             "FOCUS_ABSOLUTE_POSITION");
 
-	return absPos->max;
+    return absPos->max;
 }
 
 int IndiFocusInterfaceT::getMaxAbsPos() const {
-	try {
-		return getMaxAbsPosInternal();
-	} catch (IndiExceptionT & exc) {
-		throw FocusExceptionT(
-				"Unable to get absolute minimum focus position. Details: "
-						+ std::string(exc.what()));
-	}
+    try {
+        return getMaxAbsPosInternal();
+    } catch (IndiExceptionT &exc) {
+        throw FocusExceptionT(
+                "Unable to get absolute minimum focus position. Details: "
+                + std::string(exc.what()));
+    }
 }
 
 bool IndiFocusInterfaceT::isAbortSupported() const {
-	// TODO
-	return true;
+    // TODO
+    return true;
 }
 
 void IndiFocusInterfaceT::abortMotion() {
-	// TODO
+    // TODO
 //	mMovementAborted = true;
 }

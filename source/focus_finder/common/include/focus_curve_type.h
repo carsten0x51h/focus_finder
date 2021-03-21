@@ -32,42 +32,43 @@
 #include "fitting_curve_type.h"
 
 struct FocusCurveTypeT {
-  enum TypeE {
-	      HYPERBOLIC, PARABOLIC, HYPERBOLIC_POS_ONLY, _Count
-  };
-  
-  static const char * asStr(const TypeE & inType) {
-    switch (inType) {
-    case HYPERBOLIC:
-      return "HYPERBOLIC";
-    case PARABOLIC:
-      return "PARABOLIC";
-    case HYPERBOLIC_POS_ONLY:
-      return "HYPERBOLIC_POS_ONLY";
-    default:
-      return "<?>";
+    enum TypeE {
+        HYPERBOLIC, PARABOLIC, HYPERBOLIC_POS_ONLY, _Count
+    };
+
+    static const char *asStr(const TypeE &inType) {
+        switch (inType) {
+            case HYPERBOLIC:
+                return "HYPERBOLIC";
+            case PARABOLIC:
+                return "PARABOLIC";
+            case HYPERBOLIC_POS_ONLY:
+                return "HYPERBOLIC_POS_ONLY";
+            default:
+                return "<?>";
+        }
     }
-  }
-  MAC_AS_TYPE(Type, E, _Count);
 
-  static FittingCurveTypeT::TypeE toFittingCurve(FocusCurveTypeT::TypeE focusCurveType) {
-    return FittingCurveTypeT::asType(FocusCurveTypeT::asStr(focusCurveType));
-  }
+    MAC_AS_TYPE(Type, E, _Count);
 
-  static FocusCurveTypeT::TypeE fromFittingCurve(FittingCurveTypeT::TypeE fittingCurveType) {
-    FocusCurveTypeT::TypeE focusCurveType = FocusCurveTypeT::asType(FittingCurveTypeT::asStr(fittingCurveType));
-
-    if (focusCurveType == FocusCurveTypeT::_Count) {
-      // TODO: If bad_cast exception works, create
-      std::stringstream ss;
-      ss << "Cannot convert FittingCurveTypeT '" << FittingCurveTypeT::asStr(fittingCurveType) << "'"
-	 << " to FocusCurveTypeT. Type not supported." << std::endl;
-      
-      throw std::invalid_argument(ss.str());
+    static FittingCurveTypeT::TypeE toFittingCurve(FocusCurveTypeT::TypeE focusCurveType) {
+        return FittingCurveTypeT::asType(FocusCurveTypeT::asStr(focusCurveType));
     }
-    
-    return focusCurveType;
-  }
+
+    static FocusCurveTypeT::TypeE fromFittingCurve(FittingCurveTypeT::TypeE fittingCurveType) {
+        FocusCurveTypeT::TypeE focusCurveType = FocusCurveTypeT::asType(FittingCurveTypeT::asStr(fittingCurveType));
+
+        if (focusCurveType == FocusCurveTypeT::_Count) {
+            // TODO: If bad_cast exception works, create
+            std::stringstream ss;
+            ss << "Cannot convert FittingCurveTypeT '" << FittingCurveTypeT::asStr(fittingCurveType) << "'"
+               << " to FocusCurveTypeT. Type not supported." << std::endl;
+
+            throw std::invalid_argument(ss.str());
+        }
+
+        return focusCurveType;
+    }
 };
 
 #endif /* SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FOCUS_CURVE_TYPE_H_ */

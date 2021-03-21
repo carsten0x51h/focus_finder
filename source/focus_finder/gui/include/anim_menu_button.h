@@ -30,27 +30,29 @@
 #include <QMovie>
 #include <QIcon>
 
-class AnimMenuButtonT : public QToolButton
-{
-    Q_OBJECT
+class AnimMenuButtonT : public QToolButton {
+Q_OBJECT
 public:
-  explicit AnimMenuButtonT(QWidget *parent = 0);
-  ~AnimMenuButtonT();
-  
+    explicit AnimMenuButtonT(QWidget *parent = 0);
+
+    ~AnimMenuButtonT();
+
     void startAnimation();
+
     void stopAnimation();
 
 
 public slots:
-   // member function that catches the frameChanged signal of the QMovie
-   void setButtonIcon(int frame);
+
+    // member function that catches the frameChanged signal of the QMovie
+    void setButtonIcon(int frame);
 
 
 private:
-   void toggleIfDefault(QAction* a);
+    void toggleIfDefault(QAction *a);
 
-   QMovie * mMovie;
-   QIcon mOriginalIcon;
+    QMovie *mMovie;
+    QIcon mOriginalIcon;
 };
 
 #endif /* SOURCE_FOCUS_FINDER_GUI_INCLUDE_ANIM_MENU_BUTTON_H_ */

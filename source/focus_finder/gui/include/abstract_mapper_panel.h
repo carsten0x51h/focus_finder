@@ -33,17 +33,20 @@
 #include "../../common/include/mapper_function.h"
 
 class AbstractMapperPanelT : public QWidget {
-	Q_OBJECT
+Q_OBJECT
 
 public:
-	AbstractMapperPanelT(QWidget * parent) : QWidget(parent) {}
+    AbstractMapperPanelT(QWidget *parent) : QWidget(parent) {}
+
     virtual ~AbstractMapperPanelT() {};
 
     virtual std::shared_ptr<MapperFunctionT> getMapperFunction() const = 0;
+
     virtual void notifyNewImage() = 0;
 
 signals:
-	void valueChangedSignal();
+
+    void valueChangedSignal();
 };
 
 #endif /* SOURCE_FOCUS_FINDER_GUI_INCLUDE_ABSTRACT_MAPPER_PANEL_H_ */

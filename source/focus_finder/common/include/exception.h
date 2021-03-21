@@ -30,20 +30,22 @@
 
 class BaseExceptionT : public std::exception {
 public:
-  BaseExceptionT(const std::string & inName = "", const std::string & inMsg = "") : mName(inName), mMsg(inMsg) { }
-  ~BaseExceptionT() throw() {}
-  const char * what() const throw() { return mMsg.c_str(); }
+    BaseExceptionT(const std::string &inName = "", const std::string &inMsg = "") : mName(inName), mMsg(inMsg) {}
+
+    ~BaseExceptionT() throw() {}
+
+    const char *what() const throw() { return mMsg.c_str(); }
 
 private:
-  std::string mName;
-  std::string mMsg;
+    std::string mName;
+    std::string mMsg;
 };
 
 
 #define DEF_Exception(XYZ) \
-  class XYZ##ExceptionT : public BaseExceptionT {			\
-  public:								\
-  	  inline XYZ##ExceptionT(const std::string & inMsg = "") : BaseExceptionT(#XYZ"Exception", inMsg) {} \
+  class XYZ##ExceptionT : public BaseExceptionT {            \
+  public:                                \
+      inline XYZ##ExceptionT(const std::string & inMsg = "") : BaseExceptionT(#XYZ"Exception", inMsg) {} \
   }
 
 

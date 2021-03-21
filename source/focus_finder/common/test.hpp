@@ -28,5 +28,4 @@
 int test123();
 
 
-
 #endif /* SOURCE_FOCUS_FINDER_COMMON_TEST_HPP_ */

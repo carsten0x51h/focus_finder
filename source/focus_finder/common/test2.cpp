@@ -25,6 +25,6 @@
 #include <test.hpp>
 
 int test123() {
-	return 123;
+    return 123;
 }
 

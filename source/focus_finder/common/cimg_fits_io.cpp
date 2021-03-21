@@ -30,89 +30,87 @@
 
 // TODO: As template...???
 // TODO: Imporve error handling...
-void CImgFitsIOHelperT::readFits(ImageT * outImg,
-		const std::string & inFilename, long * outBitPix,
-		std::stringstream * ss) {
+void CImgFitsIOHelperT::readFits(ImageT *outImg,
+                                 const std::string &inFilename, long *outBitPix,
+                                 std::stringstream *ss) {
 
-	THROW_IF(FitsIO, outImg == nullptr, "outImg expected to be set.");
+    THROW_IF(FitsIO, outImg == nullptr, "outImg expected to be set.");
 
-	// TODO: Is it possible to pass a stream?
-	CCfits::FITS::setVerboseMode(ss != nullptr);
+    // TODO: Is it possible to pass a stream?
+    CCfits::FITS::setVerboseMode(ss != nullptr);
 
-	try {
-		std::unique_ptr < CCfits::FITS
-				> pInfile(new CCfits::FITS(inFilename, CCfits::Read, true));
-		CCfits::PHDU& image = pInfile->pHDU();
+    try {
+        std::unique_ptr<CCfits::FITS
+        > pInfile(new CCfits::FITS(inFilename, CCfits::Read, true));
+        CCfits::PHDU &image = pInfile->pHDU();
 
-		if (outBitPix != nullptr) {
-			*outBitPix = image.bitpix();
-		}
+        if (outBitPix != nullptr) {
+            *outBitPix = image.bitpix();
+        }
 
-		// read all user-specifed, coordinate, and checksum keys in the image
-		image.readAllKeys();
+        // read all user-specifed, coordinate, and checksum keys in the image
+        image.readAllKeys();
 
-		if (ss != nullptr) {
-			*ss << image << std::endl;
-		}
+        if (ss != nullptr) {
+            *ss << image << std::endl;
+        }
 
-		// Set image dimensions
-		outImg->resize(image.axis(0) /*x*/, image.axis(1) /*y*/, 1/*z - HACK*/,
-				1 /*1 color*/);
+        // Set image dimensions
+        outImg->resize(image.axis(0) /*x*/, image.axis(1) /*y*/, 1/*z - HACK*/,
+                       1 /*1 color*/);
 
-		// HACK / FIXME: At this point we assume that there is only 1 layer!
-		std::valarray<typename ImageT::value_type> imgData;
-		image.read(imgData);
+        // HACK / FIXME: At this point we assume that there is only 1 layer!
+        std::valarray<typename ImageT::value_type> imgData;
+        image.read(imgData);
 
-		// For now we create a copy... maybe there is a better way to directly read data into CImg, later...
-		cimg_forXY(*outImg, x, y)
-		{
-			// TODO: Should this be parameterized? Or is it possible to find out automatically?
-			// Correct, when reading old, existing FITS files
-			//(*outImg)(x, outImg->height() - 1 - y) = imgData[outImg->offset(x, y)];
+        // For now we create a copy... maybe there is a better way to directly read data into CImg, later...
+        cimg_forXY(*outImg, x, y) {
+                // TODO: Should this be parameterized? Or is it possible to find out automatically?
+                // Correct, when reading old, existing FITS files
+                //(*outImg)(x, outImg->height() - 1 - y) = imgData[outImg->offset(x, y)];
 
-			// Correct when reading the image directly after storing the BLOB file with INDI.
-			(*outImg)(x, y) = imgData[outImg->offset(x, y)];
-		}
+                // Correct when reading the image directly after storing the BLOB file with INDI.
+                (*outImg)(x, y) = imgData[outImg->offset(x, y)];
+            }
 
-	} catch (CCfits::FitsException & exc) {
-		throw FitsIOExceptionT(exc.message());
-	}
+    } catch (CCfits::FitsException &exc) {
+        throw FitsIOExceptionT(exc.message());
+    }
 }
 
 // TODO: As template...
 // TODO: more generic..?
 // TODO: error handling?
-void CImgFitsIOHelperT::writeFits(const ImageT & inImg,
-		const std::string & inFilename, std::stringstream * ss) {
+void CImgFitsIOHelperT::writeFits(const ImageT &inImg,
+                                  const std::string &inFilename, std::stringstream *ss) {
 
-	// TODO: Is it possible to pass a stream?
-	CCfits::FITS::setVerboseMode(ss != nullptr);
+    // TODO: Is it possible to pass a stream?
+    CCfits::FITS::setVerboseMode(ss != nullptr);
 
-	try {
-		long naxis = 2;
-		long naxes[2] = { inImg.width(), inImg.height() };
+    try {
+        long naxis = 2;
+        long naxes[2] = {inImg.width(), inImg.height()};
 
-		std::unique_ptr < CCfits::FITS > pFits;
+        std::unique_ptr<CCfits::FITS> pFits;
 
-		pFits.reset(
-				new CCfits::FITS(std::string("!") + inFilename, USHORT_IMG,
-						naxis, naxes));
+        pFits.reset(
+                new CCfits::FITS(std::string("!") + inFilename, USHORT_IMG,
+                                 naxis, naxes));
 
-		// NOTE: At this point we assume that there is only 1 layer.
-		long nelements = std::accumulate(&naxes[0], &naxes[naxis], 1,
-				std::multiplies<long>());
+        // NOTE: At this point we assume that there is only 1 layer.
+        long nelements = std::accumulate(&naxes[0], &naxes[naxis], 1,
+                                         std::multiplies<long>());
 
-		std::valarray<typename ImageT::value_type> array(nelements);
+        std::valarray<typename ImageT::value_type> array(nelements);
 
-		cimg_forXY(inImg, x, y)
-		{
-			array[inImg.offset(x, y)] = inImg(x, inImg.height() - y - 1);
-		}
+        cimg_forXY(inImg, x, y) {
+                array[inImg.offset(x, y)] = inImg(x, inImg.height() - y - 1);
+            }
 
-		long fpixel(1);
-		pFits->pHDU().write(fpixel, nelements, array);
-	} catch (CCfits::FitsException & exc) {
-		throw FitsIOExceptionT(exc.message());
-	}
+        long fpixel(1);
+        pFits->pHDU().write(fpixel, nelements, array);
+    } catch (CCfits::FitsException &exc) {
+        throw FitsIOExceptionT(exc.message());
+    }
 }
 

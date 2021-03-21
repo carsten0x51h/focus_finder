@@ -36,19 +36,22 @@
 class ProfileManagerT;
 
 class FocusCurveRecorderLogicT {
- private:
-  FocusFinderLogicT & mFfl;
+private:
+    FocusFinderLogicT &mFfl;
 
-  std::shared_ptr<FocusCurveRecorderT> mFocusCurveRecorder;
+    std::shared_ptr<FocusCurveRecorderT> mFocusCurveRecorder;
 
- public:
-  FocusCurveRecorderLogicT(FocusFinderLogicT & ffl);
+public:
+    FocusCurveRecorderLogicT(FocusFinderLogicT &ffl);
 
-  std::optional<FocusFinderProfileT> getActiveProfile();
-  std::shared_ptr<ProfileManagerT> getProfileManager() const;
-  
-  std::shared_ptr<FocusCurveRecorderT> getFocusCurveRecorder();
-  void resetFocusCurveRecorder(FocusCurveRecorderTypeT::TypeE focusCurveRecorderType, const FocusFinderProfileT & focusFinderProfile);
+    std::optional<FocusFinderProfileT> getActiveProfile();
+
+    std::shared_ptr<ProfileManagerT> getProfileManager() const;
+
+    std::shared_ptr<FocusCurveRecorderT> getFocusCurveRecorder();
+
+    void resetFocusCurveRecorder(FocusCurveRecorderTypeT::TypeE focusCurveRecorderType,
+                                 const FocusFinderProfileT &focusFinderProfile);
 
 };
 

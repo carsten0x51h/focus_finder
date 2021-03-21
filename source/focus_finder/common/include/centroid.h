@@ -41,47 +41,53 @@ DEF_Exception(Centroid);
 
 class CentroidT {
 private:
-	ImageT mImg;
-	std::optional<PointT<float> > mCenterOpt;
+    ImageT mImg;
+    std::optional<PointT<float> > mCenterOpt;
 
-	/**
-	 * The star centroid algorithm is based on the code from: http://aladin.u-strasbg.fr/java/Plugins/Centroid.java
-	 * Further information on image moments can be found on wikipedia: http://de.wikipedia.org/wiki/Moment_%28Bildverarbeitung%29
-	 *
-	 * Also see http://www.isprs.org/proceedings/XXXV/congress/comm3/papers/341.pdf
-	 */
-	static void calcCentroid2ndMoment(const ImageT & inImg,
-			PointT<float> * outCentroidPos);
-	static void calcCentroidSubPixel(const ImageT & inImg,
-			PointT<float> inCenter, PointT<float> * outSubPixelCenter,
-			size_t inNumIterations = 10);
+    /**
+     * The star centroid algorithm is based on the code from: http://aladin.u-strasbg.fr/java/Plugins/Centroid.java
+     * Further information on image moments can be found on wikipedia: http://de.wikipedia.org/wiki/Moment_%28Bildverarbeitung%29
+     *
+     * Also see http://www.isprs.org/proceedings/XXXV/congress/comm3/papers/341.pdf
+     */
+    static void calcCentroid2ndMoment(const ImageT &inImg,
+                                      PointT<float> *outCentroidPos);
 
-	static float calcIx2(const ImageT & img, int x);
-	static float calcJy2(const ImageT & img, int y);
+    static void calcCentroidSubPixel(const ImageT &inImg,
+                                     PointT<float> inCenter, PointT<float> *outSubPixelCenter,
+                                     size_t inNumIterations = 10);
 
-	/**
-	 * Calculate Intensity Weighted Center (IWC).
-	 */
-	static void calcIntensityWeightedCenter(const ImageT & inImg,
-			PointT<float> * outCentroidPos);
+    static float calcIx2(const ImageT &img, int x);
+
+    static float calcJy2(const ImageT &img, int y);
+
+    /**
+     * Calculate Intensity Weighted Center (IWC).
+     */
+    static void calcIntensityWeightedCenter(const ImageT &inImg,
+                                            PointT<float> *outCentroidPos);
+
 public:
-	CentroidT();
-	CentroidT(const ImageT & inImg,
-			CentroidTypeT::TypeE inCalcType = CentroidTypeT::IWC,
-			bool inSubMean = true);
+    CentroidT();
 
-	void set(const ImageT & inImg,
-			CentroidTypeT::TypeE inCalcType = CentroidTypeT::IWC,
-			bool inSubMean = true);
+    CentroidT(const ImageT &inImg,
+              CentroidTypeT::TypeE inCalcType = CentroidTypeT::IWC,
+              bool inSubMean = true);
 
-	static std::optional<PointT<float> > calculate(const ImageT & inImg,
-			CentroidTypeT::TypeE inCalcType = CentroidTypeT::IWC,
-			bool inSubMean = true,
-			ImageT * outImg = 0);
+    void set(const ImageT &inImg,
+             CentroidTypeT::TypeE inCalcType = CentroidTypeT::IWC,
+             bool inSubMean = true);
 
-	bool valid() const;
-	const ImageT & getResultImage() const;
-	std::optional<PointT<float> > getCenter() const;
+    static std::optional<PointT<float> > calculate(const ImageT &inImg,
+                                                   CentroidTypeT::TypeE inCalcType = CentroidTypeT::IWC,
+                                                   bool inSubMean = true,
+                                                   ImageT *outImg = 0);
+
+    bool valid() const;
+
+    const ImageT &getResultImage() const;
+
+    std::optional<PointT<float> > getCenter() const;
 };
 
 #endif // SOURCE_FOCUS_FINDER_COMMON_INCLUDE_CENTROID_H_

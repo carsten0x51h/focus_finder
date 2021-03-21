@@ -30,29 +30,29 @@
 
 
 namespace Ui {
-	class AboutDialog;
+    class AboutDialog;
 }
 
 /**
  *  @brief
  */
-class AboutDialogT: public QDialog {
-	Q_OBJECT
+class AboutDialogT : public QDialog {
+Q_OBJECT
 
 public:
-	/**
-	 *  @brief
-	 *    Constructor
-	 */
-	AboutDialogT(QWidget * parent);
+    /**
+     *  @brief
+     *    Constructor
+     */
+    AboutDialogT(QWidget *parent);
 
-	/**
-	 *  @brief
-	 *    Destructor
-	 */
-	virtual ~AboutDialogT();
+    /**
+     *  @brief
+     *    Destructor
+     */
+    virtual ~AboutDialogT();
 
-	signals:
+signals:
 
 protected slots:
 

@@ -32,20 +32,23 @@
 /**
  * PointT structure (X x Y).
  */
-template <class T>
-class PointT : public std::tuple<T,T> {
+template<class T>
+class PointT : public std::tuple<T, T> {
 public:
-	PointT() : std::tuple<T,T>() {}
-	PointT(const T & x, const T & y) : std::tuple<T,T>(x,y) {}
+    PointT() : std::tuple<T, T>() {}
 
-	const T & x() const { return std::get<0>(*this); }
-	void setX(const T & x) { std::get<0>(*this) = x; }
+    PointT(const T &x, const T &y) : std::tuple<T, T>(x, y) {}
 
-	const T & y() const { return std::get<1>(*this); }
-	void setY(const T & y) { std::get<1>(*this) = y; }
+    const T &x() const { return std::get<0>(*this); }
 
-	template <class U>
-	PointT<U> to() const { return PointT<U>(x(), y()); }
+    void setX(const T &x) { std::get<0>(*this) = x; }
+
+    const T &y() const { return std::get<1>(*this); }
+
+    void setY(const T &y) { std::get<1>(*this) = y; }
+
+    template<class U>
+    PointT<U> to() const { return PointT<U>(x(), y()); }
 };
 
 using PointFT = PointT<float>;

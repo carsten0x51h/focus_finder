@@ -59,9 +59,8 @@ using namespace logging::trivial;
 
 typedef src::severity_channel_logger_mt<severity_level, std::string> global_logger_type;
 
-BOOST_LOG_INLINE_GLOBAL_LOGGER_INIT(global_logger, global_logger_type)
-{
-  return global_logger_type(boost::log::keywords::channel = "global_logger");
+BOOST_LOG_INLINE_GLOBAL_LOGGER_INIT(global_logger, global_logger_type) {
+    return global_logger_type(boost::log::keywords::channel = "global_logger");
 }
 
 // TODO: Do we need channels? See http://www.boost.org/doc/libs/1_54_0/libs/log/doc/html/log/detailed/sources.html
@@ -69,9 +68,10 @@ class LoggingT {
 private:
 
 public:
-  static void init(const logging::trivial::severity_level & inLogSev = logging::trivial::debug, bool inWantConsoleLog = false, bool inWantLogFile = true);
+    static void
+    init(const logging::trivial::severity_level &inLogSev = logging::trivial::debug, bool inWantConsoleLog = false,
+         bool inWantLogFile = true);
 };
-
 
 
 #endif /* SOURCE_FOCUS_FINDER_COMMON_INCLUDE_LOGGING_H_ */

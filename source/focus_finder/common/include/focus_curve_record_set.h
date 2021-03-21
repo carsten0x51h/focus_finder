@@ -37,22 +37,29 @@
 #include "image.h"
 #include "point.h"
 
-class FocusCurveRecordSetT : public std::vector< std::shared_ptr<FocusCurveRecordT> > {
+class FocusCurveRecordSetT : public std::vector<std::shared_ptr<FocusCurveRecordT> > {
 private:
-  FocusMeasureTypeT::TypeE mFocusMeasureType;
-  float mFocusMeasureLimit;
-  
-public:
-  FocusCurveRecordSetT(FocusMeasureTypeT::TypeE focusMeasureType, float focusMeasureLimit);
-  FocusMeasureTypeT::TypeE getFocusMeasureType() const;
-  float getFocusMeasureLimit() const;
-  std::pair<int, int> minmaxFocusPos() const;
+    FocusMeasureTypeT::TypeE mFocusMeasureType;
+    float mFocusMeasureLimit;
 
-  static std::shared_ptr<FocusCurveRecordSetT> load(const boost::property_tree::ptree & pt, const std::filesystem::path & lightFramePath);
-  static void save(boost::property_tree::ptree & pt, std::shared_ptr<FocusCurveRecordSetT> focusCurveRecordSet, const std::filesystem::path & lightFramePath);
-  
-  std::ostream & print(std::ostream & os, size_t indent = 0) const;
-  friend std::ostream & operator<<(std::ostream & os, const FocusCurveRecordSetT & focusCurveRecordSet);
+public:
+    FocusCurveRecordSetT(FocusMeasureTypeT::TypeE focusMeasureType, float focusMeasureLimit);
+
+    FocusMeasureTypeT::TypeE getFocusMeasureType() const;
+
+    float getFocusMeasureLimit() const;
+
+    std::pair<int, int> minmaxFocusPos() const;
+
+    static std::shared_ptr<FocusCurveRecordSetT>
+    load(const boost::property_tree::ptree &pt, const std::filesystem::path &lightFramePath);
+
+    static void save(boost::property_tree::ptree &pt, std::shared_ptr<FocusCurveRecordSetT> focusCurveRecordSet,
+                     const std::filesystem::path &lightFramePath);
+
+    std::ostream &print(std::ostream &os, size_t indent = 0) const;
+
+    friend std::ostream &operator<<(std::ostream &os, const FocusCurveRecordSetT &focusCurveRecordSet);
 };
 
 #endif /*SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FOCUS_CURVE_RECORD_SET_H_*/

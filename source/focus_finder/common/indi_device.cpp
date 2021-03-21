@@ -37,14 +37,14 @@
 #include <atomic>
 
 IndiDeviceT::IndiDeviceT(INDI::BaseDevice *dp,
-                         IndiClientT * indiClient) :
-		mIndiBaseDevice(dp), mIndiClient(indiClient), mCancelConnectFlag(false) {
+                         IndiClientT *indiClient) :
+        mIndiBaseDevice(dp), mIndiClient(indiClient), mCancelConnectFlag(false) {
 
-	// TODO: Read initial connection status etc. from driver
+    // TODO: Read initial connection status etc. from driver
 
 
-	// Initialize interface wrappers
-	initInterfaceMap();
+    // Initialize interface wrappers
+    initInterfaceMap();
 }
 
 IndiDeviceT::~IndiDeviceT() {
@@ -52,7 +52,7 @@ IndiDeviceT::~IndiDeviceT() {
 
 // TODO: May be moved to a sep. factory... IndiDeviceInterfaceFactoryT...
 std::shared_ptr<DeviceInterfaceT> IndiDeviceT::createDeviceInterface(DeviceInterfaceTypeT::TypeE interfaceType) {
-    switch(interfaceType) {
+    switch (interfaceType) {
         case DeviceInterfaceTypeT::CCD: {
             auto cameraInterface = std::make_shared<IndiCameraInterfaceT>(this);
             return std::static_pointer_cast<DeviceInterfaceT>(cameraInterface);
@@ -75,7 +75,7 @@ std::shared_ptr<DeviceInterfaceT> IndiDeviceT::createDeviceInterface(DeviceInter
             // TODO...
             return nullptr;
         }
-        // TODO / FIXME / HACK !!!!!! Add other devices!
+            // TODO / FIXME / HACK !!!!!! Add other devices!
 
         default: {
             std::stringstream ss;
@@ -90,7 +90,7 @@ void IndiDeviceT::initInterfaceMap() {
 
     uint16_t indiInterfaceSupportMask = mIndiBaseDevice->getDriverInterface();
 
-    for (size_t i=0; i < DeviceInterfaceTypeT::_Count; ++i) {
+    for (size_t i = 0; i < DeviceInterfaceTypeT::_Count; ++i) {
         auto currentInterfaceType = static_cast<DeviceInterfaceTypeT::TypeE>(i);
         uint16_t currentInterfaceMask = getIndiDeviceInterfaceMaskByDeviceType(currentInterfaceType);
 
@@ -165,7 +165,7 @@ IndiDeviceT::getIndiDeviceInterfaceMaskByDeviceType(DeviceInterfaceTypeT::TypeE 
         case DeviceInterfaceTypeT::WEATHER:
             return INDI::BaseDevice::WEATHER_INTERFACE;
         default:
-            std::stringstream  ss;
+            std::stringstream ss;
             ss << "Unsupported device interface type '" << DeviceInterfaceTypeT::asStr(deviceType) << "'.";
             throw IndiDeviceExceptionT(ss.str());
     }
@@ -174,70 +174,70 @@ IndiDeviceT::getIndiDeviceInterfaceMaskByDeviceType(DeviceInterfaceTypeT::TypeE 
 
 // NOTE: This call is blocking - until success or timeout
 void IndiDeviceT::connectInternal() {
-  using namespace std::chrono_literals;
-  
-	std::string deviceName = mIndiBaseDevice->getDeviceName();
+    using namespace std::chrono_literals;
 
-	LOG(debug) << "IndiDeviceT::connectInternal... deviceName='"
-			<< deviceName << "'" << std::endl;
+    std::string deviceName = mIndiBaseDevice->getDeviceName();
 
-	notifyDeviceConnecting(); // Notify that device starts to connect...
+    LOG(debug) << "IndiDeviceT::connectInternal... deviceName='"
+               << deviceName << "'" << std::endl;
 
-	mIndiClient->connectDevice(deviceName.c_str());
+    notifyDeviceConnecting(); // Notify that device starts to connect...
 
-	auto isConnOrCancel =
-	  [=, this]() -> bool {
-				try {
-					LOG(debug) << "mCancelConnectFlag:" << mCancelConnectFlag.load()
-					<< ", getConnectionStateInternal() == DeviceConnectionStateT::CONNECTED: "
-					<< (getConnectionStateInternal() == DeviceConnectionStateT::CONNECTED)
-					<< std::endl;
+    mIndiClient->connectDevice(deviceName.c_str());
 
-					return (mCancelConnectFlag || getConnectionStateInternal() == DeviceConnectionStateT::CONNECTED);
-				} catch (IndiExceptionT & exc) {
-					return false;
-				}
-			};
+    auto isConnOrCancel =
+            [=, this]() -> bool {
+                try {
+                    LOG(debug) << "mCancelConnectFlag:" << mCancelConnectFlag.load()
+                               << ", getConnectionStateInternal() == DeviceConnectionStateT::CONNECTED: "
+                               << (getConnectionStateInternal() == DeviceConnectionStateT::CONNECTED)
+                               << std::endl;
+
+                    return (mCancelConnectFlag || getConnectionStateInternal() == DeviceConnectionStateT::CONNECTED);
+                } catch (IndiExceptionT &exc) {
+                    return false;
+                }
+            };
 
 // "wait for" the successful connect with a timeout.
-	bool isConnected;
+    bool isConnected;
 
-	try {
-		wait_for(isConnOrCancel, 10000ms);
-		isConnected = true;
-	} catch (TimeoutExceptionT & exc) {
-		notifyDeviceConnectionTimeout();
-		isConnected = false;
-	}
+    try {
+        wait_for(isConnOrCancel, 10000ms);
+        isConnected = true;
+    } catch (TimeoutExceptionT &exc) {
+        notifyDeviceConnectionTimeout();
+        isConnected = false;
+    }
 
-	if (isConnected) {
-		notifyDeviceConnected();
-	} else {
-		throw DeviceExceptionT(
-				"Connecting device '" + deviceName + "' failed.");
-	}
+    if (isConnected) {
+        notifyDeviceConnected();
+    } else {
+        throw DeviceExceptionT(
+                "Connecting device '" + deviceName + "' failed.");
+    }
 }
 
 void IndiDeviceT::connect() {
 
-	std::string deviceName = mIndiBaseDevice->getDeviceName();
+    std::string deviceName = mIndiBaseDevice->getDeviceName();
 
-	if (isConnected() || isConnecting()) {
-		LOG(debug) << "IndiDeviceT - Device '" << deviceName
-				<< "' already connected or currently connecting." << std::endl;
+    if (isConnected() || isConnecting()) {
+        LOG(debug) << "IndiDeviceT - Device '" << deviceName
+                   << "' already connected or currently connecting." << std::endl;
 
-		return;
-	}
+        return;
+    }
 
-	LOG(debug) << "IndiDeviceT - Trying to connect to device '"
-			<< deviceName << "'..." << std::endl;
+    LOG(debug) << "IndiDeviceT - Trying to connect to device '"
+               << deviceName << "'..." << std::endl;
 
 // TODO: Check somehow that thread already runs?! -> at least make sure that thread is no started multiple times!
-	mCancelConnectFlag = false;
+    mCancelConnectFlag = false;
 
-	mConnectThread = std::thread(&IndiDeviceT::connectInternal,
-			this);
-	mConnectThread.detach();
+    mConnectThread = std::thread(&IndiDeviceT::connectInternal,
+                                 this);
+    mConnectThread.detach();
 }
 
 
@@ -245,131 +245,131 @@ void IndiDeviceT::connect() {
 void IndiDeviceT::disconnectInternal() {
     using namespace std::chrono_literals;
 
-	std::string deviceName = mIndiBaseDevice->getDeviceName();
+    std::string deviceName = mIndiBaseDevice->getDeviceName();
 
-	LOG(debug) << "IndiDeviceT::disconnectInternal... deviceName='"
-			<< deviceName << "'" << std::endl;
+    LOG(debug) << "IndiDeviceT::disconnectInternal... deviceName='"
+               << deviceName << "'" << std::endl;
 
-	notifyDeviceDisconnecting(); // Notify that device starts to disconnect...
+    notifyDeviceDisconnecting(); // Notify that device starts to disconnect...
 
-	mIndiClient->disconnectDevice(deviceName.c_str());
+    mIndiClient->disconnectDevice(deviceName.c_str());
 
-	auto isDisconnectedLambda =
-			[=]() -> bool {
-				try {
-					return (getConnectionStateInternal() == DeviceConnectionStateT::DISCONNECTED);
-				} catch (IndiExceptionT & exc) {
-					return false;
-				}
-			};
+    auto isDisconnectedLambda =
+            [=]() -> bool {
+                try {
+                    return (getConnectionStateInternal() == DeviceConnectionStateT::DISCONNECTED);
+                } catch (IndiExceptionT &exc) {
+                    return false;
+                }
+            };
 
-	// "wait for" the successful disconnect with a timeout.
-	bool isDisconnected;
+    // "wait for" the successful disconnect with a timeout.
+    bool isDisconnected;
 
-	try {
-		wait_for(isDisconnectedLambda, 5000ms);
-		isDisconnected = true;
-	} catch (TimeoutExceptionT & exc) {
-		notifyDeviceConnectionTimeout();
-		isDisconnected = false;
-	}
+    try {
+        wait_for(isDisconnectedLambda, 5000ms);
+        isDisconnected = true;
+    } catch (TimeoutExceptionT &exc) {
+        notifyDeviceConnectionTimeout();
+        isDisconnected = false;
+    }
 
-	if (isDisconnected) {
-		notifyDeviceDisconnected();
-	} else {
-		throw IndiDeviceExceptionT(
-				"Disconnecting device '" + deviceName + "' failed.");
-	}
+    if (isDisconnected) {
+        notifyDeviceDisconnected();
+    } else {
+        throw IndiDeviceExceptionT(
+                "Disconnecting device '" + deviceName + "' failed.");
+    }
 }
 
 void IndiDeviceT::disconnect() {
 
-	std::string deviceName = mIndiBaseDevice->getDeviceName();
+    std::string deviceName = mIndiBaseDevice->getDeviceName();
 
-	if (isDisconnected() || isDisconnecting()) {
-		LOG(debug) << "IndiDeviceT - Device '" << deviceName
-				<< "' already disconnected or currently disconnecting." << std::endl;
+    if (isDisconnected() || isDisconnecting()) {
+        LOG(debug) << "IndiDeviceT - Device '" << deviceName
+                   << "' already disconnected or currently disconnecting." << std::endl;
 
-		return;
-	}
+        return;
+    }
 
-	LOG(debug) << "IndiDeviceT - Trying to disconnect from device '"
-			<< deviceName << "'..." << std::endl;
+    LOG(debug) << "IndiDeviceT - Trying to disconnect from device '"
+               << deviceName << "'..." << std::endl;
 
-	// TODO: Should there be another thread mDisconnectThread?
-	mConnectThread = std::thread(&IndiDeviceT::disconnectInternal,
-			this);
-	mConnectThread.detach();
+    // TODO: Should there be another thread mDisconnectThread?
+    mConnectThread = std::thread(&IndiDeviceT::disconnectInternal,
+                                 this);
+    mConnectThread.detach();
 }
 
 // TODO: Device connection state listener....?! -> set mConnectionState!
 
 bool IndiDeviceT::isConnected() const {
-	return (getConnectionState() == DeviceConnectionStateT::CONNECTED);
+    return (getConnectionState() == DeviceConnectionStateT::CONNECTED);
 }
 
 bool IndiDeviceT::isConnecting() const {
-	return (getConnectionState() == DeviceConnectionStateT::CONNECTING);
+    return (getConnectionState() == DeviceConnectionStateT::CONNECTING);
 }
 
 bool IndiDeviceT::isDisconnected() const {
-	return (getConnectionState() == DeviceConnectionStateT::DISCONNECTED);
+    return (getConnectionState() == DeviceConnectionStateT::DISCONNECTED);
 }
 
 bool IndiDeviceT::isDisconnecting() const {
-	return (getConnectionState() == DeviceConnectionStateT::DISCONNECTING);
+    return (getConnectionState() == DeviceConnectionStateT::DISCONNECTING);
 }
 
 // NOTE: Throws an IndiExceptionT in case prop not found.
 DeviceConnectionStateT::TypeE IndiDeviceT::getConnectionStateInternal() const {
 
-	DeviceConnectionStateT::TypeE connState;
+    DeviceConnectionStateT::TypeE connState;
 
 // Check switch property "CONNECTION" for connection state.
-	ISwitchVectorProperty * deviceConnVecProp = IndiHelperT::getSwitchVec(
-			mIndiBaseDevice, "CONNECTION");
+    ISwitchVectorProperty *deviceConnVecProp = IndiHelperT::getSwitchVec(
+            mIndiBaseDevice, "CONNECTION");
 
-	IndiHelperT::requireReadable(deviceConnVecProp);
+    IndiHelperT::requireReadable(deviceConnVecProp);
 
-	ISwitch * connProp = IndiHelperT::getSwitch(deviceConnVecProp, "CONNECT");
+    ISwitch *connProp = IndiHelperT::getSwitch(deviceConnVecProp, "CONNECT");
 
-	bool connBusy = (deviceConnVecProp->s == IPS_BUSY);
-	bool okOrIdle = (deviceConnVecProp->s == IPS_IDLE
-			|| deviceConnVecProp->s == IPS_OK);
-	bool connected = (connProp->s == ISS_ON);
+    bool connBusy = (deviceConnVecProp->s == IPS_BUSY);
+    bool okOrIdle = (deviceConnVecProp->s == IPS_IDLE
+                     || deviceConnVecProp->s == IPS_OK);
+    bool connected = (connProp->s == ISS_ON);
 
-	if (connected && okOrIdle) {
-		connState = DeviceConnectionStateT::CONNECTED;
-	} else if (!connected && okOrIdle) {
-		connState = DeviceConnectionStateT::DISCONNECTED;
-	} else if (connected && connBusy) {
-		// Disconnecting - TODO: Is this ok?
-		connState = DeviceConnectionStateT::DISCONNECTING;
-	} else if (!connected && connBusy) {
-		// Connecting - TODO: Is this ok?
-		connState = DeviceConnectionStateT::CONNECTING;
-	} else {
-		LOG(warning) << "Unable to determine device connection state."
-				<< std::endl;
-		connState = DeviceConnectionStateT::_Count;
-	}
+    if (connected && okOrIdle) {
+        connState = DeviceConnectionStateT::CONNECTED;
+    } else if (!connected && okOrIdle) {
+        connState = DeviceConnectionStateT::DISCONNECTED;
+    } else if (connected && connBusy) {
+        // Disconnecting - TODO: Is this ok?
+        connState = DeviceConnectionStateT::DISCONNECTING;
+    } else if (!connected && connBusy) {
+        // Connecting - TODO: Is this ok?
+        connState = DeviceConnectionStateT::CONNECTING;
+    } else {
+        LOG(warning) << "Unable to determine device connection state."
+                     << std::endl;
+        connState = DeviceConnectionStateT::_Count;
+    }
 
-	return connState;
+    return connState;
 }
 
 DeviceConnectionStateT::TypeE IndiDeviceT::getConnectionState() const {
 
-	try {
-		return getConnectionStateInternal();
-	} catch (IndiExceptionT & exc) {
-		LOG (error) << exc.what() << std::endl;
-		throw DeviceExceptionT(exc.what());
-	}
+    try {
+        return getConnectionStateInternal();
+    } catch (IndiExceptionT &exc) {
+        LOG (error) << exc.what() << std::endl;
+        throw DeviceExceptionT(exc.what());
+    }
 }
 
 std::set<DeviceInterfaceTypeT::TypeE> IndiDeviceT::getSupportedInferfaces() const {
 
-    THROW_IF(IndiDevice, ! mIndiBaseDevice, "mIndiBaseDevice not set!");
+    THROW_IF(IndiDevice, !mIndiBaseDevice, "mIndiBaseDevice not set!");
 
     // TODO: Unse mInterfaceMap instead...
 
@@ -377,7 +377,7 @@ std::set<DeviceInterfaceTypeT::TypeE> IndiDeviceT::getSupportedInferfaces() cons
 
     std::set<DeviceInterfaceTypeT::TypeE> resultSet;
 
-    for (size_t i=0; i < DeviceInterfaceTypeT::_Count; ++i) {
+    for (size_t i = 0; i < DeviceInterfaceTypeT::_Count; ++i) {
         auto currentInterfaceType = static_cast<DeviceInterfaceTypeT::TypeE>(i);
         uint16_t currentInterfaceMask = getIndiDeviceInterfaceMaskByDeviceType(currentInterfaceType);
 
@@ -390,9 +390,10 @@ std::set<DeviceInterfaceTypeT::TypeE> IndiDeviceT::getSupportedInferfaces() cons
 }
 
 std::shared_ptr<DeviceInterfaceT> IndiDeviceT::getInterface(DeviceInterfaceTypeT::TypeE interfaceType) {
-    if (! isInterfaceSupported(interfaceType)) {
+    if (!isInterfaceSupported(interfaceType)) {
         std::stringstream ss;
-        ss << "Interface '" << DeviceInterfaceTypeT::asStr(interfaceType) << "' not supported by '" << this->getName() << "'." << std::endl;
+        ss << "Interface '" << DeviceInterfaceTypeT::asStr(interfaceType) << "' not supported by '" << this->getName()
+           << "'." << std::endl;
         throw IndiDeviceExceptionT(ss.str());
     }
 
@@ -402,17 +403,16 @@ std::shared_ptr<DeviceInterfaceT> IndiDeviceT::getInterface(DeviceInterfaceTypeT
 }
 
 
-
-void IndiDeviceT::setIndiBaseDevice(INDI::BaseDevice * indiBaseDevice) {
+void IndiDeviceT::setIndiBaseDevice(INDI::BaseDevice *indiBaseDevice) {
     LOG(info) << "Updating INDI base device handle..." << std::endl;
     mIndiBaseDevice = indiBaseDevice;
 }
 
-INDI::BaseDevice * IndiDeviceT::getIndiBaseDevice() {
+INDI::BaseDevice *IndiDeviceT::getIndiBaseDevice() {
     return mIndiBaseDevice;
 }
 
-IndiClientT * IndiDeviceT::getIndiClient() {
+IndiClientT *IndiDeviceT::getIndiClient() {
     return mIndiClient;
 }
 

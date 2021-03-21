@@ -28,20 +28,23 @@
 #include <memory> // std::shared_ptr
 
 class GlobalConfigManagerT;
+
 class ProfileManagerT;
 
 /**
  *
  */
 class FoFiConfigManagerT {
- private:
-  std::shared_ptr<GlobalConfigManagerT> mGlobalConfigManager;
-  std::shared_ptr<ProfileManagerT> mProfileManager;
-  
- public:
-  FoFiConfigManagerT();
-  std::shared_ptr<GlobalConfigManagerT> getGlobalConfigManager();
-  std::shared_ptr<ProfileManagerT> getProfileManager();  
+private:
+    std::shared_ptr<GlobalConfigManagerT> mGlobalConfigManager;
+    std::shared_ptr<ProfileManagerT> mProfileManager;
+
+public:
+    FoFiConfigManagerT();
+
+    std::shared_ptr<GlobalConfigManagerT> getGlobalConfigManager();
+
+    std::shared_ptr<ProfileManagerT> getProfileManager();
 };
 
 #endif /* SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FOFI_CONFIG_MANAGER_H_ */

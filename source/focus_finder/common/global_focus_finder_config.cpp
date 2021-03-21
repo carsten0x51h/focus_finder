@@ -42,109 +42,112 @@ const GlobalFocusFinderConfigT GlobalFocusFinderConfigT::sDefaultGlobalFocusFind
 
 
 GlobalFocusFinderConfigT::GlobalFocusFinderConfigT() :
-  mLastChanged(std::chrono::high_resolution_clock::now()),
-  mLastActiveFocusFinderProfileName(),
-  mDeviceManagerType(DeviceManagerTypeT::INDI)
-{
-	LOG(debug)
-	<< "GlobalFocusFinderConfigT::GlobalFocusFinderConfigT()..." << std::endl;
+        mLastChanged(std::chrono::high_resolution_clock::now()),
+        mLastActiveFocusFinderProfileName(),
+        mDeviceManagerType(DeviceManagerTypeT::INDI) {
+    LOG(debug)
+        << "GlobalFocusFinderConfigT::GlobalFocusFinderConfigT()..." << std::endl;
 }
 
 GlobalFocusFinderConfigT::~GlobalFocusFinderConfigT() {
-	LOG(debug)
-	<< "GlobalFocusFinderConfigT::~GlobalFocusFinderConfigT()..." << std::endl;
+    LOG(debug)
+        << "GlobalFocusFinderConfigT::~GlobalFocusFinderConfigT()..." << std::endl;
 }
 
 
-const TimestampT & GlobalFocusFinderConfigT::getLastChanged() const {
-	return mLastChanged;
+const TimestampT &GlobalFocusFinderConfigT::getLastChanged() const {
+    return mLastChanged;
 }
 
-void GlobalFocusFinderConfigT::setLastChanged(const TimestampT & lastChanged) {
-	mLastChanged = lastChanged;
+void GlobalFocusFinderConfigT::setLastChanged(const TimestampT &lastChanged) {
+    mLastChanged = lastChanged;
 }
 
 
 std::string GlobalFocusFinderConfigT::getLastActiveFocusFinderProfileName() const {
-	return mLastActiveFocusFinderProfileName;
+    return mLastActiveFocusFinderProfileName;
 }
 
-void GlobalFocusFinderConfigT::setLastActiveFocusFinderProfileName(const std::string & lastActiveFocusFinderProfileName) {
-	mLastActiveFocusFinderProfileName = lastActiveFocusFinderProfileName;
+void
+GlobalFocusFinderConfigT::setLastActiveFocusFinderProfileName(const std::string &lastActiveFocusFinderProfileName) {
+    mLastActiveFocusFinderProfileName = lastActiveFocusFinderProfileName;
 }
 
 
 DeviceManagerTypeT::TypeE GlobalFocusFinderConfigT::getDeviceManagerType() const {
-  return mDeviceManagerType;
+    return mDeviceManagerType;
 }
 
 void GlobalFocusFinderConfigT::setDeviceManagerType(DeviceManagerTypeT::TypeE deviceManagerType) {
-  mDeviceManagerType = deviceManagerType;
+    mDeviceManagerType = deviceManagerType;
 }
 
 
-GlobalFocusFinderConfigT GlobalFocusFinderConfigT::load(const std::string & fullGlobalFocusFinderConfigPath) {
-    
-  GlobalFocusFinderConfigT globalConfig;
+GlobalFocusFinderConfigT GlobalFocusFinderConfigT::load(const std::string &fullGlobalFocusFinderConfigPath) {
 
-  try {
+    GlobalFocusFinderConfigT globalConfig;
+
+    try {
+        boost::property_tree::ptree pt;
+        boost::property_tree::xml_parser::read_xml(fullGlobalFocusFinderConfigPath, pt);
+
+        globalConfig.setLastChanged(pt.get("global_fofi_cfg.<xmlattr>.last_changed", defaults().getLastChanged()));
+        globalConfig.setLastActiveFocusFinderProfileName(pt.get("global_fofi_cfg.last_active_focus_finder_profile_name",
+                                                                defaults().getLastActiveFocusFinderProfileName()));
+        globalConfig.setDeviceManagerType(
+                pt.get("global_fofi_cfg.device_manager_type", defaults().getDeviceManagerType()));
+
+        //
+        // Add further fields which should need to be loaded here...
+        //
+
+    } catch (boost::property_tree::xml_parser_error &exc) {
+        throw GlobalFocusFinderConfigExceptionT(exc.what());
+    }
+
+    return globalConfig;
+}
+
+
+void GlobalFocusFinderConfigT::save(const std::string &fullGlobalFocusFinderConfigPath,
+                                    const GlobalFocusFinderConfigT &globalConfig) {
     boost::property_tree::ptree pt;
-    boost::property_tree::xml_parser::read_xml(fullGlobalFocusFinderConfigPath, pt);
 
-    globalConfig.setLastChanged(pt.get("global_fofi_cfg.<xmlattr>.last_changed", defaults().getLastChanged()));
-    globalConfig.setLastActiveFocusFinderProfileName(pt.get("global_fofi_cfg.last_active_focus_finder_profile_name", defaults().getLastActiveFocusFinderProfileName()));
-    globalConfig.setDeviceManagerType(pt.get("global_fofi_cfg.device_manager_type", defaults().getDeviceManagerType()));
-    
-    //
-    // Add further fields which should need to be loaded here...
-    //
-    
-  } catch (boost::property_tree::xml_parser_error & exc) {
-    throw GlobalFocusFinderConfigExceptionT(exc.what());
-  }
+    try {
 
-  return globalConfig;
+        pt.put<TimestampT>("global_fofi_cfg.<xmlattr>.last_changed", globalConfig.getLastChanged());
+        pt.put<std::string>("global_fofi_cfg.last_active_focus_finder_profile_name",
+                            globalConfig.getLastActiveFocusFinderProfileName());
+        pt.put<DeviceManagerTypeT::TypeE>("global_fofi_cfg.device_manager_type", globalConfig.getDeviceManagerType());
+
+        //
+        // Add further fiels which should need to be stored here...
+        //
+
+        write_xml(fullGlobalFocusFinderConfigPath, pt);
+
+    } catch (boost::property_tree::xml_parser_error &exc) {
+        throw GlobalFocusFinderConfigExceptionT(exc.what());
+    }
 }
 
 
-void GlobalFocusFinderConfigT::save(const std::string & fullGlobalFocusFinderConfigPath, const GlobalFocusFinderConfigT & globalConfig) {
-  boost::property_tree::ptree pt;
+std::ostream &GlobalFocusFinderConfigT::print(std::ostream &os, size_t indent) const {
 
-  try {
+    std::string prefix = std::string(indent, ' ');
 
-    pt.put<TimestampT>("global_fofi_cfg.<xmlattr>.last_changed", globalConfig.getLastChanged());
-    pt.put<std::string>("global_fofi_cfg.last_active_focus_finder_profile_name", globalConfig.getLastActiveFocusFinderProfileName());
-    pt.put<DeviceManagerTypeT::TypeE>("global_fofi_cfg.device_manager_type", globalConfig.getDeviceManagerType());
+    os << prefix << "---Global Focus Finder Config---" << std::endl
+       << prefix << "Last changed: " << mLastActiveFocusFinderProfileName << std::endl
+       << prefix << "Device manager type: " << DeviceManagerTypeT::asStr(mDeviceManagerType) << std::endl;
 
-    //
-    // Add further fiels which should need to be stored here...
-    //
-    
-    write_xml(fullGlobalFocusFinderConfigPath, pt);
-    
-  } catch (boost::property_tree::xml_parser_error & exc) {
-    throw GlobalFocusFinderConfigExceptionT(exc.what());
-  }
+    return os;
 }
 
 
-
-std::ostream & GlobalFocusFinderConfigT::print(std::ostream & os, size_t indent) const {
-
-  std::string prefix = std::string(indent, ' ');
-
-  os << prefix << "---Global Focus Finder Config---" << std::endl
-     << prefix << "Last changed: " << mLastActiveFocusFinderProfileName << std::endl
-     << prefix << "Device manager type: " << DeviceManagerTypeT::asStr(mDeviceManagerType) << std::endl;
-  
-  return os;
+const GlobalFocusFinderConfigT &GlobalFocusFinderConfigT::defaults() {
+    return sDefaultGlobalFocusFinderConfig;
 }
 
-
-const GlobalFocusFinderConfigT & GlobalFocusFinderConfigT::defaults() {
-  return sDefaultGlobalFocusFinderConfig;
-}
-
-std::ostream & operator<<(std::ostream & os, const GlobalFocusFinderConfigT & globalFocusFinderConfig) {
-  return globalFocusFinderConfig.print(os);
+std::ostream &operator<<(std::ostream &os, const GlobalFocusFinderConfigT &globalFocusFinderConfig) {
+    return globalFocusFinderConfig.print(os);
 }

@@ -50,227 +50,246 @@ DEF_Exception(FocusFinderProfile);
 
 class FocusFinderProfileT {
 public:
-  static const std::string DEFAULT;
+    static const std::string DEFAULT;
 
-  FocusFinderProfileT();
-  ~FocusFinderProfileT();
+    FocusFinderProfileT();
 
-  const std::string & getName() const;
-  void setName(const std::string & name);
+    ~FocusFinderProfileT();
 
-  const TimestampT & getLastChanged() const;
-  void setLastChanged(const TimestampT & lastChanged);
-  
-  const std::string & getDescription() const;
-  void setDescription(const std::string & description);
+    const std::string &getName() const;
 
-  /**
-   * Camera settings
-   */
-  std::string getCameraDeviceName() const;
-  void setCameraDeviceName(const std::string & cameraDeviceName);
-  
-  const SizeT<float> & getCameraPixelSize() const;
-  void setCameraPixelSize(const SizeT<float> & cameraPixelSize);
+    void setName(const std::string &name);
 
-  // TODO: Map of "custom" device specific properties which should be set to a corresponding value - e.g. PORT of an USB device...
+    const TimestampT &getLastChanged() const;
 
-  
-  /**
-   * Focus settings
-   */
-  std::string getFocusDeviceName() const;
-  void setFocusDeviceName(const std::string & focusDeviceName);
+    void setLastChanged(const TimestampT &lastChanged);
 
-  /**
-   * Filter settings
-   */
-  std::string getFilterDeviceName() const;
-  void setFilterDeviceName(const std::string & filterDeviceName);
+    const std::string &getDescription() const;
+
+    void setDescription(const std::string &description);
+
+    /**
+     * Camera settings
+     */
+    std::string getCameraDeviceName() const;
+
+    void setCameraDeviceName(const std::string &cameraDeviceName);
+
+    const SizeT<float> &getCameraPixelSize() const;
+
+    void setCameraPixelSize(const SizeT<float> &cameraPixelSize);
+
+    // TODO: Map of "custom" device specific properties which should be set to a corresponding value - e.g. PORT of an USB device...
 
 
+    /**
+     * Focus settings
+     */
+    std::string getFocusDeviceName() const;
 
-  /**
-   * Calibration settings
-   * --------------------
-   *
-   * 1. Imaging
-   */
-  const SizeT<unsigned int> & getStarWindowSize() const;
-  void setStarWindowSize(const SizeT<unsigned int> & starWindowSize);
+    void setFocusDeviceName(const std::string &focusDeviceName);
 
-  CentroidTypeT::TypeE getCentroidMethod() const;
-  void setCentroidMethod(CentroidTypeT::TypeE centroidMethod);
+    /**
+     * Filter settings
+     */
+    std::string getFilterDeviceName() const;
 
-  bool getEnableStarAutoTracking() const;
-  void setEnableStarAutoTracking(bool enableStarAutoTracking);
-
-  size_t getNumFramesPerFocusPos() const;
-  void setNumFramesPerFocusPos(size_t numFramesPerFocusPos);
-
-  size_t getStarDetectionSnrBoundary() const;
-  void setStarDetectionSnrBoundary(float starDetectionSnrBoundary);
-
-  int getFocusingFilterPos() const;
-  void setFocusingFilterPos(int focusingFilterPos);
-
-  bool getEnableCameraCooler() const;
-  void setEnableCameraCooler(bool enableCameraCooler);
-
-  int getCameraCoolerTargetTemperature() const;
-  void setCameraCoolerTargetTemperature(int cameraCoolerTargetTemperature);
-
-  std::chrono::duration<float> getExposureTime() const;
-  void setExposureTime(std::chrono::duration<float> exposureTime);
+    void setFilterDeviceName(const std::string &filterDeviceName);
 
 
+    /**
+     * Calibration settings
+     * --------------------
+     *
+     * 1. Imaging
+     */
+    const SizeT<unsigned int> &getStarWindowSize() const;
 
-  /**
-   * 2. Focus curve recording
-   */
-  FocusMeasureTypeT::TypeE getLimitFocusMeasureType() const;
-  void setLimitFocusMeasureType(FocusMeasureTypeT::TypeE limitFocusMeasureType);
+    void setStarWindowSize(const SizeT<unsigned int> &starWindowSize);
 
-  FocusMeasureTypeT::TypeE getCurveFocusMeasureType() const;
-  void setCurveFocusMeasureType(FocusMeasureTypeT::TypeE curveFocusMeasureType);
+    CentroidTypeT::TypeE getCentroidMethod() const;
 
-  int getStepSize() const;
-  void setStepSize(int stepSize);
+    void setCentroidMethod(CentroidTypeT::TypeE centroidMethod);
 
-  size_t getNumberCurvesToRecord() const;
-  void setNumberCurvesToRecord(size_t numberCurvesToRecord);
+    bool getEnableStarAutoTracking() const;
 
-  float getFocusMeasureLimit() const;
-  void setFocusMeasureLimit(float focusMeasureLimit);
+    void setEnableStarAutoTracking(bool enableStarAutoTracking);
 
+    size_t getNumFramesPerFocusPos() const;
 
+    void setNumFramesPerFocusPos(size_t numFramesPerFocusPos);
 
-  /**
-   * 3. Focus curve matching
-   */
-  CurveFitParmsT getFocusCurveMatchingParms() const;
-  void setFocusCurveMatchingParms(const CurveFitParmsT & focusCurveMatchingParms);
+    size_t getStarDetectionSnrBoundary() const;
 
+    void setStarDetectionSnrBoundary(float starDetectionSnrBoundary);
 
+    int getFocusingFilterPos() const;
 
-  /**
-   * Focus finder calibration data
-   */
-  std::shared_ptr<FocusFinderCalibrationT> getFocusFinderCalibration() const;
-  void setFocusFinderCalibration(std::shared_ptr<FocusFinderCalibrationT> focusFinderCalibration);
-  bool hasCalibrationData() const;
+    void setFocusingFilterPos(int focusingFilterPos);
 
+    bool getEnableCameraCooler() const;
 
-  
-  /**
-   * Throws if not found.
-   */
-  static FocusFinderProfileT load(const std::string & fullProfilePath, const std::filesystem::path & lightFramePath);
+    void setEnableCameraCooler(bool enableCameraCooler);
 
-  /**
-   * Throws if save fails.
-   */
-  static void save(const std::string & fullProfilePath,
-		   const std::filesystem::path & lightFramePath,
-		   const FocusFinderProfileT & profile);
+    int getCameraCoolerTargetTemperature() const;
 
-  std::ostream & print(std::ostream & os, size_t ident = 0) const;
+    void setCameraCoolerTargetTemperature(int cameraCoolerTargetTemperature);
+
+    std::chrono::duration<float> getExposureTime() const;
+
+    void setExposureTime(std::chrono::duration<float> exposureTime);
 
 
+    /**
+     * 2. Focus curve recording
+     */
+    FocusMeasureTypeT::TypeE getLimitFocusMeasureType() const;
 
-  static const FocusFinderProfileT & defaults();
-  
+    void setLimitFocusMeasureType(FocusMeasureTypeT::TypeE limitFocusMeasureType);
+
+    FocusMeasureTypeT::TypeE getCurveFocusMeasureType() const;
+
+    void setCurveFocusMeasureType(FocusMeasureTypeT::TypeE curveFocusMeasureType);
+
+    int getStepSize() const;
+
+    void setStepSize(int stepSize);
+
+    size_t getNumberCurvesToRecord() const;
+
+    void setNumberCurvesToRecord(size_t numberCurvesToRecord);
+
+    float getFocusMeasureLimit() const;
+
+    void setFocusMeasureLimit(float focusMeasureLimit);
+
+
+    /**
+     * 3. Focus curve matching
+     */
+    CurveFitParmsT getFocusCurveMatchingParms() const;
+
+    void setFocusCurveMatchingParms(const CurveFitParmsT &focusCurveMatchingParms);
+
+
+    /**
+     * Focus finder calibration data
+     */
+    std::shared_ptr<FocusFinderCalibrationT> getFocusFinderCalibration() const;
+
+    void setFocusFinderCalibration(std::shared_ptr<FocusFinderCalibrationT> focusFinderCalibration);
+
+    bool hasCalibrationData() const;
+
+
+    /**
+     * Throws if not found.
+     */
+    static FocusFinderProfileT load(const std::string &fullProfilePath, const std::filesystem::path &lightFramePath);
+
+    /**
+     * Throws if save fails.
+     */
+    static void save(const std::string &fullProfilePath,
+                     const std::filesystem::path &lightFramePath,
+                     const FocusFinderProfileT &profile);
+
+    std::ostream &print(std::ostream &os, size_t ident = 0) const;
+
+
+    static const FocusFinderProfileT &defaults();
+
 private:
-  static const FocusFinderProfileT sDefaultProfile;
+    static const FocusFinderProfileT sDefaultProfile;
 
-  /**
-   * Profile meta data
-   */
-  std::string mName;
-  TimestampT mLastChanged;
-  std::string mDescription;
-
-  
-  /**
-   * Camera settings
-   */
-  std::string mCameraDeviceName;
-  SizeT<float> mCameraPixelSize; // Unit = um
-
-  
-  /**
-   * Focus settings
-   */
-  std::string mFocusDeviceName;
+    /**
+     * Profile meta data
+     */
+    std::string mName;
+    TimestampT mLastChanged;
+    std::string mDescription;
 
 
-  /**
-   * Filter settings
-   */
-  std::string mFilterDeviceName; 
-
-  
-  /**
-   * Calibration - Imaging
-   */
-  SizeT<unsigned int> mStarWindowSize;
-  CentroidTypeT::TypeE mCentroidMethod;
-  bool mEnableStarAutoTracking;
-  size_t mNumFramesPerFocusPos;
-  float mStarDetectionSnrBoundary;
-  int mFocusingFilterPos;
-  bool mEnableCameraCooler;
-  int mCameraCoolerTargetTemperature;
-  std::chrono::duration<float> mExposureTime;
+    /**
+     * Camera settings
+     */
+    std::string mCameraDeviceName;
+    SizeT<float> mCameraPixelSize; // Unit = um
 
 
-  /**
-   * Calibration - Focus curve recording
-   */
-  FocusMeasureTypeT::TypeE mLimitFocusMeasureType;
-  FocusMeasureTypeT::TypeE mCurveFocusMeasureType;
-  int mStepSize;
-  int mNumberCurvesToRecord;
-  float mFocusMeasureLimit;
-  
-
-  /**
-   * Calibration - Focus curve matching
-   */
-  CurveFitParmsT mFocusCurveMatchingParms;
+    /**
+     * Focus settings
+     */
+    std::string mFocusDeviceName;
 
 
-  /**
-   * Focus finder
-   *
-   * NOTE / TODO: There are probably settings which are specific for the respective "focus finder strategy".
-   *              So it will probably be hard to just "extract" the strategy and create it dynamically on
-   *              request using a factory. In case a different configuration is required, new / corresponding
-   *              GUI panels in the settings dialog would be required. Therefore, to keep it simple,
-   *              the "focus finder strategy" whould be hardcoded (i.e. not selectable) at all for now.
-   */
-  //FocusFinderStrategyT::TypeE mFocusFinderStrategy; //< Defines which focus finder strategy will be used to find the focus
+    /**
+     * Filter settings
+     */
+    std::string mFilterDeviceName;
 
 
-  /**
-   * Calibration data
-   *
-   * TODO: We may store only the focus curve function parms instead...
-   * TODO: Maybe rename this to "calibration data"...
-   *       In case there is no calibration data, the container is empty.
-   */
-  std::shared_ptr<FocusFinderCalibrationT> mFocusFinderCalibration;
+    /**
+     * Calibration - Imaging
+     */
+    SizeT<unsigned int> mStarWindowSize;
+    CentroidTypeT::TypeE mCentroidMethod;
+    bool mEnableStarAutoTracking;
+    size_t mNumFramesPerFocusPos;
+    float mStarDetectionSnrBoundary;
+    int mFocusingFilterPos;
+    bool mEnableCameraCooler;
+    int mCameraCoolerTargetTemperature;
+    std::chrono::duration<float> mExposureTime;
 
-  
-  /**
-   * Telescope
-   *
-   * TODO: Maybe later..
-   */
-  //unsigned int mFocalLengthTelescope; // Unit = mm  
+
+    /**
+     * Calibration - Focus curve recording
+     */
+    FocusMeasureTypeT::TypeE mLimitFocusMeasureType;
+    FocusMeasureTypeT::TypeE mCurveFocusMeasureType;
+    int mStepSize;
+    int mNumberCurvesToRecord;
+    float mFocusMeasureLimit;
+
+
+    /**
+     * Calibration - Focus curve matching
+     */
+    CurveFitParmsT mFocusCurveMatchingParms;
+
+
+    /**
+     * Focus finder
+     *
+     * NOTE / TODO: There are probably settings which are specific for the respective "focus finder strategy".
+     *              So it will probably be hard to just "extract" the strategy and create it dynamically on
+     *              request using a factory. In case a different configuration is required, new / corresponding
+     *              GUI panels in the settings dialog would be required. Therefore, to keep it simple,
+     *              the "focus finder strategy" whould be hardcoded (i.e. not selectable) at all for now.
+     */
+    //FocusFinderStrategyT::TypeE mFocusFinderStrategy; //< Defines which focus finder strategy will be used to find the focus
+
+
+    /**
+     * Calibration data
+     *
+     * TODO: We may store only the focus curve function parms instead...
+     * TODO: Maybe rename this to "calibration data"...
+     *       In case there is no calibration data, the container is empty.
+     */
+    std::shared_ptr<FocusFinderCalibrationT> mFocusFinderCalibration;
+
+
+    /**
+     * Telescope
+     *
+     * TODO: Maybe later..
+     */
+    //unsigned int mFocalLengthTelescope; // Unit = mm
 };
 
-  // TODO: Remove... member access no longer required since print() is now used..
-std::ostream & operator<<(std::ostream & os, const FocusFinderProfileT & focusFinderProfile);
+// TODO: Remove... member access no longer required since print() is now used..
+std::ostream &operator<<(std::ostream &os, const FocusFinderProfileT &focusFinderProfile);
 
 #endif /* SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FOCUS_FINDER_PROFILE_H_ */

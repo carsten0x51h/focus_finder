@@ -43,16 +43,18 @@ namespace Ui {
 }
 
 class ManageDeviceEntryPanelT;
+
 class NewProfileDialogT;
+
 class RenameProfileDialogT;
+
 class ProfileSettingsDialogT;
 
 /**
 *  @brief
 */
-class ManageDeviceProfilesDialogT : public QDialog
-{
-    Q_OBJECT
+class ManageDeviceProfilesDialogT : public QDialog {
+Q_OBJECT
 
 
 public:
@@ -60,56 +62,70 @@ public:
     *  @brief
     *    Constructor
     */
-	ManageDeviceProfilesDialogT(FocusFinderLogicT & ffl);
+    ManageDeviceProfilesDialogT(FocusFinderLogicT &ffl);
 
     /**
     *  @brief
     *    Destructor
     */
-	virtual ~ManageDeviceProfilesDialogT();
+    virtual ~ManageDeviceProfilesDialogT();
 
 signals:
-	void activeProfileChangedSignal(std::optional<FocusFinderProfileT> oldProfile, std::optional<FocusFinderProfileT> newProfile);
-	void profileListChangedSignal();
+
+    void activeProfileChangedSignal(std::optional<FocusFinderProfileT> oldProfile,
+                                    std::optional<FocusFinderProfileT> newProfile);
+
+    void profileListChangedSignal();
 
 protected slots:
-	void onNewProfileActionTriggeredSlot();
-	void onDeleteProfileActionTriggeredSlot();
-	void onSettingsProfileActionTriggeredSlot();
 
-	void onProfileSelectionChangedSlot(const QString & selectedProfileNameQtStr);
-	void onActiveProfileChangedSlot(std::optional<FocusFinderProfileT> oldProfile, std::optional<FocusFinderProfileT> newProfile);
-	void onProfileListChangedSlot();
+    void onNewProfileActionTriggeredSlot();
+
+    void onDeleteProfileActionTriggeredSlot();
+
+    void onSettingsProfileActionTriggeredSlot();
+
+    void onProfileSelectionChangedSlot(const QString &selectedProfileNameQtStr);
+
+    void onActiveProfileChangedSlot(std::optional<FocusFinderProfileT> oldProfile,
+                                    std::optional<FocusFinderProfileT> newProfile);
+
+    void onProfileListChangedSlot();
 
 protected:
     const QScopedPointer<Ui::ManageDeviceProfilesDialog> m_ui;
 
 private:
     void updateMenuStatus();
-    int showDeleteWarningMessage(const std::string & profileName) const;
+
+    int showDeleteWarningMessage(const std::string &profileName) const;
+
     void profileToUI(std::optional<FocusFinderProfileT> profileOpt);
 
     void refillProfileList();
+
     void setupProfileList();
+
     void createManageProfilesMenu();
 
 
-    void addDevicePanel(ManageDeviceEntryPanelT * devicePanel);
+    void addDevicePanel(ManageDeviceEntryPanelT *devicePanel);
+
     void addDevices();
 
-    FocusFinderLogicT & mFfl;
+    FocusFinderLogicT &mFfl;
 
-    ManageDeviceEntryPanelT * mCameraPanel;
-    ManageDeviceEntryPanelT * mFocusPanel;
-    ManageDeviceEntryPanelT * mFilterPanel;
+    ManageDeviceEntryPanelT *mCameraPanel;
+    ManageDeviceEntryPanelT *mFocusPanel;
+    ManageDeviceEntryPanelT *mFilterPanel;
 
-    QAction * mNewProfileAction;
-    QAction * mDeleteProfileAction;
-    QAction * mSettingsProfileAction;
-    QMenu * mManageProfilesMenu;
+    QAction *mNewProfileAction;
+    QAction *mDeleteProfileAction;
+    QAction *mSettingsProfileAction;
+    QMenu *mManageProfilesMenu;
 
-    NewProfileDialogT * mNewProfileDialog;
-    ProfileSettingsDialogT * mProfileSettingsDialog;
+    NewProfileDialogT *mNewProfileDialog;
+    ProfileSettingsDialogT *mProfileSettingsDialog;
 };
 
 #endif /*SOURCE_FOCUS_FINDER_GUI_INCLUDE_MANAGE_DEVICE_PROFILES_DIALOG_H_*/

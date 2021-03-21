@@ -41,58 +41,61 @@ DEF_Exception(GlobalFocusFinderConfig);
 
 class GlobalFocusFinderConfigT {
 public:
-  GlobalFocusFinderConfigT();
-  ~GlobalFocusFinderConfigT();
+    GlobalFocusFinderConfigT();
 
-  const TimestampT & getLastChanged() const;
-  void setLastChanged(const TimestampT & lastChanged);
-  
+    ~GlobalFocusFinderConfigT();
 
-  /**
-   * Last active focus finder profile
-   */
-  std::string getLastActiveFocusFinderProfileName() const;
-  void setLastActiveFocusFinderProfileName(const std::string & lastActiveFocusFinderProfileName);
-  
-  
-  /**
-   * Device manager type name.
-   *
-   * NOTE: Currently only DUMMY and INDI is supported.
-   *       ASCOM may be supported in the future well...
-   */
-  DeviceManagerTypeT::TypeE getDeviceManagerType() const;
-  void setDeviceManagerType(DeviceManagerTypeT::TypeE deviceManagerType);
+    const TimestampT &getLastChanged() const;
 
-  
-  /**
-   * Throws if not found.
-   */
-  static GlobalFocusFinderConfigT load(const std::string & fullGlobalFocusFinderConfigPath);
-
-  /**
-   * Throws if save fails.
-   */
-  static void save(const std::string & fullGlobalFocusFinderConfigPath,
-		   const GlobalFocusFinderConfigT & profile);
-
-  std::ostream & print(std::ostream & os, size_t ident = 0) const;
+    void setLastChanged(const TimestampT &lastChanged);
 
 
+    /**
+     * Last active focus finder profile
+     */
+    std::string getLastActiveFocusFinderProfileName() const;
 
-  static const GlobalFocusFinderConfigT & defaults();
-  
+    void setLastActiveFocusFinderProfileName(const std::string &lastActiveFocusFinderProfileName);
+
+
+    /**
+     * Device manager type name.
+     *
+     * NOTE: Currently only DUMMY and INDI is supported.
+     *       ASCOM may be supported in the future well...
+     */
+    DeviceManagerTypeT::TypeE getDeviceManagerType() const;
+
+    void setDeviceManagerType(DeviceManagerTypeT::TypeE deviceManagerType);
+
+
+    /**
+     * Throws if not found.
+     */
+    static GlobalFocusFinderConfigT load(const std::string &fullGlobalFocusFinderConfigPath);
+
+    /**
+     * Throws if save fails.
+     */
+    static void save(const std::string &fullGlobalFocusFinderConfigPath,
+                     const GlobalFocusFinderConfigT &profile);
+
+    std::ostream &print(std::ostream &os, size_t ident = 0) const;
+
+
+    static const GlobalFocusFinderConfigT &defaults();
+
 private:
-  static const GlobalFocusFinderConfigT sDefaultGlobalFocusFinderConfig;
+    static const GlobalFocusFinderConfigT sDefaultGlobalFocusFinderConfig;
 
-  
-  TimestampT mLastChanged;
-  std::string mLastActiveFocusFinderProfileName;
-  DeviceManagerTypeT::TypeE mDeviceManagerType;
+
+    TimestampT mLastChanged;
+    std::string mLastActiveFocusFinderProfileName;
+    DeviceManagerTypeT::TypeE mDeviceManagerType;
 };
 
-  // TODO: Remove... member access no longer required since print() is now used..
-std::ostream & operator<<(std::ostream & os, const GlobalFocusFinderConfigT & globalFocusFinderConfig);
+// TODO: Remove... member access no longer required since print() is now used..
+std::ostream &operator<<(std::ostream &os, const GlobalFocusFinderConfigT &globalFocusFinderConfig);
 
 #endif /* SOURCE_FOCUS_FINDER_COMMON_INCLUDE_GLOBAL_FOCUS_FINDER_CONFIG_H_ */
 

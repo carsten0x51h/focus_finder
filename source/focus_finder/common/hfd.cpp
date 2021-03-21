@@ -25,71 +25,70 @@
 #include "include/hfd.h"
 #include "include/image.h"
 
-float HfdT::calc(const ImageT & inImage, unsigned int inOuterDiameter,
-		ImageT * outCenteredImg, bool inSubMean) {
+float HfdT::calc(const ImageT &inImage, unsigned int inOuterDiameter,
+                 ImageT *outCenteredImg, bool inSubMean) {
 
-	// TODO: Is this ok here???
-	// Noise reduction
-	// AD noise reduction --> In: Loaded image, Out: Noise reduced image
-	// http://cimg.sourceforge.net/reference/structcimg__library_1_1CImg.html
-	ImageT aiImg = inImage.get_blur_anisotropic(130.0F, /*amplitude*/
-	0.7F, /*sharpness*/
-	0.3F, /*anisotropy*/
-	0.6F, /*alpha*/
-	1.1F, /*sigma*/
-	0.8F, /*dl*/
-	30, /*da*/
-	2, /*gauss_prec*/
-	0, /*interpolation_type*/
-	false /*fast_approx*/
-	);
+    // TODO: Is this ok here???
+    // Noise reduction
+    // AD noise reduction --> In: Loaded image, Out: Noise reduced image
+    // http://cimg.sourceforge.net/reference/structcimg__library_1_1CImg.html
+    ImageT aiImg = inImage.get_blur_anisotropic(130.0F, /*amplitude*/
+                                                0.7F, /*sharpness*/
+                                                0.3F, /*anisotropy*/
+                                                0.6F, /*alpha*/
+                                                1.1F, /*sigma*/
+                                                0.8F, /*dl*/
+                                                30, /*da*/
+                                                2, /*gauss_prec*/
+                                                0, /*interpolation_type*/
+                                                false /*fast_approx*/
+    );
 
-	// Sub mean image if desired
-	if (inSubMean) {
-		double mean = aiImg.mean();
-		cimg_forXY(aiImg, x, y)
-		{
-			aiImg(x, y) = (aiImg(x, y) < mean ? 0 : aiImg(x, y) - mean);
-		}
-	}
+    // Sub mean image if desired
+    if (inSubMean) {
+        double mean = aiImg.mean();
+        cimg_forXY(aiImg, x, y) {
+                aiImg(x, y) = (aiImg(x, y) < mean ? 0 : aiImg(x, y) - mean);
+            }
+    }
 
-	// TODO: Check that iScaleFactor is at least 1
-	// TODO: Scale up image if necessary
+    // TODO: Check that iScaleFactor is at least 1
+    // TODO: Scale up image if necessary
 
-	// Sum up all pixel values in whole circle
-	float outerRadius = (float) inOuterDiameter / 2.0;
-	float sum = 0;
-	float sumDist = 0;
+    // Sum up all pixel values in whole circle
+    float outerRadius = (float) inOuterDiameter / 2.0;
+    float sum = 0;
+    float sumDist = 0;
 
-	cimg_forXY(aiImg, x, y)
-	{
-		if (insideCircle(x, y, outerRadius /*centerX*/, outerRadius /*centerY*/,
-				outerRadius)) {
-			sum += aiImg(x, y);
-			sumDist += aiImg(x, y)
-					* std::sqrt(
-							std::pow((float) x - outerRadius /*centerX*/, 2.0F)
-									+ pow((float) y - outerRadius /*centerX*/,
-											2.0F));
-		}
-	}
+    cimg_forXY(aiImg, x, y) {
+            if (insideCircle(x, y, outerRadius /*centerX*/, outerRadius /*centerY*/,
+                             outerRadius)) {
+                sum += aiImg(x, y);
+                sumDist += aiImg(x, y)
+                           * std::sqrt(
+                        std::pow((float) x - outerRadius /*centerX*/, 2.0F)
+                        + pow((float) y - outerRadius /*centerX*/,
+                              2.0F));
+            }
+        }
 
-	// Make a copy of the image part which was used for calculation
-	if (outCenteredImg != nullptr) {
-		// TODO: Zoom image?
-		*outCenteredImg = aiImg;
-	}
+    // Make a copy of the image part which was used for calculation
+    if (outCenteredImg != nullptr) {
+        // TODO: Zoom image?
+        *outCenteredImg = aiImg;
+    }
 
-	// NOTE: Multiplying with 2 is required since actually just the HFR is calculated above
-	return (sum > 0 ? 2.0 * sumDist / sum : std::sqrt(2.0) * outerRadius);
+    // NOTE: Multiplying with 2 is required since actually just the HFR is calculated above
+    return (sum > 0 ? 2.0 * sumDist / sum : std::sqrt(2.0) * outerRadius);
 }
 
-std::ostream & operator<<(std::ostream & os, const HfdT & hfd) {
-	return hfd.print(os);
+std::ostream &operator<<(std::ostream &os, const HfdT &hfd) {
+    return hfd.print(os);
 }
 
 std::ostream &
-HfdT::print(std::ostream & os) const {
-	os << "HFD=" << mHfdValue << ", outer diameter=" << mOuterDiameter << ", max HFD limit: " << this->getMaxHfdLimit() << std::endl;
-	return os;
+HfdT::print(std::ostream &os) const {
+    os << "HFD=" << mHfdValue << ", outer diameter=" << mOuterDiameter << ", max HFD limit: " << this->getMaxHfdLimit()
+       << std::endl;
+    return os;
 }

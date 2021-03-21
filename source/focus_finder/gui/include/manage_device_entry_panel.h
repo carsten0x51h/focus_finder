@@ -47,9 +47,8 @@ class DeviceInterfaceT;
 /**
 *  @brief
 */
-class ManageDeviceEntryPanelT : public QWidget
-{
-    Q_OBJECT
+class ManageDeviceEntryPanelT : public QWidget {
+Q_OBJECT
 
 
 public:
@@ -57,7 +56,7 @@ public:
     *  @brief
     *    Constructor
     */
-	ManageDeviceEntryPanelT(FocusFinderLogicT & ffl, const std::string & deviceTypeName, const std::string & deviceName);
+    ManageDeviceEntryPanelT(FocusFinderLogicT &ffl, const std::string &deviceTypeName, const std::string &deviceName);
 
     /**
     *  @brief
@@ -65,44 +64,56 @@ public:
     */
     virtual ~ManageDeviceEntryPanelT();
 
-	void setDeviceName(const std::string & deviceName);
+    void setDeviceName(const std::string &deviceName);
 
 signals:
-	void deviceConnectingSignal();
-	void deviceConnectedSignal();
-	void deviceDisconnectingSignal();
-	void deviceDisconnectedSignal();
-	void connectionStateChanged();
+
+    void deviceConnectingSignal();
+
+    void deviceConnectedSignal();
+
+    void deviceDisconnectingSignal();
+
+    void deviceDisconnectedSignal();
+
+    void connectionStateChanged();
 
 protected slots:
-	void onDeviceConnectClicked(bool);
+
+    void onDeviceConnectClicked(bool);
 
 
 protected:
-	const QScopedPointer<Ui::ManageDeviceEntryPanel> m_ui;
+    const QScopedPointer<Ui::ManageDeviceEntryPanel> m_ui;
 
 private:
-	void updateConnectButton();
-	void setBtnIcon(const std::string & iconName, const std::string & text);
-	void setButtonConnectionState(DeviceConnectionStateT::TypeE btnConnState);
+    void updateConnectButton();
 
-	void updateDevice(const std::string & deviceName);
-	void createDeviceConnectButton();
+    void setBtnIcon(const std::string &iconName, const std::string &text);
 
-	void onDeviceConnecting();
-	void onDeviceConnected();
-	void onDeviceDisconnecting();
-	void onDeviceDisconnected();
+    void setButtonConnectionState(DeviceConnectionStateT::TypeE btnConnState);
 
-	FocusFinderLogicT & mFfl;
+    void updateDevice(const std::string &deviceName);
 
-	AnimMenuButtonT * mConnectButton;
+    void createDeviceConnectButton();
 
-	std::shared_ptr<DeviceT> mDevice;
+    void onDeviceConnecting();
 
-	boost::signals2::connection mDeviceConnectingConnection;
-	boost::signals2::connection mDeviceConnectedConnection;
-	boost::signals2::connection mDeviceDisconnectedConnection;
+    void onDeviceConnected();
+
+    void onDeviceDisconnecting();
+
+    void onDeviceDisconnected();
+
+    FocusFinderLogicT &mFfl;
+
+    AnimMenuButtonT *mConnectButton;
+
+    std::shared_ptr<DeviceT> mDevice;
+
+    boost::signals2::connection mDeviceConnectingConnection;
+    boost::signals2::connection mDeviceConnectedConnection;
+    boost::signals2::connection mDeviceDisconnectedConnection;
 };
 
 #endif /*SOURCE_FOCUS_FINDER_GUI_INCLUDE_MANAGE_DEVICE_ENTRY_PANEL_H_*/

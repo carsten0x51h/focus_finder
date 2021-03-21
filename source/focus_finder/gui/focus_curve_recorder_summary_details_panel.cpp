@@ -34,10 +34,11 @@
 
 #include "ui_focus_curve_recorder_summary_details_panel.h"
 
-FocusCurveRecorderSummaryDetailsPanelT::FocusCurveRecorderSummaryDetailsPanelT(QWidget * parent, std::shared_ptr<FocusCurveRecorderLogicT> focusCurveRecorderLogic) : QWidget(parent),
-                                                                                        m_ui(new Ui::FocusCurveRecorderSummaryDetailsPanel),
-																					mFocusCurveRecorderLogic(focusCurveRecorderLogic)
-{
+FocusCurveRecorderSummaryDetailsPanelT::FocusCurveRecorderSummaryDetailsPanelT(QWidget *parent,
+                                                                               std::shared_ptr<FocusCurveRecorderLogicT> focusCurveRecorderLogic)
+        : QWidget(parent),
+          m_ui(new Ui::FocusCurveRecorderSummaryDetailsPanel),
+          mFocusCurveRecorderLogic(focusCurveRecorderLogic) {
     // Setup UI
     m_ui->setupUi(this);
 
@@ -61,10 +62,8 @@ FocusCurveRecorderSummaryDetailsPanelT::FocusCurveRecorderSummaryDetailsPanelT(Q
     reset();
 }
 
-FocusCurveRecorderSummaryDetailsPanelT::~FocusCurveRecorderSummaryDetailsPanelT()
-{
+FocusCurveRecorderSummaryDetailsPanelT::~FocusCurveRecorderSummaryDetailsPanelT() {
 }
 
-void FocusCurveRecorderSummaryDetailsPanelT::reset()
-{
+void FocusCurveRecorderSummaryDetailsPanelT::reset() {
 }

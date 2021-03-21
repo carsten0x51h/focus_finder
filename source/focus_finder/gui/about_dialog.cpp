@@ -28,15 +28,13 @@
 
 #include "ui_about_dialog.h"
 
-AboutDialogT::AboutDialogT(QWidget * parent) : QDialog(parent),
-	m_ui(new Ui::AboutDialog)
-{
+AboutDialogT::AboutDialogT(QWidget *parent) : QDialog(parent),
+                                              m_ui(new Ui::AboutDialog) {
     // Setup UI
     m_ui->setupUi(this);
 
     setFixedSize(size());
 }
 
-AboutDialogT::~AboutDialogT()
-{
+AboutDialogT::~AboutDialogT() {
 }

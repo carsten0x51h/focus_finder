@@ -27,23 +27,28 @@
 #define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_INDI_SERVER_CONNECTION_STATE_H_
 
 struct IndiServerConnectionStateT {
-	typedef enum {
-		DISCONNECTED,
-		CONNECTING,
-		CONNECTED,
-		DISCONNECTING,
-		_Count
-	} TypeE;
+    typedef enum {
+        DISCONNECTED,
+        CONNECTING,
+        CONNECTED,
+        DISCONNECTING,
+        _Count
+    } TypeE;
 
-	static const char * asStr(const TypeE & inType) {
-		switch (inType) {
-			case DISCONNECTED: return "DISCONNECTED";
-			case CONNECTING: return "CONNECTING";
-			case CONNECTED: return "CONNECTED";
-			case DISCONNECTING: return "DISCONNECTING";
-			default: return "<?>";
-		}
-	}
+    static const char *asStr(const TypeE &inType) {
+        switch (inType) {
+            case DISCONNECTED:
+                return "DISCONNECTED";
+            case CONNECTING:
+                return "CONNECTING";
+            case CONNECTED:
+                return "CONNECTED";
+            case DISCONNECTING:
+                return "DISCONNECTING";
+            default:
+                return "<?>";
+        }
+    }
 };
 
 

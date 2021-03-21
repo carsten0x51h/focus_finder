@@ -26,35 +26,35 @@
 #include "include/curve_parms.h"
 #include "include/math_functions.h"
 
-CurveFunctionGaussianT::CurveFunctionGaussianT(const CurveParmsT & curveParms) : CurveFunctionT(curveParms) {
-  
+CurveFunctionGaussianT::CurveFunctionGaussianT(const CurveParmsT &curveParms) : CurveFunctionT(curveParms) {
+
 }
 
 std::string CurveFunctionGaussianT::getName() const {
-  return "CurveFunctionGaussianT";
+    return "CurveFunctionGaussianT";
 }
 
 float CurveFunctionGaussianT::f(float x) const {
 
-  float b = mCurveParms.get(IdxT::B_IDX).getValue();
-  float p = mCurveParms.get(IdxT::P_IDX).getValue();
-  float c = mCurveParms.get(IdxT::C_IDX).getValue();
-  float w = mCurveParms.get(IdxT::W_IDX).getValue();
-  
-  return MathFunctionsT::gaussian(x, b, p, c, w);
+    float b = mCurveParms.get(IdxT::B_IDX).getValue();
+    float p = mCurveParms.get(IdxT::P_IDX).getValue();
+    float c = mCurveParms.get(IdxT::C_IDX).getValue();
+    float w = mCurveParms.get(IdxT::W_IDX).getValue();
+
+    return MathFunctionsT::gaussian(x, b, p, c, w);
 }
 
 float CurveFunctionGaussianT::f_inv(float x) const {
-  // TODO: IMPLEMENT
-  throw CurveFunctionExceptionT("CurveFunctionGaussianT::f_inv() not implemented.");
+    // TODO: IMPLEMENT
+    throw CurveFunctionExceptionT("CurveFunctionGaussianT::f_inv() not implemented.");
 }
 
 PointFT CurveFunctionGaussianT::min() const {
-  // TODO: Implement...?
-  throw CurveFunctionExceptionT("CurveFunctionGaussianT::min() not implemented.");
+    // TODO: Implement...?
+    throw CurveFunctionExceptionT("CurveFunctionGaussianT::min() not implemented.");
 }
 
 PointFT CurveFunctionGaussianT::max() const {
-  // TODO: Implement...?
-  throw CurveFunctionExceptionT("CurveFunctionGaussianT::max() not implemented.");
+    // TODO: Implement...?
+    throw CurveFunctionExceptionT("CurveFunctionGaussianT::max() not implemented.");
 }

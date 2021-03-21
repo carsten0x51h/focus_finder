@@ -38,42 +38,46 @@
 
 class LmFittingCurveHyperbolicT : public LmFittingCurveT {
 private:
-	float phi(float x, float a, float c) const;
+    float phi(float x, float a, float c) const;
 
 public:
-	// struct IdxT {
-	// 		enum TypeE {
-	// 			A_IDX = 0, B_IDX, C_IDX, D_IDX, _Count
-	// 		};
+    // struct IdxT {
+    // 		enum TypeE {
+    // 			A_IDX = 0, B_IDX, C_IDX, D_IDX, _Count
+    // 		};
 
-	// 		static const char * asStr(const TypeE & inType) {
-	// 			switch (inType) {
-	// 			case A_IDX:
-	// 				return "A_IDX";
-	// 			case B_IDX:
-	// 				return "B_IDX";
-	// 			case C_IDX:
-	// 				return "C_IDX";
-	// 			case D_IDX:
-	// 				return "D_IDX";
-	// 		default:
-	// 			return "<?>";
-	// 		}
-	// 	}
-	// 	MAC_AS_TYPE(Type, E, _Count);
-	// };
+    // 		static const char * asStr(const TypeE & inType) {
+    // 			switch (inType) {
+    // 			case A_IDX:
+    // 				return "A_IDX";
+    // 			case B_IDX:
+    // 				return "B_IDX";
+    // 			case C_IDX:
+    // 				return "C_IDX";
+    // 			case D_IDX:
+    // 				return "D_IDX";
+    // 		default:
+    // 			return "<?>";
+    // 		}
+    // 	}
+    // 	MAC_AS_TYPE(Type, E, _Count);
+    // };
 
 
 
-	std::string getName() const override;
-	std::vector<std::string> getParmNames() const override;
+    std::string getName() const override;
 
-  float fx(float x, const gsl_vector * curveParms) const override;
+    std::vector<std::string> getParmNames() const override;
 
-	void makeGuess(const GslMultiFitParmsT & inData, gsl_vector * guess) override;
-	int gslFx(const gsl_vector * curveParms, const GslMultiFitParmsT * gslParms, gsl_vector * outResultVec) override;
-	int gslDfx(const gsl_vector * x, const GslMultiFitParmsT * gslParms, gsl_matrix * J) override;
-	int gslFdfx(const gsl_vector * x, const GslMultiFitParmsT * gslParms, gsl_vector * f, gsl_matrix * J) override;
+    float fx(float x, const gsl_vector *curveParms) const override;
+
+    void makeGuess(const GslMultiFitParmsT &inData, gsl_vector *guess) override;
+
+    int gslFx(const gsl_vector *curveParms, const GslMultiFitParmsT *gslParms, gsl_vector *outResultVec) override;
+
+    int gslDfx(const gsl_vector *x, const GslMultiFitParmsT *gslParms, gsl_matrix *J) override;
+
+    int gslFdfx(const gsl_vector *x, const GslMultiFitParmsT *gslParms, gsl_vector *f, gsl_matrix *J) override;
 };
 
 #endif /*SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FOCUS_FINDER_LM_FITTING_CURVE_HYPERBOLIC_H_*/

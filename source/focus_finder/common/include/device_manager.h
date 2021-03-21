@@ -35,19 +35,19 @@
 
 class DeviceManagerT {
 private:
-  
+
 public:
-  virtual DeviceManagerTypeT::TypeE getDeviceManagerType() const = 0;
+    virtual DeviceManagerTypeT::TypeE getDeviceManagerType() const = 0;
 
-  virtual bool isReady() const = 0;
+    virtual bool isReady() const = 0;
 
-  /**
-   * Get device object ptr by name.
-   *
-   * @param deviceName Name of the device
-   * @return Returns nullptr if not found.
-   */
-   virtual std::shared_ptr<DeviceT> getDevice(const std::string & deviceName) = 0;
+    /**
+     * Get device object ptr by name.
+     *
+     * @param deviceName Name of the device
+     * @return Returns nullptr if not found.
+     */
+    virtual std::shared_ptr<DeviceT> getDevice(const std::string &deviceName) = 0;
 
     /**
      * Get list of device object ptrs by interface type.
@@ -55,7 +55,7 @@ public:
      * @param interfaceType Type of the device interface
      * @return Returns empty vector if no devices with given interface type found.
      */
-   virtual std::vector<std::shared_ptr<DeviceT> > getDevices(DeviceInterfaceTypeT::TypeE interfaceType) = 0;
+    virtual std::vector<std::shared_ptr<DeviceT> > getDevices(DeviceInterfaceTypeT::TypeE interfaceType) = 0;
 
     // Convenience functions...
     /**

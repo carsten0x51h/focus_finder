@@ -43,8 +43,7 @@ namespace Ui {
 /**
 *  @brief
 */
-class FwhmViewPanelT : public QWidget
-{
+class FwhmViewPanelT : public QWidget {
 Q_OBJECT
 
 public:
@@ -52,7 +51,7 @@ public:
     *  @brief
     *    Constructor
     */
-FwhmViewPanelT(QWidget * parent, FocusFinderLogicT & ffl);
+    FwhmViewPanelT(QWidget *parent, FocusFinderLogicT &ffl);
 
     /**
     *  @brief
@@ -60,19 +59,20 @@ FwhmViewPanelT(QWidget * parent, FocusFinderLogicT & ffl);
     */
     virtual ~FwhmViewPanelT();
 
-	void reset();
-	void setFwhm(const FwhmT & fwhm);
+    void reset();
+
+    void setFwhm(const FwhmT &fwhm);
 
 signals:
 
 protected slots:
 
 protected:
-	const QScopedPointer<Ui::FwhmViewPanel> m_ui;
+    const QScopedPointer<Ui::FwhmViewPanel> m_ui;
 
 private:
-	FocusFinderLogicT & mFfl;
-	FwhmViewWidgetT * mFwhmWidget;
+    FocusFinderLogicT &mFfl;
+    FwhmViewWidgetT *mFwhmWidget;
 };
 
 #endif /*SOURCE_FOCUS_FINDER_GUI_INCLUDE_FWHM_VIEW_PANEL_H_*/

@@ -38,8 +38,11 @@
 DEF_Exception(Device);
 
 class DeviceInterfaceT;
+
 class CameraInterfaceT;
+
 class FocusInterfaceT;
+
 class FilterInterfaceT;
 
 /**
@@ -48,24 +51,25 @@ class FilterInterfaceT;
 class DeviceT {
 
 private:
-	// We do not want device copies
-	DeviceT(const DeviceT &);
-	DeviceT & operator=(const DeviceT &);
+    // We do not want device copies
+    DeviceT(const DeviceT &);
 
-	/**
-	 * This flag is true if the corresponding part on the serverside is available (common case).
-	 * However, if a device gets removed for some reason on the server side, this flag will turn false.
-	 * It will turn true again, when the device becomes available again. In this case also a new
-	 * base device handle will be set.
-	 */
-	bool mIsAvailable;
+    DeviceT &operator=(const DeviceT &);
 
-    typedef boost::signals2::signal<void (void)> DeviceConnectingListenersT;
-    typedef boost::signals2::signal<void (void)> DeviceConnectedListenersT;
-    typedef boost::signals2::signal<void (void)> DeviceDisconnectingListenersT;
-    typedef boost::signals2::signal<void (void)> DeviceDisconnectedListenersT;
+    /**
+     * This flag is true if the corresponding part on the serverside is available (common case).
+     * However, if a device gets removed for some reason on the server side, this flag will turn false.
+     * It will turn true again, when the device becomes available again. In this case also a new
+     * base device handle will be set.
+     */
+    bool mIsAvailable;
+
+    typedef boost::signals2::signal<void(void)> DeviceConnectingListenersT;
+    typedef boost::signals2::signal<void(void)> DeviceConnectedListenersT;
+    typedef boost::signals2::signal<void(void)> DeviceDisconnectingListenersT;
+    typedef boost::signals2::signal<void(void)> DeviceDisconnectedListenersT;
     //typedef boost::signals2::signal<void (void)> DeviceConnectCancelledListenersT;
-    typedef boost::signals2::signal<void (void)> DeviceConnectionTimeoutListenersT;
+    typedef boost::signals2::signal<void(void)> DeviceConnectionTimeoutListenersT;
 
     DeviceConnectedListenersT mDeviceConnectedListeners;
     DeviceConnectingListenersT mDeviceConnectingListeners;
@@ -75,10 +79,11 @@ private:
     DeviceConnectionTimeoutListenersT mDeviceConnectionTimeoutListeners;
 
 public:
-	DeviceT();
+    DeviceT();
+
     virtual ~DeviceT();
 
-	virtual std::string getName() const = 0;
+    virtual std::string getName() const = 0;
 
     static const std::string NONE;
 
@@ -92,29 +97,29 @@ public:
 	 *
 	 * @return
 	 */
-	virtual std::set<DeviceInterfaceTypeT::TypeE> getSupportedInferfaces() const = 0;
+    virtual std::set<DeviceInterfaceTypeT::TypeE> getSupportedInferfaces() const = 0;
 
 
-	/**
-	 * Uses getSupportedInferfaceTypes() to easily check if a given interface type is supported
-	 * by the device.
-	 *
-	 * @return
-	 */
-	bool isInterfaceSupported(DeviceInterfaceTypeT::TypeE) const;
+    /**
+     * Uses getSupportedInferfaceTypes() to easily check if a given interface type is supported
+     * by the device.
+     *
+     * @return
+     */
+    bool isInterfaceSupported(DeviceInterfaceTypeT::TypeE) const;
 
 
-	/**
-	 *
-	 */
-	virtual std::shared_ptr<DeviceInterfaceT> getInterface(DeviceInterfaceTypeT::TypeE interfaceType) = 0;
+    /**
+     *
+     */
+    virtual std::shared_ptr<DeviceInterfaceT> getInterface(DeviceInterfaceTypeT::TypeE interfaceType) = 0;
 
 
-	/**
-	 * Conenience function to get the camera interface.
-	 *
-	 * @return
-	 */
+    /**
+     * Conenience function to get the camera interface.
+     *
+     * @return
+     */
     std::shared_ptr<CameraInterfaceT> getCameraInterface();
 
     /**
@@ -131,20 +136,20 @@ public:
      */
     std::shared_ptr<FilterInterfaceT> getFilterInterface();
 
-	/**
-	 * DeviceInterfaceT has no state. It is just a wrapper / facade to make access
-	 * to the device interface more comfortable.
-	 * TODO / WRONG! DeviceInterfaces can have a state - e.g. IndiCameraInterfaceT has an additional state for counting the number of images to record
-	 * --> Probably this is not a good idea. Should additional states be removed from a wrapper?
-	 * --> Depending on that retuen by value or a shred_ptr... I guess a PTR is required anyway!!!!!
-	 *
-	 * Throws if requested interface type is not supported.
-	 *
-	 * @param interfaceType
-	 * @return
-	 */
+    /**
+     * DeviceInterfaceT has no state. It is just a wrapper / facade to make access
+     * to the device interface more comfortable.
+     * TODO / WRONG! DeviceInterfaces can have a state - e.g. IndiCameraInterfaceT has an additional state for counting the number of images to record
+     * --> Probably this is not a good idea. Should additional states be removed from a wrapper?
+     * --> Depending on that retuen by value or a shred_ptr... I guess a PTR is required anyway!!!!!
+     *
+     * Throws if requested interface type is not supported.
+     *
+     * @param interfaceType
+     * @return
+     */
 // TODO............
-	//	virtual DeviceInterfaceT getInterface(DeviceInterfaceTypeT::TypeE interfaceType) = 0;
+    //	virtual DeviceInterfaceT getInterface(DeviceInterfaceTypeT::TypeE interfaceType) = 0;
 //
 //	OR just
 //
@@ -172,37 +177,50 @@ public:
     virtual void disconnect() = 0;  // Expected to be non-blocking
 
     virtual bool isConnected() const = 0;
+
     virtual bool isConnecting() const = 0;
+
     virtual bool isDisconnected() const = 0;
+
     virtual bool isDisconnecting() const = 0;
 
     bool isAvailable() const;
+
     void setAvailable(bool isAvailable);
 
 
     virtual DeviceConnectionStateT::TypeE getConnectionState() const = 0;
 
     // Register on events
-    boost::signals2::connection registerDeviceConnectedListener(const DeviceConnectedListenersT::slot_type & inCallBack) {
+    boost::signals2::connection
+    registerDeviceConnectedListener(const DeviceConnectedListenersT::slot_type &inCallBack) {
         return mDeviceConnectedListeners.connect(inCallBack);
     }
-    template <class T> void unregisterDeviceConnectedListener(const T & inCallBack) {
+
+    template<class T>
+    void unregisterDeviceConnectedListener(const T &inCallBack) {
         //mDeviceConnectedListeners.disconnect(inCallBack);
         inCallBack.disconnect();
     }
 
-    boost::signals2::connection registerDeviceConnectingListener(const DeviceConnectingListenersT::slot_type & inCallBack) {
+    boost::signals2::connection
+    registerDeviceConnectingListener(const DeviceConnectingListenersT::slot_type &inCallBack) {
         return mDeviceConnectingListeners.connect(inCallBack);
     }
-    template <class T> void unregisterDeviceConnectingListener(const T & inCallBack) {
+
+    template<class T>
+    void unregisterDeviceConnectingListener(const T &inCallBack) {
         //mDeviceConnectingListeners.disconnect(inCallBack);
         inCallBack.disconnect();
     }
 
-    boost::signals2::connection registerDeviceDisconnectingListener(const DeviceDisconnectingListenersT::slot_type & inCallBack) {
+    boost::signals2::connection
+    registerDeviceDisconnectingListener(const DeviceDisconnectingListenersT::slot_type &inCallBack) {
         return mDeviceDisconnectingListeners.connect(inCallBack);
     }
-    template <class T> void unregisterDeviceDisconnectingListener(const T & inCallBack) {
+
+    template<class T>
+    void unregisterDeviceDisconnectingListener(const T &inCallBack) {
         //mDeviceConnectingListeners.disconnect(inCallBack);
         inCallBack.disconnect();
     }
@@ -215,30 +233,39 @@ public:
 //		inCallBack.disconnect();
 //	}
 
-    boost::signals2::connection registerDeviceDisconnectedListener(const DeviceDisconnectedListenersT::slot_type & inCallBack) {
+    boost::signals2::connection
+    registerDeviceDisconnectedListener(const DeviceDisconnectedListenersT::slot_type &inCallBack) {
         return mDeviceDisconnectedListeners.connect(inCallBack);
     }
-    template <class T> void unregisterDeviceDisconnectedListener(const T & inCallBack) {
+
+    template<class T>
+    void unregisterDeviceDisconnectedListener(const T &inCallBack) {
         //mDeviceDisconnectedListeners.disconnect(inCallBack);
         inCallBack.disconnect();
     }
 
-    boost::signals2::connection registerConnectionTimeoutListener(const DeviceConnectionTimeoutListenersT::slot_type & inCallBack) {
+    boost::signals2::connection
+    registerConnectionTimeoutListener(const DeviceConnectionTimeoutListenersT::slot_type &inCallBack) {
         return mDeviceConnectionTimeoutListeners.connect(inCallBack);
     }
-    template <class T> void unregisterConnectionTimeoutListener(const T & inCallBack) {
+
+    template<class T>
+    void unregisterConnectionTimeoutListener(const T &inCallBack) {
         //mDeviceConnectionTimeoutListeners.disconnect(inCallBack);
         inCallBack.disconnect();
     }
 
 
-
 protected:
     // To be used by startExposure, cancelExposure and actual device implementation.
     void notifyDeviceConnected() { mDeviceConnectedListeners(); };
+
     void notifyDeviceConnecting() { mDeviceConnectingListeners(); };
+
     void notifyDeviceDisconnected() { mDeviceDisconnectedListeners(); };
+
     void notifyDeviceDisconnecting() { mDeviceDisconnectingListeners(); };
+
     //void notifyDeviceConnectCancelled() { mDeviceConnectCancelledListeners(); }
     void notifyDeviceConnectionTimeout() { mDeviceConnectionTimeoutListeners(); }
 

@@ -38,86 +38,86 @@
 
 class FocusCurveRecordBuilderT {
 private:
-  TimestampT mCreationTimestamp;
-  int mCurrentFocusPos;
-  std::tuple<float, float> mDrift;
-  std::chrono::duration<float> mExposureTime;
+    TimestampT mCreationTimestamp;
+    int mCurrentFocusPos;
+    std::tuple<float, float> mDrift;
+    std::chrono::duration<float> mExposureTime;
 
-  float mSnr;
-  FwhmT mFwhmHorz;
-  FwhmT mFwhmVert;
-  HfdT mHfd;
-  ImageT mCorrectedStarImage;
-  
+    float mSnr;
+    FwhmT mFwhmHorz;
+    FwhmT mFwhmVert;
+    HfdT mHfd;
+    ImageT mCorrectedStarImage;
+
 public:
-	FocusCurveRecordBuilderT() :
-			mCurrentFocusPos(0), mSnr(0), mDrift(0, 0) {
-		// TODO: Automatically sets the creation date and time (?)
-	}
+    FocusCurveRecordBuilderT() :
+            mCurrentFocusPos(0), mSnr(0), mDrift(0, 0) {
+        // TODO: Automatically sets the creation date and time (?)
+    }
 
-	FocusCurveRecordBuilderT & setCreationTimestamp(TimestampT creationTimestamp) {
-		mCreationTimestamp = creationTimestamp;
-		return (*this);
-	}
+    FocusCurveRecordBuilderT &setCreationTimestamp(TimestampT creationTimestamp) {
+        mCreationTimestamp = creationTimestamp;
+        return (*this);
+    }
 
-  
-	FocusCurveRecordBuilderT & setAbsoluteFocusPos(int currentFocusPos) {
-		mCurrentFocusPos = currentFocusPos;
-		return (*this);
-	}
+
+    FocusCurveRecordBuilderT &setAbsoluteFocusPos(int currentFocusPos) {
+        mCurrentFocusPos = currentFocusPos;
+        return (*this);
+    }
 
 //	.setCenterCoords()						// In abs coords for UI to set cross / ROI frame...
 //	.setDrift()								// dx, dy - how far did star center move since last shot
 
 // SNR of the star image
-	FocusCurveRecordBuilderT & setSnr(float snr) {
-		mSnr = snr;
-		return (*this);
-	}
+    FocusCurveRecordBuilderT &setSnr(float snr) {
+        mSnr = snr;
+        return (*this);
+    }
 
-	// Horizontal Star FWHM
-	FocusCurveRecordBuilderT & setHorzFwhm(const FwhmT & fwhmHorz) {
-		mFwhmHorz = fwhmHorz;
-		return (*this);
-	}
+    // Horizontal Star FWHM
+    FocusCurveRecordBuilderT &setHorzFwhm(const FwhmT &fwhmHorz) {
+        mFwhmHorz = fwhmHorz;
+        return (*this);
+    }
 
-	// Vertical Star FWHM
-	FocusCurveRecordBuilderT & setVertFwhm(const FwhmT & fwhmVert) {
-		mFwhmVert = fwhmVert;
-		return (*this);
-	}
+    // Vertical Star FWHM
+    FocusCurveRecordBuilderT &setVertFwhm(const FwhmT &fwhmVert) {
+        mFwhmVert = fwhmVert;
+        return (*this);
+    }
 
-	// Star HFD
-	FocusCurveRecordBuilderT & setHfd(const HfdT & hfd) {
-		mHfd = hfd;
-		return (*this);
-	}
+    // Star HFD
+    FocusCurveRecordBuilderT &setHfd(const HfdT &hfd) {
+        mHfd = hfd;
+        return (*this);
+    }
 
-	FocusCurveRecordBuilderT & setCorrectedStarImage(
-			const ImageT & correctedStarImage) {
-		mCorrectedStarImage = correctedStarImage;
-		return (*this);
-	}
+    FocusCurveRecordBuilderT &setCorrectedStarImage(
+            const ImageT &correctedStarImage) {
+        mCorrectedStarImage = correctedStarImage;
+        return (*this);
+    }
 
-	// dx, dy - how far did star center move since last shot
-	FocusCurveRecordBuilderT & setDrift(
-					const std::tuple<float, float> & drift) {
-				mDrift = drift;
-				return (*this);
-			}
+    // dx, dy - how far did star center move since last shot
+    FocusCurveRecordBuilderT &setDrift(
+            const std::tuple<float, float> &drift) {
+        mDrift = drift;
+        return (*this);
+    }
 
-	FocusCurveRecordBuilderT & setExposureTime(
-			std::chrono::duration<float> exposureTime) {
-		mExposureTime = exposureTime;
-		return (*this);
-	}
+    FocusCurveRecordBuilderT &setExposureTime(
+            std::chrono::duration<float> exposureTime) {
+        mExposureTime = exposureTime;
+        return (*this);
+    }
 
-  
-	std::shared_ptr<FocusCurveRecordT> build() const {
-	  return std::make_shared<FocusCurveRecordT>(mCreationTimestamp, mCurrentFocusPos, mExposureTime, mSnr,
-				mFwhmHorz, mFwhmVert, mHfd, mCorrectedStarImage,
-				mDrift);
-	}
+
+    std::shared_ptr<FocusCurveRecordT> build() const {
+        return std::make_shared<FocusCurveRecordT>(mCreationTimestamp, mCurrentFocusPos, mExposureTime, mSnr,
+                                                   mFwhmHorz, mFwhmVert, mHfd, mCorrectedStarImage,
+                                                   mDrift);
+    }
 
 };
 

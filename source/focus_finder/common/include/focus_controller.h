@@ -50,127 +50,153 @@ class CurveFunctionT;
 //       -> overwrite setCamera and call super method?
 
 DEF_Exception(FocusController);
+
 DEF_Exception(FocusControllerFailed);
+
 DEF_Exception(FocusControllerCancelled);
 
 class FocusControllerT {
 private:
-  // Prevent copy of FocusControllerT
-  FocusControllerT(const FocusControllerT &);
-  FocusControllerT & operator=(const FocusControllerT &);
+    // Prevent copy of FocusControllerT
+    FocusControllerT(const FocusControllerT &);
 
-  std::shared_ptr<CameraInterfaceT> mCamera;
-  std::shared_ptr<FocusInterfaceT> mFocus;
-  std::shared_ptr<FilterInterfaceT> mFilter;
+    FocusControllerT &operator=(const FocusControllerT &);
 
-  PointFT mLastFocusStarPos;
-  FocusFinderProfileT mFocusFinderProfile;
+    std::shared_ptr<CameraInterfaceT> mCamera;
+    std::shared_ptr<FocusInterfaceT> mFocus;
+    std::shared_ptr<FilterInterfaceT> mFilter;
+
+    PointFT mLastFocusStarPos;
+    FocusFinderProfileT mFocusFinderProfile;
 
 
-  // TODO: Rename FocusCurveRecordT to FocusControllerRecordT? Or just RecordT? or StarRecordT?
-  typedef boost::signals2::signal<void(float, std::string, std::shared_ptr<FocusCurveRecordT>)> FocusControllerProgressUpdateListenersT;
-  FocusControllerProgressUpdateListenersT mFocusControllerProgressUpdateListeners;
-  
-  typedef boost::signals2::signal<void(std::shared_ptr<FocusCurveRecordT>)> FocusControllerNewRecordListenersT;
-  FocusControllerNewRecordListenersT mFocusControllerNewRecordListeners;
+    // TODO: Rename FocusCurveRecordT to FocusControllerRecordT? Or just RecordT? or StarRecordT?
+    typedef boost::signals2::signal<void(float, std::string,
+                                         std::shared_ptr<FocusCurveRecordT>)> FocusControllerProgressUpdateListenersT;
+    FocusControllerProgressUpdateListenersT mFocusControllerProgressUpdateListeners;
 
-    
-  void waitForFocus(std::chrono::milliseconds timeout, bool ignoreCancel = false) const;
-  void onImageReceived(RectT<unsigned int> roi, std::shared_ptr<const ImageT> image, bool lastFrame);
-  BoundaryLocationT::TypeE determineBoundaryLoc(float lowerFocusMeasure, float upperFocusMeasure, float focusMeasure) const;
+    typedef boost::signals2::signal<void(std::shared_ptr<FocusCurveRecordT>)> FocusControllerNewRecordListenersT;
+    FocusControllerNewRecordListenersT mFocusControllerNewRecordListeners;
 
-  
-  std::shared_ptr<const ImageT> mCurrentImage;
-  
-  boost::signals2::connection mCameraExposureFinishedConnection;
-  
-  std::atomic<bool> mCancelled;
-  std::condition_variable cv;
-  std::mutex cvMutex;
-  
-  int mInitialFocusPos;
 
- protected:
-  void notifyFocusControllerProgressUpdate(float progress,
-				       const std::string & msg, std::shared_ptr<FocusCurveRecordT> focusCurveRecord = nullptr) const {
-    mFocusControllerProgressUpdateListeners(progress, msg, focusCurveRecord);
-  }
-  void notifyFocusControllerProgressUpdate(const std::string & msg, std::shared_ptr<FocusCurveRecordT> focusCurveRecord = nullptr) const {
-    mFocusControllerProgressUpdateListeners(-1.0F, msg, focusCurveRecord);
-  }
-  void notifyFocusControllerProgressUpdate(std::shared_ptr<FocusCurveRecordT> focusCurveRecord = nullptr) const {
-    mFocusControllerProgressUpdateListeners(-1.0F, "", focusCurveRecord);
-  }
-  void notifyFocusControllerNewRecord(std::shared_ptr<FocusCurveRecordT> focusCurveRecord) {
-    mFocusControllerNewRecordListeners(focusCurveRecord);
-  }
+    void waitForFocus(std::chrono::milliseconds timeout, bool ignoreCancel = false) const;
+
+    void onImageReceived(RectT<unsigned int> roi, std::shared_ptr<const ImageT> image, bool lastFrame);
+
+    BoundaryLocationT::TypeE
+    determineBoundaryLoc(float lowerFocusMeasure, float upperFocusMeasure, float focusMeasure) const;
+
+
+    std::shared_ptr<const ImageT> mCurrentImage;
+
+    boost::signals2::connection mCameraExposureFinishedConnection;
+
+    std::atomic<bool> mCancelled;
+    std::condition_variable cv;
+    std::mutex cvMutex;
+
+    int mInitialFocusPos;
+
+protected:
+    void notifyFocusControllerProgressUpdate(float progress,
+                                             const std::string &msg,
+                                             std::shared_ptr<FocusCurveRecordT> focusCurveRecord = nullptr) const {
+        mFocusControllerProgressUpdateListeners(progress, msg, focusCurveRecord);
+    }
+
+    void notifyFocusControllerProgressUpdate(const std::string &msg,
+                                             std::shared_ptr<FocusCurveRecordT> focusCurveRecord = nullptr) const {
+        mFocusControllerProgressUpdateListeners(-1.0F, msg, focusCurveRecord);
+    }
+
+    void notifyFocusControllerProgressUpdate(std::shared_ptr<FocusCurveRecordT> focusCurveRecord = nullptr) const {
+        mFocusControllerProgressUpdateListeners(-1.0F, "", focusCurveRecord);
+    }
+
+    void notifyFocusControllerNewRecord(std::shared_ptr<FocusCurveRecordT> focusCurveRecord) {
+        mFocusControllerNewRecordListeners(focusCurveRecord);
+    }
 
 public:
-  //FocusControllerT();
-  FocusControllerT(std::shared_ptr<CameraInterfaceT> camera, std::shared_ptr<FocusInterfaceT> focus, std::shared_ptr<FilterInterfaceT> filter);
-  ~FocusControllerT();
+    //FocusControllerT();
+    FocusControllerT(std::shared_ptr<CameraInterfaceT> camera, std::shared_ptr<FocusInterfaceT> focus,
+                     std::shared_ptr<FilterInterfaceT> filter);
 
-  void cancel();
-  
-  std::shared_ptr<CameraInterfaceT> getCamera() const;
-  //  void setCamera(std::shared_ptr<CameraInterfaceT> camera);
+    ~FocusControllerT();
 
-  std::shared_ptr<FocusInterfaceT> getFocus() const;
-  //  void setFocus(std::shared_ptr<FocusInterfaceT> focus);
+    void cancel();
 
-  std::shared_ptr<FilterInterfaceT> getFilter() const;
-  //  void setFilter(std::shared_ptr<FilterInterfaceT> filter);
-  
-  // TODO: Maybe we find a better name?!
-  void setLastFocusStarPos(PointFT lastFocusStarPos);
-  PointFT getLastFocusStarPos() const;
+    std::shared_ptr<CameraInterfaceT> getCamera() const;
+    //  void setCamera(std::shared_ptr<CameraInterfaceT> camera);
 
-  void setFocusFinderProfile(const FocusFinderProfileT & profile);
-  const FocusFinderProfileT & getFocusFinderProfile() const;
+    std::shared_ptr<FocusInterfaceT> getFocus() const;
+    //  void setFocus(std::shared_ptr<FocusInterfaceT> focus);
 
+    std::shared_ptr<FilterInterfaceT> getFilter() const;
+    //  void setFilter(std::shared_ptr<FilterInterfaceT> filter);
 
-  void devicesAvailabilityCheck();
-  
-  void checkIfStarIsThere(const ImageT & img, float * outSnr = 0) const;
-  void runExposureBlocking(std::chrono::milliseconds expTime);
-  void moveFocusByBlocking(FocusDirectionT::TypeE direction, int ticks, std::chrono::milliseconds timeout);
-  void moveFocusToBlocking(int absPos, std::chrono::milliseconds timeout, bool ignoreCancel = false);
-  
-  void checkCancelled() const;
-  
-  SelfOrientationResultT performSelfOrientation(float focusMeasureLimit);
+    // TODO: Maybe we find a better name?!
+    void setLastFocusStarPos(PointFT lastFocusStarPos);
 
-  // TODO: Could there also be a "binary search" to be faster than "boundaryScanLinear" even without having a curve?!
-  void boundaryScanLinear(const SelfOrientationResultT & selfOrientationResult, float stepSize, float focusMeasureLimit);
+    PointFT getLastFocusStarPos() const;
 
-  int boundaryScanWithFocusCurveSupport(std::shared_ptr<CurveFunctionT> focusCurveFunction, const SelfOrientationResultT & selfOrientationResult, FocusMeasureTypeT::TypeE curveFocusMeasureType, float focusMeasureLimit, float focusMeasureDelta = 1.5F);
-  
+    void setFocusFinderProfile(const FocusFinderProfileT &profile);
 
-  std::shared_ptr<FocusCurveRecordT> measureFocus();
-  
-  void cleanup(); // NOTE: Called from destructor
+    const FocusFinderProfileT &getFocusFinderProfile() const;
 
 
-  
-  boost::signals2::connection registerFocusControllerProgressUpdateListener(
-									       const FocusControllerProgressUpdateListenersT::slot_type & inCallBack) {
-    return mFocusControllerProgressUpdateListeners.connect(inCallBack);
-  }
-  template<class T> void unregistermFocusControllerProgressUpdateListener(
-									    const T & inCallBack) {
-    inCallBack.disconnect();
-  }
+    void devicesAvailabilityCheck();
 
-  boost::signals2::connection registerFocusControllerNewRecordListener(
-									       const FocusControllerNewRecordListenersT::slot_type & inCallBack) {
-    return mFocusControllerNewRecordListeners.connect(inCallBack);
-  }
-  template<class T> void unregisterFocusControllerNewRecordListener(
-									    const T & inCallBack) {
-    inCallBack.disconnect();
-  }
+    void checkIfStarIsThere(const ImageT &img, float *outSnr = 0) const;
+
+    void runExposureBlocking(std::chrono::milliseconds expTime);
+
+    void moveFocusByBlocking(FocusDirectionT::TypeE direction, int ticks, std::chrono::milliseconds timeout);
+
+    void moveFocusToBlocking(int absPos, std::chrono::milliseconds timeout, bool ignoreCancel = false);
+
+    void checkCancelled() const;
+
+    SelfOrientationResultT performSelfOrientation(float focusMeasureLimit);
+
+    // TODO: Could there also be a "binary search" to be faster than "boundaryScanLinear" even without having a curve?!
+    void
+    boundaryScanLinear(const SelfOrientationResultT &selfOrientationResult, float stepSize, float focusMeasureLimit);
+
+    int boundaryScanWithFocusCurveSupport(std::shared_ptr<CurveFunctionT> focusCurveFunction,
+                                          const SelfOrientationResultT &selfOrientationResult,
+                                          FocusMeasureTypeT::TypeE curveFocusMeasureType, float focusMeasureLimit,
+                                          float focusMeasureDelta = 1.5F);
+
+
+    std::shared_ptr<FocusCurveRecordT> measureFocus();
+
+    void cleanup(); // NOTE: Called from destructor
+
+
+
+    boost::signals2::connection registerFocusControllerProgressUpdateListener(
+            const FocusControllerProgressUpdateListenersT::slot_type &inCallBack) {
+        return mFocusControllerProgressUpdateListeners.connect(inCallBack);
+    }
+
+    template<class T>
+    void unregistermFocusControllerProgressUpdateListener(
+            const T &inCallBack) {
+        inCallBack.disconnect();
+    }
+
+    boost::signals2::connection registerFocusControllerNewRecordListener(
+            const FocusControllerNewRecordListenersT::slot_type &inCallBack) {
+        return mFocusControllerNewRecordListeners.connect(inCallBack);
+    }
+
+    template<class T>
+    void unregisterFocusControllerNewRecordListener(
+            const T &inCallBack) {
+        inCallBack.disconnect();
+    }
 };
-
 
 
 #endif /*SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FOCUS_ANALYZER_H_*/

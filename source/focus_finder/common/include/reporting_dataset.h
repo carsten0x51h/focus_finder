@@ -32,21 +32,25 @@
 
 class ReportingDatasetT {
 private:
-	std::string mSender;
-	std::string mTitle;
-	std::string mDetails;
-	std::time_t mTime;
+    std::string mSender;
+    std::string mTitle;
+    std::string mDetails;
+    std::time_t mTime;
 
 public:
-	ReportingDatasetT();
-	ReportingDatasetT(const std::string & sender, const std::string & title, const std::string & details);
+    ReportingDatasetT();
 
-	std::time_t getTime() const;
-	std::string getSender() const;
-	std::string getTitle() const;
-	std::string getDetails() const;
+    ReportingDatasetT(const std::string &sender, const std::string &title, const std::string &details);
 
-	friend std::ostream& operator<<(std::ostream& os, const ReportingDatasetT& reportingDataset);
+    std::time_t getTime() const;
+
+    std::string getSender() const;
+
+    std::string getTitle() const;
+
+    std::string getDetails() const;
+
+    friend std::ostream &operator<<(std::ostream &os, const ReportingDatasetT &reportingDataset);
 };
 
 #endif /* SOURCE_FOCUS_FINDER_COMMON_INCLUDE_REPORTING_DATASET_H_ */

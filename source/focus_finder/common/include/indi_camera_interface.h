@@ -56,85 +56,107 @@ using namespace std::chrono_literals;
 class IndiCameraInterfaceT : virtual public CameraInterfaceT {
 
 public:
-	IndiCameraInterfaceT(IndiDeviceT * indiDevice);
-	virtual ~IndiCameraInterfaceT();
+    IndiCameraInterfaceT(IndiDeviceT *indiDevice);
 
-	std::string getName() const;
-    DeviceT * getParentDevice();
+    virtual ~IndiCameraInterfaceT();
 
-	unsigned int getBitsPerPixel() const;
-	SizeT<float> getPixelSize() const;
-	SizeT<unsigned int> getMaxResolution() const;
+    std::string getName() const;
 
-	std::chrono::milliseconds getMinExposureTime() const;
-	std::chrono::milliseconds getMaxExposureTime() const;
+    DeviceT *getParentDevice();
+
+    unsigned int getBitsPerPixel() const;
+
+    SizeT<float> getPixelSize() const;
+
+    SizeT<unsigned int> getMaxResolution() const;
+
+    std::chrono::milliseconds getMinExposureTime() const;
+
+    std::chrono::milliseconds getMaxExposureTime() const;
 
 
-	void startExposure();
-	void cancelExposure();
-	bool isExposureRunning();
+    void startExposure();
 
-	std::chrono::milliseconds getExposureTime() const;
-	void setExposureTime(const std::chrono::milliseconds & exposureTime);
+    void cancelExposure();
 
-	void setExposureDelay(const std::chrono::milliseconds & exposureDelay);
-	std::chrono::milliseconds getExposureDelay() const;
+    bool isExposureRunning();
 
-	LoopModeT::TypeE getLoopMode() const;
-	void setLoopMode(LoopModeT::TypeE loopMode);
+    std::chrono::milliseconds getExposureTime() const;
 
-	std::list<FrameTypeT::TypeE> getSupportedFrameTypes() const;
-	FrameTypeT::TypeE getFrameType() const;
-	void setFrameType(FrameTypeT::TypeE frameType);
+    void setExposureTime(const std::chrono::milliseconds &exposureTime);
 
-	BinningT getSupportedMaxBinningMode() const;
-	BinningT getBinning() const;
-	void setBinning(const BinningT & binning);
+    void setExposureDelay(const std::chrono::milliseconds &exposureDelay);
 
-	bool isRoiSupported() const;
-	RectT<unsigned int> getRoi() const;
-	void setRoi(const RectT<unsigned int> &);
-	void clearRoi();
+    std::chrono::milliseconds getExposureDelay() const;
+
+    LoopModeT::TypeE getLoopMode() const;
+
+    void setLoopMode(LoopModeT::TypeE loopMode);
+
+    std::list<FrameTypeT::TypeE> getSupportedFrameTypes() const;
+
+    FrameTypeT::TypeE getFrameType() const;
+
+    void setFrameType(FrameTypeT::TypeE frameType);
+
+    BinningT getSupportedMaxBinningMode() const;
+
+    BinningT getBinning() const;
+
+    void setBinning(const BinningT &binning);
+
+    bool isRoiSupported() const;
+
+    RectT<unsigned int> getRoi() const;
+
+    void setRoi(const RectT<unsigned int> &);
+
+    void clearRoi();
 
 private:
-	void setRoiIndi(const RectT<unsigned int> & roi);
+    void setRoiIndi(const RectT<unsigned int> &roi);
 
 
-	// TODO: This will probably later be IndiDeviceConnectorT - a super
-	//       class of IndiDeviceT and IndiEthernetDeviceConnectorT.
-	//std::shared_ptr<IndiDeviceT> mIndiConnector;
+    // TODO: This will probably later be IndiDeviceConnectorT - a super
+    //       class of IndiDeviceT and IndiEthernetDeviceConnectorT.
+    //std::shared_ptr<IndiDeviceT> mIndiConnector;
 
-	std::shared_ptr<ImageT> convertIndiBlobToCImg(IBLOB* iblob) const;
-	void newNumber(INumberVectorProperty * nvp);
-	void newBlob(IBLOB* blob);
-    void newSwitch(ISwitchVectorProperty* svp);
+    std::shared_ptr<ImageT> convertIndiBlobToCImg(IBLOB *iblob) const;
 
-	bool indiExposure();
-	bool delayedExposueTimer();
+    void newNumber(INumberVectorProperty *nvp);
+
+    void newBlob(IBLOB *blob);
+
+    void newSwitch(ISwitchVectorProperty *svp);
+
+    bool indiExposure();
+
+    bool delayedExposueTimer();
+
 //	bool exposureTimer();
 //	bool transferTimer(std::shared_ptr<ImageT> resultImage);
-	void expose();
+    void expose();
 
 
-    IndiDeviceT * mIndiDevice;
+    IndiDeviceT *mIndiDevice;
 
-	boost::signals2::connection mNewNumberConnection;
-	boost::signals2::connection mNewBlobConnection;
+    boost::signals2::connection mNewNumberConnection;
+    boost::signals2::connection mNewBlobConnection;
     boost::signals2::connection mNewSwitchConnection;
 
-	std::thread exposureThread;
-	std::atomic<bool> cancelExposureFlag;
+    std::thread exposureThread;
+    std::atomic<bool> cancelExposureFlag;
     std::atomic<bool> mIsExposureRunning;
 
-	std::atomic<LoopModeT::TypeE> mLoopMode;
-	std::chrono::milliseconds mExposureDelay; // TODO: atomic?
-	std::chrono::milliseconds mExposureTime; // TODO: atomic?
+    std::atomic<LoopModeT::TypeE> mLoopMode;
+    std::chrono::milliseconds mExposureDelay; // TODO: atomic?
+    std::chrono::milliseconds mExposureTime; // TODO: atomic?
 
-	RectT<unsigned int> mSelectedRoi;
+    RectT<unsigned int> mSelectedRoi;
 
-	std::shared_ptr<ImageT> mResultImage;
-	std::condition_variable cv;
-	std::mutex cvMutex;
+    std::shared_ptr<ImageT> mResultImage;
+    std::condition_variable cv;
+    std::mutex cvMutex;
 };
 
 #endif /* SOURCE_FOCUS_FINDER_COMMON_INDI_CAMERA_INTERFACE_H_ */

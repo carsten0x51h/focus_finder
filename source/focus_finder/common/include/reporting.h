@@ -32,25 +32,27 @@
 
 class ReportingT {
 private:
-	// TODO: Maybe also pass a severity?
-	typedef boost::signals2::signal<void (const ReportingDatasetT &)> NewReportListenersT;
+    // TODO: Maybe also pass a severity?
+    typedef boost::signals2::signal<void(const ReportingDatasetT &)> NewReportListenersT;
 
-	static NewReportListenersT sNewReportListeners;
+    static NewReportListenersT sNewReportListeners;
 
 public:
-	static void reportMsg(const ReportingDatasetT & reportingDataset);
+    static void reportMsg(const ReportingDatasetT &reportingDataset);
 
-	static boost::signals2::connection registerNewReportListener(const NewReportListenersT::slot_type & inCallBack) {
-		return sNewReportListeners.connect(inCallBack);
-	}
-	template <class T> static void unregisterNewReportListener(const T & inCallBack) {
-		inCallBack.disconnect();
-	}
+    static boost::signals2::connection registerNewReportListener(const NewReportListenersT::slot_type &inCallBack) {
+        return sNewReportListeners.connect(inCallBack);
+    }
+
+    template<class T>
+    static void unregisterNewReportListener(const T &inCallBack) {
+        inCallBack.disconnect();
+    }
 
 protected:
-	// NOTE: boost::signals2::signal is thread safe.
-	// See https://theboostcpplibraries.com/boost.signals2-multithreading
-	static void notifyNewReport(const ReportingDatasetT & reportingDataset) { sNewReportListeners(reportingDataset); }
+    // NOTE: boost::signals2::signal is thread safe.
+    // See https://theboostcpplibraries.com/boost.signals2-multithreading
+    static void notifyNewReport(const ReportingDatasetT &reportingDataset) { sNewReportListeners(reportingDataset); }
 
 private:
 };

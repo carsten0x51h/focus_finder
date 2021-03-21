@@ -33,30 +33,28 @@
 #include "include/main_window.h"
 
 
+int main(int argc, char *argv[]) {
+    FocusFinderLogicT::init();
 
-int main(int argc, char *argv[])
-{
-  FocusFinderLogicT::init();
-  
-  QApplication application(argc, argv);
+    QApplication application(argc, argv);
 
 
-  // See https://stackoverflow.com/questions/4448236/how-could-qt-apply-style-from-an-external-qt-stylesheet-file
-  QFile styleSheetFile(":/res/style.qss");
-  styleSheetFile.open(QFile::ReadOnly);
-  QString styleSheet = QLatin1String(styleSheetFile.readAll());
+    // See https://stackoverflow.com/questions/4448236/how-could-qt-apply-style-from-an-external-qt-stylesheet-file
+    QFile styleSheetFile(":/res/style.qss");
+    styleSheetFile.open(QFile::ReadOnly);
+    QString styleSheet = QLatin1String(styleSheetFile.readAll());
 
-  application.setStyleSheet(styleSheet);
+    application.setStyleSheet(styleSheet);
 
 
-  // We may pass the Logic here... however, since it is currently static,
-  // it can be accessed from everywhere in the app without passing it everywhere...
-  MainWindow mainWindow;
-  mainWindow.show();
-  
-  int rc = QApplication::exec();
+    // We may pass the Logic here... however, since it is currently static,
+    // it can be accessed from everywhere in the app without passing it everywhere...
+    MainWindow mainWindow;
+    mainWindow.show();
 
-  FocusFinderLogicT::close();
+    int rc = QApplication::exec();
 
-  return rc;
+    FocusFinderLogicT::close();
+
+    return rc;
 }

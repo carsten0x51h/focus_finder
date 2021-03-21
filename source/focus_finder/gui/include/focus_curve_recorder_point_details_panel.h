@@ -33,6 +33,7 @@
 #include <QHBoxLayout>
 
 class FocusCurveRecorderLogicT;
+
 class FocusCurveRecordT;
 
 namespace Ui {
@@ -42,34 +43,34 @@ namespace Ui {
 /**
 *  @brief
 */
-class FocusCurveRecorderPointDetailsPanelT : public QWidget
-{
-    Q_OBJECT
+class FocusCurveRecorderPointDetailsPanelT : public QWidget {
+Q_OBJECT
 
 public:
-  /**
-   *  @brief
-   *    Constructor
-   */
-  FocusCurveRecorderPointDetailsPanelT(QWidget * parent, std::shared_ptr<FocusCurveRecorderLogicT> focusCurveRecorderLogic);
+    /**
+     *  @brief
+     *    Constructor
+     */
+    FocusCurveRecorderPointDetailsPanelT(QWidget *parent,
+                                         std::shared_ptr<FocusCurveRecorderLogicT> focusCurveRecorderLogic);
 
-  void setPointDetails(std::shared_ptr<FocusCurveRecordT> focusCurveRecord);
-  
-  /**
-   *  @brief
-   *    Destructor
-   */
-  virtual ~FocusCurveRecorderPointDetailsPanelT();
+    void setPointDetails(std::shared_ptr<FocusCurveRecordT> focusCurveRecord);
 
-  void reset();
+    /**
+     *  @brief
+     *    Destructor
+     */
+    virtual ~FocusCurveRecorderPointDetailsPanelT();
+
+    void reset();
 
 protected slots:
 
 protected:
-  const QScopedPointer<Ui::FocusCurveRecorderPointDetailsPanel> m_ui;
+    const QScopedPointer<Ui::FocusCurveRecorderPointDetailsPanel> m_ui;
 
 private:
-  std::shared_ptr<FocusCurveRecorderLogicT> mFocusCurveRecorderLogic;
+    std::shared_ptr<FocusCurveRecorderLogicT> mFocusCurveRecorderLogic;
 };
 
 #endif /*SOURCE_FOCUS_FINDER_GUI_INCLUDE_FOCUS_CURVE_RECORDER_POINT_DETAILS_PANEL_H_*/

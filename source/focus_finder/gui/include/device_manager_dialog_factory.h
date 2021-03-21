@@ -30,11 +30,12 @@
 #include "../../common/include/device_manager.h"
 
 class QDialog;
+
 class QWidget;
 
 class DeviceManagerDialogFactoryT {
 public:
-  static std::shared_ptr<QDialog> getInstance(QWidget * parent, std::shared_ptr<DeviceManagerT> deviceManager);
+    static std::shared_ptr<QDialog> getInstance(QWidget *parent, std::shared_ptr<DeviceManagerT> deviceManager);
 };
 
 

@@ -28,23 +28,24 @@
 #include "enum_helper.h"
 
 struct CentroidTypeT {
-		enum TypeE {
-			IWC, IWC_SUB, MOMENT2, _Count
-		};
+    enum TypeE {
+        IWC, IWC_SUB, MOMENT2, _Count
+    };
 
-		static const char * asStr(const TypeE & inType) {
-			switch (inType) {
-			case IWC:
-				return "IWC";
-			case IWC_SUB:
-				return "IWC_SUB";
-			case MOMENT2:
-				return "MOMENT2";
-		default:
-			return "<?>";
-		}
-	}
-	MAC_AS_TYPE(Type, E, _Count);
+    static const char *asStr(const TypeE &inType) {
+        switch (inType) {
+            case IWC:
+                return "IWC";
+            case IWC_SUB:
+                return "IWC_SUB";
+            case MOMENT2:
+                return "MOMENT2";
+            default:
+                return "<?>";
+        }
+    }
+
+    MAC_AS_TYPE(Type, E, _Count);
 };
 
 #endif /* SOURCE_FOCUS_FINDER_COMMON_INCLUDE_CENTROID_TYPE_H_ */

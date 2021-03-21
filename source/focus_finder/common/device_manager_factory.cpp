@@ -28,13 +28,13 @@
 #include "include/indi_device_manager.h"
 
 std::shared_ptr<DeviceManagerT> DeviceManagerFactoryT::getInstance(
-		const DeviceManagerTypeT::TypeE & type) {
+        const DeviceManagerTypeT::TypeE &type) {
 
-	switch (type) {
-	case DeviceManagerTypeT::INDI:
-		return std::make_shared<IndiDeviceManagerT>();
+    switch (type) {
+        case DeviceManagerTypeT::INDI:
+            return std::make_shared<IndiDeviceManagerT>();
 
-	default:
-		return nullptr;
-	}
+        default:
+            return nullptr;
+    }
 }

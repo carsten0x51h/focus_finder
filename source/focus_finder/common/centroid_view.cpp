@@ -28,44 +28,43 @@
 const float CentroidViewT::defaultScaleFactor = 4.0;
 
 cimg_library::CImg<unsigned char> CentroidViewT::genView(
-		const CentroidT & centroid, float scaleFactor) {
+        const CentroidT &centroid, float scaleFactor) {
 
-	cimg_library::CImg<unsigned char> rgbImg;
+    cimg_library::CImg<unsigned char> rgbImg;
 
-	auto centerOpt = centroid.getCenter();
+    auto centerOpt = centroid.getCenter();
 
-	if (centerOpt.has_value()) {
-		PointT<float> center = centerOpt.value();
+    if (centerOpt.has_value()) {
+        PointT<float> center = centerOpt.value();
 
-		const ImageT & centroidResultImage = centroid.getResultImage();
+        const ImageT &centroidResultImage = centroid.getResultImage();
 
-		rgbImg.assign(centroidResultImage.width(), centroidResultImage.height(),
-				1 /*depth*/, 3 /*3 channels - RGB*/);
+        rgbImg.assign(centroidResultImage.width(), centroidResultImage.height(),
+                      1 /*depth*/, 3 /*3 channels - RGB*/);
 
-		// TODO: We may use the normalize function instead...
-		const float min = centroidResultImage.min();
-		const float mm = centroidResultImage.max() - min;
+        // TODO: We may use the normalize function instead...
+        const float min = centroidResultImage.min();
+        const float mm = centroidResultImage.max() - min;
 
-		cimg_forXY(centroidResultImage, x, y)
-		{
-			int value = 255.0 * (centroidResultImage(x, y) - min) / mm;
-			rgbImg(x, y, 0 /*red*/) = value;
-			rgbImg(x, y, 1 /*green*/) = value;
-			rgbImg(x, y, 2 /*blue*/) = value;
-		}
+        cimg_forXY(centroidResultImage, x, y) {
+                int value = 255.0 * (centroidResultImage(x, y) - min) / mm;
+                rgbImg(x, y, 0 /*red*/) = value;
+                rgbImg(x, y, 1 /*green*/) = value;
+                rgbImg(x, y, 2 /*blue*/) = value;
+            }
 
-		// Draw center cross
-		const unsigned char red[3] = { 255, 0, 0 };
+        // Draw center cross
+        const unsigned char red[3] = {255, 0, 0};
 
-		// Scale image
-		rgbImg.resize(scaleFactor * rgbImg.width(),
-				scaleFactor * rgbImg.height(), -100 /*size_z*/, -100 /*size_c*/,
-				1 /*interpolation_type*/);
+        // Scale image
+        rgbImg.resize(scaleFactor * rgbImg.width(),
+                      scaleFactor * rgbImg.height(), -100 /*size_z*/, -100 /*size_c*/,
+                      1 /*interpolation_type*/);
 
-		DrawHelperT::drawCross(&rgbImg,
-				floor(scaleFactor * std::get<0>(center) + 0.5),
-				floor(scaleFactor * std::get<1>(center) + 0.5), red,
-				3 /*cross-size*/, 1.0 /*scale factor*/, 1 /*opacity*/);
-	}
-	return rgbImg; // Make a copy...
+        DrawHelperT::drawCross(&rgbImg,
+                               floor(scaleFactor * std::get<0>(center) + 0.5),
+                               floor(scaleFactor * std::get<1>(center) + 0.5), red,
+                               3 /*cross-size*/, 1.0 /*scale factor*/, 1 /*opacity*/);
+    }
+    return rgbImg; // Make a copy...
 }

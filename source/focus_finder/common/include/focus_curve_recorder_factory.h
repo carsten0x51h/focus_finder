@@ -31,11 +31,13 @@
 #include "enum_helper.h"
 
 class FocusCurveRecorderT;
+
 class FocusControllerT;
 
 class FocusCurveRecorderFactoryT {
 public:
-  static std::shared_ptr<FocusCurveRecorderT> getInstance(const FocusCurveRecorderTypeT::TypeE & type, std::shared_ptr<FocusControllerT> focusAnalyzer);
+    static std::shared_ptr<FocusCurveRecorderT>
+    getInstance(const FocusCurveRecorderTypeT::TypeE &type, std::shared_ptr<FocusControllerT> focusAnalyzer);
 };
 
 

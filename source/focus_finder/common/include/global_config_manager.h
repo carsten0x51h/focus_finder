@@ -39,38 +39,38 @@ DEF_Exception(GlobalConfigManager);
  *
  */
 class GlobalConfigManagerT {
-  
-private:
-  static const std::string GLOBAL_CFG_FILENAME;
-  
-  /**
-   *
-   */
-  static std::filesystem::path composeFullGlobalConfigFilePath();
 
-  /**
-   *
-   */
-  GlobalFocusFinderConfigT mGlobalFocusFinderConfig;
+private:
+    static const std::string GLOBAL_CFG_FILENAME;
+
+    /**
+     *
+     */
+    static std::filesystem::path composeFullGlobalConfigFilePath();
+
+    /**
+     *
+     */
+    GlobalFocusFinderConfigT mGlobalFocusFinderConfig;
 
 
 public:
-  GlobalConfigManagerT();
+    GlobalConfigManagerT();
 
-  /**
-   *
-   */
-  static std::filesystem::path getGlobalConfigRootDirectory();
+    /**
+     *
+     */
+    static std::filesystem::path getGlobalConfigRootDirectory();
 
-  /**
-   *
-   */
-  GlobalFocusFinderConfigT getConfig() const;
+    /**
+     *
+     */
+    GlobalFocusFinderConfigT getConfig() const;
 
-  /**
-   *
-   */
-  void setConfig(const GlobalFocusFinderConfigT & modifiedGlobalConfig);
+    /**
+     *
+     */
+    void setConfig(const GlobalFocusFinderConfigT &modifiedGlobalConfig);
 };
 
 #endif /* SOURCE_FOCUS_FINDER_COMMON_INCLUDE_GLOBAL_CONFIG_MANAGER_H_ */

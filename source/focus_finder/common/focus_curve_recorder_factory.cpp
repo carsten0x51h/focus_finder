@@ -30,13 +30,13 @@
 class FocusControllerT;
 
 std::shared_ptr<FocusCurveRecorderT> FocusCurveRecorderFactoryT::getInstance(
-									     const FocusCurveRecorderTypeT::TypeE & type, std::shared_ptr<FocusControllerT> focusAnalyzer) {
+        const FocusCurveRecorderTypeT::TypeE &type, std::shared_ptr<FocusControllerT> focusAnalyzer) {
 
-	switch (type) {
-	case FocusCurveRecorderTypeT::DEFAULT:
-		return std::make_shared<DefaultFocusCurveRecorderT>(focusAnalyzer);
+    switch (type) {
+        case FocusCurveRecorderTypeT::DEFAULT:
+            return std::make_shared<DefaultFocusCurveRecorderT>(focusAnalyzer);
 
-	default:
-		return nullptr;
-	}
+        default:
+            return nullptr;
+    }
 }

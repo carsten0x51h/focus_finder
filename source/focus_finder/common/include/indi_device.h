@@ -46,19 +46,25 @@ DEF_Exception(IndiDevice);
 class IndiDeviceT : public DeviceT {
 
 public:
-	IndiDeviceT(INDI::BaseDevice *dp, IndiClientT * indiClient);
-	virtual ~IndiDeviceT();
+    IndiDeviceT(INDI::BaseDevice *dp, IndiClientT *indiClient);
+
+    virtual ~IndiDeviceT();
 
     std::string getName() const;
 
     void connect();
-	void disconnect();
-	bool isConnected() const;
-	bool isConnecting() const;
-	bool isDisconnected() const;
-	bool isDisconnecting() const;
 
-	DeviceConnectionStateT::TypeE getConnectionState() const;
+    void disconnect();
+
+    bool isConnected() const;
+
+    bool isConnecting() const;
+
+    bool isDisconnected() const;
+
+    bool isDisconnecting() const;
+
+    DeviceConnectionStateT::TypeE getConnectionState() const;
 
     std::set<DeviceInterfaceTypeT::TypeE> getSupportedInferfaces() const;
 
@@ -68,31 +74,37 @@ public:
     // USB
     // TODO: Instead of the specific methods below, set a generic key-value config object like the Java "Properties" or similar...
     // This can be implemented in the DeviceT base class...
-	//std::string getUsbDevicePort() const; // e.g. /dev/ttyUSB0 - TODO: How is this handled in Windows?
-	//void setUsbDevicePort(const std::string & usbDevicePort);
+    //std::string getUsbDevicePort() const; // e.g. /dev/ttyUSB0 - TODO: How is this handled in Windows?
+    //void setUsbDevicePort(const std::string & usbDevicePort);
 
-	void setIndiBaseDevice(INDI::BaseDevice * indiBaseDevice);
-    INDI::BaseDevice * getIndiBaseDevice();
-    IndiClientT * getIndiClient();
+    void setIndiBaseDevice(INDI::BaseDevice *indiBaseDevice);
+
+    INDI::BaseDevice *getIndiBaseDevice();
+
+    IndiClientT *getIndiClient();
 
 private:
     std::shared_ptr<DeviceInterfaceT> createDeviceInterface(DeviceInterfaceTypeT::TypeE interfaceType);
+
     void initInterfaceMap();
+
     static uint16_t getIndiDeviceInterfaceMaskByDeviceType(DeviceInterfaceTypeT::TypeE deviceType);
 
 
-	DeviceConnectionStateT::TypeE getConnectionStateInternal() const;
-	void connectInternal();
-	void disconnectInternal();
+    DeviceConnectionStateT::TypeE getConnectionStateInternal() const;
+
+    void connectInternal();
+
+    void disconnectInternal();
 
 
-	INDI::BaseDevice * mIndiBaseDevice;
-	IndiClientT * mIndiClient;
+    INDI::BaseDevice *mIndiBaseDevice;
+    IndiClientT *mIndiClient;
 
-	std::atomic<bool> mCancelConnectFlag;
-	std::thread mConnectThread;
+    std::atomic<bool> mCancelConnectFlag;
+    std::thread mConnectThread;
 
-	std::map<DeviceInterfaceTypeT::TypeE, std::shared_ptr<DeviceInterfaceT> > mInterfaceMap;
+    std::map<DeviceInterfaceTypeT::TypeE, std::shared_ptr<DeviceInterfaceT> > mInterfaceMap;
 
 };
 

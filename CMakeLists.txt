@@ -112,6 +112,9 @@ include(cmake/CompileOptions.cmake)
 #
 include(cmake/FindINDI.cmake)
 
+find_package(Nova REQUIRED)
+include_directories(${NOVA_INCLUDE_DIR})
+
 #
 # Look for BOOST
 #

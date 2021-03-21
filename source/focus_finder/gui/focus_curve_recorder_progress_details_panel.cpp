@@ -36,11 +36,12 @@
 
 #include "ui_focus_curve_recorder_progress_details_panel.h"
 
-FocusCurveRecorderProgressDetailsPanelT::FocusCurveRecorderProgressDetailsPanelT(QWidget * parent, std::shared_ptr<FocusCurveRecorderLogicT> focusCurveRecorderLogic) : QWidget(parent),
-                                                                                        m_ui(new Ui::FocusCurveRecorderProgressDetailsPanel),
-																					mFocusCurveRecorderLogic(focusCurveRecorderLogic),
-	mMovie(nullptr)
-{
+FocusCurveRecorderProgressDetailsPanelT::FocusCurveRecorderProgressDetailsPanelT(QWidget *parent,
+                                                                                 std::shared_ptr<FocusCurveRecorderLogicT> focusCurveRecorderLogic)
+        : QWidget(parent),
+          m_ui(new Ui::FocusCurveRecorderProgressDetailsPanel),
+          mFocusCurveRecorderLogic(focusCurveRecorderLogic),
+          mMovie(nullptr) {
     // Setup UI
     m_ui->setupUi(this);
 
@@ -68,72 +69,65 @@ FocusCurveRecorderProgressDetailsPanelT::FocusCurveRecorderProgressDetailsPanelT
     // if movie doesn't loop forever, force it to.
     // TODO: Update to new signal-slot API...
     if (mMovie->loopCount() != -1) {
-    	connect(mMovie, SIGNAL(finished()), mMovie, SLOT(start()));
+        connect(mMovie, SIGNAL(finished()), mMovie, SLOT(start()));
     }
 
 
     // Add focus measure panel
     // TODO: Not only HFD in the future.... displayed view depends on selected focus measure...
     mHfdViewPanel = new HfdViewPanelT(m_ui->widgetFocusMeasure);
-    
-    
+
+
     reset();
 }
 
-FocusCurveRecorderProgressDetailsPanelT::~FocusCurveRecorderProgressDetailsPanelT()
-{
-  delete mMovie;
+FocusCurveRecorderProgressDetailsPanelT::~FocusCurveRecorderProgressDetailsPanelT() {
+    delete mMovie;
 }
 
-void FocusCurveRecorderProgressDetailsPanelT::reset()
-{
-  m_ui->grpProgressIteration->setTitle(QStringLiteral("Progress iteration"));
-  m_ui->pgbCurrentIterationProgress->setValue(0);
-  m_ui->lblCurrentIterationProgressText->setText(QStringLiteral("Idle."));
-  m_ui->pgbTotalProgress->setValue(0);
-  m_ui->lblTotalProgressText->setText(QStringLiteral("Idle."));
-  //  m_ui->lblFocusingAnimation->clear();
+void FocusCurveRecorderProgressDetailsPanelT::reset() {
+    m_ui->grpProgressIteration->setTitle(QStringLiteral("Progress iteration"));
+    m_ui->pgbCurrentIterationProgress->setValue(0);
+    m_ui->lblCurrentIterationProgressText->setText(QStringLiteral("Idle."));
+    m_ui->pgbTotalProgress->setValue(0);
+    m_ui->lblTotalProgressText->setText(QStringLiteral("Idle."));
+    //  m_ui->lblFocusingAnimation->clear();
 }
 
-void FocusCurveRecorderProgressDetailsPanelT::setIteration(size_t currentIteration, size_t numTotalIterations)
-{
-  std::stringstream ss;
-  ss << "Progress iteration " << currentIteration << "/" << numTotalIterations;
-  m_ui->grpProgressIteration->setTitle(QString::fromStdString(ss.str()));
+void FocusCurveRecorderProgressDetailsPanelT::setIteration(size_t currentIteration, size_t numTotalIterations) {
+    std::stringstream ss;
+    ss << "Progress iteration " << currentIteration << "/" << numTotalIterations;
+    m_ui->grpProgressIteration->setTitle(QString::fromStdString(ss.str()));
 }
 
-void FocusCurveRecorderProgressDetailsPanelT::setProgress(QProgressBar * progressBar, int progressPerc) {
-  if (progressPerc == -1) {
-    // If there is no progress info, just display a "busy" animation
-    // See: https://forum.qt.io/topic/53791/stoping-qprogressbar-animation/2
-    progressBar->setMinimum(0);
-    progressBar->setMaximum(0);
-    progressBar->setValue(0);
-  } else {
-    progressBar->setMinimum(0);
-    progressBar->setMaximum(100);
-    progressBar->setValue(progressPerc);
-  }
+void FocusCurveRecorderProgressDetailsPanelT::setProgress(QProgressBar *progressBar, int progressPerc) {
+    if (progressPerc == -1) {
+        // If there is no progress info, just display a "busy" animation
+        // See: https://forum.qt.io/topic/53791/stoping-qprogressbar-animation/2
+        progressBar->setMinimum(0);
+        progressBar->setMaximum(0);
+        progressBar->setValue(0);
+    } else {
+        progressBar->setMinimum(0);
+        progressBar->setMaximum(100);
+        progressBar->setValue(progressPerc);
+    }
 }
 
-void FocusCurveRecorderProgressDetailsPanelT::setCurrentIterationProgress(int progressPerc)
-{
-  setProgress(m_ui->pgbCurrentIterationProgress, progressPerc);
+void FocusCurveRecorderProgressDetailsPanelT::setCurrentIterationProgress(int progressPerc) {
+    setProgress(m_ui->pgbCurrentIterationProgress, progressPerc);
 }
 
-void FocusCurveRecorderProgressDetailsPanelT::setCurrentIterationProgressText(const QString & currentProgressText)
-{
-  m_ui->lblCurrentIterationProgressText->setText(currentProgressText);
+void FocusCurveRecorderProgressDetailsPanelT::setCurrentIterationProgressText(const QString &currentProgressText) {
+    m_ui->lblCurrentIterationProgressText->setText(currentProgressText);
 }
 
-void FocusCurveRecorderProgressDetailsPanelT::setTotalProgress(int progressPerc)
-{
-  setProgress(m_ui->pgbTotalProgress, progressPerc);
+void FocusCurveRecorderProgressDetailsPanelT::setTotalProgress(int progressPerc) {
+    setProgress(m_ui->pgbTotalProgress, progressPerc);
 }
 
-void FocusCurveRecorderProgressDetailsPanelT::setTotalProgressText(const QString & totalProgressText)
-{
-  m_ui->lblTotalProgressText->setText(totalProgressText);
+void FocusCurveRecorderProgressDetailsPanelT::setTotalProgressText(const QString &totalProgressText) {
+    m_ui->lblTotalProgressText->setText(totalProgressText);
 }
 
 
@@ -142,31 +136,28 @@ void FocusCurveRecorderProgressDetailsPanelT::setTotalProgressText(const QString
 // [2019-11-06 14:54:30.130344]: FocusCurveRecorderProgressDetailsPanelT::startAnimation...
 
 
-void FocusCurveRecorderProgressDetailsPanelT::startAnimation()
-{
-  LOG(debug) << "FocusCurveRecorderProgressDetailsPanelT::startAnimation..." << std::endl;
-  mMovie->start();
+void FocusCurveRecorderProgressDetailsPanelT::startAnimation() {
+    LOG(debug) << "FocusCurveRecorderProgressDetailsPanelT::startAnimation..." << std::endl;
+    mMovie->start();
 }
 
-void FocusCurveRecorderProgressDetailsPanelT::stopAnimation()
-{
-  LOG(debug) << "FocusCurveRecorderProgressDetailsPanelT::stopAnimation..." << std::endl;
-  mMovie->stop();
+void FocusCurveRecorderProgressDetailsPanelT::stopAnimation() {
+    LOG(debug) << "FocusCurveRecorderProgressDetailsPanelT::stopAnimation..." << std::endl;
+    mMovie->stop();
 }
 
-void FocusCurveRecorderProgressDetailsPanelT::setButtonIcon(int /*frame*/)
-{
-  m_ui->lblFocusingAnimation->setPixmap(mMovie->currentPixmap());
+void FocusCurveRecorderProgressDetailsPanelT::setButtonIcon(int /*frame*/) {
+    m_ui->lblFocusingAnimation->setPixmap(mMovie->currentPixmap());
 }
 
 // TODO
-void FocusCurveRecorderProgressDetailsPanelT::setCurrentFocusCurveRecord(std::shared_ptr<FocusCurveRecordT> focusCurveRecord)
-{
-  // For FWHM, show both FWHMs and the star image. For HFD just show the "all-in-one HFD" panel...
-  // A representation which combines all would be a 3D rep.
-  // TODO: Not only HFD in the future.... displayed view depends on selected focus measure...
-  if (focusCurveRecord != nullptr) {
-    mHfdViewPanel->setHfd(focusCurveRecord->getHfd());
-  }
+void FocusCurveRecorderProgressDetailsPanelT::setCurrentFocusCurveRecord(
+        std::shared_ptr<FocusCurveRecordT> focusCurveRecord) {
+    // For FWHM, show both FWHMs and the star image. For HFD just show the "all-in-one HFD" panel...
+    // A representation which combines all would be a 3D rep.
+    // TODO: Not only HFD in the future.... displayed view depends on selected focus measure...
+    if (focusCurveRecord != nullptr) {
+        mHfdViewPanel->setHfd(focusCurveRecord->getHfd());
+    }
 }
 

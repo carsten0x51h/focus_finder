@@ -38,10 +38,11 @@
 
 #include "ui_focus_curve_recorder_point_details_panel.h"
 
-FocusCurveRecorderPointDetailsPanelT::FocusCurveRecorderPointDetailsPanelT(QWidget * parent, std::shared_ptr<FocusCurveRecorderLogicT> focusCurveRecorderLogic) : QWidget(parent),
-                                                                                        m_ui(new Ui::FocusCurveRecorderPointDetailsPanel),
-                                                                                        mFocusCurveRecorderLogic(focusCurveRecorderLogic)
-{
+FocusCurveRecorderPointDetailsPanelT::FocusCurveRecorderPointDetailsPanelT(QWidget *parent,
+                                                                           std::shared_ptr<FocusCurveRecorderLogicT> focusCurveRecorderLogic)
+        : QWidget(parent),
+          m_ui(new Ui::FocusCurveRecorderPointDetailsPanel),
+          mFocusCurveRecorderLogic(focusCurveRecorderLogic) {
     // Setup UI
     m_ui->setupUi(this);
 
@@ -61,59 +62,56 @@ FocusCurveRecorderPointDetailsPanelT::FocusCurveRecorderPointDetailsPanelT(QWidg
     // mFocusCurveViewPanel = new FocusCurveViewPanelT(m_ui->widget, mFocusCurveRecorderLogic);
     // mFocusCurveViewPanel->setSizePolicy(sizePolicy);
     // m_ui->layFocusCurveViewPanel->addWidget(mFocusCurveViewPanel, 0/*row*/, 0/*col*/, 1/*rowspan*/, 1/*colspan*/);
-    
+
     reset();
 }
 
-FocusCurveRecorderPointDetailsPanelT::~FocusCurveRecorderPointDetailsPanelT()
-{
+FocusCurveRecorderPointDetailsPanelT::~FocusCurveRecorderPointDetailsPanelT() {
 }
 
-void FocusCurveRecorderPointDetailsPanelT::reset()
-{
+void FocusCurveRecorderPointDetailsPanelT::reset() {
 }
 
 
-void FocusCurveRecorderPointDetailsPanelT::setPointDetails(std::shared_ptr<FocusCurveRecordT> focusCurveRecord)
-{
-  std::stringstream ss;
+void FocusCurveRecorderPointDetailsPanelT::setPointDetails(std::shared_ptr<FocusCurveRecordT> focusCurveRecord) {
+    std::stringstream ss;
 
-  // TODO: focusCurveRecord->getDateTime() changed to time_point...
-  //       --> adapt code below...
-  // std::time_t t = focusCurveRecord->getDateTime();
-  // char mbstr[100];
-  // std::strftime(mbstr, sizeof(mbstr), "%A %c", std::localtime(& t));
-  // m_ui->lblDateTime->setText(QString::fromStdString(std::string(mbstr)));
-  // ss.str(std::string());
-
-  
-  ss << std::fixed << std::setprecision(2) << focusCurveRecord->getHfd().getValue();
-  m_ui->lblHfd->setText(QString::fromStdString(ss.str()));
-  ss.str(std::string());
+    // TODO: focusCurveRecord->getDateTime() changed to time_point...
+    //       --> adapt code below...
+    // std::time_t t = focusCurveRecord->getDateTime();
+    // char mbstr[100];
+    // std::strftime(mbstr, sizeof(mbstr), "%A %c", std::localtime(& t));
+    // m_ui->lblDateTime->setText(QString::fromStdString(std::string(mbstr)));
+    // ss.str(std::string());
 
 
-  // TODO: Convert to arcsec?
-  ss << std::fixed << std::setprecision(2) << focusCurveRecord->getFwhmVert().getValue();
-  m_ui->lblFwhmVert->setText(QString::fromStdString(ss.str()));
-  ss.str(std::string());
+    ss << std::fixed << std::setprecision(2) << focusCurveRecord->getHfd().getValue();
+    m_ui->lblHfd->setText(QString::fromStdString(ss.str()));
+    ss.str(std::string());
 
 
-  // TODO: Convert to arcsec?
-  ss << std::fixed << std::setprecision(2) << focusCurveRecord->getFwhmHorz().getValue();
-  m_ui->lblFwhmHorz->setText(QString::fromStdString(ss.str()));
-  ss.str(std::string());
+    // TODO: Convert to arcsec?
+    ss << std::fixed << std::setprecision(2) << focusCurveRecord->getFwhmVert().getValue();
+    m_ui->lblFwhmVert->setText(QString::fromStdString(ss.str()));
+    ss.str(std::string());
 
-  
-  ss << focusCurveRecord->getCurrentAbsoluteFocusPos();
-  m_ui->lblFocusPos->setText(QString::fromStdString(ss.str()));
-  ss.str(std::string());
 
-  
-  ss << std::fixed << std::setprecision(2) << focusCurveRecord->getSnr();
-  m_ui->lblSnr->setText(QString::fromStdString(ss.str()));
-  ss.str(std::string());
+    // TODO: Convert to arcsec?
+    ss << std::fixed << std::setprecision(2) << focusCurveRecord->getFwhmHorz().getValue();
+    m_ui->lblFwhmHorz->setText(QString::fromStdString(ss.str()));
+    ss.str(std::string());
 
-  
-  // TODO: Where is this info?
-  //m_ui->lblIsOutlier->setText(QString::fromStdString(focusCurveRecord->getIsOutlier()));
+
+    ss << focusCurveRecord->getCurrentAbsoluteFocusPos();
+    m_ui->lblFocusPos->setText(QString::fromStdString(ss.str()));
+    ss.str(std::string());
+
+
+    ss << std::fixed << std::setprecision(2) << focusCurveRecord->getSnr();
+    m_ui->lblSnr->setText(QString::fromStdString(ss.str()));
+    ss.str(std::string());
+
+
+    // TODO: Where is this info?
+    //m_ui->lblIsOutlier->setText(QString::fromStdString(focusCurveRecord->getIsOutlier()));
 }

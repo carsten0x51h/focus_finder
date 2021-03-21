@@ -40,112 +40,148 @@
 #include "../../common/include/focus_curve_recorder.h"
 
 class FocusCurveViewPanelT;
+
 class FocusCurveRecorderProgressDetailsPanelT;
+
 class FocusCurveRecorderCurveDetailsPanelT;
+
 class FocusCurveRecorderPointDetailsPanelT;
+
 class FocusCurveRecorderSummaryDetailsPanelT;
 
 namespace Ui {
     class FocusCurveRecorderDialog;
 }
 
-enum FocusCurveRecorderDetailViewE { SUMMARY, CURVE, POINT, PROGRESS };
+enum FocusCurveRecorderDetailViewE {
+    SUMMARY, CURVE, POINT, PROGRESS
+};
 
 /**
 *  @brief
 */
-class FocusCurveRecorderDialogT : public QDialog
-{
-    Q_OBJECT
+class FocusCurveRecorderDialogT : public QDialog {
+Q_OBJECT
 
 public:
-  /**
-   *  @brief
-   *    Constructor
-   */
-  FocusCurveRecorderDialogT(QWidget * parent, std::shared_ptr<FocusCurveRecorderLogicT> focusCurveRecorderLogic);
+    /**
+     *  @brief
+     *    Constructor
+     */
+    FocusCurveRecorderDialogT(QWidget *parent, std::shared_ptr<FocusCurveRecorderLogicT> focusCurveRecorderLogic);
 
-  /**
-   *  @brief
-   *    Destructor
-   */
-  virtual ~FocusCurveRecorderDialogT();
+    /**
+     *  @brief
+     *    Destructor
+     */
+    virtual ~FocusCurveRecorderDialogT();
 
-  void reset();
-  void selectDetailView(FocusCurveRecorderDetailViewE detailView);
-  
+    void reset();
+
+    void selectDetailView(FocusCurveRecorderDetailViewE detailView);
+
 signals:
-  void focusCurveRecorderStartedSignal();
-  void focusCurveRecorderNewRecordSignal(std::shared_ptr<FocusCurveRecordT> focusCurveRecord);
-  void focusCurveRecorderRecordSetUpdateSignal(std::shared_ptr<FocusCurveRecordSetT> focusCurveRecordSet);
-  void focusCurveRecorderProgressUpdateSignal(float progress, const QString & msg, std::shared_ptr<FocusCurveRecordT> focusCurveRecord);
-  void focusCurveRecorderRecordSetFinishedSignal(std::shared_ptr<FocusCurveRecordSetT> focusCurveRecordSet);
-  void focusCurveRecorderFinishedSignal(std::shared_ptr<const FocusCurveRecordSetContainerT> focusCurveRecordSetContainer);
-  void focusCurveRecorderCancelledSignal();
 
-					  
+    void focusCurveRecorderStartedSignal();
+
+    void focusCurveRecorderNewRecordSignal(std::shared_ptr<FocusCurveRecordT> focusCurveRecord);
+
+    void focusCurveRecorderRecordSetUpdateSignal(std::shared_ptr<FocusCurveRecordSetT> focusCurveRecordSet);
+
+    void focusCurveRecorderProgressUpdateSignal(float progress, const QString &msg,
+                                                std::shared_ptr<FocusCurveRecordT> focusCurveRecord);
+
+    void focusCurveRecorderRecordSetFinishedSignal(std::shared_ptr<FocusCurveRecordSetT> focusCurveRecordSet);
+
+    void
+    focusCurveRecorderFinishedSignal(std::shared_ptr<const FocusCurveRecordSetContainerT> focusCurveRecordSetContainer);
+
+    void focusCurveRecorderCancelledSignal();
+
+
 protected slots:
-  void onPushButtonPressed();
-  //void on_buttonBox_clicked(QAbstractButton *button);
-  void onSpinFocusMeasureLimitValueChanged(double value);
-  void onSpinNumFocusCurvesToRecordValueChanged(int value);
-  
+
+    void onPushButtonPressed();
+
+    //void on_buttonBox_clicked(QAbstractButton *button);
+    void onSpinFocusMeasureLimitValueChanged(double value);
+
+    void onSpinNumFocusCurvesToRecordValueChanged(int value);
+
 protected:
-  //void closeEvent(QCloseEvent *event) override;
+    //void closeEvent(QCloseEvent *event) override;
 
-  virtual void accept() override;
-  virtual void reject() override;
+    virtual void accept() override;
 
-  void buttonBoxClicked(QAbstractButton * button);
+    virtual void reject() override;
 
-  const QScopedPointer<Ui::FocusCurveRecorderDialog> m_ui;
-							  
+    void buttonBoxClicked(QAbstractButton *button);
+
+    const QScopedPointer<Ui::FocusCurveRecorderDialog> m_ui;
+
 protected slots:
-  // Setting elements
-  void onFocusCurveTypeSelectionChanged();
+
+    // Setting elements
+    void onFocusCurveTypeSelectionChanged();
 
 private:
-  void applyAction();
-  void rejectAction();
+    void applyAction();
 
-  QPushButton * getOkButton();
-  QPushButton * getApplyButton();
-  void setupButtonBox();
-  QHBoxLayout * getMainToolBar();
+    void rejectAction();
 
-  //void initFocusMeasureCombobox();
-  
-  void setBtnIcon(QAbstractButton * btn, const std::string & filename);
-  bool deviceCheck() const;
+    QPushButton *getOkButton();
 
-  void createMainToolBar();
-  void createFocusCurveRecordButton();
-  void setFocusCurveRecordButtonState(bool isRunning);
+    QPushButton *getApplyButton();
+
+    void setupButtonBox();
+
+    QHBoxLayout *getMainToolBar();
+
+    //void initFocusMeasureCombobox();
+
+    void setBtnIcon(QAbstractButton *btn, const std::string &filename);
+
+    bool deviceCheck() const;
+
+    void createMainToolBar();
+
+    void createFocusCurveRecordButton();
+
+    void setFocusCurveRecordButtonState(bool isRunning);
 
 
-  void onFocusCurveRecorderStarted();
-  void onFocusCurveRecorderNewRecord(std::shared_ptr<FocusCurveRecordT> focusCurveRecord);
-  void onFocusCurveRecorderRecordSetUpdate(std::shared_ptr<FocusCurveRecordSetT> focusCurveRecordSet);
-  void onFocusCurveRecorderProgressUpdate(float progress, const QString & msg, std::shared_ptr<FocusCurveRecordT> focusCurveRecord);
-  void onFocusCurveRecorderCancelled();
-  void onFocusCurveRecorderRecordSetFinished(std::shared_ptr<FocusCurveRecordSetT> focusCurveRecordSet);
-  void onFocusCurveRecorderFinished(std::shared_ptr<const FocusCurveRecordSetContainerT> focusCurveRecordSetContainer);
-  void onFocusCurveRecordPressed(bool isChecked);
+    void onFocusCurveRecorderStarted();
 
-  
-  FocusFinderProfileT mActiveProfileTmp;
-  
-  AnimMenuButtonT * mFocusCurveRecordButton;
+    void onFocusCurveRecorderNewRecord(std::shared_ptr<FocusCurveRecordT> focusCurveRecord);
 
-  // TODO: Is it ok that all those instances are local to this GUI window?
-  std::shared_ptr<TaskExecutorT<FocusCurveRecorderT> > mRecorderExec;
-  
-  std::shared_ptr<FocusCurveRecorderLogicT> mFocusCurveRecorderLogic;
-  FocusCurveViewPanelT * mFocusCurveViewPanel;
-  FocusCurveRecorderProgressDetailsPanelT * mFocusCurveRecorderProgressDetailsPanel;
-  FocusCurveRecorderCurveDetailsPanelT * mFocusCurveRecorderCurveDetailsPanel; 
-  FocusCurveRecorderPointDetailsPanelT * mFocusCurveRecorderPointDetailsPanel;
-  FocusCurveRecorderSummaryDetailsPanelT * mFocusCurveRecorderSummaryDetailsPanel;
+    void onFocusCurveRecorderRecordSetUpdate(std::shared_ptr<FocusCurveRecordSetT> focusCurveRecordSet);
+
+    void onFocusCurveRecorderProgressUpdate(float progress, const QString &msg,
+                                            std::shared_ptr<FocusCurveRecordT> focusCurveRecord);
+
+    void onFocusCurveRecorderCancelled();
+
+    void onFocusCurveRecorderRecordSetFinished(std::shared_ptr<FocusCurveRecordSetT> focusCurveRecordSet);
+
+    void
+    onFocusCurveRecorderFinished(std::shared_ptr<const FocusCurveRecordSetContainerT> focusCurveRecordSetContainer);
+
+    void onFocusCurveRecordPressed(bool isChecked);
+
+
+    FocusFinderProfileT mActiveProfileTmp;
+
+    AnimMenuButtonT *mFocusCurveRecordButton;
+
+    // TODO: Is it ok that all those instances are local to this GUI window?
+    std::shared_ptr<TaskExecutorT<FocusCurveRecorderT> > mRecorderExec;
+
+    std::shared_ptr<FocusCurveRecorderLogicT> mFocusCurveRecorderLogic;
+    FocusCurveViewPanelT *mFocusCurveViewPanel;
+    FocusCurveRecorderProgressDetailsPanelT *mFocusCurveRecorderProgressDetailsPanel;
+    FocusCurveRecorderCurveDetailsPanelT *mFocusCurveRecorderCurveDetailsPanel;
+    FocusCurveRecorderPointDetailsPanelT *mFocusCurveRecorderPointDetailsPanel;
+    FocusCurveRecorderSummaryDetailsPanelT *mFocusCurveRecorderSummaryDetailsPanel;
 };
 
 #endif /*SOURCE_FOCUS_FINDER_GUI_INCLUDE_FOCUS_CURVE_RECORDER_DIALOG_H_*/

@@ -42,8 +42,7 @@ namespace Ui {
 /**
 *  @brief
 */
-class ReportingViewerPanelT : public QWidget
-{
+class ReportingViewerPanelT : public QWidget {
 Q_OBJECT
 
 public:
@@ -51,7 +50,7 @@ public:
     *  @brief
     *    Constructor
     */
-	ReportingViewerPanelT(QWidget * parent);
+    ReportingViewerPanelT(QWidget *parent);
 
     /**
     *  @brief
@@ -60,21 +59,24 @@ public:
     virtual ~ReportingViewerPanelT();
 
 signals:
-	void newReportSignal(const ReportingDatasetT & reportingDataset);
+
+    void newReportSignal(const ReportingDatasetT &reportingDataset);
 
 protected slots:
-	void onNewReportSlot(const ReportingDatasetT & reportingDataset);
-	void onModelRowsInsertedSlot(const QModelIndex & parent, int start, int end);
+
+    void onNewReportSlot(const ReportingDatasetT &reportingDataset);
+
+    void onModelRowsInsertedSlot(const QModelIndex &parent, int start, int end);
 
 protected:
-	const QScopedPointer<Ui::ReportingViewerPanel> m_ui;
+    const QScopedPointer<Ui::ReportingViewerPanel> m_ui;
 
 private:
-	void addEntry(const ReportingDatasetT & reportingDataset);
+    void addEntry(const ReportingDatasetT &reportingDataset);
 
-	boost::signals2::connection mNewReportConnection;
+    boost::signals2::connection mNewReportConnection;
 
-	QStandardItemModel* mDataModel;
+    QStandardItemModel *mDataModel;
 };
 
 #endif /*SOURCE_FOCUS_FINDER_GUI_INCLUDE_REPORTING_VIEWER_PANEL_H_*/

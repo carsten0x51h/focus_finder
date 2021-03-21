@@ -51,104 +51,104 @@
 
 class LmCurveMatcherT {
 public:
-	LmCurveMatcherT(std::shared_ptr<LmFittingCurveT> lmFittingCurve);
+    LmCurveMatcherT(std::shared_ptr<LmFittingCurveT> lmFittingCurve);
 
-  // TODO: Replace CurveFitParmsT & by LmCurveMatcherParmsT... (new class which does not hold outlier stuff... -> also reduced dependencies...)
-	template<typename RngT>
-	CurveParmsT fit(const RngT & rng, const CurveFitParmsT & curveFitParms,
-			LmCurveMatcherSummaryT * outLmCurveMatcherSummary = nullptr) {
+    // TODO: Replace CurveFitParmsT & by LmCurveMatcherParmsT... (new class which does not hold outlier stuff... -> also reduced dependencies...)
+    template<typename RngT>
+    CurveParmsT fit(const RngT &rng, const CurveFitParmsT &curveFitParms,
+                    LmCurveMatcherSummaryT *outLmCurveMatcherSummary = nullptr) {
 
-		CurveParmsT curveParms;
-		LmCurveMatcherSummaryT lmCurveMatcherSummary;
-		size_t numPoints = std::distance(rng.begin(), rng.end());
+        CurveParmsT curveParms;
+        LmCurveMatcherSummaryT lmCurveMatcherSummary;
+        size_t numPoints = std::distance(rng.begin(), rng.end());
 
-		// TODO: FIXED_PARMS - Only return number of non-fixed parms... ask mLmFittingCurve for this... (generic IF)... 
-		size_t numCurveParams = mLmFittingCurve->getParmNames().size();
-		LOG(debug) << "LmCurveMatcher::fit() - numPoints: " << numPoints << std::endl;
-		
-		GslMultiFitParmsT gslMultiFitParms;
-		LmFittingParmsContainerT parmsContainer(& gslMultiFitParms, mLmFittingCurve.get());
+        // TODO: FIXED_PARMS - Only return number of non-fixed parms... ask mLmFittingCurve for this... (generic IF)...
+        size_t numCurveParams = mLmFittingCurve->getParmNames().size();
+        LOG(debug) << "LmCurveMatcher::fit() - numPoints: " << numPoints << std::endl;
 
-		// Create a service data structure for each data point
-		for (auto it = rng.begin(); it != rng.end(); ++it) {
-		  gslMultiFitParms.push_back(GslMultiFitDataT(it->y() /*y*/, 0.1 /*sigma*/, *it /*data point*/));
-		}
+        GslMultiFitParmsT gslMultiFitParms;
+        LmFittingParmsContainerT parmsContainer(&gslMultiFitParms, mLmFittingCurve.get());
 
-		// Fill in function info
-		// See http://www.csse.uwa.edu.au/programming/gsl-1.0/gsl-ref_35.html
-		gsl_multifit_function_fdf f;
-		f.f = & LmFittingCurveT::gslFx;
-		f.df = & LmFittingCurveT::gslDfx;
-		f.fdf = & LmFittingCurveT::gslFdfx;
-		f.n = numPoints;
-		f.p = numCurveParams;
-		f.params = & parmsContainer;
+        // Create a service data structure for each data point
+        for (auto it = rng.begin(); it != rng.end(); ++it) {
+            gslMultiFitParms.push_back(GslMultiFitDataT(it->y() /*y*/, 0.1 /*sigma*/, *it /*data point*/));
+        }
 
-		gsl_vector * guess = gsl_vector_alloc(numCurveParams); // Allocate the guess vector
+        // Fill in function info
+        // See http://www.csse.uwa.edu.au/programming/gsl-1.0/gsl-ref_35.html
+        gsl_multifit_function_fdf f;
+        f.f = &LmFittingCurveT::gslFx;
+        f.df = &LmFittingCurveT::gslDfx;
+        f.fdf = &LmFittingCurveT::gslFdfx;
+        f.n = numPoints;
+        f.p = numCurveParams;
+        f.params = &parmsContainer;
 
-		//TODO: FIXED_PARMS - gslFx, gslDfx and gslFdfx must also take into account only the non-fixed params! makeGuess() as well! 
-		
-		mLmFittingCurve->makeGuess(gslMultiFitParms, guess); // Make initial guesses
+        gsl_vector *guess = gsl_vector_alloc(numCurveParams); // Allocate the guess vector
 
-		// Create a Levenberg-Marquardt solver with n data points and m parameters
-		gsl_multifit_fdfsolver * solver = gsl_multifit_fdfsolver_alloc(
-				gsl_multifit_fdfsolver_lmsder, numPoints, numCurveParams);
+        //TODO: FIXED_PARMS - gslFx, gslDfx and gslFdfx must also take into account only the non-fixed params! makeGuess() as well!
 
-		gsl_multifit_fdfsolver_set(solver, &f, guess); // Initialize the solver
+        mLmFittingCurve->makeGuess(gslMultiFitParms, guess); // Make initial guesses
 
-		int status;
-		size_t iter = 0;
-		
-		// Iterate to to find a result
-		// Status will be 0 in case of success, otherwise value != 0 (GSL error code).
-		do {
-			iter++;
-			status = gsl_multifit_fdfsolver_iterate(solver); // returns 0 in case of success
+        // Create a Levenberg-Marquardt solver with n data points and m parameters
+        gsl_multifit_fdfsolver *solver = gsl_multifit_fdfsolver_alloc(
+                gsl_multifit_fdfsolver_lmsder, numPoints, numCurveParams);
 
-			if (status) {
-				break;
-			}
+        gsl_multifit_fdfsolver_set(solver, &f, guess); // Initialize the solver
 
-			// See http://www.csse.uwa.edu.au/programming/gsl-1.0/gsl-ref_35.html
-			status = gsl_multifit_test_delta(solver->dx, solver->x, curveFitParms.getMaxAcceptedAbsoluteError(),
-					curveFitParms.getMaxAcceptedRelativError());
+        int status;
+        size_t iter = 0;
 
-		} while (GSL_CONTINUE == status && iter < curveFitParms.getNumMaxIterations());
+        // Iterate to to find a result
+        // Status will be 0 in case of success, otherwise value != 0 (GSL error code).
+        do {
+            iter++;
+            status = gsl_multifit_fdfsolver_iterate(solver); // returns 0 in case of success
 
-		// Store the result into the summary
-		lmCurveMatcherSummary.numIterationsRequired = iter;
-		lmCurveMatcherSummary.statusCode = status;
-		lmCurveMatcherSummary.statusMsg = gsl_strerror(status);
+            if (status) {
+                break;
+            }
 
-		// In case of success, fill the resulting curve parameters into the generic CurveParmsT structure
-		if (GSL_SUCCESS == status) {
-			curveParms = fillCurveParms(solver->x);
-		}
+            // See http://www.csse.uwa.edu.au/programming/gsl-1.0/gsl-ref_35.html
+            status = gsl_multifit_test_delta(solver->dx, solver->x, curveFitParms.getMaxAcceptedAbsoluteError(),
+                                             curveFitParms.getMaxAcceptedRelativError());
 
-		// In any case cleanup - Free GSL memory
-		gsl_multifit_fdfsolver_free(solver);
-		gsl_vector_free(guess);
+        } while (GSL_CONTINUE == status && iter < curveFitParms.getNumMaxIterations());
 
-		if (GSL_SUCCESS != status) {
-			std::stringstream ss;
-			ss << "GSL fit failed. Reason: " << gsl_strerror(status)
-					<< " (status code: " << status << ")." << std::endl;
+        // Store the result into the summary
+        lmCurveMatcherSummary.numIterationsRequired = iter;
+        lmCurveMatcherSummary.statusCode = status;
+        lmCurveMatcherSummary.statusMsg = gsl_strerror(status);
 
-			throw LmCurveMatcherExceptionT(ss.str(), lmCurveMatcherSummary);
-		}
+        // In case of success, fill the resulting curve parameters into the generic CurveParmsT structure
+        if (GSL_SUCCESS == status) {
+            curveParms = fillCurveParms(solver->x);
+        }
 
-		// If user requested, store the matching summary
-		if (outLmCurveMatcherSummary != nullptr) {
-			*outLmCurveMatcherSummary = lmCurveMatcherSummary;
-		}
+        // In any case cleanup - Free GSL memory
+        gsl_multifit_fdfsolver_free(solver);
+        gsl_vector_free(guess);
 
-		return curveParms;
-	}
+        if (GSL_SUCCESS != status) {
+            std::stringstream ss;
+            ss << "GSL fit failed. Reason: " << gsl_strerror(status)
+               << " (status code: " << status << ")." << std::endl;
+
+            throw LmCurveMatcherExceptionT(ss.str(), lmCurveMatcherSummary);
+        }
+
+        // If user requested, store the matching summary
+        if (outLmCurveMatcherSummary != nullptr) {
+            *outLmCurveMatcherSummary = lmCurveMatcherSummary;
+        }
+
+        return curveParms;
+    }
 
 private:
-	CurveParmsT fillCurveParms(const gsl_vector * resultVec) const;
+    CurveParmsT fillCurveParms(const gsl_vector *resultVec) const;
 
-	std::shared_ptr<LmFittingCurveT> mLmFittingCurve;
+    std::shared_ptr<LmFittingCurveT> mLmFittingCurve;
 };
 
 #endif /*SOURCE_FOCUS_FINDER_COMMON_INCLUDE_LM_CURVE_MATCHER_H_*/

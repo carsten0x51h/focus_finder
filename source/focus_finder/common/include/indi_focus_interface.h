@@ -41,41 +41,55 @@
 class IndiFocusInterfaceT : virtual public FocusInterfaceT {
 
 public:
-	IndiFocusInterfaceT(IndiDeviceT * indiDevice);
-	virtual ~IndiFocusInterfaceT();
+    IndiFocusInterfaceT(IndiDeviceT *indiDevice);
 
-	std::string getName() const;
-    DeviceT * getParentDevice();
+    virtual ~IndiFocusInterfaceT();
 
-	// Impl. of focus interface
-	bool isTemperatureSupported() const;
-	float getTemperature() const;
+    std::string getName() const;
 
-	bool isMoving() const;
+    DeviceT *getParentDevice();
 
-	bool isAbsPosSupported() const;
-	int getCurrentPos() const;
-	int getTargetPos() const;
-	void setTargetPos(unsigned int inTicks, FocusDirectionT::TypeE direction);
-	void setTargetPos(int inAbsPos);
-	void resetPositionCounter();
-	int getMinAbsPos() const;
-	int getMaxAbsPos() const;
+    // Impl. of focus interface
+    bool isTemperatureSupported() const;
 
-	bool isAbortSupported() const;
-	void abortMotion();
+    float getTemperature() const;
+
+    bool isMoving() const;
+
+    bool isAbsPosSupported() const;
+
+    int getCurrentPos() const;
+
+    int getTargetPos() const;
+
+    void setTargetPos(unsigned int inTicks, FocusDirectionT::TypeE direction);
+
+    void setTargetPos(int inAbsPos);
+
+    void resetPositionCounter();
+
+    int getMinAbsPos() const;
+
+    int getMaxAbsPos() const;
+
+    bool isAbortSupported() const;
+
+    void abortMotion();
 
 private:
-	int clipTicks(int ticks, FocusDirectionT::TypeE direction) const;
-	int getCurrentPosInternal() const;
-	int getMinAbsPosInternal() const;
-	int getMaxAbsPosInternal() const;
+    int clipTicks(int ticks, FocusDirectionT::TypeE direction) const;
 
-	void newNumber(INumberVectorProperty * nvp);
+    int getCurrentPosInternal() const;
 
-    IndiDeviceT * mIndiDevice;
+    int getMinAbsPosInternal() const;
 
-	boost::signals2::connection mNewNumberConnection;
+    int getMaxAbsPosInternal() const;
+
+    void newNumber(INumberVectorProperty *nvp);
+
+    IndiDeviceT *mIndiDevice;
+
+    boost::signals2::connection mNewNumberConnection;
 };
 
 #endif /* SOURCE_FOCUS_FINDER_COMMON_INDI_FOCUS_INTERFACE_H_ */

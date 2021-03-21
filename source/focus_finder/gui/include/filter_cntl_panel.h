@@ -34,6 +34,7 @@
 #include "../../common/include/focus_finder_logic.h"
 
 class FilterInterfaceT;
+
 class QMovie;
 
 namespace Ui {
@@ -43,8 +44,7 @@ namespace Ui {
 /**
 *  @brief
 */
-class FilterCntlPanelT : public QWidget
-{
+class FilterCntlPanelT : public QWidget {
 Q_OBJECT
 
 public:
@@ -52,7 +52,7 @@ public:
     *  @brief
     *    Constructor
     */
-	FilterCntlPanelT(QWidget * parent, FocusFinderLogicT & ffl);
+    FilterCntlPanelT(QWidget *parent, FocusFinderLogicT &ffl);
 
     /**
     *  @brief
@@ -61,43 +61,57 @@ public:
     virtual ~FilterCntlPanelT();
 
 signals:
-	void deviceConnectedSignal();
-	void deviceDisconnectedSignal();
-	void filterPositionChangedSignal(int currentPos);
-	void targetPositionReachedSignal(int targetPos);
-	void filterMovementAbortedSignal(int currentPos);
+
+    void deviceConnectedSignal();
+
+    void deviceDisconnectedSignal();
+
+    void filterPositionChangedSignal(int currentPos);
+
+    void targetPositionReachedSignal(int targetPos);
+
+    void filterMovementAbortedSignal(int currentPos);
 
 protected slots:
-	void setFilterAnimationIcon(int /*frame*/);
-	void onFilterPositionChangeRequest(int targetIdx);
+
+    void setFilterAnimationIcon(int /*frame*/);
+
+    void onFilterPositionChangeRequest(int targetIdx);
+
 //	void onFocusAbortRequest();                     // Abort button pressed
 //
-	void onDeviceConnectedSlot();
-	void onDeviceDisconnectedSlot();
-	void onFilterPositionChangedSlot(int currentPos);
-	void onTargetPositionReachedSlot(int targetPos);
-	void onFilterMovementAbortedSlot(int currentPos);
+    void onDeviceConnectedSlot();
+
+    void onDeviceDisconnectedSlot();
+
+    void onFilterPositionChangedSlot(int currentPos);
+
+    void onTargetPositionReachedSlot(int targetPos);
+
+    void onFilterMovementAbortedSlot(int currentPos);
 
 protected:
-	const QScopedPointer<Ui::FilterCntlPanel> m_ui;
+    const QScopedPointer<Ui::FilterCntlPanel> m_ui;
 
 private:
-	void updateProfile();
-	std::shared_ptr<FilterInterfaceT> getFilter() const;
+    void updateProfile();
 
-	void startAnimation();
-	void stopAnimation();
+    std::shared_ptr<FilterInterfaceT> getFilter() const;
 
-	QMovie * mMovie;
+    void startAnimation();
 
-	FocusFinderLogicT & mFfl;
-	std::shared_ptr<FilterInterfaceT> mFilterDevice;
+    void stopAnimation();
 
-	boost::signals2::connection mDeviceConnectedConnection;
-	boost::signals2::connection mDeviceDisconnectedConnection;
-	boost::signals2::connection mFilterPositionChangedConnection;
-	boost::signals2::connection mTargetPositionReachedConnection;
-	boost::signals2::connection mFilterMovementAbortedConnection;
+    QMovie *mMovie;
+
+    FocusFinderLogicT &mFfl;
+    std::shared_ptr<FilterInterfaceT> mFilterDevice;
+
+    boost::signals2::connection mDeviceConnectedConnection;
+    boost::signals2::connection mDeviceDisconnectedConnection;
+    boost::signals2::connection mFilterPositionChangedConnection;
+    boost::signals2::connection mTargetPositionReachedConnection;
+    boost::signals2::connection mFilterMovementAbortedConnection;
 };
 
 #endif /*SOURCE_FOCUS_FINDER_GUI_INCLUDE_FILTER_CNTL_PANEL_H_*/

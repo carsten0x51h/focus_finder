@@ -45,8 +45,7 @@ class FocusCurveT;
 /**
 *  @brief
 */
-class FocusCurveViewPanelT : public QWidget
-{
+class FocusCurveViewPanelT : public QWidget {
 Q_OBJECT
 
 public:
@@ -54,7 +53,7 @@ public:
     *  @brief
     *    Constructor
     */
-  FocusCurveViewPanelT(QWidget * parent, std::shared_ptr<FocusCurveRecorderLogicT> focusCurveRecorderLogic);
+    FocusCurveViewPanelT(QWidget *parent, std::shared_ptr<FocusCurveRecorderLogicT> focusCurveRecorderLogic);
 
     /**
     *  @brief
@@ -62,14 +61,15 @@ public:
     */
     virtual ~FocusCurveViewPanelT();
 
-	void reset();
-  //void setFocusCurve(std::shared_ptr<const FocusCurveT> focusCurve);
-  void update();
+    void reset();
 
-  void drawCurveHack(std::shared_ptr<FocusCurveT> focusCurve);
+    //void setFocusCurve(std::shared_ptr<const FocusCurveT> focusCurve);
+    void update();
 
-  // FocusMeasureTypeT::TypeE getFocusMeasureType() const;
-  // void setFocusMeasureType(FocusMeasureTypeT::TypeE focusMeasureType);
+    void drawCurveHack(std::shared_ptr<FocusCurveT> focusCurve);
+
+    // FocusMeasureTypeT::TypeE getFocusMeasureType() const;
+    // void setFocusMeasureType(FocusMeasureTypeT::TypeE focusMeasureType);
 
 
 signals:
@@ -77,11 +77,11 @@ signals:
 protected slots:
 
 protected:
-	const QScopedPointer<Ui::FocusCurveViewPanel> m_ui;
+    const QScopedPointer<Ui::FocusCurveViewPanel> m_ui;
 
 private:
-  std::shared_ptr<FocusCurveRecorderLogicT> mFocusCurveRecorderLogic;
-  FocusCurveViewWidgetT * mFocusCurveWidget;
+    std::shared_ptr<FocusCurveRecorderLogicT> mFocusCurveRecorderLogic;
+    FocusCurveViewWidgetT *mFocusCurveWidget;
 };
 
 #endif /*SOURCE_FOCUS_FINDER_GUI_INCLUDE_FOCUS_CURVE_VIEW_PANEL_H_*/

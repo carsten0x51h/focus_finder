@@ -30,25 +30,27 @@
 
 // Define a type which holds an unsigned integer value
 // See http://cpplove.blogspot.de/2012/07/printing-tuples.html
-template<std::size_t> struct int_{};
+template<std::size_t>
+struct int_ {
+};
 
-template <class Tuple, size_t Pos>
-std::ostream& print_tuple(std::ostream& out, const Tuple& t, int_<Pos> ) {
-	out << std::get< std::tuple_size<Tuple>::value-Pos >(t) << ',';
-	return print_tuple(out, t, int_<Pos-1>());
+template<class Tuple, size_t Pos>
+std::ostream &print_tuple(std::ostream &out, const Tuple &t, int_<Pos>) {
+    out << std::get<std::tuple_size<Tuple>::value - Pos>(t) << ',';
+    return print_tuple(out, t, int_<Pos - 1>());
 }
 
-template <class Tuple>
-std::ostream& print_tuple(std::ostream& out, const Tuple& t, int_<1> ) {
-	auto & value = std::get<std::tuple_size<Tuple>::value-1>(t);
-	return out << value;
+template<class Tuple>
+std::ostream &print_tuple(std::ostream &out, const Tuple &t, int_<1>) {
+    auto &value = std::get<std::tuple_size<Tuple>::value - 1>(t);
+    return out << value;
 }
 
-template <class... Args>
-std::ostream& operator<<(std::ostream& out, const std::tuple<Args...>& t) {
-	out << '(';
-	print_tuple(out, t, int_<sizeof...(Args)>());
-	return out << ')';
+template<class... Args>
+std::ostream &operator<<(std::ostream &out, const std::tuple<Args...> &t) {
+    out << '(';
+    print_tuple(out, t, int_<sizeof...(Args)>());
+    return out << ')';
 }
 
 #endif /* __TUPLE_PRINTER__ */

@@ -48,9 +48,8 @@ namespace Ui {
 class DeviceInterfaceT;
 
 
-class ImageViewerPanelT : public QWidget
-{
-    Q_OBJECT
+class ImageViewerPanelT : public QWidget {
+Q_OBJECT
 
 
 public:
@@ -58,7 +57,7 @@ public:
     *  @brief
     *    Constructor
     */
-	ImageViewerPanelT(FocusFinderLogicT & ffl);
+    ImageViewerPanelT(FocusFinderLogicT &ffl);
 
     /**
     *  @brief
@@ -66,11 +65,15 @@ public:
     */
     virtual ~ImageViewerPanelT();
 
-    void setFrame(const QImage & image);
-    void setSubFrame(const QRect & roiRect, const QImage & image); // TODO: Rename to setRoi?! Or rename setFrame() to setImage() amd rename setSubFrame() to setFrame()...
+    void setFrame(const QImage &image);
+
+    void setSubFrame(const QRect &roiRect,
+                     const QImage &image); // TODO: Rename to setRoi?! Or rename setFrame() to setImage() amd rename setSubFrame() to setFrame()...
 
     bool isPoiSet() const;
-    void setPoi(const QPointF & poi);
+
+    void setPoi(const QPointF &poi);
+
     void clearPoi();
 
     void update();
@@ -78,36 +81,44 @@ public:
     void clearSelection();
 
     void setMode(ImageViewerModeT::TypeE mode);
+
     ImageViewerModeT::TypeE getMode() const;
 
 
 signals:
-	void roiClearedSignal();
-	void roiSelectedSignal(const QRect & roiRect, const QImage & roiImage);
-	void poiSelectedSignal(const QPoint & poi);
+
+    void roiClearedSignal();
+
+    void roiSelectedSignal(const QRect &roiRect, const QImage &roiImage);
+
+    void poiSelectedSignal(const QPoint &poi);
 
 protected slots:
-	void onRoiClearedSlot();
-	void onRoiSelectedSlot(const QRect & roiRect, const QImage & roiImage);
-	void onPoiSelectedSlot(const QPoint & poi);
+
+    void onRoiClearedSlot();
+
+    void onRoiSelectedSlot(const QRect &roiRect, const QImage &roiImage);
+
+    void onPoiSelectedSlot(const QPoint &poi);
 
 protected:
-	const QScopedPointer<Ui::ImageViewerPanel> m_ui;
+    const QScopedPointer<Ui::ImageViewerPanel> m_ui;
 
-	void resizeEvent(QResizeEvent *event) override;
-	void keyPressEvent(QKeyEvent *ev) override;
+    void resizeEvent(QResizeEvent *event) override;
+
+    void keyPressEvent(QKeyEvent *ev) override;
 
 
 private:
-	void updateProfile();
+    void updateProfile();
 
-	FocusFinderLogicT & mFfl;
+    FocusFinderLogicT &mFfl;
 
-	SelectableImageWidgetT * mSelectableImageWidget;
+    SelectableImageWidgetT *mSelectableImageWidget;
 
-	bool selectionStarted;
-	bool moveStarted;
-	QPoint mMoveDelta;
+    bool selectionStarted;
+    bool moveStarted;
+    QPoint mMoveDelta;
 };
 
 #endif /*SOURCE_FOCUS_FINDER_GUI_INCLUDE_IMAGE_VIEWER_PANEL_H_*/

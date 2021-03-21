@@ -39,14 +39,13 @@ class IndiDeviceT;
 DEF_Exception(IndiDevceManager);
 
 
-
 class IndiDeviceManagerT : public DeviceManagerT {
 
 private:
-    typedef boost::signals2::signal<void (std::shared_ptr<DeviceT>)> DeviceAddedListenersT;
+    typedef boost::signals2::signal<void(std::shared_ptr<DeviceT>)> DeviceAddedListenersT;
     DeviceAddedListenersT mDeviceAddedListeners;
 
-    typedef boost::signals2::signal<void (std::shared_ptr<DeviceT>)> DeviceRemovedListenersT;
+    typedef boost::signals2::signal<void(std::shared_ptr<DeviceT>)> DeviceRemovedListenersT;
     DeviceRemovedListenersT mDeviceRemovedListeners;
 
 
@@ -64,49 +63,58 @@ private:
     void addNewDevice(INDI::BaseDevice *dp);
 
 protected:
-    void newDevice(INDI::BaseDevice * dp);
-    void newProperty(INDI::Property * property);
-    void removeDevice(INDI::BaseDevice * dp);
-    void newMessage(INDI::BaseDevice * dp, int messageID);
+    void newDevice(INDI::BaseDevice *dp);
+
+    void newProperty(INDI::Property *property);
+
+    void removeDevice(INDI::BaseDevice *dp);
+
+    void newMessage(INDI::BaseDevice *dp, int messageID);
 
     void notifyDeviceAdded(std::shared_ptr<DeviceT> device) { mDeviceAddedListeners(device); };
+
     void notifyDeviceRemoved(std::shared_ptr<DeviceT> device) { mDeviceRemovedListeners(device); };
 
 public:
     // TODO: Instead of specific properties maybe bettwer use one key-value "Properties" object...
-	static const std::string sDefaultIndiHostname;
-	static const int sDefaultIndiPort;
+    static const std::string sDefaultIndiHostname;
+    static const int sDefaultIndiPort;
 
 
-	IndiDeviceManagerT();
-	virtual ~IndiDeviceManagerT();
+    IndiDeviceManagerT();
 
-  DeviceManagerTypeT::TypeE getDeviceManagerType() const;
+    virtual ~IndiDeviceManagerT();
 
-
-  bool isReady() const;
+    DeviceManagerTypeT::TypeE getDeviceManagerType() const;
 
 
-
-  std::shared_ptr<DeviceT> getDevice(const std::string & deviceName);
-  std::vector<std::shared_ptr<DeviceT> > getDevices(DeviceInterfaceTypeT::TypeE interfaceType);
-
-  // TODO: Make const...
-  std::vector<std::string> getDeviceNames(DeviceInterfaceTypeT::TypeE interfaceType);
+    bool isReady() const;
 
 
-    boost::signals2::connection registerDeviceAddedListener(const DeviceAddedListenersT::slot_type & inCallBack) {
+    std::shared_ptr<DeviceT> getDevice(const std::string &deviceName);
+
+    std::vector<std::shared_ptr<DeviceT> > getDevices(DeviceInterfaceTypeT::TypeE interfaceType);
+
+    // TODO: Make const...
+    std::vector<std::string> getDeviceNames(DeviceInterfaceTypeT::TypeE interfaceType);
+
+
+    boost::signals2::connection registerDeviceAddedListener(const DeviceAddedListenersT::slot_type &inCallBack) {
         return mDeviceAddedListeners.connect(inCallBack);
     }
-    template <class T> void unregisterDeviceAddedListener(const T & inCallBack) {
+
+    template<class T>
+    void unregisterDeviceAddedListener(const T &inCallBack) {
         inCallBack.disconnect();
     }
 
 
-    boost::signals2::connection registerDeviceRemovedListener(const DeviceRemovedListenersT::slot_type & inCallBack) {
+    boost::signals2::connection registerDeviceRemovedListener(const DeviceRemovedListenersT::slot_type &inCallBack) {
         return mDeviceRemovedListeners.connect(inCallBack);
     }
-    template <class T> void unregisterDeviceRemovedListener(const T & inCallBack) {
+
+    template<class T>
+    void unregisterDeviceRemovedListener(const T &inCallBack) {
         inCallBack.disconnect();
     }
 
@@ -121,15 +129,17 @@ public:
 //	std::vector<std::string> getFilterInterfaceList() const;
 //	std::shared_ptr<FilterInterfaceT> getFilterInterface(const std::string & filterName) const;
 
-	// INDI specific settings
-	// TODO: Maybe introduce a generic setup(Properties props), setProperty(), getProperty() functions instead of specific functions...
-	void setHostname(const std::string & hostname);
-	std::string getHostname() const;
+    // INDI specific settings
+    // TODO: Maybe introduce a generic setup(Properties props), setProperty(), getProperty() functions instead of specific functions...
+    void setHostname(const std::string &hostname);
 
-	void setPort(unsigned int port);
-	unsigned int getPort() const;
+    std::string getHostname() const;
 
-    IndiClientT & getIndiClient();
+    void setPort(unsigned int port);
+
+    unsigned int getPort() const;
+
+    IndiClientT &getIndiClient();
 };
 
 

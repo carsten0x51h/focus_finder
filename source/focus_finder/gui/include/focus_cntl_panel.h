@@ -34,6 +34,7 @@
 #include "../../common/include/focus_finder_logic.h"
 
 class FocusInterfaceT;
+
 class QMovie;
 
 namespace Ui {
@@ -43,8 +44,7 @@ namespace Ui {
 /**
 *  @brief
 */
-class FocusCntlPanelT : public QWidget
-{
+class FocusCntlPanelT : public QWidget {
 Q_OBJECT
 
 public:
@@ -52,7 +52,7 @@ public:
     *  @brief
     *    Constructor
     */
-	FocusCntlPanelT(QWidget * parent, FocusFinderLogicT & ffl);
+    FocusCntlPanelT(QWidget *parent, FocusFinderLogicT &ffl);
 
     /**
     *  @brief
@@ -61,45 +61,59 @@ public:
     virtual ~FocusCntlPanelT();
 
 signals:
-	void deviceConnectedSignal();
-	void deviceDisconnectedSignal();
-	void focusPositionChangedSignal(int absPos);
-	void targetPositionReachedSignal(int absPos);
-	void focusMovementAbortedSignal(int currentPos);
+
+    void deviceConnectedSignal();
+
+    void deviceDisconnectedSignal();
+
+    void focusPositionChangedSignal(int absPos);
+
+    void targetPositionReachedSignal(int absPos);
+
+    void focusMovementAbortedSignal(int currentPos);
 
 protected slots:
-	void setFocusAnimationIcon(int /*frame*/);
-	void onFocusPositionChangeRequest(int inSteps); // One of the +/- buttons pressed
-	void onFocusAbortRequest();                     // Abort button pressed
 
-	void onDeviceConnectedSlot();
-	void onDeviceDisconnectedSlot();
-	void onFocusPositionChangedSlot(int absPos);
-	void onTargetPositionReachedSlot(int absPos);
-	void onFocusMovementAbortedSlot(int currentPos);
+    void setFocusAnimationIcon(int /*frame*/);
+
+    void onFocusPositionChangeRequest(int inSteps); // One of the +/- buttons pressed
+    void onFocusAbortRequest();                     // Abort button pressed
+
+    void onDeviceConnectedSlot();
+
+    void onDeviceDisconnectedSlot();
+
+    void onFocusPositionChangedSlot(int absPos);
+
+    void onTargetPositionReachedSlot(int absPos);
+
+    void onFocusMovementAbortedSlot(int currentPos);
 
 protected:
-	const QScopedPointer<Ui::FocusCntlPanel> m_ui;
+    const QScopedPointer<Ui::FocusCntlPanel> m_ui;
 
 private:
-	void updateCurrentPos(int absPos);
-	void updateProfile();
-	std::shared_ptr<FocusInterfaceT> getFocus() const;
+    void updateCurrentPos(int absPos);
 
-	void startAnimation();
-	void stopAnimation();
+    void updateProfile();
 
-	QMovie * mMovie;
+    std::shared_ptr<FocusInterfaceT> getFocus() const;
 
-	FocusFinderLogicT & mFfl;
-	QSignalMapper * mStepSignalMapper;
-	std::shared_ptr<FocusInterfaceT> mFocusDevice;
+    void startAnimation();
 
-	boost::signals2::connection mDeviceConnectedConnection;
-	boost::signals2::connection mDeviceDisconnectedConnection;
-	boost::signals2::connection mFocusPositionChangedConnection;
-	boost::signals2::connection mTargetPositionReachedConnection;
-	boost::signals2::connection mFocusMovementAbortedConnection;
+    void stopAnimation();
+
+    QMovie *mMovie;
+
+    FocusFinderLogicT &mFfl;
+    QSignalMapper *mStepSignalMapper;
+    std::shared_ptr<FocusInterfaceT> mFocusDevice;
+
+    boost::signals2::connection mDeviceConnectedConnection;
+    boost::signals2::connection mDeviceDisconnectedConnection;
+    boost::signals2::connection mFocusPositionChangedConnection;
+    boost::signals2::connection mTargetPositionReachedConnection;
+    boost::signals2::connection mFocusMovementAbortedConnection;
 };
 
 #endif /*SOURCE_FOCUS_FINDER_GUI_INCLUDE_FOCUS_CNTL_PANEL_H_*/

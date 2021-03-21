@@ -37,94 +37,111 @@
 #include "task_executor.h"
 
 class CameraInterfaceT;
+
 class FocusInterfaceT;
+
 class FilterInterfaceT;
+
 class DeviceManagerT;
+
 class ProfileManagerT;
+
 class MapperFunctionT;
+
 class ImageConverter16To8T;
+
 class FocusFinderT;
+
 class FocusCurveRecorderLogicT;
+
 class FoFiConfigManagerT;
 
-class FocusFinderLogicT
-{
+class FocusFinderLogicT {
 public:
-  FocusFinderLogicT();
-  ~FocusFinderLogicT();
+    FocusFinderLogicT();
 
-  std::shared_ptr<CameraInterfaceT> getCurrentCamera();
-  std::shared_ptr<FocusInterfaceT> getCurrentFocus();
-  std::shared_ptr<FilterInterfaceT> getCurrentFilter();
+    ~FocusFinderLogicT();
 
-  std::shared_ptr<DeviceManagerT> getDeviceManager() const;
-  std::shared_ptr<ProfileManagerT> getProfileManager() const;
+    std::shared_ptr<CameraInterfaceT> getCurrentCamera();
 
-  void setSelectedRoi(const RectT<unsigned int> & roi);
-  RectT<unsigned int> getSelectedRoi() const;
-  void clearSelectedRoi();
+    std::shared_ptr<FocusInterfaceT> getCurrentFocus();
 
-  std::optional<PointT<float> > findFocusStar(const PointT<float> & poi);
+    std::shared_ptr<FilterInterfaceT> getCurrentFilter();
 
-  const FrameT & getLastFrame() const;
+    std::shared_ptr<DeviceManagerT> getDeviceManager() const;
 
+    std::shared_ptr<ProfileManagerT> getProfileManager() const;
 
-  std::vector<std::string> getMapperFunctionNames() const;
+    void setSelectedRoi(const RectT<unsigned int> &roi);
 
-  std::shared_ptr<MapperFunctionT>
-  getMapperFunctionByName(const std::string & mapperFunctionName) const;
+    RectT<unsigned int> getSelectedRoi() const;
 
-  std::shared_ptr<ImageConverter16To8T> getImageConverter16To8() const;
+    void clearSelectedRoi();
 
-  std::shared_ptr<TaskExecutorT<FocusFinderT> > getFocusFinderExecutor() const;
+    std::optional<PointT<float> > findFocusStar(const PointT<float> &poi);
 
-  std::optional<PointT<float> > getLastFocusStarPos() const;
-
-  std::shared_ptr<FocusCurveRecorderLogicT> getFocusCurveRecorderLogic();
+    const FrameT &getLastFrame() const;
 
 
-  static void init();
-  static void close();
+    std::vector<std::string> getMapperFunctionNames() const;
 
-  /**
-   * Example usage:
-   *
-   * FocusFinderLogicT::get()->getProfileManager()...
-   */
-  static FocusFinderLogicT * get();
-  
+    std::shared_ptr<MapperFunctionT>
+    getMapperFunctionByName(const std::string &mapperFunctionName) const;
+
+    std::shared_ptr<ImageConverter16To8T> getImageConverter16To8() const;
+
+    std::shared_ptr<TaskExecutorT<FocusFinderT> > getFocusFinderExecutor() const;
+
+    std::optional<PointT<float> > getLastFocusStarPos() const;
+
+    std::shared_ptr<FocusCurveRecorderLogicT> getFocusCurveRecorderLogic();
+
+
+    static void init();
+
+    static void close();
+
+    /**
+     * Example usage:
+     *
+     * FocusFinderLogicT::get()->getProfileManager()...
+     */
+    static FocusFinderLogicT *get();
+
 private:
-  static FocusFinderLogicT * sSelf;
+    static FocusFinderLogicT *sSelf;
 
-  size_t calcNumStarsInRegion(const ImageT & inImg) const;
-  void initImageMappers();
-  void updateProfile();
+    size_t calcNumStarsInRegion(const ImageT &inImg) const;
 
-  // TODO... remove?
-  std::shared_ptr<DeviceManagerT> mDeviceManager;
+    void initImageMappers();
 
-  // TODO: Not yet sure, if sep. of DeviceManager and ProfileManager is a good idea...
-  std::shared_ptr<FoFiConfigManagerT> mFoFiConfigManager;
+    void updateProfile();
 
-  std::shared_ptr<CameraInterfaceT> mCameraDevice;
+    // TODO... remove?
+    std::shared_ptr<DeviceManagerT> mDeviceManager;
+
+    // TODO: Not yet sure, if sep. of DeviceManager and ProfileManager is a good idea...
+    std::shared_ptr<FoFiConfigManagerT> mFoFiConfigManager;
+
+    std::shared_ptr<CameraInterfaceT> mCameraDevice;
 
 
-  RectT<unsigned int> mSelectedRoi; // TODO: Question is if this should be stored here or directly or only inside the camera device...
+    RectT<unsigned int> mSelectedRoi; // TODO: Question is if this should be stored here or directly or only inside the camera device...
 
-  boost::signals2::connection mExposureCycleFinishedConnection;
+    boost::signals2::connection mExposureCycleFinishedConnection;
 
-  // TODO: Needs mutex guard!!!-> or atomic?
-  FrameT mLastFrame;
+    // TODO: Needs mutex guard!!!-> or atomic?
+    FrameT mLastFrame;
 
-  std::vector<std::shared_ptr<MapperFunctionT> > mMapperFunctions;
+    std::vector<std::shared_ptr<MapperFunctionT> > mMapperFunctions;
 
-  std::shared_ptr<ImageConverter16To8T> mImageConverter16To8;
+    std::shared_ptr<ImageConverter16To8T> mImageConverter16To8;
 
-  std::shared_ptr<TaskExecutorT<FocusFinderT> > mFocusFinderExecutor;
+    std::shared_ptr<TaskExecutorT<FocusFinderT> > mFocusFinderExecutor;
 
-  std::optional<PointT<float> > mLastFocusStarPos;
+    std::optional<PointT<float> > mLastFocusStarPos;
 
-  std::shared_ptr<FocusCurveRecorderLogicT> mFocusCurveRecorderLogic;
+    std::shared_ptr<FocusCurveRecorderLogicT> mFocusCurveRecorderLogic;
 };
 
 #endif /* SOURCE_FOCUS_FINDER_COMMON_FOCUS_FINDER_LOGIC_H_ */

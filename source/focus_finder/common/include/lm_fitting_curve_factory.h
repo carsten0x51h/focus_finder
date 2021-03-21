@@ -33,7 +33,7 @@
 
 class LmFittingCurveFactoryT {
 public:
-	static std::shared_ptr<LmFittingCurveT> getInstance(const FittingCurveTypeT::TypeE & type);
+    static std::shared_ptr<LmFittingCurveT> getInstance(const FittingCurveTypeT::TypeE &type);
 };
 
 #endif /*SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FITTING_CURVE_FACTORY_H_*/

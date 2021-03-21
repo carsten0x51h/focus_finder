@@ -33,13 +33,13 @@
     throw __exn__; \
   }
 
-#define THROW(x,m) { \
+#define THROW(x, m) { \
   std::ostringstream __oss__; \
   __oss__.flush(); \
   __oss__ << m; \
   THROW_CLASS (x##ExceptionT, (__oss__.str())); \
 }
 
-#define THROW_IF(x,a,m) { if (a) { THROW(x,m); } }
+#define THROW_IF(x, a, m) { if (a) { THROW(x,m); } }
 
 #endif /* SOURCE_FOCUS_FINDER_COMMON_INCLUDE_THROW_IF_H_ */

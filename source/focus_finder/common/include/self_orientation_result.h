@@ -34,14 +34,14 @@
 class FocusCurveRecordT;
 
 struct SelfOrientationResultT {
-  FocusDirectionT::TypeE focusDirectionToLimit;
-  CurveHalfT::TypeE curveHalf;
-  std::shared_ptr<FocusCurveRecordT> record1;
-  std::shared_ptr<FocusCurveRecordT> record2;
+    FocusDirectionT::TypeE focusDirectionToLimit;
+    CurveHalfT::TypeE curveHalf;
+    std::shared_ptr<FocusCurveRecordT> record1;
+    std::shared_ptr<FocusCurveRecordT> record2;
 
-  std::ostream & print(std::ostream & os) const;
+    std::ostream &print(std::ostream &os) const;
 
-  friend std::ostream & operator<<(std::ostream & os, const SelfOrientationResultT & selfOrientationResult);  
+    friend std::ostream &operator<<(std::ostream &os, const SelfOrientationResultT &selfOrientationResult);
 };
 
 #endif /*SOURCE_FOCUS_FINDER_COMMON_INCLUDE_SELF_ORIENTATION_RESULT_H_*/

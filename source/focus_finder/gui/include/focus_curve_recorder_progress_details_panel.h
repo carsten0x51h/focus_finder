@@ -34,7 +34,9 @@
 #include <QProgressBar>
 
 class FocusCurveRecorderLogicT;
+
 class FocusCurveRecordT;
+
 class HfdViewPanelT;
 
 namespace Ui {
@@ -44,50 +46,57 @@ namespace Ui {
 /**
 *  @brief
 */
-class FocusCurveRecorderProgressDetailsPanelT : public QWidget
-{
-    Q_OBJECT
+class FocusCurveRecorderProgressDetailsPanelT : public QWidget {
+Q_OBJECT
 
 public:
-  /**
-   *  @brief
-   *    Constructor
-   */
-  FocusCurveRecorderProgressDetailsPanelT(QWidget * parent, std::shared_ptr<FocusCurveRecorderLogicT> focusCurveRecorderLogic);
+    /**
+     *  @brief
+     *    Constructor
+     */
+    FocusCurveRecorderProgressDetailsPanelT(QWidget *parent,
+                                            std::shared_ptr<FocusCurveRecorderLogicT> focusCurveRecorderLogic);
 
-  /**
-   *  @brief
-   *    Destructor
-   */
-  virtual ~FocusCurveRecorderProgressDetailsPanelT();
+    /**
+     *  @brief
+     *    Destructor
+     */
+    virtual ~FocusCurveRecorderProgressDetailsPanelT();
 
-  void reset();
+    void reset();
 
-  void setIteration(size_t currentIteration, size_t numTotalIterations);
-  void setCurrentIterationProgress(int progressPerc);
-  void setCurrentIterationProgressText(const QString & currentProgressText);
-  void setTotalProgress(int progressPerc);
-  void setTotalProgressText(const QString & totalProgressText);
-  void setCurrentFocusCurveRecord(std::shared_ptr<FocusCurveRecordT> focusCurveRecord);
+    void setIteration(size_t currentIteration, size_t numTotalIterations);
 
-  void startAnimation();
-  void stopAnimation();
-		      
+    void setCurrentIterationProgress(int progressPerc);
+
+    void setCurrentIterationProgressText(const QString &currentProgressText);
+
+    void setTotalProgress(int progressPerc);
+
+    void setTotalProgressText(const QString &totalProgressText);
+
+    void setCurrentFocusCurveRecord(std::shared_ptr<FocusCurveRecordT> focusCurveRecord);
+
+    void startAnimation();
+
+    void stopAnimation();
+
 public slots:
-  // member function that catches the frameChanged signal of the QMovie
-  void setButtonIcon(int frame);
-								  
+
+    // member function that catches the frameChanged signal of the QMovie
+    void setButtonIcon(int frame);
+
 protected slots:
 
 protected:
-  const QScopedPointer<Ui::FocusCurveRecorderProgressDetailsPanel> m_ui;
+    const QScopedPointer<Ui::FocusCurveRecorderProgressDetailsPanel> m_ui;
 
 private:
-  void setProgress(QProgressBar * progressBar, int progressPerc);
+    void setProgress(QProgressBar *progressBar, int progressPerc);
 
-  std::shared_ptr<FocusCurveRecorderLogicT> mFocusCurveRecorderLogic;
-  QMovie * mMovie;
-  HfdViewPanelT * mHfdViewPanel;
+    std::shared_ptr<FocusCurveRecorderLogicT> mFocusCurveRecorderLogic;
+    QMovie *mMovie;
+    HfdViewPanelT *mHfdViewPanel;
 };
 
 #endif /*SOURCE_FOCUS_FINDER_GUI_INCLUDE_FOCUS_CURVE_RECORDER_PROGRESS_DETAILS_PANEL_H_*/

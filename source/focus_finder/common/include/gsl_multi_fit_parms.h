@@ -32,11 +32,12 @@
 // Helper classes
 ///////////////////////////////////////////////////////////////////////
 struct GslMultiFitDataT {
-  //GslMultiFitDataT() : y(0.0f), sigma(0.0f) {}
-GslMultiFitDataT(float y, float sigma, PointFT pt) : y(y), sigma(sigma), pt(pt) { }
-	float y;
-	float sigma;
-	PointFT pt;
+    //GslMultiFitDataT() : y(0.0f), sigma(0.0f) {}
+    GslMultiFitDataT(float y, float sigma, PointFT pt) : y(y), sigma(sigma), pt(pt) {}
+
+    float y;
+    float sigma;
+    PointFT pt;
 };
 
 typedef std::vector<GslMultiFitDataT> GslMultiFitParmsT;

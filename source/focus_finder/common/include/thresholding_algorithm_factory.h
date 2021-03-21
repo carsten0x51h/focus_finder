@@ -34,7 +34,7 @@ class ThresholdingAlgorithmT;
 
 class ThresholdingAlgorithmFactoryT {
 public:
-	static std::shared_ptr<ThresholdingAlgorithmT> getInstance(const ThresholdingAlgorithmTypeT::TypeE & type);
+    static std::shared_ptr<ThresholdingAlgorithmT> getInstance(const ThresholdingAlgorithmTypeT::TypeE &type);
 };
 
 

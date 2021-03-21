@@ -31,31 +31,33 @@
 
 class LinearBWStretchMapperFunctionT : public MapperFunctionT {
 public:
-	LinearBWStretchMapperFunctionT();
-	virtual ~LinearBWStretchMapperFunctionT();
+    LinearBWStretchMapperFunctionT();
 
-	std::string getName() const;
+    virtual ~LinearBWStretchMapperFunctionT();
 
-	// TODO: Maybe move to parent class
-	void setSrcRange(float from, float to);
+    std::string getName() const;
 
-	// TODO: Maybe move to parent class
-	void setDestRange(float from, float to);
+    // TODO: Maybe move to parent class
+    void setSrcRange(float from, float to);
 
-	float f(float f);
+    // TODO: Maybe move to parent class
+    void setDestRange(float from, float to);
 
-	void setBlackPoint(float blackPoint);
-	void setWhitePoint(float whitePoint);
+    float f(float f);
+
+    void setBlackPoint(float blackPoint);
+
+    void setWhitePoint(float whitePoint);
 
 private:
-	float mBlackPoint;
-	float mWhitePoint;
+    float mBlackPoint;
+    float mWhitePoint;
 
-	// TODO: Maybe move to parent class
-	float mSrcFrom;
-	float mSrcTo;
-	float mDestFrom;
-	float mDestTo;
+    // TODO: Maybe move to parent class
+    float mSrcFrom;
+    float mSrcTo;
+    float mDestFrom;
+    float mDestTo;
 };
 
 #endif /*SOURCE_FOCUS_FINDER_COMMON_INCLUDE_LINEAR_BW_STRETCH_MAPPER_FUNCTION_H_*/

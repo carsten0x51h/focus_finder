@@ -52,43 +52,49 @@ typedef std::vector<MyDataPointT> MyDataContainerT;
 
 class MyDataAccessorT {
 public:
-	typedef MyDataContainerT TypeT;
-	static PointFT getDataPoint(size_t /*inIdx*/, TypeT::const_iterator inIt) {
-		return PointFT(inIt->first /*inIdx*/, inIt->second /*y*/);
-	}
+    typedef MyDataContainerT TypeT;
+
+    static PointFT getDataPoint(size_t /*inIdx*/, TypeT::const_iterator inIt) {
+        return PointFT(inIt->first /*inIdx*/, inIt->second /*y*/);
+    }
 };
 
-class FocusFinderFastCurveLookupT: public FocusFinderT {
+class FocusFinderFastCurveLookupT : public FocusFinderT {
 private:
-  // Prevent copy
-  FocusFinderFastCurveLookupT(const FocusFinderFastCurveLookupT &);
-  FocusFinderFastCurveLookupT & operator=(const FocusFinderFastCurveLookupT &);
-  
-  //float estimateRelPos(std::shared_ptr<CurveFunctionT> focusCurveFunction, float focusMeasure, CurveHalfT::TypeE curveHalf);
+    // Prevent copy
+    FocusFinderFastCurveLookupT(const FocusFinderFastCurveLookupT &);
 
-  void rollbackFocus();
-  void focusFinderCleanup();
-  
-  void checkCancelled() const;
-  
-  std::shared_ptr<const ImageT> mCurrentImage;
-  
-  boost::signals2::connection mCameraExposureFinishedConnection;
-  
-  std::atomic<bool> mCancelled;
-  std::atomic<bool> mIsRunning;  
-  int mInitialAbsPosition;
-  
+    FocusFinderFastCurveLookupT &operator=(const FocusFinderFastCurveLookupT &);
+
+    //float estimateRelPos(std::shared_ptr<CurveFunctionT> focusCurveFunction, float focusMeasure, CurveHalfT::TypeE curveHalf);
+
+    void rollbackFocus();
+
+    void focusFinderCleanup();
+
+    void checkCancelled() const;
+
+    std::shared_ptr<const ImageT> mCurrentImage;
+
+    boost::signals2::connection mCameraExposureFinishedConnection;
+
+    std::atomic<bool> mCancelled;
+    std::atomic<bool> mIsRunning;
+    int mInitialAbsPosition;
+
 public:
-  FocusFinderFastCurveLookupT(std::shared_ptr<FocusControllerT> focusController);
+    FocusFinderFastCurveLookupT(std::shared_ptr<FocusControllerT> focusController);
 
-  // Implement focus finder interface
-  std::string getName() const override;
-  
-  bool isRunning() const override;
-  void run() override;
-  void cancel() override;
-  void reset() override;
+    // Implement focus finder interface
+    std::string getName() const override;
+
+    bool isRunning() const override;
+
+    void run() override;
+
+    void cancel() override;
+
+    void reset() override;
 };
 
 #endif /* SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FOCUS_FINDER_FAST_CURVE_LOOKUP_H_ */

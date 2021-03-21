@@ -28,34 +28,34 @@
 #include "enum_helper.h"
 
 struct DeviceInterfaceTypeT {
-		enum TypeE {
-			TELESCOPE,
-			CCD,
-            GUIDER,
-			FILTER,
-			FOCUS,
-			DOME,
-			WEATHER,
-            GPS,
-            AO,
-            DUSTCAP,
-            LIGHTBOX,
-            DETECTOR,
-            ROTATOR,
-            SPECTROGRAPH,
-            CORRELATOR,
-            AUXILIARY,
-			_Count
-		};
+    enum TypeE {
+        TELESCOPE,
+        CCD,
+        GUIDER,
+        FILTER,
+        FOCUS,
+        DOME,
+        WEATHER,
+        GPS,
+        AO,
+        DUSTCAP,
+        LIGHTBOX,
+        DETECTOR,
+        ROTATOR,
+        SPECTROGRAPH,
+        CORRELATOR,
+        AUXILIARY,
+        _Count
+    };
 
-		static const char * asStr(const TypeE & inType) {
-            switch (inType) {
+    static const char *asStr(const TypeE &inType) {
+        switch (inType) {
             case TELESCOPE:
                 return "TELESCOPE";
             case CCD:
                 return "CCD";
             case GUIDER:
-                 return "GUIDER";
+                return "GUIDER";
             case FILTER:
                 return "FILTER";
             case FOCUS:
@@ -84,9 +84,10 @@ struct DeviceInterfaceTypeT {
                 return "AUXILIARY";
             default:
                 return "<?>";
-		}
-	}
-	MAC_AS_TYPE(Type, E, _Count);
+        }
+    }
+
+    MAC_AS_TYPE(Type, E, _Count);
 };
 
 #endif /* SOURCE_FOCUS_FINDER_COMMON_INCLUDE_DEVICE_INTERFACE_TYPE_H_ */

@@ -40,45 +40,46 @@
 
 #include "basedevice.h"
 
-IndiCameraInterfaceT::IndiCameraInterfaceT(IndiDeviceT * indiDevice) : mIndiDevice(indiDevice),
-		cancelExposureFlag(false), mIsExposureRunning(false), mLoopMode(
-				LoopModeT::SINGLE), mExposureDelay(0s), mExposureTime(1s) {
-  
-	LOG(debug) << "IndiCameraInterfaceT::IndiCameraInterfaceT..." << std::endl;
+IndiCameraInterfaceT::IndiCameraInterfaceT(IndiDeviceT *indiDevice) : mIndiDevice(indiDevice),
+                                                                      cancelExposureFlag(false),
+                                                                      mIsExposureRunning(false), mLoopMode(
+                LoopModeT::SINGLE), mExposureDelay(0s), mExposureTime(1s) {
 
-    IndiClientT * indiClient = mIndiDevice->getIndiClient();
+    LOG(debug) << "IndiCameraInterfaceT::IndiCameraInterfaceT..." << std::endl;
 
-	//mIndiConnector = std::make_shared < IndiDeviceT > (dp, indiClient);
+    IndiClientT *indiClient = mIndiDevice->getIndiClient();
 
-	//TODO: mIndiConnector->setUsbDevicePort();
-	
-	// Register number
+    //mIndiConnector = std::make_shared < IndiDeviceT > (dp, indiClient);
 
-	mNewNumberConnection = indiClient->registerNewNumberListener(
-			boost::bind(&IndiCameraInterfaceT::newNumber, this, boost::placeholders::_1));
+    //TODO: mIndiConnector->setUsbDevicePort();
 
-	// Register on image recipient event
-  	mNewBlobConnection = indiClient->registerNewBlobListener(
-       		boost::bind(&IndiCameraInterfaceT::newBlob, this, boost::placeholders::_1));
+    // Register number
+
+    mNewNumberConnection = indiClient->registerNewNumberListener(
+            boost::bind(&IndiCameraInterfaceT::newNumber, this, boost::placeholders::_1));
+
+    // Register on image recipient event
+    mNewBlobConnection = indiClient->registerNewBlobListener(
+            boost::bind(&IndiCameraInterfaceT::newBlob, this, boost::placeholders::_1));
 
     mIndiDevice->getIndiClient()->setBLOBMode(B_ALSO, mIndiDevice->getIndiBaseDevice()->getDeviceName(), nullptr);
 
     // Register switch
     mNewSwitchConnection = indiClient->registerNewSwitchListener(
-          boost::bind(&IndiCameraInterfaceT::newSwitch, this, boost::placeholders::_1));
+            boost::bind(&IndiCameraInterfaceT::newSwitch, this, boost::placeholders::_1));
 }
 
 IndiCameraInterfaceT::~IndiCameraInterfaceT() {
-	LOG(debug) << "IndiCameraInterfaceT::IndiCameraInterfaceTnterfaceT..." << std::endl;
+    LOG(debug) << "IndiCameraInterfaceT::IndiCameraInterfaceTnterfaceT..." << std::endl;
 
-    IndiClientT * indiClient = mIndiDevice->getIndiClient();
+    IndiClientT *indiClient = mIndiDevice->getIndiClient();
 
     indiClient->unregisterNewNumberListener(mNewNumberConnection);
     indiClient->unregisterNewBlobListener(mNewBlobConnection);
     indiClient->unregisterNewSwitchListener(mNewSwitchConnection);
 }
 
-DeviceT * IndiCameraInterfaceT::getParentDevice() {
+DeviceT *IndiCameraInterfaceT::getParentDevice() {
     return mIndiDevice;
 }
 
@@ -87,149 +88,149 @@ DeviceT * IndiCameraInterfaceT::getParentDevice() {
  *
  *  See http://cboard.cprogramming.com/c-programming/82961-example-mkstemp.html
  */
-std::shared_ptr<ImageT> IndiCameraInterfaceT::convertIndiBlobToCImg(IBLOB* iblob) const {
-	char sfn[15] = "";
-	FILE * sfp;
-	int fd = -1;
+std::shared_ptr<ImageT> IndiCameraInterfaceT::convertIndiBlobToCImg(IBLOB *iblob) const {
+    char sfn[15] = "";
+    FILE *sfp;
+    int fd = -1;
 
-	strncpy(sfn, "/tmp/ed.XXXXXX", sizeof sfn);
+    strncpy(sfn, "/tmp/ed.XXXXXX", sizeof sfn);
 
-	if ((fd = mkstemp(sfn)) == -1 || (sfp = fdopen(fd, "w+")) == NULL) {
+    if ((fd = mkstemp(sfn)) == -1 || (sfp = fdopen(fd, "w+")) == NULL) {
 
-		if (fd != -1) {
-			unlink(sfn);
-			close(fd);
-		}
+        if (fd != -1) {
+            unlink(sfn);
+            close(fd);
+        }
 
-		LOG(fatal) << "Unable to create temporary FITS file '" << sfn
-				<< "', error='" << strerror(errno) << "'" << std::endl;
+        LOG(fatal) << "Unable to create temporary FITS file '" << sfn
+                   << "', error='" << strerror(errno) << "'" << std::endl;
 
-		// TODO: throw exc?!
+        // TODO: throw exc?!
 
-	} else {
-		LOG(debug) << "Successfully opened TMP file. Writing image to "
-			   << sfn << std::endl;
+    } else {
+        LOG(debug) << "Successfully opened TMP file. Writing image to "
+                   << sfn << std::endl;
 
-		// TODO: IDEA - we may do the write below in chunks to have a better
-		//       indication of the porgress.
-		notifyFrameTransferUpd(0);
+        // TODO: IDEA - we may do the write below in chunks to have a better
+        //       indication of the porgress.
+        notifyFrameTransferUpd(0);
 
-		// TODO: Replace write with filesystem::write...
-		size_t bytesWritten = fwrite(static_cast<char *>(iblob->blob),
-				sizeof(char), iblob->bloblen, sfp);
+        // TODO: Replace write with filesystem::write...
+        size_t bytesWritten = fwrite(static_cast<char *>(iblob->blob),
+                                     sizeof(char), iblob->bloblen, sfp);
 
-		LOG(debug) << "bytesWritten: " << bytesWritten << " to file: "
-			   << sfn << std::endl;
+        LOG(debug) << "bytesWritten: " << bytesWritten << " to file: "
+                   << sfn << std::endl;
 
-		// TODO: Use filesystem::close...
-		fclose(sfp);
+        // TODO: Use filesystem::close...
+        fclose(sfp);
 
-		notifyFrameTransferUpd(50);
+        notifyFrameTransferUpd(50);
 
-		// Read file
-		std::shared_ptr<ImageT> resultImage = std::make_shared<ImageT>();
+        // Read file
+        std::shared_ptr<ImageT> resultImage = std::make_shared<ImageT>();
 
-		LOG(debug)
-				<< "IndiCameraInterfaceT::convertIndiBlobToCImg... reading FITS file '"
-				<< sfn << "'" << std::endl;
+        LOG(debug)
+            << "IndiCameraInterfaceT::convertIndiBlobToCImg... reading FITS file '"
+            << sfn << "'" << std::endl;
 
-		try {
-			std::stringstream ss;
-			long bitsPerPixel;
-			CImgFitsIOHelperT::readFits(resultImage.get(), sfn, &bitsPerPixel,
-					&ss);
+        try {
+            std::stringstream ss;
+            long bitsPerPixel;
+            CImgFitsIOHelperT::readFits(resultImage.get(), sfn, &bitsPerPixel,
+                                        &ss);
 
-			LOG(debug)
-					<< "IndiCameraInterfaceT::convertIndiBlobToCImg... FITS file '"
-					<< sfn << "' read, bitsPerPixel=" << bitsPerPixel
-					<< ", details: " << ss.str() << std::endl;
+            LOG(debug)
+                << "IndiCameraInterfaceT::convertIndiBlobToCImg... FITS file '"
+                << sfn << "' read, bitsPerPixel=" << bitsPerPixel
+                << ", details: " << ss.str() << std::endl;
 
-		} catch (FitsIOExceptionT & exc) {
-			LOG(fatal) << "Reading FITS file failed: " << exc.what()
-					<< std::endl;
+        } catch (FitsIOExceptionT &exc) {
+            LOG(fatal) << "Reading FITS file failed: " << exc.what()
+                       << std::endl;
 
-			return nullptr;
-		}
+            return nullptr;
+        }
 
-		notifyFrameTransferUpd(100);
+        notifyFrameTransferUpd(100);
 
-		// Removing tmp file
-		std::error_code ec;
-		std::filesystem::remove(sfn, ec);
+        // Removing tmp file
+        std::error_code ec;
+        std::filesystem::remove(sfn, ec);
 
-		if (ec) {
-			LOG(warning) << "Unable to delete temporary FITS file '" << sfn
-					<< "', error='" << ec.message() << "'." << std::endl;
-		}
+        if (ec) {
+            LOG(warning) << "Unable to delete temporary FITS file '" << sfn
+                         << "', error='" << ec.message() << "'." << std::endl;
+        }
 
-		return resultImage;
-	}
-	return nullptr;
+        return resultImage;
+    }
+    return nullptr;
 }
 
-void IndiCameraInterfaceT::newNumber(INumberVectorProperty * nvp) {
-	if (strcmp(nvp->device, getName().c_str()) == 0) {
+void IndiCameraInterfaceT::newNumber(INumberVectorProperty *nvp) {
+    if (strcmp(nvp->device, getName().c_str()) == 0) {
 
-		LOG(debug) << "IndiCameraInterfaceT::newNumber... " << nvp->name
-				<< " has changed..." << std::endl;
+        LOG(debug) << "IndiCameraInterfaceT::newNumber... " << nvp->name
+                   << " has changed..." << std::endl;
 
-		// TODO: Handle ? -> Are we interested in any number update? (especially status changes?!!!)
+        // TODO: Handle ? -> Are we interested in any number update? (especially status changes?!!!)
 
-		// NOTE: Call of notify is limited to state IPS_BUSY since otherwise called again
-		//       after notification of "exposure finished" was already called.
-		if (strcmp(nvp->name, "CCD_EXPOSURE") == 0) {
+        // NOTE: Call of notify is limited to state IPS_BUSY since otherwise called again
+        //       after notification of "exposure finished" was already called.
+        if (strcmp(nvp->name, "CCD_EXPOSURE") == 0) {
 
-			if (nvp->s == IPS_BUSY) {
-				INumber * exposureTimeNum = IndiHelperT::getNumber(nvp,
-						"CCD_EXPOSURE_VALUE");
+            if (nvp->s == IPS_BUSY) {
+                INumber *exposureTimeNum = IndiHelperT::getNumber(nvp,
+                                                                  "CCD_EXPOSURE_VALUE");
 
-				notifyExposureTimerUpd(exposureTimeNum->value);
-			} else if (nvp->s == IPS_ALERT) {
+                notifyExposureTimerUpd(exposureTimeNum->value);
+            } else if (nvp->s == IPS_ALERT) {
 
-				// Report problem... -TODO: good idea here? from sep. thread...
-				ReportingT::reportMsg(ReportingDatasetT("IndiCamera", "Exposure failed. Cancelling exposure.",
-						"CCD_EXPOSURE property reported IPS_ALERT."));
+                // Report problem... -TODO: good idea here? from sep. thread...
+                ReportingT::reportMsg(ReportingDatasetT("IndiCamera", "Exposure failed. Cancelling exposure.",
+                                                        "CCD_EXPOSURE property reported IPS_ALERT."));
 
-				// Cancel exposure
-				// In any case set cancel flag - TODO: Is this a good diea?
-				cancelExposureFlag = true;
+                // Cancel exposure
+                // In any case set cancel flag - TODO: Is this a good diea?
+                cancelExposureFlag = true;
 
-				cv.notify_all();
-			}
-		}
-	}
+                cv.notify_all();
+            }
+        }
+    }
 }
 
-void IndiCameraInterfaceT::newBlob(IBLOB* blob) {
-	IBLOBVectorProperty * blobVec = blob->bvp;
+void IndiCameraInterfaceT::newBlob(IBLOB *blob) {
+    IBLOBVectorProperty *blobVec = blob->bvp;
 
-	if (strcmp(blobVec->device, getName().c_str()) == 0) {
-		LOG(debug) << "IndiCameraInterfaceT::newBlob...name=" << blob->name
-				<< ", blob=" << blob << std::endl;
+    if (strcmp(blobVec->device, getName().c_str()) == 0) {
+        LOG(debug) << "IndiCameraInterfaceT::newBlob...name=" << blob->name
+                   << ", blob=" << blob << std::endl;
 
-		// Check if blob is really an "image"
-		if (strcmp(blob->name, "CCD1") == 0 && blobVec->s == IPS_OK) {
+        // Check if blob is really an "image"
+        if (strcmp(blob->name, "CCD1") == 0 && blobVec->s == IPS_OK) {
 
-			LOG(debug) << "blobVec - device: " << blobVec->device
-					<< ", name: " << blobVec->name << ", label: "
-					<< blobVec->label << ", group: " << blobVec->group
-					<< ", p: " << blobVec->p << ", timeout: "
-					<< blobVec->timeout << ", s: " << blobVec->s << ", bp: "
-					<< blobVec->bp << ", nbp: " << blobVec->nbp << ", aux: "
-					<< blobVec->aux << std::endl;
+            LOG(debug) << "blobVec - device: " << blobVec->device
+                       << ", name: " << blobVec->name << ", label: "
+                       << blobVec->label << ", group: " << blobVec->group
+                       << ", p: " << blobVec->p << ", timeout: "
+                       << blobVec->timeout << ", s: " << blobVec->s << ", bp: "
+                       << blobVec->bp << ", nbp: " << blobVec->nbp << ", aux: "
+                       << blobVec->aux << std::endl;
 
-			mResultImage = convertIndiBlobToCImg(blob);
+            mResultImage = convertIndiBlobToCImg(blob);
 
-			LOG(debug)
-					<< "IndiCameraInterfaceT::newBlob... image stored, now notify_all()..."
-					<< std::endl;
+            LOG(debug)
+                << "IndiCameraInterfaceT::newBlob... image stored, now notify_all()..."
+                << std::endl;
 
-			cv.notify_all();
-		}
-	}
+            cv.notify_all();
+        }
+    }
 }
 
-void IndiCameraInterfaceT::newSwitch(ISwitchVectorProperty* svp) {
+void IndiCameraInterfaceT::newSwitch(ISwitchVectorProperty *svp) {
     if (strcmp(svp->device, getName().c_str()) == 0) {
 
         LOG(debug) << "IndiCameraInterfaceT::newSwitch... " << svp->name
@@ -237,12 +238,13 @@ void IndiCameraInterfaceT::newSwitch(ISwitchVectorProperty* svp) {
 
         if (strcmp(svp->name, "CCD_ABORT_EXPOSURE") == 0) {
 
-            ISwitch * abortSwitch = IndiHelperT::getSwitch(svp, "ABORT");
+            ISwitch *abortSwitch = IndiHelperT::getSwitch(svp, "ABORT");
 
             if (svp->s == IPS_OK) {
                 bool exposureCancelled = (abortSwitch->s == ISS_OFF);
 
-                LOG(info) << "Exposure cancelled: " << exposureCancelled << ", status: " << IndiHelperT::propStateAsStr(svp->s) << std::endl;
+                LOG(info) << "Exposure cancelled: " << exposureCancelled << ", status: "
+                          << IndiHelperT::propStateAsStr(svp->s) << std::endl;
 
                 cancelExposureFlag = true;
                 cv.notify_all();
@@ -258,179 +260,179 @@ void IndiCameraInterfaceT::newSwitch(ISwitchVectorProperty* svp) {
 // Device
 /////////////////////////////////////////////////
 std::string IndiCameraInterfaceT::getName() const {
-	return mIndiDevice->getIndiBaseDevice()->getDeviceName();
+    return mIndiDevice->getIndiBaseDevice()->getDeviceName();
 }
 
 // Hardware properties
 unsigned int IndiCameraInterfaceT::getBitsPerPixel() const {
 
-	try {
-		INumberVectorProperty * ccdInfoVecProp = IndiHelperT::getNumberVec(
+    try {
+        INumberVectorProperty *ccdInfoVecProp = IndiHelperT::getNumberVec(
                 mIndiDevice->getIndiBaseDevice(), "CCD_INFO");
 
-		IndiHelperT::requireReadable(ccdInfoVecProp);
+        IndiHelperT::requireReadable(ccdInfoVecProp);
 
-		INumber * bpp = IndiHelperT::getNumber(ccdInfoVecProp,
-				"CCD_BITSPERPIXEL");
+        INumber *bpp = IndiHelperT::getNumber(ccdInfoVecProp,
+                                              "CCD_BITSPERPIXEL");
 
-		return bpp->value;
-	} catch (IndiExceptionT & exc) {
-		throw CameraExceptionT(
-				"Unable to get bits per pixel. Details: "
-						+ std::string(exc.what()));
-	}
+        return bpp->value;
+    } catch (IndiExceptionT &exc) {
+        throw CameraExceptionT(
+                "Unable to get bits per pixel. Details: "
+                + std::string(exc.what()));
+    }
 }
 
 SizeT<float> IndiCameraInterfaceT::getPixelSize() const {
-	try {
-		INumberVectorProperty * ccdInfoVecProp = IndiHelperT::getNumberVec(
+    try {
+        INumberVectorProperty *ccdInfoVecProp = IndiHelperT::getNumberVec(
                 mIndiDevice->getIndiBaseDevice(), "CCD_INFO");
 
-		IndiHelperT::requireReadable(ccdInfoVecProp);
+        IndiHelperT::requireReadable(ccdInfoVecProp);
 
-		// First try CCD_PIXEL_SIZE_X and CCD_PIXEL_SIZE_Y
-		INumber * pixelSizeX = IndiHelperT::getNumber(ccdInfoVecProp,
-				"CCD_PIXEL_SIZE_X");
-		INumber * pixelSizeY = IndiHelperT::getNumber(ccdInfoVecProp,
-				"CCD_PIXEL_SIZE_Y");
+        // First try CCD_PIXEL_SIZE_X and CCD_PIXEL_SIZE_Y
+        INumber *pixelSizeX = IndiHelperT::getNumber(ccdInfoVecProp,
+                                                     "CCD_PIXEL_SIZE_X");
+        INumber *pixelSizeY = IndiHelperT::getNumber(ccdInfoVecProp,
+                                                     "CCD_PIXEL_SIZE_Y");
 
-		return SizeT<float>(pixelSizeX->value, pixelSizeY->value);
+        return SizeT<float>(pixelSizeX->value, pixelSizeY->value);
 
-	} catch (IndiExceptionT & exc) {
-		throw CameraExceptionT(
-				"Unable to get pixel size. Details: "
-						+ std::string(exc.what()));
-	}
+    } catch (IndiExceptionT &exc) {
+        throw CameraExceptionT(
+                "Unable to get pixel size. Details: "
+                + std::string(exc.what()));
+    }
 }
 
 SizeT<unsigned int> IndiCameraInterfaceT::getMaxResolution() const {
 
-	try {
-		INumberVectorProperty * ccdInfoVecProp = IndiHelperT::getNumberVec(
+    try {
+        INumberVectorProperty *ccdInfoVecProp = IndiHelperT::getNumberVec(
                 mIndiDevice->getIndiBaseDevice(), "CCD_INFO");
 
-		IndiHelperT::requireReadable(ccdInfoVecProp);
+        IndiHelperT::requireReadable(ccdInfoVecProp);
 
-		INumber * maxX = IndiHelperT::getNumber(ccdInfoVecProp, "CCD_MAX_X");
-		INumber * maxY = IndiHelperT::getNumber(ccdInfoVecProp, "CCD_MAX_Y");
+        INumber *maxX = IndiHelperT::getNumber(ccdInfoVecProp, "CCD_MAX_X");
+        INumber *maxY = IndiHelperT::getNumber(ccdInfoVecProp, "CCD_MAX_Y");
 
-		return SizeT<unsigned int>(maxX->value, maxY->value);
+        return SizeT<unsigned int>(maxX->value, maxY->value);
 
-	} catch (IndiExceptionT & exc) {
-		throw CameraExceptionT(
-				"Unable to get max resolution. Details: "
-						+ std::string(exc.what()));
-	}
+    } catch (IndiExceptionT &exc) {
+        throw CameraExceptionT(
+                "Unable to get max resolution. Details: "
+                + std::string(exc.what()));
+    }
 }
 
 std::chrono::milliseconds IndiCameraInterfaceT::getMinExposureTime() const {
 
-	try {
-		INumberVectorProperty * exposureTimeVecProp = IndiHelperT::getNumberVec(
+    try {
+        INumberVectorProperty *exposureTimeVecProp = IndiHelperT::getNumberVec(
                 mIndiDevice->getIndiBaseDevice(), "CCD_EXPOSURE");
 
-		IndiHelperT::requireReadable(exposureTimeVecProp);
+        IndiHelperT::requireReadable(exposureTimeVecProp);
 
-		INumber * exposureTime = IndiHelperT::getNumber(exposureTimeVecProp,
-				"CCD_EXPOSURE_VALUE");
+        INumber *exposureTime = IndiHelperT::getNumber(exposureTimeVecProp,
+                                                       "CCD_EXPOSURE_VALUE");
 
-		// See: https://stackoverflow.com/questions/14391327/how-to-get-duration-as-int-millis-and-float-seconds-from-chrono
-		std::chrono::duration<float> fs(exposureTime->min);
+        // See: https://stackoverflow.com/questions/14391327/how-to-get-duration-as-int-millis-and-float-seconds-from-chrono
+        std::chrono::duration<float> fs(exposureTime->min);
 
-		std::chrono::milliseconds d = std::chrono::duration_cast
-				< std::chrono::milliseconds > (fs);
+        std::chrono::milliseconds d = std::chrono::duration_cast
+                <std::chrono::milliseconds>(fs);
 
-		LOG(debug) << "IndiCameraInterfaceT::getMinExposureTime - min: "
-				<< exposureTime->min << ", sec: " << fs.count() << ", ms: " << d.count() << std::endl;
+        LOG(debug) << "IndiCameraInterfaceT::getMinExposureTime - min: "
+                   << exposureTime->min << ", sec: " << fs.count() << ", ms: " << d.count() << std::endl;
 
-		return d;
+        return d;
 
-	} catch (IndiExceptionT & exc) {
-		throw CameraExceptionT(
-				"Unable to get min exposure time. Details: "
-						+ std::string(exc.what()));
-	}
+    } catch (IndiExceptionT &exc) {
+        throw CameraExceptionT(
+                "Unable to get min exposure time. Details: "
+                + std::string(exc.what()));
+    }
 }
 
 std::chrono::milliseconds IndiCameraInterfaceT::getMaxExposureTime() const {
-	try {
-		INumberVectorProperty * exposureTimeVecProp = IndiHelperT::getNumberVec(
+    try {
+        INumberVectorProperty *exposureTimeVecProp = IndiHelperT::getNumberVec(
                 mIndiDevice->getIndiBaseDevice(), "CCD_EXPOSURE");
 
-		IndiHelperT::requireReadable(exposureTimeVecProp);
+        IndiHelperT::requireReadable(exposureTimeVecProp);
 
-		INumber * exposureTime = IndiHelperT::getNumber(exposureTimeVecProp,
-				"CCD_EXPOSURE_VALUE");
+        INumber *exposureTime = IndiHelperT::getNumber(exposureTimeVecProp,
+                                                       "CCD_EXPOSURE_VALUE");
 
-		// See: https://stackoverflow.com/questions/14391327/how-to-get-duration-as-int-millis-and-float-seconds-from-chrono
-		std::chrono::duration<float> fs(exposureTime->max);
+        // See: https://stackoverflow.com/questions/14391327/how-to-get-duration-as-int-millis-and-float-seconds-from-chrono
+        std::chrono::duration<float> fs(exposureTime->max);
 
-		std::chrono::milliseconds d = std::chrono::duration_cast
-				< std::chrono::milliseconds > (fs);
+        std::chrono::milliseconds d = std::chrono::duration_cast
+                <std::chrono::milliseconds>(fs);
 
-		LOG(debug) << "IndiCameraInterfaceT::getMaxExposureTime - max: "
-				<< exposureTime->min << ", sec: " << fs.count() << ", ms: "
-				<< d.count() << std::endl;
+        LOG(debug) << "IndiCameraInterfaceT::getMaxExposureTime - max: "
+                   << exposureTime->min << ", sec: " << fs.count() << ", ms: "
+                   << d.count() << std::endl;
 
-		return d;
+        return d;
 
-	} catch (IndiExceptionT & exc) {
-		throw CameraExceptionT(
-				"Unable to get max exposure time. Details: "
-						+ std::string(exc.what()));
-	}
+    } catch (IndiExceptionT &exc) {
+        throw CameraExceptionT(
+                "Unable to get max exposure time. Details: "
+                + std::string(exc.what()));
+    }
 }
 
 // Camera
 // Exposure related properties
 void IndiCameraInterfaceT::startExposure() {
 
-  // TODO / BUG: When "Loop" is enabled, an "Exposure already running" exception is thrown...
-	if (DeviceConnectionStateT::CONNECTED
-			!= mIndiDevice->getConnectionState()) {
-		// TODO: Maybe better reporting? + return
-		throw CameraExceptionT("Camera not connected.");
-	}
+    // TODO / BUG: When "Loop" is enabled, an "Exposure already running" exception is thrown...
+    if (DeviceConnectionStateT::CONNECTED
+        != mIndiDevice->getConnectionState()) {
+        // TODO: Maybe better reporting? + return
+        throw CameraExceptionT("Camera not connected.");
+    }
 
-	if (isExposureRunning()) {
-		// TODO: Maybe better reporting? + return
-		throw CameraExceptionT("Exposure already running.");
-	}
-	cancelExposureFlag = false;
+    if (isExposureRunning()) {
+        // TODO: Maybe better reporting? + return
+        throw CameraExceptionT("Exposure already running.");
+    }
+    cancelExposureFlag = false;
 
-	exposureThread = std::thread(&IndiCameraInterfaceT::expose, this);
-	exposureThread.detach();
+    exposureThread = std::thread(&IndiCameraInterfaceT::expose, this);
+    exposureThread.detach();
 }
 
 void IndiCameraInterfaceT::cancelExposure() {
-	LOG(debug) << "IndiCameraInterfaceT - cancelExposure..." << std::endl;
+    LOG(debug) << "IndiCameraInterfaceT - cancelExposure..." << std::endl;
 
-	// TODO: Introduce and check if: isExposureAbortSupported()...
+    // TODO: Introduce and check if: isExposureAbortSupported()...
 
-	try {
-		// Tell camera to cancel...
-		ISwitchVectorProperty * abortExposureVecProp =
-				IndiHelperT::getSwitchVec(mIndiDevice->getIndiBaseDevice(),
-						"CCD_ABORT_EXPOSURE");
+    try {
+        // Tell camera to cancel...
+        ISwitchVectorProperty *abortExposureVecProp =
+                IndiHelperT::getSwitchVec(mIndiDevice->getIndiBaseDevice(),
+                                          "CCD_ABORT_EXPOSURE");
 
-		IndiHelperT::requireWritable(abortExposureVecProp);
+        IndiHelperT::requireWritable(abortExposureVecProp);
 
-		ISwitch * abortExposure = IndiHelperT::getSwitch(abortExposureVecProp,
-				"ABORT");
-		abortExposure->s = ISS_ON;
+        ISwitch *abortExposure = IndiHelperT::getSwitch(abortExposureVecProp,
+                                                        "ABORT");
+        abortExposure->s = ISS_ON;
 
         mIndiDevice->getIndiClient()->sendNewSwitch(abortExposureVecProp);
 
-		// --> generates a newSwitch() event!
+        // --> generates a newSwitch() event!
 
-	} catch (IndiExceptionT & exc) {
-		// Report problem...
-		ReportingT::reportMsg(ReportingDatasetT("IndiCamera", "Aborting exposure failed.", exc.what()));
+    } catch (IndiExceptionT &exc) {
+        // Report problem...
+        ReportingT::reportMsg(ReportingDatasetT("IndiCamera", "Aborting exposure failed.", exc.what()));
 
-		// TODO!!!!!: Should this class actually use Reporting:: ? Or should it throw a CameraExceptionT and we catch it there and call ReportingT:: there..?!
-	}
+        // TODO!!!!!: Should this class actually use Reporting:: ? Or should it throw a CameraExceptionT and we catch it there and call ReportingT:: there..?!
+    }
 
-	// In any case set cancel flag - TODO: Is this a good idea?
+    // In any case set cancel flag - TODO: Is this a good idea?
 //	cancelExposureFlag = true;
 //
 //	cv.notify_all();
@@ -458,214 +460,214 @@ bool IndiCameraInterfaceT::isExposureRunning() {
 }
 
 std::chrono::milliseconds IndiCameraInterfaceT::getExposureTime() const {
-	return mExposureTime;
+    return mExposureTime;
 }
 
 void IndiCameraInterfaceT::setExposureTime(
-		const std::chrono::milliseconds & exposureTime) {
-  mExposureTime = exposureTime;
-  // TODO ! HACK!
-  //using namespace std::chrono_literals;
-  //mExposureTime = 1000ms;
+        const std::chrono::milliseconds &exposureTime) {
+    mExposureTime = exposureTime;
+    // TODO ! HACK!
+    //using namespace std::chrono_literals;
+    //mExposureTime = 1000ms;
 }
 
 void IndiCameraInterfaceT::setExposureDelay(
-		const std::chrono::milliseconds & exposureDelay) {
-	mExposureDelay = exposureDelay;
+        const std::chrono::milliseconds &exposureDelay) {
+    mExposureDelay = exposureDelay;
 }
 
 std::chrono::milliseconds IndiCameraInterfaceT::getExposureDelay() const {
-	return mExposureDelay;
+    return mExposureDelay;
 }
 
 LoopModeT::TypeE IndiCameraInterfaceT::getLoopMode() const {
-	return mLoopMode.load();
+    return mLoopMode.load();
 }
 
 void IndiCameraInterfaceT::setLoopMode(LoopModeT::TypeE loopMode) {
-	mLoopMode = loopMode;
+    mLoopMode = loopMode;
 }
 
 std::list<FrameTypeT::TypeE> IndiCameraInterfaceT::getSupportedFrameTypes() const {
-	return {FrameTypeT::LIGHT, FrameTypeT::BIAS, FrameTypeT::DARK, FrameTypeT::FLAT};
+    return {FrameTypeT::LIGHT, FrameTypeT::BIAS, FrameTypeT::DARK, FrameTypeT::FLAT};
 }
 
 FrameTypeT::TypeE IndiCameraInterfaceT::getFrameType() const {
-	return FrameTypeT::LIGHT;
+    return FrameTypeT::LIGHT;
 }
 
 void IndiCameraInterfaceT::setFrameType(FrameTypeT::TypeE) {
-	// TODO...
+    // TODO...
 }
 
 BinningT IndiCameraInterfaceT::getSupportedMaxBinningMode() const {
-	return BinningT(5, 5);
+    return BinningT(5, 5);
 }
 
 BinningT IndiCameraInterfaceT::getBinning() const {
-	return BinningT(1, 1);
+    return BinningT(1, 1);
 }
 
 void IndiCameraInterfaceT::setBinning(const BinningT &) {
-	// TODO...
+    // TODO...
 }
 
 bool IndiCameraInterfaceT::isRoiSupported() const {
-	return true;
+    return true;
 }
 
 RectT<unsigned int> IndiCameraInterfaceT::getRoi() const {
-	return mSelectedRoi;
+    return mSelectedRoi;
 }
 
-void IndiCameraInterfaceT::setRoi(const RectT<unsigned int> & selectedSubFrame) {
-	LOG(debug) << "IndiCameraInterfaceT::setSubFrame... subFrame: "
-			<< selectedSubFrame.x() << ", " << selectedSubFrame.y() << ", w: "
-			<< selectedSubFrame.width() << ", h: " << selectedSubFrame.height()
-			<< std::endl;
+void IndiCameraInterfaceT::setRoi(const RectT<unsigned int> &selectedSubFrame) {
+    LOG(debug) << "IndiCameraInterfaceT::setSubFrame... subFrame: "
+               << selectedSubFrame.x() << ", " << selectedSubFrame.y() << ", w: "
+               << selectedSubFrame.width() << ", h: " << selectedSubFrame.height()
+               << std::endl;
 
-	mSelectedRoi = selectedSubFrame;
+    mSelectedRoi = selectedSubFrame;
 }
 
 void IndiCameraInterfaceT::clearRoi() {
-	mSelectedRoi.clear();
+    mSelectedRoi.clear();
 }
 
 bool IndiCameraInterfaceT::delayedExposueTimer() {
 
-	int exosureDelayMillis = mExposureDelay.count();
-	bool result = true;
+    int exosureDelayMillis = mExposureDelay.count();
+    bool result = true;
 
-	notifyExposureDelayTimerUpd(exosureDelayMillis);
+    notifyExposureDelayTimerUpd(exosureDelayMillis);
 
-	while (exosureDelayMillis > 0) {
-		LOG(debug) << "Next exposure starts in '" << exosureDelayMillis
-				<< "ms'..." << std::endl;
+    while (exosureDelayMillis > 0) {
+        LOG(debug) << "Next exposure starts in '" << exosureDelayMillis
+                   << "ms'..." << std::endl;
 
-		if (cancelExposureFlag.load()) {
-			result = false;
-			break;
-		}
+        if (cancelExposureFlag.load()) {
+            result = false;
+            break;
+        }
 
-		// During loop notify listeners only every 500 ms
-		if (exosureDelayMillis % 500 == 0) {
-			notifyExposureDelayTimerUpd(exosureDelayMillis);
-		}
+        // During loop notify listeners only every 500 ms
+        if (exosureDelayMillis % 500 == 0) {
+            notifyExposureDelayTimerUpd(exosureDelayMillis);
+        }
 
-		std::this_thread::sleep_for(1ms);
-		--exosureDelayMillis;
-	}
+        std::this_thread::sleep_for(1ms);
+        --exosureDelayMillis;
+    }
 
-	notifyExposureDelayTimerUpd(exosureDelayMillis);
+    notifyExposureDelayTimerUpd(exosureDelayMillis);
 
-	return result;
+    return result;
 }
 
-void IndiCameraInterfaceT::setRoiIndi(const RectT<unsigned int> & roi) {
+void IndiCameraInterfaceT::setRoiIndi(const RectT<unsigned int> &roi) {
 
-	INumberVectorProperty * frameVecProp = IndiHelperT::getNumberVec(
+    INumberVectorProperty *frameVecProp = IndiHelperT::getNumberVec(
             mIndiDevice->getIndiBaseDevice(), "CCD_FRAME");
 
-	IndiHelperT::requireWritable(frameVecProp);
+    IndiHelperT::requireWritable(frameVecProp);
 
-	INumber * pNumX = IndiHelperT::getNumber(frameVecProp, "X");
-	INumber * pNumY = IndiHelperT::getNumber(frameVecProp, "Y");
-	INumber * pNumWidth = IndiHelperT::getNumber(frameVecProp, "WIDTH");
-	INumber * pNumHeight = IndiHelperT::getNumber(frameVecProp, "HEIGHT");
+    INumber *pNumX = IndiHelperT::getNumber(frameVecProp, "X");
+    INumber *pNumY = IndiHelperT::getNumber(frameVecProp, "Y");
+    INumber *pNumWidth = IndiHelperT::getNumber(frameVecProp, "WIDTH");
+    INumber *pNumHeight = IndiHelperT::getNumber(frameVecProp, "HEIGHT");
 
-	if (roi.isSet()) {
-		pNumX->value = roi.x();
-		pNumY->value = roi.y();
-		pNumWidth->value = roi.width();
-		pNumHeight->value = roi.height();
-	} else {
-		SizeT<unsigned int> maxRes = getMaxResolution();
+    if (roi.isSet()) {
+        pNumX->value = roi.x();
+        pNumY->value = roi.y();
+        pNumWidth->value = roi.width();
+        pNumHeight->value = roi.height();
+    } else {
+        SizeT<unsigned int> maxRes = getMaxResolution();
 
-		pNumX->value = 0;
-		pNumY->value = 0;
-		pNumWidth->value = maxRes.width();
-		pNumHeight->value = maxRes.height();
-	}
+        pNumX->value = 0;
+        pNumY->value = 0;
+        pNumWidth->value = maxRes.width();
+        pNumHeight->value = maxRes.height();
+    }
 
     mIndiDevice->getIndiClient()->sendNewNumber(frameVecProp);
 }
 
 bool IndiCameraInterfaceT::indiExposure() {
-	LOG(debug) << "IndiCameraInterfaceT - startExposure..." << std::endl;
+    LOG(debug) << "IndiCameraInterfaceT - startExposure..." << std::endl;
 
-	// TODO: Also set binning, frame type, etc...??
+    // TODO: Also set binning, frame type, etc...??
 
-	// Set ROI
-	try {
+    // Set ROI
+    try {
 
-		setRoiIndi(mSelectedRoi);
+        setRoiIndi(mSelectedRoi);
 
-	} catch (IndiExceptionT & exc) {
-		ReportingT::reportMsg(ReportingDatasetT("IndiCamera", "Aborting exposure failed.", exc.what()));
+    } catch (IndiExceptionT &exc) {
+        ReportingT::reportMsg(ReportingDatasetT("IndiCamera", "Aborting exposure failed.", exc.what()));
 
-		return false;
-	}
+        return false;
+    }
 
-	// Set exposure time (-> starts exposure)
-	try {
+    // Set exposure time (-> starts exposure)
+    try {
 
-		INumberVectorProperty * exposureTimeVecProp = IndiHelperT::getNumberVec(
+        INumberVectorProperty *exposureTimeVecProp = IndiHelperT::getNumberVec(
                 mIndiDevice->getIndiBaseDevice(), "CCD_EXPOSURE");
 
-		IndiHelperT::requireWritable(exposureTimeVecProp);
+        IndiHelperT::requireWritable(exposureTimeVecProp);
 
-		INumber * exposureTimeNum = IndiHelperT::getNumber(exposureTimeVecProp,
-				"CCD_EXPOSURE_VALUE");
+        INumber *exposureTimeNum = IndiHelperT::getNumber(exposureTimeVecProp,
+                                                          "CCD_EXPOSURE_VALUE");
 
-		auto seconds = std::chrono::duration_cast < std::chrono::duration<float>
-				> (mExposureTime);
+        auto seconds = std::chrono::duration_cast<std::chrono::duration<float>
+        >(mExposureTime);
 
-		exposureTimeNum->value = seconds.count(); // In seconds
+        exposureTimeNum->value = seconds.count(); // In seconds
 
         mIndiDevice->getIndiClient()->sendNewNumber(exposureTimeVecProp);
 
-	} catch (IndiExceptionT & exc) {
-		ReportingT::reportMsg(ReportingDatasetT("IndiCamera", "Unable to set exposure time.", exc.what()));
+    } catch (IndiExceptionT &exc) {
+        ReportingT::reportMsg(ReportingDatasetT("IndiCamera", "Unable to set exposure time.", exc.what()));
 
-		return false;
-	}
+        return false;
+    }
 
-	// Wait until exposure finished or cancelled
-	LOG(debug) << "Waiting for exposure to finish or cancel..."
-			<< std::endl;
+    // Wait until exposure finished or cancelled
+    LOG(debug) << "Waiting for exposure to finish or cancel..."
+               << std::endl;
 
-	std::unique_lock < std::mutex > lk(cvMutex);
+    std::unique_lock<std::mutex> lk(cvMutex);
 
-	cv.wait(lk);
+    cv.wait(lk);
 
-	return (!cancelExposureFlag.load());
+    return (!cancelExposureFlag.load());
 }
 
 void IndiCameraInterfaceT::expose() {
-	bool cancelled;
-	bool lastExposure = (getLoopMode() != LoopModeT::LOOP);
+    bool cancelled;
+    bool lastExposure = (getLoopMode() != LoopModeT::LOOP);
 
-	do {
-		mResultImage = std::make_shared<ImageT>();
+    do {
+        mResultImage = std::make_shared<ImageT>();
 
         mIsExposureRunning = true;
 
         // https://stackoverflow.com/questions/7925479/if-argument-evaluation-order
-		// https://stackoverflow.com/questions/18450585/what-is-the-order-of-evaluation-of-statements-in-a-if-bracket-if
-		cancelled = !delayedExposueTimer() || !indiExposure();
+        // https://stackoverflow.com/questions/18450585/what-is-the-order-of-evaluation-of-statements-in-a-if-bracket-if
+        cancelled = !delayedExposueTimer() || !indiExposure();
 
-		lastExposure = (getLoopMode() != LoopModeT::LOOP);
+        lastExposure = (getLoopMode() != LoopModeT::LOOP);
 
         mIsExposureRunning = false;
 
-		if (cancelled) {
-			LOG(debug) << "Exposure cancelled." << std::endl;
-			notifyExposureCancelled();
-		} else {
-			LOG(debug) << "Exposure finished." << std::endl;
-			notifyExposureCycleFinished(mSelectedRoi, mResultImage,
-					lastExposure);
-		}
+        if (cancelled) {
+            LOG(debug) << "Exposure cancelled." << std::endl;
+            notifyExposureCancelled();
+        } else {
+            LOG(debug) << "Exposure finished." << std::endl;
+            notifyExposureCycleFinished(mSelectedRoi, mResultImage,
+                                        lastExposure);
+        }
 
-	} while (!lastExposure && !cancelled);
+    } while (!lastExposure && !cancelled);
 }

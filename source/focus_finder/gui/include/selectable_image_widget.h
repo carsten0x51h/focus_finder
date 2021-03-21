@@ -39,105 +39,127 @@
 
 class QScrollArea;
 
-class SelectableImageWidgetT : public QLabel
-{
+class SelectableImageWidgetT : public QLabel {
 Q_OBJECT
 
 public:
-	SelectableImageWidgetT(QWidget *parent = 0);
-	~SelectableImageWidgetT();
+    SelectableImageWidgetT(QWidget *parent = 0);
 
-	void setFrame(const QPixmap & pixmap);
-	void setSubFrame(const QRect & roiRect, const QPixmap & pixmap);
+    ~SelectableImageWidgetT();
+
+    void setFrame(const QPixmap &pixmap);
+
+    void setSubFrame(const QRect &roiRect, const QPixmap &pixmap);
+
     void clearSelection();
 
     bool isPoiSet() const;
-    void setPoi(const QPointF & poi);
-    void clearPoi();
-    const QSize & getPoiWindowSize() const;
-    void setPoiWindowSize(const QSize & poiWindowSize);
 
-	ImageViewerModeT::TypeE getMode() const;
-	void setMode(ImageViewerModeT::TypeE mode);
+    void setPoi(const QPointF &poi);
+
+    void clearPoi();
+
+    const QSize &getPoiWindowSize() const;
+
+    void setPoiWindowSize(const QSize &poiWindowSize);
+
+    ImageViewerModeT::TypeE getMode() const;
+
+    void setMode(ImageViewerModeT::TypeE mode);
 
     void update();
 
     void zoomIn();
+
     void zoomOut();
 
 
 protected:
-	void paintEvent(QPaintEvent * event);
-	void mousePressEvent(QMouseEvent * event);
-	void mouseMoveEvent(QMouseEvent * event);
-	void mouseReleaseEvent(QMouseEvent * event);
-	void wheelEvent(QWheelEvent * event);
+    void paintEvent(QPaintEvent *event);
+
+    void mousePressEvent(QMouseEvent *event);
+
+    void mouseMoveEvent(QMouseEvent *event);
+
+    void mouseReleaseEvent(QMouseEvent *event);
+
+    void wheelEvent(QWheelEvent *event);
 
 private:
     void zoomBy(float factor);
-	bool hasImage() const;
 
-	QPoint translateToBase(const QPoint & p) const;
-	QRect translateToBase(const QRect & r) const;
+    bool hasImage() const;
 
-	void handleMousePressedEventNavigation(QMouseEvent * event);
-	void handleMousePressedEventRoiSelect(QMouseEvent * event);
-	void handleMousePressedEventPoiSelect(QMouseEvent * event);
+    QPoint translateToBase(const QPoint &p) const;
 
-	void handleMouseMoveEventNavigation(QMouseEvent * event);
-	void handleMouseMoveEventRoiSelect(QMouseEvent * event);
-	void handleMouseReleaseEventNavigation(QMouseEvent * event);
-	void handleMouseReleaseEventRoiSelect(QMouseEvent * event);
+    QRect translateToBase(const QRect &r) const;
 
-	bool selectionStarted;
-	bool moveStarted;
-	QPoint mMoveDelta;
+    void handleMousePressedEventNavigation(QMouseEvent *event);
 
+    void handleMousePressedEventRoiSelect(QMouseEvent *event);
 
-	QRect mSelectionRect;
+    void handleMousePressedEventPoiSelect(QMouseEvent *event);
 
-	QRect mSubFrameRect;
-	QPixmap mSubFramePixmap;
+    void handleMouseMoveEventNavigation(QMouseEvent *event);
 
-	//QMenu contextMenu; // May be used for context menu on selection later on
+    void handleMouseMoveEventRoiSelect(QMouseEvent *event);
 
-	ImageViewerModeT::TypeE mImageViewerMode;
+    void handleMouseReleaseEventNavigation(QMouseEvent *event);
 
-	/**
-	 * "mPixmapRect" stores the original pixmap rect size - i.e. the original size of the image.
-	 * For the test the rect is "x: 0, y: 0, w: 2500, h: 1500".
-	 * This value is later used by the paintEvent() method.
-	 */
-	QRectF mPixmapRect;
+    void handleMouseReleaseEventRoiSelect(QMouseEvent *event);
 
-	/**
-	 * Position at first left click (in pan mode) or after last mouse move. (QPointF).
-	 */
-	QPointF mReferencePoint;
-
-	/**
-	 * Scale factor of pixmap (only as drawn) - original pixmap is not touched.
-	 */
-	qreal mScaleFactor;
-
-	QScrollArea * mParentScrollArea;
+    bool selectionStarted;
+    bool moveStarted;
+    QPoint mMoveDelta;
 
 
-	QPoint mLastMousePos;
+    QRect mSelectionRect;
+
+    QRect mSubFrameRect;
+    QPixmap mSubFramePixmap;
+
+    //QMenu contextMenu; // May be used for context menu on selection later on
+
+    ImageViewerModeT::TypeE mImageViewerMode;
+
+    /**
+     * "mPixmapRect" stores the original pixmap rect size - i.e. the original size of the image.
+     * For the test the rect is "x: 0, y: 0, w: 2500, h: 1500".
+     * This value is later used by the paintEvent() method.
+     */
+    QRectF mPixmapRect;
+
+    /**
+     * Position at first left click (in pan mode) or after last mouse move. (QPointF).
+     */
+    QPointF mReferencePoint;
+
+    /**
+     * Scale factor of pixmap (only as drawn) - original pixmap is not touched.
+     */
+    qreal mScaleFactor;
+
+    QScrollArea *mParentScrollArea;
 
 
-	QPointF mPoi;
-	QSize mPoiWindowSize;
+    QPoint mLastMousePos;
+
+
+    QPointF mPoi;
+    QSize mPoiWindowSize;
 
 signals:
-	// TODO: Question is if QImage should be returned by image viewer... or just Rect roi and QPoint poi!?
-	void roiSelectedSignal(const QRect & roiRect, const QImage & roiImage);
-	void roiClearedSignal();
-	void poiSelectedSignal(const QPoint & poi);
+
+    // TODO: Question is if QImage should be returned by image viewer... or just Rect roi and QPoint poi!?
+    void roiSelectedSignal(const QRect &roiRect, const QImage &roiImage);
+
+    void roiClearedSignal();
+
+    void poiSelectedSignal(const QPoint &poi);
 
 
 private slots:
-	//void saveSlot();
+    //void saveSlot();
 
 };
 

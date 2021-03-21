@@ -34,66 +34,65 @@ const std::string GlobalConfigManagerT::GLOBAL_CFG_FILENAME = "fofi_global.cfg";
 
 
 std::filesystem::path GlobalConfigManagerT::getGlobalConfigRootDirectory() {
-  std::filesystem::path globalConfigRootPath = HomeDirectoryFinderT::getHomeDir();
+    std::filesystem::path globalConfigRootPath = HomeDirectoryFinderT::getHomeDir();
 
-  globalConfigRootPath /= ".fofi";
-  
-  return globalConfigRootPath;
+    globalConfigRootPath /= ".fofi";
+
+    return globalConfigRootPath;
 }
 
 
 std::filesystem::path GlobalConfigManagerT::composeFullGlobalConfigFilePath() {
 
-  std::filesystem::path fullPath = GlobalConfigManagerT::getGlobalConfigRootDirectory();
+    std::filesystem::path fullPath = GlobalConfigManagerT::getGlobalConfigRootDirectory();
 
-  fullPath /= GLOBAL_CFG_FILENAME;
-  
-  return fullPath;
+    fullPath /= GLOBAL_CFG_FILENAME;
+
+    return fullPath;
 }
 
-GlobalConfigManagerT::GlobalConfigManagerT()
-{
-  // Create ".fofi" in home directory if it does not exist.
-  // TODO: Only create if it does not exist...
-  // TODO: Error handling...
-  std::filesystem::create_directories(GlobalConfigManagerT::getGlobalConfigRootDirectory());
+GlobalConfigManagerT::GlobalConfigManagerT() {
+    // Create ".fofi" in home directory if it does not exist.
+    // TODO: Only create if it does not exist...
+    // TODO: Error handling...
+    std::filesystem::create_directories(GlobalConfigManagerT::getGlobalConfigRootDirectory());
 
-  // Try to load the config
-  try {
-    std::string fullPathToGlobalConfig = composeFullGlobalConfigFilePath().string();
+    // Try to load the config
+    try {
+        std::string fullPathToGlobalConfig = composeFullGlobalConfigFilePath().string();
 
-    // TODO: Handle case when config does not exist...?! -> Create empty global config...?!
-    mGlobalFocusFinderConfig = GlobalFocusFinderConfigT::load(fullPathToGlobalConfig);
-    
-    LOG(debug) << "Loaded global FoFi config: " << fullPathToGlobalConfig << std::endl;
-    
-    
-  } catch (GlobalFocusFinderConfigExceptionT & exc) {
-    throw GlobalConfigManagerExceptionT(exc.what());
-  }
-    
+        // TODO: Handle case when config does not exist...?! -> Create empty global config...?!
+        mGlobalFocusFinderConfig = GlobalFocusFinderConfigT::load(fullPathToGlobalConfig);
+
+        LOG(debug) << "Loaded global FoFi config: " << fullPathToGlobalConfig << std::endl;
+
+
+    } catch (GlobalFocusFinderConfigExceptionT &exc) {
+        throw GlobalConfigManagerExceptionT(exc.what());
+    }
+
 }
 
 GlobalFocusFinderConfigT GlobalConfigManagerT::getConfig() const {
-  return mGlobalFocusFinderConfig;
+    return mGlobalFocusFinderConfig;
 }
 
-void GlobalConfigManagerT::setConfig(const GlobalFocusFinderConfigT & modifiedGlobalConfig) {
+void GlobalConfigManagerT::setConfig(const GlobalFocusFinderConfigT &modifiedGlobalConfig) {
 
-  std::string fullPathToGlobalConfig = composeFullGlobalConfigFilePath().string();
-  
-  // Store to file
-  try {
-    GlobalFocusFinderConfigT::save(fullPathToGlobalConfig, modifiedGlobalConfig);
+    std::string fullPathToGlobalConfig = composeFullGlobalConfigFilePath().string();
 
-    // If string was successful, set the new global config
-    mGlobalFocusFinderConfig = modifiedGlobalConfig;
-    
-    // Notify all listeners about global config change...
-    // Add if required...
-    //notifyGlobalConfigChanged();
+    // Store to file
+    try {
+        GlobalFocusFinderConfigT::save(fullPathToGlobalConfig, modifiedGlobalConfig);
 
-  } catch (GlobalFocusFinderConfigExceptionT & exc) {
-    throw GlobalConfigManagerExceptionT(exc.what());
-  }
+        // If string was successful, set the new global config
+        mGlobalFocusFinderConfig = modifiedGlobalConfig;
+
+        // Notify all listeners about global config change...
+        // Add if required...
+        //notifyGlobalConfigChanged();
+
+    } catch (GlobalFocusFinderConfigExceptionT &exc) {
+        throw GlobalConfigManagerExceptionT(exc.what());
+    }
 }

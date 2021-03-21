@@ -42,8 +42,7 @@ namespace Ui {
 /**
 *  @brief
 */
-class HfdViewPanelT : public QWidget
-{
+class HfdViewPanelT : public QWidget {
 Q_OBJECT
 
 public:
@@ -51,7 +50,7 @@ public:
     *  @brief
     *    Constructor
     */
-	HfdViewPanelT(QWidget * parent);
+    HfdViewPanelT(QWidget *parent);
 
     /**
     *  @brief
@@ -59,18 +58,19 @@ public:
     */
     virtual ~HfdViewPanelT();
 
-	void reset();
-	void setHfd(const HfdT & hfd);
+    void reset();
+
+    void setHfd(const HfdT &hfd);
 
 signals:
 
 protected slots:
 
 protected:
-	const QScopedPointer<Ui::HfdViewPanel> m_ui;
+    const QScopedPointer<Ui::HfdViewPanel> m_ui;
 
 private:
-	HfdViewWidgetT * mHfdWidget;
+    HfdViewWidgetT *mHfdWidget;
 };
 
 #endif /*SOURCE_FOCUS_FINDER_GUI_INCLUDE_HFD_VIEW_PANEL_H_*/

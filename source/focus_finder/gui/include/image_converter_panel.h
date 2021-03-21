@@ -38,15 +38,15 @@
 
 
 class AbstractMapperPanelT;
+
 class CameraInterfaceT;
 
 namespace Ui {
     class ImageConverterPanel;
 }
 
-class ImageConverterPanelT : public QWidget
-{
-    Q_OBJECT
+class ImageConverterPanelT : public QWidget {
+Q_OBJECT
 
 
 public:
@@ -54,31 +54,38 @@ public:
     *  @brief
     *    Constructor
     */
-	ImageConverterPanelT(QWidget * parent, FocusFinderLogicT & ffl);
-	~ImageConverterPanelT();
+    ImageConverterPanelT(QWidget *parent, FocusFinderLogicT &ffl);
+
+    ~ImageConverterPanelT();
 
 
 signals:
-	void valueChangedSignal();
-	void newImageReceivedSignal();
+
+    void valueChangedSignal();
+
+    void newImageReceivedSignal();
 
 protected slots:
-	void currentIndexChanged(int idx);
-	void valueChangedSlot();
-	void onNewImageReceivedSlot();
+
+    void currentIndexChanged(int idx);
+
+    void valueChangedSlot();
+
+    void onNewImageReceivedSlot();
 
 protected:
-	const QScopedPointer<Ui::ImageConverterPanel> m_ui;
+    const QScopedPointer<Ui::ImageConverterPanel> m_ui;
 
 
 private:
-	AbstractMapperPanelT * getWidgetFromCbx(int idx);
-	void updateProfile();
+    AbstractMapperPanelT *getWidgetFromCbx(int idx);
 
-	FocusFinderLogicT & mFfl;
-	int mPrevIdx;
-	std::shared_ptr<CameraInterfaceT> mCameraDevice;
-	boost::signals2::connection mExposureCycleFinishedConnection;
+    void updateProfile();
+
+    FocusFinderLogicT &mFfl;
+    int mPrevIdx;
+    std::shared_ptr<CameraInterfaceT> mCameraDevice;
+    boost::signals2::connection mExposureCycleFinishedConnection;
 };
 
 #endif /*SOURCE_FOCUS_FINDER_GUI_INCLUDE_IMAGE_CONVERTER_PANEL_H_*/

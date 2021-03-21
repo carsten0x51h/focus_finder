@@ -39,8 +39,7 @@
 /**
 *  @brief
 */
-class HfdViewWidgetT : public QLabel
-{
+class HfdViewWidgetT : public QLabel {
 Q_OBJECT
 
 public:
@@ -48,7 +47,7 @@ public:
     *  @brief
     *    Constructor
     */
-	HfdViewWidgetT(QWidget * parent);
+    HfdViewWidgetT(QWidget *parent);
 
     /**
     *  @brief
@@ -56,10 +55,11 @@ public:
     */
     virtual ~HfdViewWidgetT();
 
-	void reset();
-	void setHfd(const HfdT & hfd);
+    void reset();
 
-	void paintEvent(QPaintEvent * event) override;
+    void setHfd(const HfdT &hfd);
+
+    void paintEvent(QPaintEvent *event) override;
 
 signals:
 
@@ -68,10 +68,10 @@ protected slots:
 protected:
 
 private:
-	QPixmap convertToPixmap(const ImageT & img);
+    QPixmap convertToPixmap(const ImageT &img);
 
-	HfdT mHfd;
-	QPixmap mStarPixmap;
+    HfdT mHfd;
+    QPixmap mStarPixmap;
 };
 
 #endif /*SOURCE_FOCUS_FINDER_GUI_INCLUDE_HFD_VIEW_WIDGET_H_*/

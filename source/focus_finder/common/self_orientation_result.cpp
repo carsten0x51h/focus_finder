@@ -27,18 +27,18 @@
 
 
 std::ostream &
-SelfOrientationResultT::print(std::ostream & os) const {
-  os << "--- SelfOrientationResultT ---" << std::endl
-     << "Focus direction to closest limit: " << FocusDirectionT::asStr(focusDirectionToLimit) << std::endl
-     << "We are in curve half: " << CurveHalfT::asStr(curveHalf) << std::endl
-     << "Record1: " << std::endl
-     << *record1 << std::endl
-     << "Record2: " << std::endl
-     << *record2;
+SelfOrientationResultT::print(std::ostream &os) const {
+    os << "--- SelfOrientationResultT ---" << std::endl
+       << "Focus direction to closest limit: " << FocusDirectionT::asStr(focusDirectionToLimit) << std::endl
+       << "We are in curve half: " << CurveHalfT::asStr(curveHalf) << std::endl
+       << "Record1: " << std::endl
+       << *record1 << std::endl
+       << "Record2: " << std::endl
+       << *record2;
 
-  return os;
+    return os;
 }
 
-std::ostream & operator<<(std::ostream & os, const SelfOrientationResultT & selfOrientationResult) {
-  return selfOrientationResult.print(os);
+std::ostream &operator<<(std::ostream &os, const SelfOrientationResultT &selfOrientationResult) {
+    return selfOrientationResult.print(os);
 }

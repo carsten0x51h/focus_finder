@@ -28,14 +28,14 @@
 
 
 FoFiConfigManagerT::FoFiConfigManagerT() {
-  mGlobalConfigManager = std::make_shared<GlobalConfigManagerT>();
-  mProfileManager = std::make_shared<ProfileManagerT>();
+    mGlobalConfigManager = std::make_shared<GlobalConfigManagerT>();
+    mProfileManager = std::make_shared<ProfileManagerT>();
 }
 
 std::shared_ptr<GlobalConfigManagerT> FoFiConfigManagerT::getGlobalConfigManager() {
-  return mGlobalConfigManager;
+    return mGlobalConfigManager;
 }
 
 std::shared_ptr<ProfileManagerT> FoFiConfigManagerT::getProfileManager() {
-  return mProfileManager;
+    return mProfileManager;
 }

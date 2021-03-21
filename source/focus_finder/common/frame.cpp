@@ -31,71 +31,69 @@
 
 
 bool FrameT::isRoiSet() const {
-	return mRoi.isSet();
+    return mRoi.isSet();
 }
 
 FrameT::FrameT() :
-	mRoi(0, 0, 0, 0),
-	mBinning(1, 1)
-{
+        mRoi(0, 0, 0, 0),
+        mBinning(1, 1) {
 
 }
 
 void FrameT::setImage(std::shared_ptr<const ImageT> image) {
-	mImage = image;
+    mImage = image;
 }
 // TODO: Needs clearImage() ?
 
 std::shared_ptr<const ImageT> FrameT::getImage() const {
-	return mImage;
+    return mImage;
 }
 
 bool FrameT::isEmpty() const {
-	return (mImage == nullptr);
+    return (mImage == nullptr);
 }
 
 // TODO: binning ...?!
-void FrameT::setRoi(const RectT<unsigned int> & roi) {
-	mRoi = roi;
+void FrameT::setRoi(const RectT<unsigned int> &roi) {
+    mRoi = roi;
 }
 
 // TODO: binning ...?!
-const RectT<unsigned int> & FrameT::getRoi() const {
-	return mRoi;
+const RectT<unsigned int> &FrameT::getRoi() const {
+    return mRoi;
 }
 
 RectT<unsigned int> FrameT::getBounds() const {
 
-	RectT<unsigned int> retRect; // by default "not set"
+    RectT<unsigned int> retRect; // by default "not set"
 
-	if (mRoi.isSet()) {
-		retRect = mRoi;
-	}
-	else if (mImage != nullptr) {
-		retRect = RectT<unsigned int> (0,0,mImage->width(), mImage->height());
-	}
+    if (mRoi.isSet()) {
+        retRect = mRoi;
+    } else if (mImage != nullptr) {
+        retRect = RectT<unsigned int>(0, 0, mImage->width(), mImage->height());
+    }
 
-	return retRect;
+    return retRect;
 }
 
 void FrameT::clearRoi() {
-	mRoi.clear();
+    mRoi.clear();
 }
 
 bool FrameT::isSubFrame() const {
-	return ! isEmpty() && isRoiSet();
+    return !isEmpty() && isRoiSet();
 }
 
 bool FrameT::isFullFrame() const {
-	return ! isEmpty() && ! isRoiSet();
+    return !isEmpty() && !isRoiSet();
 }
 
-const BinningT & FrameT::getBinning() const {
-	return mBinning;
+const BinningT &FrameT::getBinning() const {
+    return mBinning;
 }
 
-void FrameT::setBinning(const BinningT & binning) {
-	mBinning = binning;
+void FrameT::setBinning(const BinningT &binning) {
+    mBinning = binning;
 }
 
 #endif /* SOURCE_FOCUS_FINDER_COMMON_FRAME_CPP_ */

@@ -31,23 +31,23 @@
 #include "include/lm_fitting_curve.h"
 
 LmCurveMatcherT::LmCurveMatcherT(std::shared_ptr<LmFittingCurveT> lmFittingCurve) :
-		mLmFittingCurve(lmFittingCurve) {
+        mLmFittingCurve(lmFittingCurve) {
 
 }
 
 CurveParmsT LmCurveMatcherT::fillCurveParms(
-		const gsl_vector * resultVec) const {
-	CurveParmsT curveParms(resultVec->size);
-	auto parmNames = mLmFittingCurve->getParmNames();
+        const gsl_vector *resultVec) const {
+    CurveParmsT curveParms(resultVec->size);
+    auto parmNames = mLmFittingCurve->getParmNames();
 
-	//TODO: FIXED_PARMS - Only iterate about  the non-fixed ones... --> ask mLmFittingCurve for this info...
-	  
-	for (size_t idx = 0; idx < resultVec->size; ++idx) {
-		std::string parmName = parmNames.at(idx);
-		float value = gsl_vector_get(resultVec, idx);
+    //TODO: FIXED_PARMS - Only iterate about  the non-fixed ones... --> ask mLmFittingCurve for this info...
 
-		curveParms[idx] = CurveParmT(parmName, value);
-	}
+    for (size_t idx = 0; idx < resultVec->size; ++idx) {
+        std::string parmName = parmNames.at(idx);
+        float value = gsl_vector_get(resultVec, idx);
 
-	return curveParms;
+        curveParms[idx] = CurveParmT(parmName, value);
+    }
+
+    return curveParms;
 }

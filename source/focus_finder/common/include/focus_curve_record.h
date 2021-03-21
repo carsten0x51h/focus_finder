@@ -43,46 +43,59 @@ DEF_Exception(FocusCurveRecord);
 
 class FocusCurveRecordT : public std::enable_shared_from_this<FocusCurveRecordT> {
 private:
-  TimestampT mCreationTimestamp;
-  int mCurrentAbsoluteFocusPos;
-  std::tuple<float, float> mDrift;
-  std::chrono::duration<float> mExposureTime;
+    TimestampT mCreationTimestamp;
+    int mCurrentAbsoluteFocusPos;
+    std::tuple<float, float> mDrift;
+    std::chrono::duration<float> mExposureTime;
 
-  float mSnr;
-  FwhmT mFwhmHorz;
-  FwhmT mFwhmVert;
-  HfdT mHfd;
-  ImageT mCorrectedStarImage;
+    float mSnr;
+    FwhmT mFwhmHorz;
+    FwhmT mFwhmVert;
+    HfdT mHfd;
+    ImageT mCorrectedStarImage;
 
 public:
-  FocusCurveRecordT(TimestampT creationTimestamp, int currentAbsoluteFocusPos, std::chrono::duration<float> exposureTime, float snr,
-			const FwhmT & fwhmHorz, const FwhmT & fwhmVert, const HfdT & hfd,
-			const ImageT & correctedStarImage, const std::tuple<float,float> & drift);
+    FocusCurveRecordT(TimestampT creationTimestamp, int currentAbsoluteFocusPos,
+                      std::chrono::duration<float> exposureTime, float snr,
+                      const FwhmT &fwhmHorz, const FwhmT &fwhmVert, const HfdT &hfd,
+                      const ImageT &correctedStarImage, const std::tuple<float, float> &drift);
 
-  TimestampT getCreationTimestamp() const;
-  int getCurrentAbsoluteFocusPos() const;
-  std::chrono::duration<float> getExposureTime() const;
+    TimestampT getCreationTimestamp() const;
 
-  // TODO: Do not store those as members but only calc if required ... based on correctedStarImage...?
-  // -> Even store "focus measure" in curve record?? 
-  float getSnr() const;
-	const FwhmT & getFwhmHorz() const;
-	const FwhmT & getFwhmVert() const;
-	const HfdT & getHfd() const;
-  
-	const ImageT & getCorrectedStarImage() const;
-	const std::tuple<float, float> & getDrift() const;
+    int getCurrentAbsoluteFocusPos() const;
 
-  static float getFocusMeasure(std::shared_ptr<FocusCurveRecordT> focusCurveRecord, FocusMeasureTypeT::TypeE focusMeasureType);
-  float getFocusMeasure(FocusMeasureTypeT::TypeE focusMeasureType);
-  
-  std::ostream & print(std::ostream & os, size_t indent = 0) const;
-  friend std::ostream & operator<<(std::ostream & os, const FocusCurveRecordT & record);
+    std::chrono::duration<float> getExposureTime() const;
 
-  
-  // TODO: Those functions may be moved out of this class because the dependency to property_tree shoud not be in here... It does not have to be a class member at all!
-  static std::shared_ptr<FocusCurveRecordT> load(const boost::property_tree::ptree & pt, const std::filesystem::path & lightFramePath);
-  static void save(boost::property_tree::ptree & pt, const FocusCurveRecordT & focusCurveRecord, const std::filesystem::path & lightFramePath);
+    // TODO: Do not store those as members but only calc if required ... based on correctedStarImage...?
+    // -> Even store "focus measure" in curve record??
+    float getSnr() const;
+
+    const FwhmT &getFwhmHorz() const;
+
+    const FwhmT &getFwhmVert() const;
+
+    const HfdT &getHfd() const;
+
+    const ImageT &getCorrectedStarImage() const;
+
+    const std::tuple<float, float> &getDrift() const;
+
+    static float
+    getFocusMeasure(std::shared_ptr<FocusCurveRecordT> focusCurveRecord, FocusMeasureTypeT::TypeE focusMeasureType);
+
+    float getFocusMeasure(FocusMeasureTypeT::TypeE focusMeasureType);
+
+    std::ostream &print(std::ostream &os, size_t indent = 0) const;
+
+    friend std::ostream &operator<<(std::ostream &os, const FocusCurveRecordT &record);
+
+
+    // TODO: Those functions may be moved out of this class because the dependency to property_tree shoud not be in here... It does not have to be a class member at all!
+    static std::shared_ptr<FocusCurveRecordT>
+    load(const boost::property_tree::ptree &pt, const std::filesystem::path &lightFramePath);
+
+    static void save(boost::property_tree::ptree &pt, const FocusCurveRecordT &focusCurveRecord,
+                     const std::filesystem::path &lightFramePath);
 };
 
 #endif /*SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FOCUS_FINDER_RECORD_H_*/

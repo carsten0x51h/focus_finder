@@ -38,13 +38,13 @@ OutlierFilterT::OutlierFilterT() : mOutlierBoundary(-1) {
 }
 
 void OutlierFilterT::setOutlierBoundary(float outlierBoundary) {
-	mOutlierBoundary = outlierBoundary;
+    mOutlierBoundary = outlierBoundary;
 }
 
 bool OutlierFilterT::isSet() const {
-	return (mOutlierBoundary >= 0);
+    return (mOutlierBoundary >= 0);
 }
 
 std::vector<PointWithResidualT> OutlierFilterT::getOutliers() const {
-	return mOutliers;
+    return mOutliers;
 }

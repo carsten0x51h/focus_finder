@@ -33,18 +33,21 @@
  * TODO: Move to sep header file?
  */
 struct FocusFinderStrategyT {
-  enum TypeE {
-    FAST_CURVE_LOOKUP,
-    _Count
-  };
+    enum TypeE {
+        FAST_CURVE_LOOKUP,
+        _Count
+    };
 
-  static const char * asStr(const TypeE & inType) {
-    switch (inType) {
-    	case FAST_CURVE_LOOKUP: return "FAST_CURVE_LOOKUP";
-    	default: return "<?>";
+    static const char *asStr(const TypeE &inType) {
+        switch (inType) {
+            case FAST_CURVE_LOOKUP:
+                return "FAST_CURVE_LOOKUP";
+            default:
+                return "<?>";
+        }
     }
-  }
-  MAC_AS_TYPE(Type, E, _Count);
+
+    MAC_AS_TYPE(Type, E, _Count);
 };
 
 

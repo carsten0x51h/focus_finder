@@ -32,15 +32,18 @@ class DeviceT;
 
 class DeviceInterfaceT {
 private:
-	DeviceInterfaceT(const DeviceInterfaceT &);
-	DeviceInterfaceT & operator=(const DeviceInterfaceT &);
+    DeviceInterfaceT(const DeviceInterfaceT &);
+
+    DeviceInterfaceT &operator=(const DeviceInterfaceT &);
+
 public:
-	DeviceInterfaceT()  { }
-	virtual ~DeviceInterfaceT() { };
+    DeviceInterfaceT() {}
+
+    virtual ~DeviceInterfaceT() {};
 
     virtual DeviceInterfaceTypeT::TypeE getType() const = 0;
 
-    virtual DeviceT * getParentDevice() = 0;
+    virtual DeviceT *getParentDevice() = 0;
 };
 
 

@@ -36,53 +36,57 @@ DEF_Exception(Indi);
 
 class IndiHelperT {
 public:
-	static std::string propPermAsStr(IPerm perm);
-	static std::string propStateAsStr(IPState state);
+    static std::string propPermAsStr(IPerm perm);
 
-	template<typename T>
-	static void requireWritable(T * vec) {
-		IPerm perm = vec->p;
+    static std::string propStateAsStr(IPState state);
 
-		if (perm != IP_WO && perm != IP_RW) {
-			std::stringstream ss;
-			ss << "Property '" << vec->name
-					<< "' is required to be writable but is '"
-					<< IndiHelperT::propPermAsStr(perm) << "'.";
+    template<typename T>
+    static void requireWritable(T *vec) {
+        IPerm perm = vec->p;
 
-			throw IndiExceptionT(ss.str());
-		}
-	}
+        if (perm != IP_WO && perm != IP_RW) {
+            std::stringstream ss;
+            ss << "Property '" << vec->name
+               << "' is required to be writable but is '"
+               << IndiHelperT::propPermAsStr(perm) << "'.";
 
-	template<typename T>
-	static void requireReadable(T * vec) {
-		IPerm perm = vec->p;
+            throw IndiExceptionT(ss.str());
+        }
+    }
 
-		if (perm != IP_RO && perm != IP_RW) {
-			std::stringstream ss;
-			ss << "Property '" << vec->name
-					<< "' is required to be readable but is '"
-					<< IndiHelperT::propPermAsStr(perm) << "'.";
+    template<typename T>
+    static void requireReadable(T *vec) {
+        IPerm perm = vec->p;
 
-			throw IndiExceptionT(ss.str());
-		}
-	}
+        if (perm != IP_RO && perm != IP_RW) {
+            std::stringstream ss;
+            ss << "Property '" << vec->name
+               << "' is required to be readable but is '"
+               << IndiHelperT::propPermAsStr(perm) << "'.";
 
-	static INumberVectorProperty * getNumberVec(INDI::BaseDevice * dev,
-			const std::string & vecPropName);
-	static INumber * getNumber(INumberVectorProperty * vec,
-			const std::string & propName);
+            throw IndiExceptionT(ss.str());
+        }
+    }
 
-	static ISwitchVectorProperty * getSwitchVec(INDI::BaseDevice * dev,
-			const std::string & vecPropName);
-	static ISwitch * getSwitch(ISwitchVectorProperty * vec,
-			const std::string & propName);
+    static INumberVectorProperty *getNumberVec(INDI::BaseDevice *dev,
+                                               const std::string &vecPropName);
 
-	static ITextVectorProperty * getTextVec(INDI::BaseDevice * dev,
-			const std::string & vecPropName);
-	static IText * getText(ITextVectorProperty * vec,
-			const std::string & propName);
+    static INumber *getNumber(INumberVectorProperty *vec,
+                              const std::string &propName);
 
-	// TODO: Add further types? -> if needed...
+    static ISwitchVectorProperty *getSwitchVec(INDI::BaseDevice *dev,
+                                               const std::string &vecPropName);
+
+    static ISwitch *getSwitch(ISwitchVectorProperty *vec,
+                              const std::string &propName);
+
+    static ITextVectorProperty *getTextVec(INDI::BaseDevice *dev,
+                                           const std::string &vecPropName);
+
+    static IText *getText(ITextVectorProperty *vec,
+                          const std::string &propName);
+
+    // TODO: Add further types? -> if needed...
 };
 
 #endif /* SOURCE_FOCUS_FINDER_COMMON_INCLUDE_INDI_HELPER_H_ */

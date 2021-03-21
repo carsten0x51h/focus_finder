@@ -44,8 +44,7 @@ namespace Ui {
     class SplineCurveMapperPanel;
 }
 
-class SplineCurveMapperPanelT : public AbstractMapperPanelT
-{
+class SplineCurveMapperPanelT : public AbstractMapperPanelT {
 Q_OBJECT
 
 
@@ -54,28 +53,31 @@ public:
     *  @brief
     *    Constructor
     */
-	SplineCurveMapperPanelT(QWidget * parent, FocusFinderLogicT & ffl, const std::string & functionMapperName, bool visible);
-	~SplineCurveMapperPanelT();
+    SplineCurveMapperPanelT(QWidget *parent, FocusFinderLogicT &ffl, const std::string &functionMapperName,
+                            bool visible);
+
+    ~SplineCurveMapperPanelT();
 
     void notifyNewImage();
 
-	std::shared_ptr<MapperFunctionT> getMapperFunction() const;
+    std::shared_ptr<MapperFunctionT> getMapperFunction() const;
 
 
 signals:
-	void valueChangedSignal();
+
+    void valueChangedSignal();
 
 protected slots:
-	//void onRoiClearedSlot();
+    //void onRoiClearedSlot();
 
 protected:
-	const QScopedPointer<Ui::SplineCurveMapperPanel> m_ui;
+    const QScopedPointer<Ui::SplineCurveMapperPanel> m_ui;
 
 
 private:
-	void update();
+    void update();
 
-	FocusFinderLogicT & mFfl;
+    FocusFinderLogicT &mFfl;
     std::shared_ptr<SplineCurveMapperFunctionT> mFunctionMapper;
 };
 

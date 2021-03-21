@@ -28,20 +28,21 @@
 #include "enum_helper.h"
 
 struct FocusCurveRecorderTypeT {
-  enum TypeE {
-	      DEFAULT, // TODO: Rename this to something more meaningful
-	      _Count
-  };
-  
-		static const char * asStr(const TypeE & inType) {
-			switch (inType) {
-			case DEFAULT:
-			  return "DEFAULT";
-			default:
-			  return "<?>";
-		}
-	}
-	MAC_AS_TYPE(Type, E, _Count);
+    enum TypeE {
+        DEFAULT, // TODO: Rename this to something more meaningful
+        _Count
+    };
+
+    static const char *asStr(const TypeE &inType) {
+        switch (inType) {
+            case DEFAULT:
+                return "DEFAULT";
+            default:
+                return "<?>";
+        }
+    }
+
+    MAC_AS_TYPE(Type, E, _Count);
 };
 
 #endif /* SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FOCUS_CURVE_RECORDER_TYPE_H_ */

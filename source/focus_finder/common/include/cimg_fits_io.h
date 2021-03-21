@@ -33,10 +33,12 @@ DEF_Exception(FitsIO);
 
 class CImgFitsIOHelperT {
 public:
-	// CCfits helper function
-	// See http://heasarc.gsfc.nasa.gov/fitsio/ccfits/html/cookbook.html
-	static void readFits(ImageT * outImg, const std::string & inFilename, long * outBitPix = nullptr, std::stringstream * ss = nullptr);
-	static void writeFits(const ImageT & inImg, const std::string & inFilename, std::stringstream * ss = nullptr);
+    // CCfits helper function
+    // See http://heasarc.gsfc.nasa.gov/fitsio/ccfits/html/cookbook.html
+    static void
+    readFits(ImageT *outImg, const std::string &inFilename, long *outBitPix = nullptr, std::stringstream *ss = nullptr);
+
+    static void writeFits(const ImageT &inImg, const std::string &inFilename, std::stringstream *ss = nullptr);
 };
 
 #endif // SOURCE_FOCUS_FINDER_COMMON_INCLUDE_CIMG_FITS_IO_H_

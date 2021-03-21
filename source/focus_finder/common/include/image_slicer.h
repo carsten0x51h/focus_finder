@@ -60,58 +60,57 @@
  * Helper class - horizontal and vertical.
  */
 struct SliceDirectionT {
-	enum TypeE {
-		HORZ, VERT, _Count
-	};
+    enum TypeE {
+        HORZ, VERT, _Count
+    };
 
-	static const char * asStr(const TypeE & inType) {
-		switch (inType) {
-		case HORZ:
-			return "HORZ";
-		case VERT:
-			return "VERT";
-		default:
-			return "<?>";
-		}
-	}
+    static const char *asStr(const TypeE &inType) {
+        switch (inType) {
+            case HORZ:
+                return "HORZ";
+            case VERT:
+                return "VERT";
+            default:
+                return "<?>";
+        }
+    }
 
-	MAC_AS_TYPE(Type, E, _Count);
+    MAC_AS_TYPE(Type, E, _Count);
 };
 
 DEF_Exception(ImageSlicer);
 
 class ImageSlicerT {
 public:
-	template<SliceDirectionT::TypeE D> static std::vector<typename ImageT::value_type> slice(
-			const ImageT & inImage, size_t index) {
-		std::vector<typename ImageT::value_type> values;
+    template<SliceDirectionT::TypeE D>
+    static std::vector<typename ImageT::value_type> slice(
+            const ImageT &inImage, size_t index) {
+        std::vector<typename ImageT::value_type> values;
 
-		// Extract slices through centroid for profiles
-		switch (D) {
-		case SliceDirectionT::HORZ: {
-			values.resize(inImage.width());
+        // Extract slices through centroid for profiles
+        switch (D) {
+            case SliceDirectionT::HORZ: {
+                values.resize(inImage.width());
 
-			cimg_forX(inImage, x)
-			{
-				values[x] = inImage(x, index);
-			}
-			break;
-		}
-		case SliceDirectionT::VERT: {
-			values.resize(inImage.height());
+                cimg_forX(inImage, x) {
+                    values[x] = inImage(x, index);
+                }
+                break;
+            }
+            case SliceDirectionT::VERT: {
+                values.resize(inImage.height());
 
-			cimg_forY(inImage, y)
-			{
-				values[y] = inImage(index, y);
-			}
-			break;
-		}
-		default: {
-			throw ImageSlicerExceptionT("Invalid direction.");
-		}
-		}
-		return values;
-	}
+                cimg_forY(inImage, y) {
+                    values[y] = inImage(index, y);
+                }
+                break;
+            }
+            default: {
+                throw ImageSlicerExceptionT("Invalid direction.");
+            }
+        }
+        return values;
+    }
 };
 
 #endif /*_IMAGE_SLICER_H_*/

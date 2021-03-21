@@ -36,9 +36,12 @@
 #include "ui_focus_curve_view_panel.h"
 
 
-FocusCurveViewPanelT::FocusCurveViewPanelT(QWidget * parent, std::shared_ptr<FocusCurveRecorderLogicT> focusCurveRecorderLogic) : QWidget(parent),
-							       m_ui(new Ui::FocusCurveViewPanel), mFocusCurveRecorderLogic(focusCurveRecorderLogic)
-{
+FocusCurveViewPanelT::FocusCurveViewPanelT(QWidget *parent,
+                                           std::shared_ptr<FocusCurveRecorderLogicT> focusCurveRecorderLogic) : QWidget(
+        parent),
+                                                                                                                m_ui(new Ui::FocusCurveViewPanel),
+                                                                                                                mFocusCurveRecorderLogic(
+                                                                                                                        focusCurveRecorderLogic) {
     // Setup UI
     m_ui->setupUi(this);
 
@@ -49,26 +52,25 @@ FocusCurveViewPanelT::FocusCurveViewPanelT(QWidget * parent, std::shared_ptr<Foc
     mFocusCurveWidget = new FocusCurveViewWidgetT(m_ui->widget, mFocusCurveRecorderLogic);
     mFocusCurveWidget->setSizePolicy(sizePolicy);
     m_ui->layFocusCurveViewWidget->addWidget(mFocusCurveWidget, 0/*row*/, 0/*col*/, 1/*rowspan*/, 1/*colspan*/);
-    
+
     reset();
 }
 
-FocusCurveViewPanelT::~FocusCurveViewPanelT()
-{
-	// TODO: Cleanup required??
-	//delete mHfdWidget;
+FocusCurveViewPanelT::~FocusCurveViewPanelT() {
+    // TODO: Cleanup required??
+    //delete mHfdWidget;
 }
 
 void FocusCurveViewPanelT::reset() {
-  mFocusCurveWidget->reset();
+    mFocusCurveWidget->reset();
 }
 
 void FocusCurveViewPanelT::update() {
-  mFocusCurveWidget->update();
+    mFocusCurveWidget->update();
 }
 
 void FocusCurveViewPanelT::drawCurveHack(std::shared_ptr<FocusCurveT> focusCurve) {
-  mFocusCurveWidget->drawCurveHack(focusCurve);
+    mFocusCurveWidget->drawCurveHack(focusCurve);
 }
 
 

@@ -1,371 +1,375 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>FocusCurveRecorderDialog</class>
- <widget class="QWidget" name="FocusCurveRecorderDialog">
-  <property name="windowModality">
-   <enum>Qt::NonModal</enum>
-  </property>
-  <property name="geometry">
-   <rect>
-    <x>0</x>
-    <y>0</y>
-    <width>960</width>
-    <height>723</height>
-   </rect>
-  </property>
-  <property name="sizePolicy">
-   <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-    <horstretch>1</horstretch>
-    <verstretch>1</verstretch>
-   </sizepolicy>
-  </property>
-  <property name="minimumSize">
-   <size>
-    <width>400</width>
-    <height>400</height>
-   </size>
-  </property>
-  <property name="windowTitle">
-   <string>Focus curve recorder</string>
-  </property>
-  <property name="autoFillBackground">
-   <bool>false</bool>
-  </property>
-  <property name="styleSheet">
-   <string notr="true"/>
-  </property>
-  <layout class="QGridLayout" name="gridLayout_2">
-   <item row="0" column="0">
-    <layout class="QGridLayout" name="gridLayout" rowstretch="1" columnstretch="1,5,5">
-     <property name="leftMargin">
-      <number>6</number>
-     </property>
-     <property name="topMargin">
-      <number>6</number>
-     </property>
-     <property name="rightMargin">
-      <number>6</number>
-     </property>
-     <property name="bottomMargin">
-      <number>6</number>
-     </property>
-     <item row="0" column="1">
-      <layout class="QGridLayout" name="lay">
-       <property name="leftMargin">
-        <number>6</number>
-       </property>
-       <property name="topMargin">
-        <number>6</number>
-       </property>
-       <property name="rightMargin">
-        <number>6</number>
-       </property>
-       <property name="bottomMargin">
-        <number>6</number>
-       </property>
-       <item row="0" column="0">
-        <layout class="QGridLayout" name="gridLayout_11" rowstretch="0" columnstretch="0">
-         <property name="leftMargin">
-          <number>6</number>
-         </property>
-         <property name="topMargin">
-          <number>6</number>
-         </property>
-         <property name="rightMargin">
-          <number>6</number>
-         </property>
-         <property name="bottomMargin">
-          <number>6</number>
-         </property>
-         <item row="0" column="0">
-          <widget class="QGroupBox" name="groupBox_3">
-           <property name="title">
-            <string>Curve matcher settings</string>
-           </property>
-           <layout class="QGridLayout" name="gridLayout_13">
-            <item row="0" column="0">
-             <layout class="QGridLayout" name="gridLayout_12" rowstretch="0" columnstretch="0,0" rowminimumheight="0" columnminimumwidth="0,1">
-              <property name="leftMargin">
-               <number>6</number>
-              </property>
-              <property name="topMargin">
-               <number>6</number>
-              </property>
-              <property name="rightMargin">
-               <number>6</number>
-              </property>
-              <property name="bottomMargin">
-               <number>6</number>
-              </property>
-              <item row="0" column="0">
-               <widget class="QLabel" name="label_10">
-                <property name="minimumSize">
-                 <size>
-                  <width>0</width>
-                  <height>0</height>
-                 </size>
-                </property>
-                <property name="text">
-                 <string>Focus curve shape:</string>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="1">
-               <widget class="QComboBox" name="cbxFocusCurveType">
-                <property name="minimumSize">
-                 <size>
-                  <width>0</width>
-                  <height>0</height>
-                 </size>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </item>
-           </layout>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item row="1" column="0">
-        <widget class="QGroupBox" name="groupBox_4">
-         <property name="title">
-          <string>Focus curve</string>
-         </property>
-         <layout class="QGridLayout" name="gridLayout_15">
-          <item row="0" column="0">
-           <layout class="QGridLayout" name="layFocusCurveViewPanel" rowstretch="0" columnstretch="0" rowminimumheight="0">
-            <property name="leftMargin">
-             <number>6</number>
-            </property>
-            <property name="topMargin">
-             <number>6</number>
-            </property>
-            <property name="rightMargin">
-             <number>6</number>
-            </property>
-            <property name="bottomMargin">
-             <number>6</number>
-            </property>
-            <item row="0" column="0">
-             <widget class="QWidget" name="widget" native="true">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+    <class>FocusCurveRecorderDialog</class>
+    <widget class="QWidget" name="FocusCurveRecorderDialog">
+        <property name="windowModality">
+            <enum>Qt::NonModal</enum>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>0</x>
+                <y>0</y>
+                <width>960</width>
+                <height>723</height>
+            </rect>
+        </property>
+        <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
                 <horstretch>1</horstretch>
                 <verstretch>1</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="styleSheet">
-               <string notr="true">background-color: black;</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-         </layout>
-        </widget>
-       </item>
-      </layout>
-     </item>
-     <item row="0" column="0">
-      <layout class="QGridLayout" name="gridLayout_4" rowstretch="0,0,0" columnstretch="0">
-       <property name="leftMargin">
-        <number>6</number>
-       </property>
-       <property name="topMargin">
-        <number>6</number>
-       </property>
-       <property name="rightMargin">
-        <number>6</number>
-       </property>
-       <property name="bottomMargin">
-        <number>6</number>
-       </property>
-       <item row="1" column="0">
-        <layout class="QGridLayout" name="layCurveRecorderRecordingSettings">
-         <property name="leftMargin">
-          <number>6</number>
-         </property>
-         <property name="topMargin">
-          <number>6</number>
-         </property>
-         <property name="rightMargin">
-          <number>20</number>
-         </property>
-         <property name="bottomMargin">
-          <number>6</number>
-         </property>
-         <item row="1" column="0">
-          <widget class="QGroupBox" name="groupBox">
-           <property name="minimumSize">
+            </sizepolicy>
+        </property>
+        <property name="minimumSize">
             <size>
-             <width>0</width>
-             <height>0</height>
+                <width>400</width>
+                <height>400</height>
             </size>
-           </property>
-           <property name="title">
-            <string>Recording settings</string>
-           </property>
-           <layout class="QGridLayout" name="gridLayout_3">
+        </property>
+        <property name="windowTitle">
+            <string>Focus curve recorder</string>
+        </property>
+        <property name="autoFillBackground">
+            <bool>false</bool>
+        </property>
+        <property name="styleSheet">
+            <string notr="true"/>
+        </property>
+        <layout class="QGridLayout" name="gridLayout_2">
             <item row="0" column="0">
-             <layout class="QGridLayout" name="gridLayout_5">
-              <property name="leftMargin">
-               <number>6</number>
-              </property>
-              <property name="topMargin">
-               <number>6</number>
-              </property>
-              <property name="rightMargin">
-               <number>6</number>
-              </property>
-              <property name="bottomMargin">
-               <number>6</number>
-              </property>
-              <item row="1" column="0">
-               <widget class="QLabel" name="label">
-                <property name="text">
-                 <string>#Curves to record</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="1">
-               <widget class="QSpinBox" name="spinNumFocusCurvesToRecord"/>
-              </item>
-              <item row="0" column="0">
-               <widget class="QLabel" name="label_2">
-                <property name="minimumSize">
-                 <size>
-                  <width>150</width>
-                  <height>0</height>
-                 </size>
-                </property>
-                <property name="text">
-                 <string>Focus measure limit</string>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="1">
-               <widget class="QDoubleSpinBox" name="spinFocusMeasureLimit"/>
-              </item>
-             </layout>
+                <layout class="QGridLayout" name="gridLayout" rowstretch="1" columnstretch="1,5,5">
+                    <property name="leftMargin">
+                        <number>6</number>
+                    </property>
+                    <property name="topMargin">
+                        <number>6</number>
+                    </property>
+                    <property name="rightMargin">
+                        <number>6</number>
+                    </property>
+                    <property name="bottomMargin">
+                        <number>6</number>
+                    </property>
+                    <item row="0" column="1">
+                        <layout class="QGridLayout" name="lay">
+                            <property name="leftMargin">
+                                <number>6</number>
+                            </property>
+                            <property name="topMargin">
+                                <number>6</number>
+                            </property>
+                            <property name="rightMargin">
+                                <number>6</number>
+                            </property>
+                            <property name="bottomMargin">
+                                <number>6</number>
+                            </property>
+                            <item row="0" column="0">
+                                <layout class="QGridLayout" name="gridLayout_11" rowstretch="0" columnstretch="0">
+                                    <property name="leftMargin">
+                                        <number>6</number>
+                                    </property>
+                                    <property name="topMargin">
+                                        <number>6</number>
+                                    </property>
+                                    <property name="rightMargin">
+                                        <number>6</number>
+                                    </property>
+                                    <property name="bottomMargin">
+                                        <number>6</number>
+                                    </property>
+                                    <item row="0" column="0">
+                                        <widget class="QGroupBox" name="groupBox_3">
+                                            <property name="title">
+                                                <string>Curve matcher settings</string>
+                                            </property>
+                                            <layout class="QGridLayout" name="gridLayout_13">
+                                                <item row="0" column="0">
+                                                    <layout class="QGridLayout" name="gridLayout_12" rowstretch="0"
+                                                            columnstretch="0,0" rowminimumheight="0"
+                                                            columnminimumwidth="0,1">
+                                                        <property name="leftMargin">
+                                                            <number>6</number>
+                                                        </property>
+                                                        <property name="topMargin">
+                                                            <number>6</number>
+                                                        </property>
+                                                        <property name="rightMargin">
+                                                            <number>6</number>
+                                                        </property>
+                                                        <property name="bottomMargin">
+                                                            <number>6</number>
+                                                        </property>
+                                                        <item row="0" column="0">
+                                                            <widget class="QLabel" name="label_10">
+                                                                <property name="minimumSize">
+                                                                    <size>
+                                                                        <width>0</width>
+                                                                        <height>0</height>
+                                                                    </size>
+                                                                </property>
+                                                                <property name="text">
+                                                                    <string>Focus curve shape:</string>
+                                                                </property>
+                                                            </widget>
+                                                        </item>
+                                                        <item row="0" column="1">
+                                                            <widget class="QComboBox" name="cbxFocusCurveType">
+                                                                <property name="minimumSize">
+                                                                    <size>
+                                                                        <width>0</width>
+                                                                        <height>0</height>
+                                                                    </size>
+                                                                </property>
+                                                            </widget>
+                                                        </item>
+                                                    </layout>
+                                                </item>
+                                            </layout>
+                                        </widget>
+                                    </item>
+                                </layout>
+                            </item>
+                            <item row="1" column="0">
+                                <widget class="QGroupBox" name="groupBox_4">
+                                    <property name="title">
+                                        <string>Focus curve</string>
+                                    </property>
+                                    <layout class="QGridLayout" name="gridLayout_15">
+                                        <item row="0" column="0">
+                                            <layout class="QGridLayout" name="layFocusCurveViewPanel" rowstretch="0"
+                                                    columnstretch="0" rowminimumheight="0">
+                                                <property name="leftMargin">
+                                                    <number>6</number>
+                                                </property>
+                                                <property name="topMargin">
+                                                    <number>6</number>
+                                                </property>
+                                                <property name="rightMargin">
+                                                    <number>6</number>
+                                                </property>
+                                                <property name="bottomMargin">
+                                                    <number>6</number>
+                                                </property>
+                                                <item row="0" column="0">
+                                                    <widget class="QWidget" name="widget" native="true">
+                                                        <property name="sizePolicy">
+                                                            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                                                                <horstretch>1</horstretch>
+                                                                <verstretch>1</verstretch>
+                                                            </sizepolicy>
+                                                        </property>
+                                                        <property name="styleSheet">
+                                                            <string notr="true">background-color: black;</string>
+                                                        </property>
+                                                    </widget>
+                                                </item>
+                                            </layout>
+                                        </item>
+                                    </layout>
+                                </widget>
+                            </item>
+                        </layout>
+                    </item>
+                    <item row="0" column="0">
+                        <layout class="QGridLayout" name="gridLayout_4" rowstretch="0,0,0" columnstretch="0">
+                            <property name="leftMargin">
+                                <number>6</number>
+                            </property>
+                            <property name="topMargin">
+                                <number>6</number>
+                            </property>
+                            <property name="rightMargin">
+                                <number>6</number>
+                            </property>
+                            <property name="bottomMargin">
+                                <number>6</number>
+                            </property>
+                            <item row="1" column="0">
+                                <layout class="QGridLayout" name="layCurveRecorderRecordingSettings">
+                                    <property name="leftMargin">
+                                        <number>6</number>
+                                    </property>
+                                    <property name="topMargin">
+                                        <number>6</number>
+                                    </property>
+                                    <property name="rightMargin">
+                                        <number>20</number>
+                                    </property>
+                                    <property name="bottomMargin">
+                                        <number>6</number>
+                                    </property>
+                                    <item row="1" column="0">
+                                        <widget class="QGroupBox" name="groupBox">
+                                            <property name="minimumSize">
+                                                <size>
+                                                    <width>0</width>
+                                                    <height>0</height>
+                                                </size>
+                                            </property>
+                                            <property name="title">
+                                                <string>Recording settings</string>
+                                            </property>
+                                            <layout class="QGridLayout" name="gridLayout_3">
+                                                <item row="0" column="0">
+                                                    <layout class="QGridLayout" name="gridLayout_5">
+                                                        <property name="leftMargin">
+                                                            <number>6</number>
+                                                        </property>
+                                                        <property name="topMargin">
+                                                            <number>6</number>
+                                                        </property>
+                                                        <property name="rightMargin">
+                                                            <number>6</number>
+                                                        </property>
+                                                        <property name="bottomMargin">
+                                                            <number>6</number>
+                                                        </property>
+                                                        <item row="1" column="0">
+                                                            <widget class="QLabel" name="label">
+                                                                <property name="text">
+                                                                    <string>#Curves to record</string>
+                                                                </property>
+                                                            </widget>
+                                                        </item>
+                                                        <item row="1" column="1">
+                                                            <widget class="QSpinBox" name="spinNumFocusCurvesToRecord"/>
+                                                        </item>
+                                                        <item row="0" column="0">
+                                                            <widget class="QLabel" name="label_2">
+                                                                <property name="minimumSize">
+                                                                    <size>
+                                                                        <width>150</width>
+                                                                        <height>0</height>
+                                                                    </size>
+                                                                </property>
+                                                                <property name="text">
+                                                                    <string>Focus measure limit</string>
+                                                                </property>
+                                                            </widget>
+                                                        </item>
+                                                        <item row="0" column="1">
+                                                            <widget class="QDoubleSpinBox"
+                                                                    name="spinFocusMeasureLimit"/>
+                                                        </item>
+                                                    </layout>
+                                                </item>
+                                            </layout>
+                                        </widget>
+                                    </item>
+                                </layout>
+                            </item>
+                            <item row="2" column="0">
+                                <layout class="QGridLayout" name="gridLayout_6">
+                                    <property name="leftMargin">
+                                        <number>6</number>
+                                    </property>
+                                    <property name="topMargin">
+                                        <number>6</number>
+                                    </property>
+                                    <property name="rightMargin">
+                                        <number>6</number>
+                                    </property>
+                                    <property name="bottomMargin">
+                                        <number>6</number>
+                                    </property>
+                                    <item row="0" column="0">
+                                        <widget class="QGroupBox" name="groupBox_2">
+                                            <property name="title">
+                                                <string>Focus curve records</string>
+                                            </property>
+                                            <layout class="QGridLayout" name="gridLayout_8">
+                                                <item row="1" column="0">
+                                                    <layout class="QGridLayout" name="gridLayout_7">
+                                                        <item row="0" column="0">
+                                                            <widget class="QTreeView" name="treeView">
+                                                                <property name="minimumSize">
+                                                                    <size>
+                                                                        <width>200</width>
+                                                                        <height>0</height>
+                                                                    </size>
+                                                                </property>
+                                                            </widget>
+                                                        </item>
+                                                    </layout>
+                                                </item>
+                                                <item row="0" column="0">
+                                                    <layout class="QHBoxLayout" name="layMainToolBar">
+                                                        <property name="leftMargin">
+                                                            <number>6</number>
+                                                        </property>
+                                                        <property name="topMargin">
+                                                            <number>6</number>
+                                                        </property>
+                                                        <property name="rightMargin">
+                                                            <number>6</number>
+                                                        </property>
+                                                        <property name="bottomMargin">
+                                                            <number>6</number>
+                                                        </property>
+                                                    </layout>
+                                                </item>
+                                            </layout>
+                                        </widget>
+                                    </item>
+                                </layout>
+                            </item>
+                            <item row="0" column="0">
+                                <widget class="QPushButton" name="pushButton">
+                                    <property name="text">
+                                        <string>PushButton</string>
+                                    </property>
+                                </widget>
+                            </item>
+                        </layout>
+                    </item>
+                    <item row="0" column="2">
+                        <layout class="QGridLayout" name="layDetailsWidget">
+                            <property name="leftMargin">
+                                <number>6</number>
+                            </property>
+                            <property name="topMargin">
+                                <number>6</number>
+                            </property>
+                            <property name="rightMargin">
+                                <number>6</number>
+                            </property>
+                            <property name="bottomMargin">
+                                <number>6</number>
+                            </property>
+                            <item row="0" column="0">
+                                <widget class="QWidget" name="wgtDetailsWidget" native="true">
+                                    <property name="sizePolicy">
+                                        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                                            <horstretch>1</horstretch>
+                                            <verstretch>1</verstretch>
+                                        </sizepolicy>
+                                    </property>
+                                    <property name="minimumSize">
+                                        <size>
+                                            <width>300</width>
+                                            <height>650</height>
+                                        </size>
+                                    </property>
+                                    <property name="styleSheet">
+                                        <string notr="true"/>
+                                    </property>
+                                </widget>
+                            </item>
+                        </layout>
+                    </item>
+                </layout>
             </item>
-           </layout>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item row="2" column="0">
-        <layout class="QGridLayout" name="gridLayout_6">
-         <property name="leftMargin">
-          <number>6</number>
-         </property>
-         <property name="topMargin">
-          <number>6</number>
-         </property>
-         <property name="rightMargin">
-          <number>6</number>
-         </property>
-         <property name="bottomMargin">
-          <number>6</number>
-         </property>
-         <item row="0" column="0">
-          <widget class="QGroupBox" name="groupBox_2">
-           <property name="title">
-            <string>Focus curve records</string>
-           </property>
-           <layout class="QGridLayout" name="gridLayout_8">
             <item row="1" column="0">
-             <layout class="QGridLayout" name="gridLayout_7">
-              <item row="0" column="0">
-               <widget class="QTreeView" name="treeView">
-                <property name="minimumSize">
-                 <size>
-                  <width>200</width>
-                  <height>0</height>
-                 </size>
-                </property>
-               </widget>
-              </item>
-             </layout>
+                <widget class="QDialogButtonBox" name="buttonBox">
+                    <property name="standardButtons">
+                        <set>QDialogButtonBox::Apply|QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+                    </property>
+                </widget>
             </item>
-            <item row="0" column="0">
-             <layout class="QHBoxLayout" name="layMainToolBar">
-              <property name="leftMargin">
-               <number>6</number>
-              </property>
-              <property name="topMargin">
-               <number>6</number>
-              </property>
-              <property name="rightMargin">
-               <number>6</number>
-              </property>
-              <property name="bottomMargin">
-               <number>6</number>
-              </property>
-             </layout>
-            </item>
-           </layout>
-          </widget>
-         </item>
         </layout>
-       </item>
-       <item row="0" column="0">
-        <widget class="QPushButton" name="pushButton">
-         <property name="text">
-          <string>PushButton</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-     <item row="0" column="2">
-      <layout class="QGridLayout" name="layDetailsWidget">
-       <property name="leftMargin">
-        <number>6</number>
-       </property>
-       <property name="topMargin">
-        <number>6</number>
-       </property>
-       <property name="rightMargin">
-        <number>6</number>
-       </property>
-       <property name="bottomMargin">
-        <number>6</number>
-       </property>
-       <item row="0" column="0">
-        <widget class="QWidget" name="wgtDetailsWidget" native="true">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-           <horstretch>1</horstretch>
-           <verstretch>1</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="minimumSize">
-          <size>
-           <width>300</width>
-           <height>650</height>
-          </size>
-         </property>
-         <property name="styleSheet">
-          <string notr="true"/>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-    </layout>
-   </item>
-   <item row="1" column="0">
-    <widget class="QDialogButtonBox" name="buttonBox">
-     <property name="standardButtons">
-      <set>QDialogButtonBox::Apply|QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
-     </property>
     </widget>
-   </item>
-  </layout>
- </widget>
- <resources>
-  <include location="../../../resources/res.qrc"/>
- </resources>
- <connections/>
+    <resources>
+        <include location="../../../resources/res.qrc"/>
+    </resources>
+    <connections/>
 </ui>

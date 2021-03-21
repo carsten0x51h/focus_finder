@@ -28,23 +28,24 @@
 #include "enum_helper.h"
 
 struct DeviceManagerTypeT {
-  enum TypeE {
-	      INDI,
-	      ASCOM,
-	      _Count
-  };
-  
-		static const char * asStr(const TypeE & inType) {
-			switch (inType) {
-			case INDI:
-			  return "INDI";
-			case ASCOM:
-			  return "ASCOM";
-			default:
-			  return "<?>";
-		}
-	}
-	MAC_AS_TYPE(Type, E, _Count);
+    enum TypeE {
+        INDI,
+        ASCOM,
+        _Count
+    };
+
+    static const char *asStr(const TypeE &inType) {
+        switch (inType) {
+            case INDI:
+                return "INDI";
+            case ASCOM:
+                return "ASCOM";
+            default:
+                return "<?>";
+        }
+    }
+
+    MAC_AS_TYPE(Type, E, _Count);
 };
 
 #endif /* SOURCE_FOCUS_FINDER_COMMON_INCLUDE_DEVICE_MANAGER_TYPE_H_ */

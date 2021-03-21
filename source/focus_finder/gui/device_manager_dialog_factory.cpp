@@ -32,18 +32,19 @@
 #include "../common/include/indi_device_manager.h"
 #include "../common/include/device_manager_type.h"
 
-std::shared_ptr<QDialog> DeviceManagerDialogFactoryT::getInstance(QWidget * parent,
-								  std::shared_ptr<DeviceManagerT> deviceManager) {
+std::shared_ptr<QDialog> DeviceManagerDialogFactoryT::getInstance(QWidget *parent,
+                                                                  std::shared_ptr<DeviceManagerT> deviceManager) {
 
-  DeviceManagerTypeT::TypeE deviceManagerType = deviceManager->getDeviceManagerType();
-  
-  // TODO: Add ASCOM? Dummy?
-  switch (deviceManagerType) {
-  case DeviceManagerTypeT::INDI: {
-    std::shared_ptr<IndiDeviceManagerT> indiDeviceManager = std::static_pointer_cast<IndiDeviceManagerT>(deviceManager);
-    return std::make_shared<IndiDeviceManagerDialogT>(parent, indiDeviceManager);
-  }
-  default:
-    return nullptr;
-  }
+    DeviceManagerTypeT::TypeE deviceManagerType = deviceManager->getDeviceManagerType();
+
+    // TODO: Add ASCOM? Dummy?
+    switch (deviceManagerType) {
+        case DeviceManagerTypeT::INDI: {
+            std::shared_ptr<IndiDeviceManagerT> indiDeviceManager = std::static_pointer_cast<IndiDeviceManagerT>(
+                    deviceManager);
+            return std::make_shared<IndiDeviceManagerDialogT>(parent, indiDeviceManager);
+        }
+        default:
+            return nullptr;
+    }
 }

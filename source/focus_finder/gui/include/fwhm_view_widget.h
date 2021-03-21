@@ -38,8 +38,7 @@
 /**
 *  @brief
 */
-class FwhmViewWidgetT : public QLabel
-{
+class FwhmViewWidgetT : public QLabel {
 Q_OBJECT
 
 public:
@@ -47,7 +46,7 @@ public:
     *  @brief
     *    Constructor
     */
-FwhmViewWidgetT(QWidget * parent);
+    FwhmViewWidgetT(QWidget *parent);
 
     /**
     *  @brief
@@ -55,10 +54,11 @@ FwhmViewWidgetT(QWidget * parent);
     */
     virtual ~FwhmViewWidgetT();
 
-	void reset();
-	void setFwhm(const FwhmT & fwhm);
+    void reset();
 
-	void paintEvent(QPaintEvent * event) override;
+    void setFwhm(const FwhmT &fwhm);
+
+    void paintEvent(QPaintEvent *event) override;
 
 signals:
 
@@ -67,10 +67,11 @@ protected slots:
 protected:
 
 private:
-	void drawCross(QPainter & p, const QPointF & center, const QColor & crossColor, int penWidth, int halfCrossLength);
-	void drawCircle(QPainter & p, const QPointF & center, const QColor & circleColor, int penWidth, int radius);
+    void drawCross(QPainter &p, const QPointF &center, const QColor &crossColor, int penWidth, int halfCrossLength);
 
-	FwhmT mFwhm;
+    void drawCircle(QPainter &p, const QPointF &center, const QColor &circleColor, int penWidth, int radius);
+
+    FwhmT mFwhm;
 };
 
 #endif /*SOURCE_FOCUS_FINDER_GUI_INCLUDE_FWHM_VIEW_WIDGET_H_*/

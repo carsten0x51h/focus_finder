@@ -41,63 +41,70 @@
 class IndiDeviceManagerT;
 
 namespace Ui {
-	class IndiDeviceManagerDialog;
+    class IndiDeviceManagerDialog;
 }
-
 
 
 /**
  *  @brief
  */
 class IndiDeviceManagerDialogT : public QDialog {
-	Q_OBJECT
+Q_OBJECT
 
 public:
-	/**
-	 *  @brief
-	 *    Constructor
-	 */
-	IndiDeviceManagerDialogT(QWidget * parent, std::shared_ptr<IndiDeviceManagerT> indiDeviceManager);
+    /**
+     *  @brief
+     *    Constructor
+     */
+    IndiDeviceManagerDialogT(QWidget *parent, std::shared_ptr<IndiDeviceManagerT> indiDeviceManager);
 
-	/**
-	 *  @brief
-	 *    Destructor
-	 */
-	virtual ~IndiDeviceManagerDialogT();
+    /**
+     *  @brief
+     *    Destructor
+     */
+    virtual ~IndiDeviceManagerDialogT();
 
- signals:
-  void indiServerConnectionStateChangedSignal(IndiServerConnectionStateT::TypeE indiServerConnectionState);
-  void indiServerConnectionFailedSignal();
+signals:
+
+    void indiServerConnectionStateChangedSignal(IndiServerConnectionStateT::TypeE indiServerConnectionState);
+
+    void indiServerConnectionFailedSignal();
 
 protected slots:
-	  
+
 protected:
     const QScopedPointer<Ui::IndiDeviceManagerDialog> m_ui;
 
 private:
-  void setBtnIcon(const std::string & iconName, const std::string & text);
+    void setBtnIcon(const std::string &iconName, const std::string &text);
 
-  void setButtonConnectionState(IndiServerConnectionStateT::TypeE btnConnState);
+    void setButtonConnectionState(IndiServerConnectionStateT::TypeE btnConnState);
 
-  static bool isServerInfoValid(const std::string & hostname, const std::string & portStr);
-  
-  QHBoxLayout * getIndiControlButtons(); 
-  void createConnectIndiServerButton();
-  void onConnectIndiServerClicked();
-  void onServerConnectionStateChanged(IndiServerConnectionStateT::TypeE indiServerConnectionState);
-  void onServerConnectionFailed();
+    static bool isServerInfoValid(const std::string &hostname, const std::string &portStr);
 
-  void onBtnCloseDialogClicked();
-  void onHostnameChanged(const QString & hostname);
-  void onPortChanged(const QString & portStr);
+    QHBoxLayout *getIndiControlButtons();
 
-  
-  boost::signals2::connection mServerConnectionStateChangedConnection;
-  boost::signals2::connection mServerConnectionFailedConnection;
-  
-  std::shared_ptr<IndiDeviceManagerT> mIndiDeviceManager;
-  AnimMenuButtonT * mConnectIndiServerButton; // TODO: Create a ConnectButtonT class.... this should also hold a ConnectionStateT...
-  IndiServerConnectionStateT::TypeE mIndiServerConnectionState;
+    void createConnectIndiServerButton();
+
+    void onConnectIndiServerClicked();
+
+    void onServerConnectionStateChanged(IndiServerConnectionStateT::TypeE indiServerConnectionState);
+
+    void onServerConnectionFailed();
+
+    void onBtnCloseDialogClicked();
+
+    void onHostnameChanged(const QString &hostname);
+
+    void onPortChanged(const QString &portStr);
+
+
+    boost::signals2::connection mServerConnectionStateChangedConnection;
+    boost::signals2::connection mServerConnectionFailedConnection;
+
+    std::shared_ptr<IndiDeviceManagerT> mIndiDeviceManager;
+    AnimMenuButtonT *mConnectIndiServerButton; // TODO: Create a ConnectButtonT class.... this should also hold a ConnectionStateT...
+    IndiServerConnectionStateT::TypeE mIndiServerConnectionState;
 };
 
 #endif /*SOURCE_FOCUS_FINDER_GUI_INCLUDE_INDI_DEVICE_MANAGER_DIALOG_H_*/

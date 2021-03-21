@@ -34,7 +34,7 @@ class DeviceManagerT;
 
 class DeviceManagerFactoryT {
 public:
-	static std::shared_ptr<DeviceManagerT> getInstance(const DeviceManagerTypeT::TypeE & type);
+    static std::shared_ptr<DeviceManagerT> getInstance(const DeviceManagerTypeT::TypeE &type);
 };
 
 
