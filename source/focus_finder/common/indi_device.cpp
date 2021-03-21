@@ -71,6 +71,10 @@ std::shared_ptr<DeviceInterfaceT> IndiDeviceT::createDeviceInterface(DeviceInter
             //return std::static_pointer_cast<DeviceInterfaceT>(filterInterface);
             return nullptr;
         }
+        case DeviceInterfaceTypeT::TELESCOPE: {
+            // TODO...
+            return nullptr;
+        }
         // TODO / FIXME / HACK !!!!!! Add other devices!
 
         default: {

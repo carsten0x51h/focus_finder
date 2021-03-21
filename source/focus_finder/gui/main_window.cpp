@@ -85,6 +85,15 @@ std::shared_ptr<CameraInterfaceT> MainWindow::getCurrentCamera() {
     return FocusFinderLogicT::get()->getCurrentCamera();
 }
 
+std::shared_ptr<FocusInterfaceT> MainWindow::getCurrentFocus() {
+    return FocusFinderLogicT::get()->getCurrentFocus();
+}
+    std::shared_ptr<FilterInterfaceT> getCurrentFilter();
+    std::shared_ptr<FilterInterfaceT> getCurrentFilter();
+
+std::shared_ptr<FilterInterfaceT> MainWindow::getCurrentFilter() {
+    return FocusFinderLogicT::get()->getCurrentFilter();
+}
 
 void MainWindow::onManageDeviceProfiles() {
 	LOG(debug)
@@ -987,8 +996,10 @@ void MainWindow::updateCameraDevice(std::shared_ptr<CameraInterfaceT> oldCameraI
 }
 
 void MainWindow::updateCurrentFocusConnectionStateUI() {
-	if (mFocusDevice) {
-		auto connState = mFocusDevice->getConnectionState();
+    auto currentFocus = getCurrentFocus();
+
+    if (currentFocus) {
+		auto connState = currentFocus->getParentDevice()->getConnectionState();
 		switch (connState) {
 		case DeviceConnectionStateT::CONNECTED: {
 			setStatusIcon(mFocusConnectionStatusLabel,
@@ -1022,8 +1033,10 @@ void MainWindow::updateCurrentFocusConnectionStateUI() {
 }
 
 void MainWindow::updateCurrentFilterConnectionStateUI() {
-	if (mFilterDevice) {
-		auto connState = mFilterDevice->getConnectionState();
+    auto currentFilter = getCurrentFilter();
+
+	if (currentFilter) {
+		auto connState = currentFilter->getParentDevice()->getConnectionState();
 		switch (connState) {
 		case DeviceConnectionStateT::CONNECTED: {
 			setStatusIcon(mFilterConnectionStatusLabel,

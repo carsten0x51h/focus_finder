@@ -108,6 +108,8 @@ protected:
 
 private:
     std::shared_ptr<CameraInterfaceT> getCurrentCamera();
+    std::shared_ptr<FocusInterfaceT> getCurrentFocus();
+    std::shared_ptr<FilterInterfaceT> getCurrentFilter();
 
 
   void showDeviceManagerConfigDialog();
