@@ -910,25 +910,6 @@ void MainWindow::updateCurrentCameraConnectionStateUI() {
 	}
 }
 
-/**
-TODO: What does the user select in the profile?? A device? Or an interface?? ->
-       --> User selects a device interface and this way implicitly a device!
-
-Problem: When a device is switched (other dialog), we are notified here... But...
-         we have registered our listeners at the "old"  device! that means
-         the "old" device carries a part of our "state"! which is still relevant.
-         This increases complexity a lot...
-         The registered listeners could be "autocleaned" when switched by the dialog or
-         even better by the program logic behind... mybe a switchDevice() or updateDevice() function
-         which does the job...
-//auto newCameraDevice = FocusFinderLogicT::get()->getCurrentCamera();
-//
- //        TODO: Currently I track devices which may change and update the members accordingly. Is this correct? Can devices AND/OR interfaces change?
-//
-//		TODO.... --> Problem: This way the cameraInterface also holds a state: The listeners!
-//		       --> The device should own its existing device interfaces!
-//		       --> Maybe storing the state of each device in here is not required? -> use DeviceManagerT::getCurrentCameraDevice()...?
- */
 void MainWindow::updateCameraDevice(std::shared_ptr<CameraInterfaceT> oldCameraInterface, std::shared_ptr<CameraInterfaceT> newCameraInterface) {
 
 	if (oldCameraInterface == newCameraInterface) {
@@ -1040,43 +1021,6 @@ void MainWindow::updateCurrentFocusConnectionStateUI() {
 	}
 }
 
-void MainWindow::updateFocusDevice() {
-// TODO: Change similar to updateCameraDevice()...
-//	auto newFocusDevice = mFfl.getCurrentFocus();
-//	bool hasOldFocus = (mFocusDevice != nullptr);
-//
-//	if (mFocusDevice == newFocusDevice) {
-//		return;
-//	}
-//
-//	if (hasOldFocus) {
-//		// There was already an old device - unregister listener and register to the new one
-//		mFocusDevice->unregisterDeviceConnectedListener(
-//				mFocusDeviceConnectedConnection);
-//		mFocusDevice->unregisterDeviceConnectingListener(
-//				mFocusDeviceConnectingConnection);
-//		mFocusDevice->unregisterDeviceDisconnectedListener(
-//				mFocusDeviceDisconnectedConnection);
-//	}
-//
-//	// Register to new device
-//	if (newFocusDevice) {
-//		mFocusDeviceConnectedConnection =
-//				newFocusDevice->registerDeviceConnectedListener(
-//						[&]() {emit focusDeviceConnectedSignal();});
-//		mFocusDeviceConnectingConnection =
-//				newFocusDevice->registerDeviceConnectingListener(
-//						[&]() {emit focusDeviceConnectingSignal();});
-//		mFocusDeviceDisconnectedConnection =
-//				newFocusDevice->registerDeviceDisconnectedListener(
-//						[&]() {emit focusDeviceDisconnectedSignal();});
-//	}
-//
-//	mFocusDevice = newFocusDevice;
-//
-//	updateCurrentFocusConnectionStateUI();
-}
-
 void MainWindow::updateCurrentFilterConnectionStateUI() {
 	if (mFilterDevice) {
 		auto connState = mFilterDevice->getConnectionState();
@@ -1118,47 +1062,102 @@ void MainWindow::updateCurrentFilterConnectionStateUI() {
 	}
 }
 
-void MainWindow::updateFilterDevice() {
-// TODO / HACK / FIXME: Change similar to updateCameraDevice()...
+void MainWindow::updateFocusDevice(std::shared_ptr<FocusInterfaceT> oldFocusInterface, std::shared_ptr<FocusInterfaceT> newFocusInterface) {
 
-//	auto newFilterDevice = mFfl.getCurrentFilter();
-//	bool hasOldFilter = (mFilterDevice != nullptr);
-//
-//	if (mFilterDevice == newFilterDevice) {
-//		return;
-//	}
-//
-//	if (hasOldFilter) {
-//		// There was already an old device - unregister listener and register to the new one.
-//		mFilterDevice->unregisterDeviceConnectedListener(
-//				mFilterDeviceConnectedConnection);
-//		mFilterDevice->unregisterDeviceConnectingListener(
-//				mFilterDeviceConnectingConnection);
-//		mFilterDevice->unregisterDeviceDisconnectedListener(
-//				mFilterDeviceDisconnectedConnection);
-//	}
-//
-//	// Register to new device
-//	if (newFilterDevice) {
-//		mFilterDeviceConnectedConnection =
-//				newFilterDevice->registerDeviceConnectedListener(
-//						[&]() {emit filterDeviceConnectedSignal();});
-//		mFilterDeviceConnectingConnection =
-//				newFilterDevice->registerDeviceConnectingListener(
-//						[&]() {emit filterDeviceConnectingSignal();});
-//		mFilterDeviceDisconnectedConnection =
-//				newFilterDevice->registerDeviceDisconnectedListener(
-//						[&]() {emit filterDeviceDisconnectedSignal();});
-//	}
-//
-//	mFilterDevice = newFilterDevice;
-//
-//	updateCurrentFilterConnectionStateUI();
+    if (oldFocusInterface == newFocusInterface) {
+        return;
+    }
+
+    bool hasOldFocusInterface = (oldFocusInterface != nullptr);
+
+    if (hasOldFocusInterface) {
+        auto oldFocusDevice = oldFocusInterface->getParentDevice();
+
+        LOG(debug)
+            << "MainWindow::updateFocusDevice... unregistering from old Focus..."
+            << oldFocusDevice->getName() << std::endl;
+
+        // There was already an old device - unregister listener and register to the new one.
+        oldFocusDevice->unregisterDeviceConnectedListener(
+                mFocusDeviceConnectedConnection);
+        oldFocusDevice->unregisterDeviceConnectingListener(
+                mFocusDeviceConnectedConnection);
+        oldFocusDevice->unregisterDeviceDisconnectedListener(
+                mFocusDeviceConnectedConnection);
+    }
+
+    // Register to new device
+    if (newFocusInterface) {
+        auto newFocusDevice = newFocusInterface->getParentDevice();
+
+        LOG(debug)
+            << "MainWindow::updateFocusDevice... registering to new Focus..."
+            << newFocusDevice->getName() << std::endl;
+
+        mFocusDeviceConnectedConnection =
+                newFocusDevice->registerDeviceConnectedListener(
+                        [&]() {emit focusDeviceConnectedSignal();});
+        mFocusDeviceConnectingConnection =
+                newFocusDevice->registerDeviceConnectingListener(
+                        [&]() {emit focusDeviceConnectingSignal();});
+        mFocusDeviceDisconnectedConnection =
+                newFocusDevice->registerDeviceDisconnectedListener(
+                        [&]() {emit focusDeviceDisconnectedSignal();});
+    }
+
+    updateCurrentFocusConnectionStateUI();
+}
+
+void MainWindow::updateFilterDevice(std::shared_ptr<FilterInterfaceT> oldFilterInterface, std::shared_ptr<FilterInterfaceT> newFilterInterface) {
+    if (oldFilterInterface == newFilterInterface) {
+        return;
+    }
+
+    bool hasOldFilterInterface = (oldFilterInterface != nullptr);
+
+    if (hasOldFilterInterface) {
+        auto oldFilterDevice = oldFilterInterface->getParentDevice();
+
+        LOG(debug)
+            << "MainWindow::updateFilterDevice... unregistering from old Filter..."
+            << oldFilterDevice->getName() << std::endl;
+
+        // There was already an old device - unregister listener and register to the new one.
+        oldFilterDevice->unregisterDeviceConnectedListener(
+                mFilterDeviceConnectedConnection);
+        oldFilterDevice->unregisterDeviceConnectingListener(
+                mFilterDeviceConnectedConnection);
+        oldFilterDevice->unregisterDeviceDisconnectedListener(
+                mFilterDeviceConnectedConnection);
+    }
+
+    // Register to new device
+    if (newFilterInterface) {
+        auto newFilterDevice = newFilterInterface->getParentDevice();
+
+        LOG(debug)
+            << "MainWindow::updateFilterDevice... registering to new Filter..."
+            << newFilterDevice->getName() << std::endl;
+
+        mFilterDeviceConnectedConnection =
+                newFilterDevice->registerDeviceConnectedListener(
+                        [&]() {emit filterDeviceConnectedSignal();});
+        mFilterDeviceConnectingConnection =
+                newFilterDevice->registerDeviceConnectingListener(
+                        [&]() {emit filterDeviceConnectingSignal();});
+        mFilterDeviceDisconnectedConnection =
+                newFilterDevice->registerDeviceDisconnectedListener(
+                        [&]() {emit filterDeviceDisconnectedSignal();});
+    }
+
+    updateCurrentFilterConnectionStateUI();
 }
 
 void MainWindow::updateProfile(std::optional<FocusFinderProfileT> oldProfile, std::optional<FocusFinderProfileT> newProfile) {
 
     auto deviceManager = FocusFinderLogicT::get()->getDeviceManager();
+
+    // TODO: Factor out code ... - template and/or lambda function... or static_pointer_cast....
     auto oldCameraDevice = (oldProfile.has_value() ?
                                 deviceManager->getDevice(oldProfile->getCameraDeviceName()) :
                                 nullptr);
@@ -1174,9 +1173,37 @@ void MainWindow::updateProfile(std::optional<FocusFinderProfileT> oldProfile, st
 
 	updateCameraDevice(oldCameraInterface, newCameraInterface);
 
-    // TODO: Do the same for focus and filter... - maybe safe some code...
-	updateFocusDevice();
-	updateFilterDevice();
+
+
+    auto oldFocusDevice = (oldProfile.has_value() ?
+                            deviceManager->getDevice(oldProfile->getFocusDeviceName()) :
+                            nullptr);
+
+    auto oldFocusInterface = (oldFocusDevice != nullptr ? oldFocusDevice->getFocusInterface() : nullptr);
+
+    auto newFocusDevice = (newProfile.has_value() ?
+                            deviceManager->getDevice(newProfile->getFocusDeviceName()) :
+                            nullptr);
+
+    auto newFocusInterface = (newFocusDevice != nullptr ? newFocusDevice->getFocusInterface() : nullptr);
+
+	updateFocusDevice(oldFocusInterface, newFocusInterface);
+
+
+
+    auto oldFilterDevice = (oldProfile.has_value() ?
+                           deviceManager->getDevice(oldProfile->getFilterDeviceName()) :
+                           nullptr);
+
+    auto oldFilterInterface = (oldFilterDevice != nullptr ? oldFilterDevice->getFilterInterface() : nullptr);
+
+    auto newFilterDevice = (newProfile.has_value() ?
+                           deviceManager->getDevice(newProfile->getFilterDeviceName()) :
+                           nullptr);
+
+    auto newFilterInterface = (newFilterDevice != nullptr ? newFilterDevice->getFilterInterface() : nullptr);
+
+	updateFilterDevice(oldFilterInterface, newFilterInterface);
 }
 
 void MainWindow::createSelectSubFrameButton() {
@@ -1567,10 +1594,9 @@ LOG(debug) << "exposureRunning: " << exposureRunning << std::endl;
 	//   -AND no exposure is currently running
 	auto currentFocus = mFfl.getCurrentFocus();
 	bool focusSelected = (currentFocus != nullptr);
-    // TODO / HACK / FIXME: Re-enable - same way as camera...
-	//bool focusConnected = (
-	//		currentFocus ? currentFocus->getConnector()->isConnected() : false);
-    bool focusConnected = true; // HACK - REMOVE!
+
+	bool focusConnected = (
+			currentFocus ? currentFocus->getParentDevice()->isConnected() : false);
 
 	bool validFocusStarSelected = mImageViewerPanel->isPoiSet();
 

@@ -171,21 +171,17 @@ std::shared_ptr<CameraInterfaceT> FocusFinderLogicT::getCurrentCamera() {
 std::shared_ptr<FocusInterfaceT> FocusFinderLogicT::getCurrentFocus() {
 	auto activeProfile = mFoFiConfigManager->getProfileManager()->getActiveProfile();
 
-	// TODO / FIXME / HACK: Add getFocusInterface()...
-//	return (activeProfile ?
-//            mDeviceManager->getDevice(activeProfile->getFocusDeviceName())->getFocusInterface() :
-//			nullptr);
-    return nullptr;
+	return (activeProfile ?
+            mDeviceManager->getDevice(activeProfile->getFocusDeviceName())->getFocusInterface() :
+			nullptr);
 }
 
 std::shared_ptr<FilterInterfaceT> FocusFinderLogicT::getCurrentFilter() {
 	auto activeProfile = mFoFiConfigManager->getProfileManager()->getActiveProfile();
 
-    // TODO / FIXME / HACK: Add getFocusInterface()...
-//	return (activeProfile ?
-//            mDeviceManager->getDevice(activeProfile->getFilterDeviceName())->getFilterInterface() :
-//			nullptr);
-    return nullptr;
+	return (activeProfile ?
+            mDeviceManager->getDevice(activeProfile->getFilterDeviceName())->getFilterInterface() :
+			nullptr);
 }
 
 std::shared_ptr<DeviceManagerT> FocusFinderLogicT::getDeviceManager() const {

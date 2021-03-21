@@ -39,6 +39,8 @@ DEF_Exception(Device);
 
 class DeviceInterfaceT;
 class CameraInterfaceT;
+class FocusInterfaceT;
+class FilterInterfaceT;
 
 /**
  * TODO: Check mIsAvailable is all the functions.... maybe set the flag atomic as well...
@@ -78,8 +80,10 @@ public:
 
 	virtual std::string getName() const = 0;
 
+    static const std::string NONE;
 
-	/**
+
+    /**
 	 * A bit-mask would of course be more efficient but as interface
 	 * function a set of the supported interface types is more intuitive
 	 * for less experienced developers.
@@ -112,6 +116,20 @@ public:
 	 * @return
 	 */
     std::shared_ptr<CameraInterfaceT> getCameraInterface();
+
+    /**
+     * Conenience function to get the focus interface.
+     *
+     * @return
+     */
+    std::shared_ptr<FocusInterfaceT> getFocusInterface();
+
+    /**
+     * Conenience function to get the filter interface.
+     *
+     * @return
+     */
+    std::shared_ptr<FilterInterfaceT> getFilterInterface();
 
 	/**
 	 * DeviceInterfaceT has no state. It is just a wrapper / facade to make access

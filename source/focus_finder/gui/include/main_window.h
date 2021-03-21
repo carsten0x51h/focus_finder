@@ -145,8 +145,8 @@ private:
   	void createAboutDialog();
 
   	void updateCameraDevice(std::shared_ptr<CameraInterfaceT> oldCameraInterface, std::shared_ptr<CameraInterfaceT> newCameraInterface);
-  	void updateFocusDevice();
-  	void updateFilterDevice();
+    void updateFocusDevice(std::shared_ptr<FocusInterfaceT> oldFocusInterface, std::shared_ptr<FocusInterfaceT> newFocusInterface);
+    void updateFilterDevice(std::shared_ptr<FilterInterfaceT> oldFilterInterface, std::shared_ptr<FilterInterfaceT> newFilterInterface);
     void updateProfile(std::optional<FocusFinderProfileT> oldProfile, std::optional<FocusFinderProfileT> newProfile);
   	void updateExposureTime();
   	void updateExposureTimeSelector();

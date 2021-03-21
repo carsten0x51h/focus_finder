@@ -93,18 +93,18 @@ void ManageDeviceProfilesDialogT::addDevices() {
 	auto activeProfile = mFfl.getProfileManager()->getActiveProfile();
 
 	mCameraPanel = new ManageDeviceEntryPanelT(mFfl, "Camera",
-			(activeProfile ? activeProfile->getCameraDeviceName() : "NONE"));
+			(activeProfile ? activeProfile->getCameraDeviceName() : DeviceT::NONE));
 
 	addDevicePanel(mCameraPanel);
 
 	mFocusPanel = new ManageDeviceEntryPanelT(mFfl, "Focus",
-			(activeProfile ? activeProfile->getFocusDeviceName() : "NONE"));
+			(activeProfile ? activeProfile->getFocusDeviceName() : DeviceT::NONE));
 
 	addDevicePanel(mFocusPanel);
 
 
 	mFilterPanel = new ManageDeviceEntryPanelT(mFfl, "Filter",
-			(activeProfile ? activeProfile->getFilterDeviceName() : "NONE"));
+			(activeProfile ? activeProfile->getFilterDeviceName() : DeviceT::NONE));
 
 	addDevicePanel(mFilterPanel);
 }

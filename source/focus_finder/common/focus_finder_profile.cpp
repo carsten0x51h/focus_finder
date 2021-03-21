@@ -50,12 +50,12 @@ FocusFinderProfileT::FocusFinderProfileT() :
   mName(DEFAULT),
   mLastChanged(std::chrono::high_resolution_clock::now()),
 
-  mCameraDeviceName("NONE"),
+  mCameraDeviceName(DeviceT::NONE),
   mCameraPixelSize(0.0F, 0.0F),
 		
-  mFocusDeviceName("NONE"),
+  mFocusDeviceName(DeviceT::NONE),
 
-  mFilterDeviceName("NONE"),
+  mFilterDeviceName(DeviceT::NONE),
 
   mStarWindowSize(33, 33),
   mCentroidMethod(CentroidTypeT::IWC),

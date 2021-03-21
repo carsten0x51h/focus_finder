@@ -24,8 +24,10 @@
 
 #include "include/device.h"
 #include "include/camera_interface.h"
+#include "include/focus_interface.h"
+#include "include/filter_interface.h"
 
-//const std::string DeviceT::NONE = "None";
+const std::string DeviceT::NONE = "None";
 
 DeviceT::DeviceT() : mIsAvailable(true) {
 
@@ -49,4 +51,12 @@ bool DeviceT::isInterfaceSupported(DeviceInterfaceTypeT::TypeE interfaceType) co
 
 std::shared_ptr<CameraInterfaceT> DeviceT::getCameraInterface() {
     return static_pointer_cast<CameraInterfaceT>(getInterface(DeviceInterfaceTypeT::CCD));
+}
+
+std::shared_ptr<FocusInterfaceT> DeviceT::getFocusInterface() {
+    return static_pointer_cast<FocusInterfaceT>(getInterface(DeviceInterfaceTypeT::FOCUS));
+}
+
+std::shared_ptr<FilterInterfaceT> DeviceT::getFilterInterface() {
+    return static_pointer_cast<FilterInterfaceT>(getInterface(DeviceInterfaceTypeT::FILTER));
 }
