@@ -1,0 +1,24 @@
+--> TODO: Move to upper file profile.cfg, rename profile.cfg to profile.dat? or profile.xml...
+
+<CalibrationSettings>
+	<CentroidMethod><IWC/CentroidMethod>
+	<LimitFocusMeasure>HFD</LimitFocusMeasure>
+	<CurveFocusMeasure>FWHM_AVERAGE</CurveFocusMeasure>
+	<ExposureTime>1s</ExposureTime>
+	<ExposureTime>1x1</ExposureTime>
+</CalibrationSettings>
+<CurveRecords>
+	<CurveRecord>
+		<!-- filename is {timestamp}.png -->
+		<record_timestamp>1574884119</record_timestamp>
+		<AbsFocusPos>12332</AbsFocusPos>
+		<FocusMeasure>12.3</FocusMeasure>
+	</CurveRecord>
+	<CurveRecord>
+		<!-- filename is {timestamp}.png -->
+		<record_timestamp>1574885123</record_timestamp>
+		<AbsFocusPos>13332</AbsFocusPos>
+		<FocusMeasure>11.7</FocusMeasure>
+	</CurveRecord>
+</CurveRecords>
+

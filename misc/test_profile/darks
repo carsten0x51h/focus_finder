@@ -1,0 +1,12 @@
+Question: Should the dark library be per profile? Or one for all? -> Probably one for all! It is independent from the profile itself. However, it depends oh the following parameters: dark = f(camera, star window size, exposure_time, binning). Binning is only added to make it more generic. The number of frames per master dark will be set "externally" and is not a selection criteria for the dark frame.
+
+
+
+      <dark_frames>
+	<!-- If no dark frams used / recorded, this section is empty -->
+	<!-- TODO: Save master dark instead? -->
+	<!-- TODO: what to do with the dark frames in case the exposure time changes dynamically? - IDEA: dark frame DB! Initially created... redo only if star window size changes! Do not save here. They will be automatically subtracted before the images of the curve are stored... and so the are implicitly part of the measurement! -->
+	<dark_frame record_timestamp="1574834119" exposure_time=""/>
+	<dark_frame record_timestamp="1574834122"/>
+	<dark_frame record_timestamp="1574834134"/>
+      </dark_frames>
