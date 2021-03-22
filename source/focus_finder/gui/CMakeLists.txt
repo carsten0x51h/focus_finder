@@ -324,7 +324,6 @@ target_include_directories(${target}
         ${INDI_INCLUDE_DIR}
         ${DEFAULT_INCLUDE_DIRECTORIES}
         ${CMAKE_CURRENT_BINARY_DIR}
-        #    ${QGIS_INCLUDE_DIR}
         ${PROJECT_BINARY_DIR}/source/include
         )
 
@@ -342,19 +341,18 @@ target_link_libraries(${target}
         Qt5::Core
         Qt5::Gui
         Qt5::Widgets
-        #    ${QGIS_GUI_LIBRARY}
         ${Boost_LOG_LIBRARY}
         ${Boost_LOG_SETUP_LIBRARY}
         ${Boost_THREAD_LIBRARY}
         ${Boost_SYSTEM_LIBRARY}
         stdc++fs
-        cfitsio
-        CCfits
-        gsl
-        gslcblas
+        ${CFITSIO_LIBRARY}
+        ${CCFITS_LIBRARY}
+        ${GSL_LIBRARY}
+        ${GSL_CBLAS_LIBRARY}
         ${INDI_CLIENT_LIBRARIES}
         ${NOVA_LIBRARIES}
-        z
+        ${ZLIB_LIBRARIES}
         ${DEFAULT_LINKER_OPTIONS}
         ${Boost_REGEX_LIBRARY}
         #    ${TIFF_LIBRARIES}

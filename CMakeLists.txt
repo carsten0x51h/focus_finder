@@ -116,20 +116,32 @@ find_package(Nova REQUIRED)
 include_directories(${NOVA_INCLUDE_DIR})
 
 #
+# Look for CCfits
+#
+include(cmake/FindCCFits.cmake)
+
+#
+# Look for GSL
+#
+include(cmake/FindGSL.cmake)
+
+#
+# C++ std filesystem library
+#
+# TODO: Does not work, yet...
+#include(cmake/FindFilesystem.cmake)
+#find_package(Filesystem REQUIRED)
+
+#
 # Look for BOOST
 #
 # https://stackoverflow.com/questions/17844085/boost-log-with-cmake-causing-undefined-reference-error
 # This line finds the boost lib and headers. 
 set(Boost_NO_BOOST_CMAKE ON) #  Don't do a find_package in config mode before searching for a regular boost install.
 
-#
-# Look for QGIS (Geograhic Information System extension for QT - see https://qgis.org/de/site/)
-#
-#include(cmake/FindQGIS.cmake)
-
 #find_package (Threads REQUIRED)
 #find_package (X11 REQUIRED)
-#find_package (ZLIB REQUIRED)
+find_package (ZLIB REQUIRED)
 
 #TODO: Add finder for CCFits!
 
