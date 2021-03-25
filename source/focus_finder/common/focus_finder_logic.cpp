@@ -108,12 +108,19 @@ FocusFinderLogicT::FocusFinderLogicT() :
     // Since this overriding only can take place as part of the CMD line app, the rsepective config object must not be generated in here!
     //TODO...
 
-    DeviceManagerTypeT::TypeE deviceManagerType = mFoFiConfigManager->getGlobalConfigManager()->getConfig().getDeviceManagerType();
+
+    GlobalFocusFinderConfigT globalCfg = mFoFiConfigManager->getGlobalConfigManager()->getConfig();
+
+    DeviceManagerTypeT::TypeE deviceManagerType = globalCfg.getDeviceManagerType();
 
     LOG(debug) << "DeviceManagerType configured: " << DeviceManagerTypeT::asStr(deviceManagerType) << std::endl;
 
     mDeviceManager = DeviceManagerFactoryT::getInstance(deviceManagerType);
-    //mDeviceManager->configure(fullFilePath.....???);
+
+
+    boost::property_tree::ptree deviceManagerConfig = globalCfg.getDeviceManagerConfig();
+    mDeviceManager->configure(deviceManagerConfig);
+
 
 
     // DEBUG START

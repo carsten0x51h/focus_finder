@@ -49,13 +49,8 @@ IndiDeviceManagerT::IndiDeviceManagerT() {
     LOG(debug) << "IndiDeviceManagerT::IndiDeviceManagerT()..."
                << std::endl;
 
-    // TODO: Use passed "Properties" key value object.... --> setup()...
-    // indiDeviceMgr->setHostname("localhost");
-    // indiDeviceMgr->setPort(7624);
-
     // // Connect - should this be here??
     // indiDeviceMgr->connectServer();
-
 
     mIndiClient.setServer(sDefaultIndiHostname.c_str(), sDefaultIndiPort);
 
@@ -88,6 +83,16 @@ IndiDeviceManagerT::~IndiDeviceManagerT() {
     // Disconnect the INDI client since this INDI device manager owns the INDI client.
     mIndiClient.disconnect();
 }
+
+void IndiDeviceManagerT::configure(const boost::property_tree::ptree & deviceManagerConfig) {
+    LOG(debug) << "IndiDeviceManagerT::configure..." << std::endl;
+
+    int indiServerPort = deviceManagerConfig.get("indi_server_port", sDefaultIndiPort);
+    std::string indiServerHostname = deviceManagerConfig.get("indi_server_hostname", sDefaultIndiHostname);
+
+    mIndiClient.setServer(indiServerHostname.c_str(), indiServerPort);
+}
+
 
 void IndiDeviceManagerT::addNewDevice(INDI::BaseDevice *dp) {
     std::string indiDeviceName = dp->getDeviceName();

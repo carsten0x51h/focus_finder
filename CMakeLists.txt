@@ -143,8 +143,6 @@ set(Boost_NO_BOOST_CMAKE ON) #  Don't do a find_package in config mode before se
 #find_package (X11 REQUIRED)
 find_package (ZLIB REQUIRED)
 
-#TODO: Add finder for CCFits!
-
 find_package(Boost COMPONENTS log system regex thread REQUIRED)
 
 #find_package(Boost 1.73 REQUIRED COMPONENTS log)

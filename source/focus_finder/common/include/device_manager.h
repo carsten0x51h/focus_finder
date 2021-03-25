@@ -30,6 +30,8 @@
 #include <memory>
 #include <boost/signals2.hpp>
 
+#include <boost/property_tree/ptree.hpp>
+
 #include "device_manager_type.h"
 #include "device.h"
 
@@ -40,6 +42,11 @@ public:
     virtual DeviceManagerTypeT::TypeE getDeviceManagerType() const = 0;
 
     virtual bool isReady() const = 0;
+
+    /**
+     *
+     */
+    virtual void configure(const boost::property_tree::ptree & deviceManagerConfig) = 0;
 
     /**
      * Get device object ptr by name.

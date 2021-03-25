@@ -68,6 +68,15 @@ public:
 
     void setDeviceManagerType(DeviceManagerTypeT::TypeE deviceManagerType);
 
+    /**
+     * Device manager specific config.
+     *
+     * @return
+     */
+    boost::property_tree::ptree getDeviceManagerConfig() const;
+    void setDeviceManagerConfig(const boost::property_tree::ptree & deviceManagerConfig);
+
+
 
     /**
      * Throws if not found.
@@ -92,6 +101,7 @@ private:
     TimestampT mLastChanged;
     std::string mLastActiveFocusFinderProfileName;
     DeviceManagerTypeT::TypeE mDeviceManagerType;
+    boost::property_tree::ptree mDeviceManagerConfig;
 };
 
 // TODO: Remove... member access no longer required since print() is now used..

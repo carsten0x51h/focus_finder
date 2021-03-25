@@ -82,6 +82,14 @@ void GlobalFocusFinderConfigT::setDeviceManagerType(DeviceManagerTypeT::TypeE de
     mDeviceManagerType = deviceManagerType;
 }
 
+boost::property_tree::ptree GlobalFocusFinderConfigT::getDeviceManagerConfig() const {
+    return mDeviceManagerConfig;
+}
+
+void GlobalFocusFinderConfigT::setDeviceManagerConfig(const boost::property_tree::ptree & deviceManagerConfig) {
+    mDeviceManagerConfig = deviceManagerConfig;
+}
+
 
 GlobalFocusFinderConfigT GlobalFocusFinderConfigT::load(const std::string &fullGlobalFocusFinderConfigPath) {
 
@@ -96,6 +104,8 @@ GlobalFocusFinderConfigT GlobalFocusFinderConfigT::load(const std::string &fullG
                                                                 defaults().getLastActiveFocusFinderProfileName()));
         globalConfig.setDeviceManagerType(
                 pt.get("global_fofi_cfg.device_manager_type", defaults().getDeviceManagerType()));
+
+        globalConfig.setDeviceManagerConfig(pt.get_child("global_fofi_cfg.device_manager_config"));
 
         //
         // Add further fields which should need to be loaded here...
@@ -119,6 +129,8 @@ void GlobalFocusFinderConfigT::save(const std::string &fullGlobalFocusFinderConf
         pt.put<std::string>("global_fofi_cfg.last_active_focus_finder_profile_name",
                             globalConfig.getLastActiveFocusFinderProfileName());
         pt.put<DeviceManagerTypeT::TypeE>("global_fofi_cfg.device_manager_type", globalConfig.getDeviceManagerType());
+
+        pt.add_child("global_fofi_cfg.device_manager_config", globalConfig.getDeviceManagerConfig());
 
         //
         // Add further fiels which should need to be stored here...

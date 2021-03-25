@@ -87,8 +87,9 @@ public:
 
     DeviceManagerTypeT::TypeE getDeviceManagerType() const;
 
-
     bool isReady() const;
+
+    void configure(const boost::property_tree::ptree & deviceManagerConfig);
 
 
     std::shared_ptr<DeviceT> getDevice(const std::string &deviceName);
