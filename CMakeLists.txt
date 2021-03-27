@@ -128,9 +128,7 @@ include(cmake/FindGSL.cmake)
 #
 # C++ std filesystem library
 #
-# TODO: Does not work, yet...
-#include(cmake/FindFilesystem.cmake)
-#find_package(Filesystem REQUIRED)
+include(cmake/FindFilesystem.cmake)
 
 #
 # Look for BOOST

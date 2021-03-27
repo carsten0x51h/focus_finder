@@ -343,7 +343,6 @@ target_link_libraries(${target}
         ${Boost_LOG_SETUP_LIBRARY}
         ${Boost_THREAD_LIBRARY}
         ${Boost_SYSTEM_LIBRARY}
-        stdc++fs
         ${CFITSIO_LIBRARY}
         ${CCFITS_LIBRARY}
         ${GSL_LIBRARY}
