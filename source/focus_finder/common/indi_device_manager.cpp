@@ -34,16 +34,15 @@
 #include "include/camera_interface.h"
 #include "include/focus_interface.h"
 #include "include/filter_interface.h"
-#include "include/cooler.h"
 
 #include "include/indi_camera_interface.h"
 #include "include/indi_focus_interface.h"
-//#include "include/indi_interface_filter.h"
+//#include "include/indi_filter_interface.h"
 
 #include "basedevice.h"
 
-const std::string IndiDeviceManagerT::sDefaultIndiHostname = "localhost";
-const int IndiDeviceManagerT::sDefaultIndiPort = 7624;
+[[maybe_unused]] const std::string IndiDeviceManagerT::sDefaultIndiHostname = "localhost";
+[[maybe_unused]] const int IndiDeviceManagerT::sDefaultIndiPort = 7624;
 
 IndiDeviceManagerT::IndiDeviceManagerT() {
     LOG(debug) << "IndiDeviceManagerT::IndiDeviceManagerT()..."
@@ -141,14 +140,14 @@ void IndiDeviceManagerT::newProperty(INDI::Property *property) {
 
 
 void IndiDeviceManagerT::newMessage(INDI::BaseDevice *dp, int messageID) {
-    std::string msgStr = dp->messageQueue(messageID);
+    const std::string& msgStr = dp->messageQueue(messageID);
     ReportingT::reportMsg(
             ReportingDatasetT("IndiServer",
                               "Message from device: '" + std::string(dp->getDeviceName()) + "'",
                               msgStr));
 }
 
-void IndiDeviceManagerT::newDevice(INDI::BaseDevice *dp) {
+void IndiDeviceManagerT::newDevice(INDI::BaseDevice *) {
     // The driver interface is not known when this callback is called...
     // This info is required. Therefore, instead of listening to newDevice(),
     // newProperty() is used.
@@ -213,17 +212,6 @@ bool IndiDeviceManagerT::isReady() const {
     return mIndiClient.isConnected();
 }
 
-
-
-
-
-//    INDI::BaseDevice * indiBaseDevice = mIndiClient.getDevice(deviceName.c_str());
-//
-//    return ((indiBaseDevice != nullptr && indiBaseDevice->getDriverInterface() & deviceInterfaceType) ?
-//            std::make_shared<IndiCameraInterfaceT>(indiBaseDevice, const_cast<IndiClientT *>(& mIndiClient)) :
-//            nullptr);
-//TODO
-
 std::shared_ptr<DeviceT> IndiDeviceManagerT::getDevice(const std::string &deviceName) {
 
     // Protect device map against async changes by INDI while reading...
@@ -247,7 +235,7 @@ std::vector<std::shared_ptr<DeviceT> > IndiDeviceManagerT::getDevices(DeviceInte
             mDeviceMap
             | boost::adaptors::map_values // -> DeviceT
             | boost::adaptors::filtered(
-                    [interfaceType](std::shared_ptr<IndiDeviceT> indiDevice) {
+                    [interfaceType](const std::shared_ptr<IndiDeviceT>& indiDevice) {
                         return indiDevice->isInterfaceSupported(interfaceType);
                     }
             ),

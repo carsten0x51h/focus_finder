@@ -172,7 +172,6 @@ set(sources
         ../common/include/device.h
         ../common/device.cpp
         ../common/include/camera_interface.h
-        ../common/include/cooler.h
         ../common/include/filter_interface.h
         ../common/include/focus_interface.h
         ../common/include/frame.h

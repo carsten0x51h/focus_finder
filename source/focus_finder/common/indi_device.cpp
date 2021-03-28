@@ -47,8 +47,7 @@ IndiDeviceT::IndiDeviceT(INDI::BaseDevice *dp,
     initInterfaceMap();
 }
 
-IndiDeviceT::~IndiDeviceT() {
-}
+IndiDeviceT::~IndiDeviceT() = default;
 
 // TODO: May be moved to a sep. factory... IndiDeviceInterfaceFactoryT...
 std::shared_ptr<DeviceInterfaceT> IndiDeviceT::createDeviceInterface(DeviceInterfaceTypeT::TypeE interfaceType) {
@@ -81,7 +80,7 @@ std::shared_ptr<DeviceInterfaceT> IndiDeviceT::createDeviceInterface(DeviceInter
             std::stringstream ss;
             ss << "Cannot create device interface of type '" << DeviceInterfaceTypeT::asStr(interfaceType)
                << "'. Unknown!" << std::endl;
-            throw new IndiDeviceExceptionT(ss.str());
+            throw IndiDeviceExceptionT(ss.str());
         }
     }
 }
@@ -369,7 +368,7 @@ DeviceConnectionStateT::TypeE IndiDeviceT::getConnectionState() const {
 
 std::set<DeviceInterfaceTypeT::TypeE> IndiDeviceT::getSupportedInferfaces() const {
 
-    THROW_IF(IndiDevice, !mIndiBaseDevice, "mIndiBaseDevice not set!");
+    THROW_IF(IndiDevice, !mIndiBaseDevice, "mIndiBaseDevice not set!")
 
     // TODO: Unse mInterfaceMap instead...
 

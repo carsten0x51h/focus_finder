@@ -76,51 +76,18 @@ FocusFinderLogicT::FocusFinderLogicT() :
 
     mFoFiConfigManager = std::make_shared<FoFiConfigManagerT>();
 
-
-
-    // Create the device manager
-    //mDeviceManager = std::make_shared<DummyDeviceManagerT>();
-
-    // Initialize the INDI DeviceManager
-    //
-    // TODO: Question: There is just a generic interface to the DeviceManager here.
-    //       Hence, there is no special method to set any INDI specific props.
-    //       However, the IndiDeviceManagerT will have additional methods.
-    //       Where will those methods be called?
-    //       -> Maybe right in this class. There could be #ifdef statements to distinguish
-    //          between the different OSs. There the one or the other DeviceManager could be
-    //          instantiated and also configured.
-    //
-    // TODO: Port and hostname should not be hardcoded...
-    //
-
-    // IDEA: Maybe just pass the DeviceManager from outside... because
-    //       which devicwe manager we use here does not matter. The configuration
-    //       of the device manager should happen outside this class and the required
-    //       parameters may also vary. They may come from a CMD lin app or from aGUI
-    //       or from a web-app or whatever...
-
-
-
-    // TODO: Allow e.g. a CMD line program to pass in the device manager type as cmd line param?  -> yes, then a GlobalFofiConfig object will just be manipulated (as part of mFoFiConfigManager...)
-    // But how to handle device manager specific params - e.g. INDI params? Will there also be an IndiGlobalConfigT object?? - just as a generic object list / map? Or maybe .. static_cast<>
-    // from a gneric DeviceManagerConfigT to an IndiDeviceManagerConfigT inside IndiDeviceManager?? This object may be created from the config file and may also be overwritten by cmdline params...
-    // Since this overriding only can take place as part of the CMD line app, the rsepective config object must not be generated in here!
-    //TODO...
-
-
     GlobalFocusFinderConfigT globalCfg = mFoFiConfigManager->getGlobalConfigManager()->getConfig();
 
     DeviceManagerTypeT::TypeE deviceManagerType = globalCfg.getDeviceManagerType();
 
     LOG(debug) << "DeviceManagerType configured: " << DeviceManagerTypeT::asStr(deviceManagerType) << std::endl;
 
+    // Create the device manager
     mDeviceManager = DeviceManagerFactoryT::getInstance(deviceManagerType);
 
 
     boost::property_tree::ptree deviceManagerConfig = globalCfg.getDeviceManagerConfig();
     mDeviceManager->configure(deviceManagerConfig);
-
 
 
     // DEBUG START

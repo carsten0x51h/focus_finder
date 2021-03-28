@@ -77,8 +77,8 @@ protected:
 
 public:
     // TODO: Instead of specific properties maybe bettwer use one key-value "Properties" object...
-    static const std::string sDefaultIndiHostname;
-    static const int sDefaultIndiPort;
+    [[maybe_unused]] static const std::string sDefaultIndiHostname;
+    [[maybe_unused]] static const int sDefaultIndiPort;
 
 
     IndiDeviceManagerT();

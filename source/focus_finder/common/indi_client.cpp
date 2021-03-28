@@ -23,10 +23,6 @@
  ****************************************************************************/
 
 #include <thread>
-#include <pthread.h>
-
-
-#include <chrono> // TODO: Remove
 
 #include "include/indi_client.h"
 #include "include/logging.h"
@@ -34,13 +30,9 @@
 #include "basedevice.h"
 
 
-IndiClientT::IndiClientT() {
+IndiClientT::IndiClientT() = default;
 
-}
-
-IndiClientT::~IndiClientT() {
-
-}
+IndiClientT::~IndiClientT() = default;
 
 void IndiClientT::newDevice(INDI::BaseDevice *dp) {
     LOG(debug) << "IndiClientT::newDevice..." << std::endl;
@@ -138,7 +130,7 @@ void IndiClientT::connect() {
     if (!this->isServerConnected()) {
         notifyServerConnectionStateChanged(IndiServerConnectionStateT::CONNECTING);
 
-        mIndiConnectServerThread = std::move(std::thread(&IndiClientT::connectToIndiServerBlocking, this));
+        mIndiConnectServerThread = std::thread(&IndiClientT::connectToIndiServerBlocking, this);
         mIndiConnectServerThread.detach();
     }
 }

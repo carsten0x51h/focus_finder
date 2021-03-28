@@ -48,27 +48,27 @@ class IndiDeviceT : public DeviceT {
 public:
     IndiDeviceT(INDI::BaseDevice *dp, IndiClientT *indiClient);
 
-    virtual ~IndiDeviceT();
+    ~IndiDeviceT() override;
 
-    std::string getName() const;
+    std::string getName() const override;
 
-    void connect();
+    void connect() override;
 
-    void disconnect();
+    void disconnect() override;
 
-    bool isConnected() const;
+    bool isConnected() const override;
 
-    bool isConnecting() const;
+    bool isConnecting() const override;
 
-    bool isDisconnected() const;
+    bool isDisconnected() const override;
 
-    bool isDisconnecting() const;
+    bool isDisconnecting() const override;
 
-    DeviceConnectionStateT::TypeE getConnectionState() const;
+    DeviceConnectionStateT::TypeE getConnectionState() const override;
 
-    std::set<DeviceInterfaceTypeT::TypeE> getSupportedInferfaces() const;
+    std::set<DeviceInterfaceTypeT::TypeE> getSupportedInferfaces() const override;
 
-    std::shared_ptr<DeviceInterfaceT> getInterface(DeviceInterfaceTypeT::TypeE interfaceType);
+    std::shared_ptr<DeviceInterfaceT> getInterface(DeviceInterfaceTypeT::TypeE interfaceType) override;
 
 
     // USB
@@ -91,7 +91,7 @@ private:
     static uint16_t getIndiDeviceInterfaceMaskByDeviceType(DeviceInterfaceTypeT::TypeE deviceType);
 
 
-    DeviceConnectionStateT::TypeE getConnectionStateInternal() const;
+    [[nodiscard]] DeviceConnectionStateT::TypeE getConnectionStateInternal() const;
 
     void connectInternal();
 
