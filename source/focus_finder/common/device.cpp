@@ -33,9 +33,7 @@ DeviceT::DeviceT() : mIsAvailable(true) {
 
 }
 
-DeviceT::~DeviceT() {
-
-}
+DeviceT::~DeviceT() = default;
 
 bool DeviceT::isAvailable() const {
     return mIsAvailable;

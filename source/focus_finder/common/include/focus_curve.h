@@ -64,30 +64,30 @@ public:
 
     ~FocusCurveT();
 
-    float getLowerFocusPos() const;
+    [[nodiscard]] float getLowerFocusPos() const;
 
-    float getUpperFocusPos() const;
+    [[nodiscard]] float getUpperFocusPos() const;
 
-    float getBestAbsFocusPos() const;
+    [[nodiscard]] float getBestAbsFocusPos() const;
 
-    float getRelativeFocusPosBoundary() const;
+    [[nodiscard]] float getRelativeFocusPosBoundary() const;
 
-    float calcFocusMeasureByFocusPosition(float focusPosition) const;
+    [[nodiscard]] float calcFocusMeasureByFocusPosition(float focusPosition) const;
 
     static std::vector<float>
     calcFocusPositionByFocusMeasure(std::shared_ptr<const CurveFunctionT> curveFunction, float focusMeasure);
 
-    std::vector<float> calcFocusPositionByFocusMeasure(float focusMeasure) const;
+    [[nodiscard]] std::vector<float> calcFocusPositionByFocusMeasure(float focusMeasure) const;
 
-    std::time_t getDateTime() const;
+    [[nodiscard]] std::time_t getDateTime() const;
 
-    FocusMeasureTypeT::TypeE getFocusMeasureType() const;
+    [[nodiscard]] FocusMeasureTypeT::TypeE getFocusMeasureType() const;
 
-    FocusCurveTypeT::TypeE getFocusCurveType() const;
+    [[nodiscard]] FocusCurveTypeT::TypeE getFocusCurveType() const;
 
-    const CurveFitSummaryT &getCurveFitSummary() const;
+    [[nodiscard]] const CurveFitSummaryT &getCurveFitSummary() const;
 
-    const CurveParmsT &getCurveParms() const;
+    [[nodiscard]] const CurveParmsT &getCurveParms() const;
 
     std::ostream &print(std::ostream &os) const;
 

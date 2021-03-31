@@ -25,16 +25,9 @@
 #ifndef SOURCE_FOCUS_FINDER_COMMON_INCLUDE_DEFAULT_FOCUS_CURVE_RECORDER_H_
 #define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_DEFAULT_FOCUS_CURVE_RECORDER_H_
 
-//#include <thread>
-//#include <atomic>
-//#include <condition_variable>
-//#include <boost/signals2.hpp>
-
 #include "focus_curve_recorder.h"
-//#include "focus_curve_record_set.h"
 #include "focus_measure_type.h"
 #include "curve_half.h"
-//#include "focus_controller.h"
 
 // TODO / IDEA: Maybe HfdT and FwhmT should both implement a generic inteface "FocusMeasureT" which just hast "float getValue()".
 

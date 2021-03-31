@@ -32,7 +32,6 @@
 #include "include/exception.h"
 #include "include/logging.h"
 #include "include/point.h"
-#include "include/rect.h"
 #include "include/tuple_printer.h"
 
 void CentroidT::calcCentroid2ndMoment(const ImageT &inImg,
@@ -161,7 +160,7 @@ void CentroidT::calcCentroid2ndMoment(const ImageT &inImg,
 
     LOG(trace)
         << "starCentroid - List of 2nd moments:" << std::endl;
-    for (MomentValuesT::const_iterator it = secondMoment.begin();
+    for (auto it = secondMoment.begin();
          it != secondMoment.end(); ++it) {
         LOG(trace)
             << "Level: "
@@ -183,7 +182,7 @@ void CentroidT::calcCentroid2ndMoment(const ImageT &inImg,
 
     LOG(trace)
         << "starCentroid - List of filtered 2nd moments:" << std::endl;
-    for (MomentValuesT::const_iterator it = filteredSecondMoment.begin();
+    for (auto it = filteredSecondMoment.begin();
          it != filteredSecondMoment.end(); ++it) {
         LOG(trace)
             << "Level: "
@@ -361,17 +360,17 @@ void CentroidT::calcCentroidSubPixel(const ImageT &inImg,
 }
 
 float CentroidT::calcIx2(const ImageT &img, int x) {
-    float Ix = 0;
+    double Ix = 0;
     cimg_forY(img, y) {
-        Ix += pow(img(x, y), 2.0) * (float) x;
+        Ix += std::pow(img(x, y), 2.0) * (float) x;
     }
     return Ix;
 }
 
 float CentroidT::calcJy2(const ImageT &img, int y) {
-    float Iy = 0;
+    double Iy = 0;
     cimg_forX(img, x) {
-        Iy += pow(img(x, y), 2.0) * (float) y;
+        Iy += std::pow(img(x, y), 2.0) * (float) y;
     }
     return Iy;
 }
@@ -408,7 +407,7 @@ std::optional<PointT<float> > CentroidT::calculate(const ImageT &inImg,
                                                    CentroidTypeT::TypeE inCalcType, bool inSubMean, ImageT *outImg) {
 
     PointT<float> relCenter;
-    bool centroidFound = false;
+    bool centroidFound;
 
     if (inImg.width() <= 0 || inImg.height() <= 0) {
         return std::nullopt;
@@ -500,8 +499,7 @@ std::optional<PointT<float> > CentroidT::calculate(const ImageT &inImg,
 }
 
 
-CentroidT::CentroidT() {
-}
+CentroidT::CentroidT() = default;
 
 CentroidT::CentroidT(const ImageT &inImg, CentroidTypeT::TypeE inCalcType,
                      bool inSubMean) {

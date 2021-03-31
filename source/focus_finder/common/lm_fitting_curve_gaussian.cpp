@@ -23,7 +23,7 @@
  ****************************************************************************/
 
 #include <vector>
-#include <math.h>
+#include <cmath>
 
 #include "include/math_functions.h"
 #include "include/throw_if.h"
@@ -62,7 +62,7 @@ void LmFittingCurveGaussianT::makeGuess(const GslMultiFitParmsT &inData,
     }
 
     y_mean /= (float) numDataPoints;
-    float w = (inData.at(numDataPoints - 1).pt.x() - inData.at(0).pt.x())
+    double w = (inData.at(numDataPoints - 1).pt.x() - inData.at(0).pt.x())
               / 10.0;
 
     gsl_vector_set(guess, IdxT::B_IDX, y_mean);
@@ -73,10 +73,10 @@ void LmFittingCurveGaussianT::makeGuess(const GslMultiFitParmsT &inData,
 
 /* y = b + p * exp(-0.5f * ((t - c) / w) * ((t - c) / w)) */
 float LmFittingCurveGaussianT::fx(float x, const gsl_vector *curveParms) const {
-    float b = gsl_vector_get(curveParms, IdxT::B_IDX);
-    float p = gsl_vector_get(curveParms, IdxT::P_IDX);
-    float c = gsl_vector_get(curveParms, IdxT::C_IDX);
-    float w = gsl_vector_get(curveParms, IdxT::W_IDX);
+    double b = gsl_vector_get(curveParms, IdxT::B_IDX);
+    double p = gsl_vector_get(curveParms, IdxT::P_IDX);
+    double c = gsl_vector_get(curveParms, IdxT::C_IDX);
+    double w = gsl_vector_get(curveParms, IdxT::W_IDX);
 
     return MathFunctionsT::gaussian(x, b, p, c, w);
 }

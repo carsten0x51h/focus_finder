@@ -45,11 +45,6 @@ class FocusCurveRecordSetT;
 
 class FocusCurveRecorderT {
 private:
-    // Prevent copy of FocusCurveRecorder
-    FocusCurveRecorderT(const FocusCurveRecorderT &);
-
-    FocusCurveRecorderT &operator=(const FocusCurveRecorderT &);
-
     typedef boost::signals2::signal<void()> FocusCurveRecorderStartedListenersT;
     FocusCurveRecorderStartedListenersT mFocusCurveRecorderStartedListeners;
 
@@ -79,19 +74,22 @@ private:
     std::shared_ptr<FocusControllerT> mFocusController;
 
 public:
-    FocusCurveRecorderT(std::shared_ptr<FocusControllerT> focusController) : mFocusController(focusController) {
+    explicit FocusCurveRecorderT(std::shared_ptr<FocusControllerT> focusController) : mFocusController(focusController) {
     }
 
-    virtual ~FocusCurveRecorderT() {
-    }
+    virtual ~FocusCurveRecorderT() = default;
+
+    // Prevent copy of FocusCurveRecorder
+    FocusCurveRecorderT(const FocusCurveRecorderT &) = delete;
+    FocusCurveRecorderT &operator=(const FocusCurveRecorderT &) = delete;
 
     std::shared_ptr<FocusControllerT> getFocusController() { return mFocusController; }
 
-    std::shared_ptr<const FocusControllerT> getFocusController() const { return mFocusController; }
+    [[nodiscard]] std::shared_ptr<const FocusControllerT> getFocusController() const { return mFocusController; }
 
-    virtual std::string getName() const = 0;
+    [[nodiscard]] virtual std::string getName() const = 0;
 
-    virtual bool isRunning() const = 0;
+    [[nodiscard]] virtual bool isRunning() const = 0;
 
     virtual void run() = 0;
 
@@ -99,7 +97,7 @@ public:
 
     virtual void reset() = 0;
 
-    virtual std::shared_ptr<const FocusCurveRecordSetContainerT> getFocusCurveRecordSets() const = 0;
+    [[nodiscard]] virtual std::shared_ptr<const FocusCurveRecordSetContainerT> getFocusCurveRecordSets() const = 0;
 
 
     boost::signals2::connection registerFocusCurveRecorderStartedListener(
@@ -191,14 +189,12 @@ protected:
     }
 
     void notifyFocusCurveRecorderRecordSetFinished(std::shared_ptr<FocusCurveRecordSetT> focusCurveRecordSet) const {
-        LOG(debug) << "FocusCurveRecorderT::notifyFocusCurveRecorderRecordSetFinished..." << std::endl;
-
-        mFocusCurveRecorderRecordSetFinishedListeners(focusCurveRecordSet);
+        mFocusCurveRecorderRecordSetFinishedListeners(std::move(focusCurveRecordSet));
     }
 
     void notifyFocusCurveRecorderFinished(
             std::shared_ptr<const FocusCurveRecordSetContainerT> focusCurveRecordSetContainer) const {
-        mFocusCurveRecorderFinishedListeners(focusCurveRecordSetContainer);
+        mFocusCurveRecorderFinishedListeners(std::move(focusCurveRecordSetContainer));
     }
 
     void notifyFocusCurveRecorderCancelled() {
@@ -206,29 +202,26 @@ protected:
     }
 
     void notifyFocusCurveRecorderNewRecord(std::shared_ptr<FocusCurveRecordT> focusCurveRecord) {
-        mFocusCurveRecorderNewRecordListeners(focusCurveRecord);
+        mFocusCurveRecorderNewRecordListeners(std::move(focusCurveRecord));
     }
 
     void notifyFocusCurveRecorderRecordSetUpdate(std::shared_ptr<FocusCurveRecordSetT> focusCurveRecordSet) {
-        LOG(debug) << "FocusCurveRecorderT::notifyFocusCurveRecorderRecordSetUpdate..." << std::endl;
-
-        // HACK! Does not compile...
-        //mFocusCurveRecorderRecordSetUpdateListeners(focusCurveRecordSet);
+        mFocusCurveRecorderRecordSetUpdateListeners(std::move(focusCurveRecordSet));
     }
 
     void notifyFocusCurveRecorderProgressUpdate(float progress,
                                                 const std::string &msg,
                                                 std::shared_ptr<FocusCurveRecordT> focusCurveRecord = nullptr) const {
-        mFocusCurveRecorderProgressUpdateListeners(progress, msg, focusCurveRecord);
+        mFocusCurveRecorderProgressUpdateListeners(progress, msg, std::move(focusCurveRecord));
     }
 
     void notifyFocusCurveRecorderProgressUpdate(const std::string &msg,
                                                 std::shared_ptr<FocusCurveRecordT> focusCurveRecord = nullptr) const {
-        mFocusCurveRecorderProgressUpdateListeners(-1.0F, msg, focusCurveRecord);
+        mFocusCurveRecorderProgressUpdateListeners(-1.0F, msg, std::move(focusCurveRecord));
     }
 
     void notifyFocusCurveRecorderProgressUpdate(std::shared_ptr<FocusCurveRecordT> focusCurveRecord = nullptr) const {
-        mFocusCurveRecorderProgressUpdateListeners(-1.0F, "", focusCurveRecord);
+        mFocusCurveRecorderProgressUpdateListeners(-1.0F, "", std::move(focusCurveRecord));
     }
 
     // TODO: Add update...

@@ -31,37 +31,37 @@
 
 class CurveFitParmsT {
 public:
-    CurveFitParmsT(FittingCurveTypeT::TypeE fittingCurveType = FittingCurveTypeT::_Count,
+    explicit CurveFitParmsT(FittingCurveTypeT::TypeE fittingCurveType = FittingCurveTypeT::_Count,
                    float maxAcceptedRelativeError = 0.1F, float maxAcceptedAbsoluteError = 0.1F,
                    std::size_t numMaxIterations = 100, bool enableOutlierDetection = true,
                    float outlierBoundaryFactor = 1.5F,
                    float maxAcceptedOutliersPerc = 10.0F);
 
-    FittingCurveTypeT::TypeE getFittingCurveType() const;
+    [[nodiscard]] FittingCurveTypeT::TypeE getFittingCurveType() const;
 
     void setFittingCurveType(FittingCurveTypeT::TypeE fittingCurveType);
 
-    float getMaxAcceptedRelativError() const;
+    [[nodiscard]] float getMaxAcceptedRelativError() const;
 
     void setMaxAcceptedRelativError(float maxAcceptedRelativeError);
 
-    float getMaxAcceptedAbsoluteError() const;
+    [[nodiscard]] float getMaxAcceptedAbsoluteError() const;
 
     void setMaxAcceptedAbsoluteError(float maxAcceptedAbsoluteError);
 
-    size_t getNumMaxIterations() const;
+    [[nodiscard]] size_t getNumMaxIterations() const;
 
     void setNumMaxIterations(size_t numMaxIterations);
 
-    bool getEnableOutlierDetection() const;
+    [[nodiscard]] bool getEnableOutlierDetection() const;
 
     void setEnableOutlierDetection(bool enableOutlierDetection);
 
-    float getOutlierBoundaryFactor() const;
+    [[nodiscard]] float getOutlierBoundaryFactor() const;
 
     void setOutlierBoundaryFactor(float outlierBoundaryFactor);
 
-    float getMaxAcceptedOutliersPerc() const;
+    [[nodiscard]] float getMaxAcceptedOutliersPerc() const;
 
     void setMaxAcceptedOutliersPerc(float maxAcceptedOutliersPerc);
 

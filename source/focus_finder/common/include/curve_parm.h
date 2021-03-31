@@ -42,9 +42,9 @@ public:
 
     CurveParmT(const std::string &name, float value);
 
-    const std::string &getName() const;
+    [[nodiscard]] const std::string &getName() const;
 
-    float getValue() const;
+    [[nodiscard]] float getValue() const;
 
     void setValue(float value);
 

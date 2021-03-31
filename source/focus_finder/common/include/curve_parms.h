@@ -43,13 +43,13 @@ private:
 public:
     CurveParmsT();
 
-    CurveParmsT(size_t size);
+    explicit CurveParmsT(size_t size);
 
-    size_t size() const;
+    [[nodiscard]] size_t size() const;
 
-    const CurveParmT &get(size_t idx) const;
+    [[nodiscard]] const CurveParmT &get(size_t idx) const;
 
-    const CurveParmT &get(const std::string &name) const;
+    [[nodiscard]] const CurveParmT &get(const std::string &name) const;
 
     CurveParmT &operator[](size_t idx);
 

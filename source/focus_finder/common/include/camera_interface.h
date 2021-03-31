@@ -30,6 +30,7 @@
 #include <memory>
 
 #include <boost/signals2.hpp>
+#include <utility>
 
 
 #include "device.h"
@@ -111,27 +112,25 @@ private:
     ExposureCancelledListenersT mExposureCancelledListeners;
     ExposureCycleFinishedListenersT mExposureCycleFinishedListeners;
 
-    // We do not want device copies
-    CameraInterfaceT(const CameraInterfaceT &);
-
-    CameraInterfaceT &operator=(const CameraInterfaceT &);
-
-
 public:
-    CameraInterfaceT() {}
+    CameraInterfaceT() = default;
 
-    DeviceInterfaceTypeT::TypeE getType() const { return DeviceInterfaceTypeT::CCD; }
+    // We do not want device copies
+    CameraInterfaceT(const CameraInterfaceT &) = delete;
+    CameraInterfaceT &operator=(const CameraInterfaceT &) = delete;
+
+    [[nodiscard]] DeviceInterfaceTypeT::TypeE getType() const override { return DeviceInterfaceTypeT::CCD; }
 
     // Hardware properties
-    virtual unsigned int getBitsPerPixel() const = 0;
+    [[nodiscard]] virtual unsigned int getBitsPerPixel() const = 0;
 
-    virtual SizeT<float> getPixelSize() const = 0;
+    [[nodiscard]] virtual SizeT<float> getPixelSize() const = 0;
 
-    virtual SizeT<unsigned int> getMaxResolution() const = 0;
+    [[nodiscard]] virtual SizeT<unsigned int> getMaxResolution() const = 0;
 
-    virtual std::chrono::milliseconds getMinExposureTime() const = 0;
+    [[nodiscard]] virtual std::chrono::milliseconds getMinExposureTime() const = 0;
 
-    virtual std::chrono::milliseconds getMaxExposureTime() const = 0;
+    [[nodiscard]] virtual std::chrono::milliseconds getMaxExposureTime() const = 0;
 
     // Exposure related properties
     virtual void startExposure() = 0;
@@ -140,34 +139,34 @@ public:
 
     virtual bool isExposureRunning() = 0;
 
-    virtual std::chrono::milliseconds getExposureTime() const = 0;
+    [[nodiscard]] virtual std::chrono::milliseconds getExposureTime() const = 0;
 
     virtual void setExposureTime(const std::chrono::milliseconds &exposureTime) = 0;
 
     virtual void setExposureDelay(const std::chrono::milliseconds &exposureDelay) = 0;
 
-    virtual std::chrono::milliseconds getExposureDelay() const = 0;
+    [[nodiscard]] virtual std::chrono::milliseconds getExposureDelay() const = 0;
 
-    virtual LoopModeT::TypeE getLoopMode() const = 0;
+    [[nodiscard]] virtual LoopModeT::TypeE getLoopMode() const = 0;
 
     virtual void setLoopMode(LoopModeT::TypeE loopMode) = 0;
 
 
-    virtual std::list<FrameTypeT::TypeE> getSupportedFrameTypes() const = 0;
+    [[nodiscard]] virtual std::list<FrameTypeT::TypeE> getSupportedFrameTypes() const = 0;
 
-    virtual FrameTypeT::TypeE getFrameType() const = 0;
+    [[nodiscard]] virtual FrameTypeT::TypeE getFrameType() const = 0;
 
     virtual void setFrameType(FrameTypeT::TypeE frameType) = 0;
 
-    virtual BinningT getSupportedMaxBinningMode() const = 0;
+    [[nodiscard]] virtual BinningT getSupportedMaxBinningMode() const = 0;
 
-    virtual BinningT getBinning() const = 0;
+    [[nodiscard]] virtual BinningT getBinning() const = 0;
 
     virtual void setBinning(const BinningT &binning) = 0;
 
-    virtual bool isRoiSupported() const = 0;
+    [[nodiscard]] virtual bool isRoiSupported() const = 0;
 
-    virtual RectT<unsigned int> getRoi() const = 0;
+    [[nodiscard]] virtual RectT<unsigned int> getRoi() const = 0;
 
     virtual void setRoi(const RectT<unsigned int> &rect) = 0;
 
@@ -244,7 +243,7 @@ protected:
     // To be used by startExposure, cancelExposure and actual device implementation.
     void notifyExposureCycleFinished(RectT<unsigned int> roiRect, std::shared_ptr<const ImageT> resultImage,
                                      bool lastExposure) const {
-        mExposureCycleFinishedListeners(roiRect, resultImage, lastExposure);
+        mExposureCycleFinishedListeners(roiRect, std::move(resultImage), lastExposure);
     }
 
     void notifyExposureCancelled() const {

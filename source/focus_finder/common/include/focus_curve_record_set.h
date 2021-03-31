@@ -45,11 +45,11 @@ private:
 public:
     FocusCurveRecordSetT(FocusMeasureTypeT::TypeE focusMeasureType, float focusMeasureLimit);
 
-    FocusMeasureTypeT::TypeE getFocusMeasureType() const;
+    [[nodiscard]] FocusMeasureTypeT::TypeE getFocusMeasureType() const;
 
-    float getFocusMeasureLimit() const;
+    [[nodiscard]] float getFocusMeasureLimit() const;
 
-    std::pair<int, int> minmaxFocusPos() const;
+    [[nodiscard]] std::pair<int, int> minmaxFocusPos() const;
 
     static std::shared_ptr<FocusCurveRecordSetT>
     load(const boost::property_tree::ptree &pt, const std::filesystem::path &lightFramePath);

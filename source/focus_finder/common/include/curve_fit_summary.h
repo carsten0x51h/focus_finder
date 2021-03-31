@@ -34,10 +34,10 @@
 class CurveFitSummaryT {
 public:
     bool success;                                // < Indicates if curve parameters were found under given constraints
-    size_t numIterationsRequiredTotal = 0;        // < Number of required iterations in total
-    float outlierBoundary;                        // < Contains outlier boundary in case outlier detection was enabled, otherwise 0
+    size_t numIterationsRequiredTotal = 0;       // < Number of required iterations in total
+    float outlierBoundary;                       // < Contains outlier boundary in case outlier detection was enabled, otherwise 0
     std::vector<PointWithResidualT> outliers;    // < Contains outliers in case outlier detection was enabled
-    std::vector<PointFT> matchedDataPoints;        // < Data points which were used to calculate the curve parameters
+    std::vector<PointFT> matchedDataPoints;      // < Data points which were used to calculate the curve parameters
     std::vector<PointFT> curveDataPoints;        // < Corresponding data points to matchedDataPoints on curve
 
     friend std::ostream &operator<<(std::ostream &os, const CurveFitSummaryT &summary);

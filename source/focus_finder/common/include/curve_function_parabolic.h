@@ -54,17 +54,17 @@ public:
         MAC_AS_TYPE(Type, E, _Count);
     };
 
-    CurveFunctionParabolicT(const CurveParmsT &curveParms);
+    explicit CurveFunctionParabolicT(const CurveParmsT &curveParms);
 
-    std::string getName() const;
+    [[nodiscard]] std::string getName() const override;
 
-    float f(float x) const;
+    [[nodiscard]] float f(float x) const override;
 
-    float f_inv(float x) const;
+    [[nodiscard]] float f_inv(float x) const override;
 
-    PointFT min() const;
+    [[nodiscard]] PointFT min() const override;
 
-    PointFT max() const;
+    [[nodiscard]] PointFT max() const override;
 };
 
 #endif /*SOURCE_FOCUS_FINDER_COMMON_INCLUDE_CURVE_FUNCTION_PARABOLIC_H_*/

@@ -83,7 +83,7 @@ public:
 
     virtual ~DeviceT();
 
-    virtual std::string getName() const = 0;
+    [[nodiscard]] virtual std::string getName() const = 0;
 
     static const std::string NONE;
 
@@ -97,7 +97,7 @@ public:
 	 *
 	 * @return
 	 */
-    virtual std::set<DeviceInterfaceTypeT::TypeE> getSupportedInferfaces() const = 0;
+    [[nodiscard]] virtual std::set<DeviceInterfaceTypeT::TypeE> getSupportedInferfaces() const = 0;
 
 
     /**
@@ -106,7 +106,7 @@ public:
      *
      * @return
      */
-    bool isInterfaceSupported(DeviceInterfaceTypeT::TypeE) const;
+    [[nodiscard]] bool isInterfaceSupported(DeviceInterfaceTypeT::TypeE) const;
 
 
     /**
@@ -176,20 +176,20 @@ public:
     virtual void connect() = 0;     // Expected to be non-blocking
     virtual void disconnect() = 0;  // Expected to be non-blocking
 
-    virtual bool isConnected() const = 0;
+    [[nodiscard]] virtual bool isConnected() const = 0;
 
-    virtual bool isConnecting() const = 0;
+    [[nodiscard]] virtual bool isConnecting() const = 0;
 
-    virtual bool isDisconnected() const = 0;
+    [[nodiscard]] virtual bool isDisconnected() const = 0;
 
-    virtual bool isDisconnecting() const = 0;
+    [[nodiscard]] virtual bool isDisconnecting() const = 0;
 
-    bool isAvailable() const;
+    [[nodiscard]] bool isAvailable() const;
 
     void setAvailable(bool isAvailable);
 
 
-    virtual DeviceConnectionStateT::TypeE getConnectionState() const = 0;
+    [[nodiscard]] virtual DeviceConnectionStateT::TypeE getConnectionState() const = 0;
 
     // Register on events
     boost::signals2::connection

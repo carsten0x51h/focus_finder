@@ -45,7 +45,7 @@ private:
 #define DEF_Exception(XYZ) \
   class XYZ##ExceptionT : public BaseExceptionT {            \
   public:                                \
-      inline XYZ##ExceptionT(const std::string & inMsg = "") : BaseExceptionT(#XYZ"Exception", inMsg) {} \
+      explicit inline XYZ##ExceptionT(const std::string & inMsg = "") : BaseExceptionT(#XYZ"Exception", inMsg) {} \
   }
 
 

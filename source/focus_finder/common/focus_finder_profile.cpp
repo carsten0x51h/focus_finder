@@ -37,6 +37,7 @@
 #include <chrono>
 
 #include <boost/property_tree/ptree.hpp>
+#include <utility>
 #include <boost/property_tree/xml_parser.hpp>
 
 using namespace std::chrono_literals;
@@ -302,7 +303,7 @@ std::shared_ptr<FocusFinderCalibrationT> FocusFinderProfileT::getFocusFinderCali
 }
 
 void FocusFinderProfileT::setFocusFinderCalibration(std::shared_ptr<FocusFinderCalibrationT> focusFinderCalibration) {
-    mFocusFinderCalibration = focusFinderCalibration;
+    mFocusFinderCalibration = std::move(focusFinderCalibration);
 }
 
 bool FocusFinderProfileT::hasCalibrationData() const {

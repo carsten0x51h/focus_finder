@@ -30,19 +30,19 @@
 
 // static!
 int LmFittingCurveT::gslFx(const gsl_vector *curveParms, void *parms, gsl_vector *outResultVec) {
-    LmFittingParmsContainerT *parmsContainer = static_cast<LmFittingParmsContainerT *>(parms);
+    auto *parmsContainer = static_cast<LmFittingParmsContainerT *>(parms);
     return parmsContainer->obj->gslFx(curveParms, parmsContainer->gslParms, outResultVec);
 }
 
 // static!
 int LmFittingCurveT::gslDfx(const gsl_vector *x, void *parms, gsl_matrix *J) {
-    LmFittingParmsContainerT *parmsContainer = static_cast<LmFittingParmsContainerT *>(parms);
+    auto *parmsContainer = static_cast<LmFittingParmsContainerT *>(parms);
     return parmsContainer->obj->gslDfx(x, parmsContainer->gslParms, J);
 }
 
 // static!
 int LmFittingCurveT::gslFdfx(const gsl_vector *x, void *parms, gsl_vector *f, gsl_matrix *J) {
-    LmFittingParmsContainerT *parmsContainer = static_cast<LmFittingParmsContainerT *>(parms);
+    auto *parmsContainer = static_cast<LmFittingParmsContainerT *>(parms);
     return parmsContainer->obj->gslFdfx(x, parmsContainer->gslParms, f, J);
 }
 

@@ -70,7 +70,7 @@ private:
 public:
     CentroidT();
 
-    CentroidT(const ImageT &inImg,
+    explicit CentroidT(const ImageT &inImg,
               CentroidTypeT::TypeE inCalcType = CentroidTypeT::IWC,
               bool inSubMean = true);
 
@@ -81,13 +81,13 @@ public:
     static std::optional<PointT<float> > calculate(const ImageT &inImg,
                                                    CentroidTypeT::TypeE inCalcType = CentroidTypeT::IWC,
                                                    bool inSubMean = true,
-                                                   ImageT *outImg = 0);
+                                                   ImageT *outImg = nullptr);
 
-    bool valid() const;
+    [[nodiscard]] bool valid() const;
 
-    const ImageT &getResultImage() const;
+    [[nodiscard]] const ImageT &getResultImage() const;
 
-    std::optional<PointT<float> > getCenter() const;
+    [[nodiscard]] std::optional<PointT<float> > getCenter() const;
 };
 
 #endif // SOURCE_FOCUS_FINDER_COMMON_INCLUDE_CENTROID_H_

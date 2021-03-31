@@ -70,17 +70,17 @@ public:
         // Check input parameters
         THROW_IF(CurveFit,
                  numInitialDataPoints < numMinInitialRequiredDataPoints,
-                 "Insufficient data points.");
+                 "Insufficient data points.")
         THROW_IF(CurveFit, curveFitParms.getNumMaxIterations() < 1,
-                 "Number of iterations needs to be at least 1.");
+                 "Number of iterations needs to be at least 1.")
         THROW_IF(CurveFit, curveFitParms.getMaxAcceptedRelativError() < 0,
-                 "Relative error needs to be greater or equal 0.");
+                 "Relative error needs to be greater or equal 0.")
         THROW_IF(CurveFit, curveFitParms.getMaxAcceptedAbsoluteError() < 0,
-                 "Absolute error needs to be greater or equal 0.");
+                 "Absolute error needs to be greater or equal 0.")
         THROW_IF(CurveFit,
                  curveFitParms.getMaxAcceptedOutliersPerc() < 0
                  || curveFitParms.getMaxAcceptedOutliersPerc() > 100,
-                 "Max accepted outlier percentage out of range 0..100.");
+                 "Max accepted outlier percentage out of range 0..100.")
 
 
         // DEBUG START
