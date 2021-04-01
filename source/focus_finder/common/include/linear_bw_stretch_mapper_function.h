@@ -35,15 +35,15 @@ public:
 
     virtual ~LinearBWStretchMapperFunctionT();
 
-    std::string getName() const;
+    [[nodiscard]] std::string getName() const override;
 
     // TODO: Maybe move to parent class
-    void setSrcRange(float from, float to);
+    void setSrcRange(float from, float to) override;
 
     // TODO: Maybe move to parent class
-    void setDestRange(float from, float to);
+    void setDestRange(float from, float to) override;
 
-    float f(float f);
+    float f(float f) override;
 
     void setBlackPoint(float blackPoint);
 

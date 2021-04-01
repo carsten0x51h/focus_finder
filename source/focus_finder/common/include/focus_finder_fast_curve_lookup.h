@@ -23,15 +23,10 @@
  ****************************************************************************/
 
 #ifndef SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FOCUS_FINDER_FAST_CURVE_LOOKUP_H_
-#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FOCUS_FINDER_FAST_CURVE_LOOKUP_H_
+#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FOCUS_FINDER_FAST_CURVE_LOOKUP_H_ SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FOCUS_FINDER_FAST_CURVE_LOOKUP_H_
 
 #include <vector>
-//#include <array>
 #include <chrono>
-
-//#include <atomic>
-//#include <thread>
-
 #include <boost/signals2.hpp>
 
 #include "focus_finder.h"
@@ -83,12 +78,12 @@ private:
     int mInitialAbsPosition;
 
 public:
-    FocusFinderFastCurveLookupT(std::shared_ptr<FocusControllerT> focusController);
+    explicit FocusFinderFastCurveLookupT(std::shared_ptr<FocusControllerT> focusController);
 
     // Implement focus finder interface
-    std::string getName() const override;
+    [[nodiscard]] std::string getName() const override;
 
-    bool isRunning() const override;
+    [[nodiscard]] bool isRunning() const override;
 
     void run() override;
 

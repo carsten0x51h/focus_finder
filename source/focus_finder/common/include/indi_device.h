@@ -23,7 +23,7 @@
  ****************************************************************************/
 
 #ifndef SOURCE_FOCUS_FINDER_COMMON_INDI_USB_DEVICE_CONNECTOR_H_
-#define SOURCE_FOCUS_FINDER_COMMON_INDI_USB_DEVICE_CONNECTOR_H_
+#define SOURCE_FOCUS_FINDER_COMMON_INDI_USB_DEVICE_CONNECTOR_H_ SOURCE_FOCUS_FINDER_COMMON_INDI_USB_DEVICE_CONNECTOR_H_
 
 #include <string>
 #include <atomic>
@@ -36,7 +36,6 @@
 #include "indi_client.h"
 #include "exception.h"
 
-// libindi
 #include "basedevice.h"
 
 #include "device_interface.h"

@@ -34,56 +34,55 @@
 #include "indi_device.h"
 #include "indi_client.h"
 
-// INDI
 #include "basedevice.h"
 
 // https://stackoverflow.com/questions/9404884/implementing-interfaces-in-c-with-inherited-concrete-classes
 class IndiFocusInterfaceT : virtual public FocusInterfaceT {
 
 public:
-    IndiFocusInterfaceT(IndiDeviceT *indiDevice);
+    explicit IndiFocusInterfaceT(IndiDeviceT *indiDevice);
 
-    virtual ~IndiFocusInterfaceT();
+    ~IndiFocusInterfaceT() override;
 
-    std::string getName() const;
+    [[nodiscard]] std::string getName() const;
 
-    DeviceT *getParentDevice();
+    DeviceT *getParentDevice() override;
 
     // Impl. of focus interface
-    bool isTemperatureSupported() const;
+    [[nodiscard]] bool isTemperatureSupported() const override;
 
-    float getTemperature() const;
+    [[nodiscard]] float getTemperature() const override;
 
-    bool isMoving() const;
+    [[nodiscard]] bool isMoving() const override;
 
-    bool isAbsPosSupported() const;
+    [[nodiscard]] bool isAbsPosSupported() const override;
 
-    int getCurrentPos() const;
+    [[nodiscard]] int getCurrentPos() const override;
 
-    int getTargetPos() const;
+    [[nodiscard]] int getTargetPos() const override;
 
-    void setTargetPos(unsigned int inTicks, FocusDirectionT::TypeE direction);
+    void setTargetPos(unsigned int inTicks, FocusDirectionT::TypeE direction) override;
 
-    void setTargetPos(int inAbsPos);
+    void setTargetPos(int inAbsPos) override;
 
-    void resetPositionCounter();
+    void resetPositionCounter() override;
 
-    int getMinAbsPos() const;
+    [[nodiscard]] int getMinAbsPos() const override;
 
-    int getMaxAbsPos() const;
+    [[nodiscard]] int getMaxAbsPos() const override;
 
-    bool isAbortSupported() const;
+    [[nodiscard]] bool isAbortSupported() const override;
 
-    void abortMotion();
+    void abortMotion() override;
 
 private:
-    int clipTicks(int ticks, FocusDirectionT::TypeE direction) const;
+    [[nodiscard]] int clipTicks(int ticks, FocusDirectionT::TypeE direction) const;
 
-    int getCurrentPosInternal() const;
+    [[nodiscard]] int getCurrentPosInternal() const;
 
-    int getMinAbsPosInternal() const;
+    [[nodiscard]] int getMinAbsPosInternal() const;
 
-    int getMaxAbsPosInternal() const;
+    [[nodiscard]] int getMaxAbsPosInternal() const;
 
     void newNumber(INumberVectorProperty *nvp);
 

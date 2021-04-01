@@ -23,7 +23,7 @@
  ****************************************************************************/
 
 #ifndef SOURCE_FOCUS_FINDER_COMMON_INCLUDE_IMAGE_H_
-#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_IMAGE_H_
+#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_IMAGE_H_ SOURCE_FOCUS_FINDER_COMMON_INCLUDE_IMAGE_H_
 
 // We do not want X11 dependency
 #define cimg_display 0

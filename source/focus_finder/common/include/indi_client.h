@@ -23,15 +23,11 @@
  ****************************************************************************/
 
 #ifndef SOURCE_FOCUS_FINDER_COMMON_INCLUDE_INDI_CLIENT_H_
-#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_INDI_CLIENT_H_
+#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_INDI_CLIENT_H_ SOURCE_FOCUS_FINDER_COMMON_INCLUDE_INDI_CLIENT_H_
 
 #include "logging.h"
-
 #include "indiapi.h"
-//#include "indidevapi.h"
-//#include "indicom.h"
 #include "baseclient.h"
-//#include "basedevice.h"
 
 #include "indi_server_connection_state.h"
 
@@ -91,7 +87,7 @@ private:
 public:
     IndiClientT();
 
-    virtual ~IndiClientT();
+    ~IndiClientT() override;
 
     boost::signals2::connection registerNewPropertyListener(const NewPropertyListenersT::slot_type &inCallBack) {
         return mNewPropertyListeners.connect(inCallBack);
@@ -209,9 +205,9 @@ public:
 
     void disconnect();
 
-    bool isConnected() const;
+    [[nodiscard]] bool isConnected() const;
 
-    INDI::BaseDevice *getDevice(const std::string &deviceName) const;
+    [[nodiscard]] INDI::BaseDevice *getDevice(const std::string &deviceName) const;
 
 protected:
     void notifyNewDevice(INDI::BaseDevice *dp) { mNewDeviceListeners(dp); }
@@ -244,29 +240,29 @@ protected:
     /////////////////////////////////////////////////////////
     // Implement the base device methods
     /////////////////////////////////////////////////////////
-    void newDevice(INDI::BaseDevice *dp);
+    void newDevice(INDI::BaseDevice *dp) override;
 
-    void removeDevice(INDI::BaseDevice *dp);
+    void removeDevice(INDI::BaseDevice *dp) override;
 
-    void newProperty(INDI::Property *property);
+    void newProperty(INDI::Property *property) override;
 
-    void removeProperty(INDI::Property *property);
+    void removeProperty(INDI::Property *property) override;
 
-    void newBLOB(IBLOB *bp);
+    void newBLOB(IBLOB *bp) override;
 
-    void newSwitch(ISwitchVectorProperty *svp);
+    void newSwitch(ISwitchVectorProperty *svp) override;
 
-    void newNumber(INumberVectorProperty *nvp);
+    void newNumber(INumberVectorProperty *nvp) override;
 
-    void newText(ITextVectorProperty *tvp);
+    void newText(ITextVectorProperty *tvp) override;
 
-    void newLight(ILightVectorProperty *lvp);
+    void newLight(ILightVectorProperty *lvp) override;
 
-    void newMessage(INDI::BaseDevice *dp, int messageID);
+    void newMessage(INDI::BaseDevice *dp, int messageID) override;
 
-    void serverConnected();
+    void serverConnected() override;
 
-    void serverDisconnected(int exit_code);
+    void serverDisconnected(int exit_code) override;
 };
 
 

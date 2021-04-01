@@ -23,7 +23,7 @@
  ****************************************************************************/
 
 #ifndef SOURCE_FOCUS_FINDER_COMMON_INCLUDE_CENTROID_H_
-#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_CENTROID_H_
+#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_CENTROID_H_ SOURCE_FOCUS_FINDER_COMMON_INCLUDE_CENTROID_H_
 
 #include <valarray>
 #include <optional>

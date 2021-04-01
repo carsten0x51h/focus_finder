@@ -23,7 +23,7 @@
  ****************************************************************************/
 
 #ifndef SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FILTER_INTERFACE_H_
-#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FILTER_INTERFACE_H_
+#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FILTER_INTERFACE_H_ SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FILTER_INTERFACE_H_
 
 #include <memory>
 #include <boost/signals2.hpp>
@@ -42,13 +42,12 @@ private:
     TargetPositionReachedListenersT mTargetPositionReachedListeners;
     FilterMovementAbortedListenersT mFilterMovementAbortedListeners;
 
-    // We do not want device copies
-    FilterInterfaceT(const FilterInterfaceT &);
-
-    FilterInterfaceT &operator=(const FilterInterfaceT &);
-
 public:
-    FilterInterfaceT() {}
+    FilterInterfaceT() = default;
+
+    // We do not want device copies
+    FilterInterfaceT(const FilterInterfaceT &) = delete;
+    FilterInterfaceT &operator=(const FilterInterfaceT &) = delete;
 
     /**
      * Filter position

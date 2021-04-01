@@ -36,16 +36,16 @@
 
 class LmFittingCurveT {
 public:
-    virtual std::string getName() const = 0;
+    [[nodiscard]] virtual std::string getName() const = 0;
 
     //virtual std::vector<std::string> getParmNames() const = 0;
     template<typename Idx>
-    std::vector<std::string>
+    [[nodiscard]] std::vector<std::string>
     getParmNames() const {
         std::vector<std::string> parmNames(Idx::_Count);
 
         for (size_t idx = 0; idx < Idx::_Count; ++idx) {
-            typename Idx::TypeE t = static_cast<typename Idx::TypeE>(idx);
+            auto t = static_cast<typename Idx::TypeE>(idx);
             parmNames[idx] = Idx::asStr(t);
         }
 
@@ -59,10 +59,10 @@ public:
 
     static int gslFdfx(const gsl_vector *x, void *parms, gsl_vector *f, gsl_matrix *J);
 
-    virtual std::vector<std::string> getParmNames() const = 0;
+    [[nodiscard]] virtual std::vector<std::string> getParmNames() const = 0;
 
 
-    float fx(float x, const CurveParmsT &curveParms) const;
+    [[nodiscard]] float fx(float x, const CurveParmsT &curveParms) const;
 
     virtual float fx(float x, const gsl_vector *curveParms) const = 0;
 

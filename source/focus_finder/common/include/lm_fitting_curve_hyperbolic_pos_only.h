@@ -41,7 +41,7 @@ private:
     float mA;
     float mB;
 
-    float phi(float x, float a, float c) const;
+    [[nodiscard]] float phi(float x, float a, float c) const;
 
 public:
     LmFittingCurveHyperbolicPosOnlyT();
@@ -69,9 +69,9 @@ public:
 
 
 
-    std::string getName() const override;
+    [[nodiscard]] std::string getName() const override;
 
-    std::vector<std::string> getParmNames() const override;
+    [[nodiscard]] std::vector<std::string> getParmNames() const override;
 
     float fx(float x, const gsl_vector *curveParms) const override;
 

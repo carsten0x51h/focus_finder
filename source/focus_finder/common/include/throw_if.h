@@ -23,7 +23,7 @@
  ****************************************************************************/
 
 #ifndef SOURCE_FOCUS_FINDER_COMMON_INCLUDE_THROW_IF_H_
-#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_THROW_IF_H_
+#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_THROW_IF_H_ SOURCE_FOCUS_FINDER_COMMON_INCLUDE_THROW_IF_H_
 
 #include <sstream>
 

@@ -27,23 +27,24 @@
 
 #include <string>
 #include <exception>
+#include <utility>
 
 #include "lm_curve_matcher_summary.h"
 
 class LmCurveMatcherExceptionT : public std::exception {
 public:
-    LmCurveMatcherExceptionT(const std::string &inMsg = "") : mName("LmCurveMatcherException"), mMsg(inMsg) {}
+    explicit LmCurveMatcherExceptionT(std::string inMsg = "") : mName("LmCurveMatcherException"), mMsg(std::move(inMsg)) {}
 
-    LmCurveMatcherExceptionT(const std::string &inMsg, const LmCurveMatcherSummaryT &inSummary) : mName(
-            "LmCurveMatcherException"), mMsg(inMsg), mSummary(inSummary) {}
+    LmCurveMatcherExceptionT(std::string inMsg, LmCurveMatcherSummaryT inSummary) : mName(
+            "LmCurveMatcherException"), mMsg(std::move(inMsg)), mSummary(std::move(inSummary)) {}
 
-    ~LmCurveMatcherExceptionT() throw() {}
+    ~LmCurveMatcherExceptionT() noexcept override = default;
 
-    const char *what() const throw() { return mMsg.c_str(); }
+    [[nodiscard]] const char *what() const throw() override { return mMsg.c_str(); }
 
-    const char *getName() const throw() { return mName.c_str(); }
+    [[nodiscard]] const char *getName() const noexcept { return mName.c_str(); }
 
-    const LmCurveMatcherSummaryT &getSummary() const throw() { return mSummary; }
+    [[nodiscard]] const LmCurveMatcherSummaryT &getSummary() const noexcept { return mSummary; }
 
 private:
     std::string mName;

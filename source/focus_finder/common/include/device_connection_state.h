@@ -23,7 +23,7 @@
  ****************************************************************************/
 
 #ifndef FOFI_DEVICE_CONNECTION_STATE_H
-#define FOFI_DEVICE_CONNECTION_STATE_H
+#define FOFI_DEVICE_CONNECTION_STATE_H FOFI_DEVICE_CONNECTION_STATE_H
 
 struct DeviceConnectionStateT {
     typedef enum {

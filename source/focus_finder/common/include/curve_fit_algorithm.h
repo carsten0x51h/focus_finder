@@ -23,7 +23,7 @@
  ****************************************************************************/
 
 #ifndef SOURCE_FOCUS_FINDER_COMMON_INCLUDE_CURVE_FIT_ALGORITHM_H_
-#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_CURVE_FIT_ALGORITHM_H_
+#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_CURVE_FIT_ALGORITHM_H_ SOURCE_FOCUS_FINDER_COMMON_INCLUDE_CURVE_FIT_ALGORITHM_H_
 
 #include <vector>
 #include <boost/range/algorithm.hpp>

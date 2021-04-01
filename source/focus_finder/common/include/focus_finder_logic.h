@@ -23,7 +23,7 @@
  ****************************************************************************/
 
 #ifndef SOURCE_FOCUS_FINDER_COMMON_FOCUS_FINDER_LOGIC_H_
-#define SOURCE_FOCUS_FINDER_COMMON_FOCUS_FINDER_LOGIC_H_
+#define SOURCE_FOCUS_FINDER_COMMON_FOCUS_FINDER_LOGIC_H_ SOURCE_FOCUS_FINDER_COMMON_FOCUS_FINDER_LOGIC_H_
 
 #include <memory>
 
@@ -68,31 +68,31 @@ public:
 
     std::shared_ptr<FilterInterfaceT> getCurrentFilter();
 
-    std::shared_ptr<DeviceManagerT> getDeviceManager() const;
+    [[nodiscard]] std::shared_ptr<DeviceManagerT> getDeviceManager() const;
 
-    std::shared_ptr<ProfileManagerT> getProfileManager() const;
+    [[nodiscard]] std::shared_ptr<ProfileManagerT> getProfileManager() const;
 
     void setSelectedRoi(const RectT<unsigned int> &roi);
 
-    RectT<unsigned int> getSelectedRoi() const;
+    [[nodiscard]] RectT<unsigned int> getSelectedRoi() const;
 
     void clearSelectedRoi();
 
     std::optional<PointT<float> > findFocusStar(const PointT<float> &poi);
 
-    const FrameT &getLastFrame() const;
+    [[nodiscard]] const FrameT &getLastFrame() const;
 
 
-    std::vector<std::string> getMapperFunctionNames() const;
+    [[nodiscard]] std::vector<std::string> getMapperFunctionNames() const;
 
-    std::shared_ptr<MapperFunctionT>
+    [[nodiscard]] std::shared_ptr<MapperFunctionT>
     getMapperFunctionByName(const std::string &mapperFunctionName) const;
 
-    std::shared_ptr<ImageConverter16To8T> getImageConverter16To8() const;
+    [[nodiscard]] std::shared_ptr<ImageConverter16To8T> getImageConverter16To8() const;
 
-    std::shared_ptr<TaskExecutorT<FocusFinderT> > getFocusFinderExecutor() const;
+    [[nodiscard]] std::shared_ptr<TaskExecutorT<FocusFinderT> > getFocusFinderExecutor() const;
 
-    std::optional<PointT<float> > getLastFocusStarPos() const;
+    [[nodiscard]] std::optional<PointT<float> > getLastFocusStarPos() const;
 
     std::shared_ptr<FocusCurveRecorderLogicT> getFocusCurveRecorderLogic();
 
@@ -111,7 +111,7 @@ public:
 private:
     static FocusFinderLogicT *sSelf;
 
-    size_t calcNumStarsInRegion(const ImageT &inImg) const;
+    [[nodiscard]] size_t calcNumStarsInRegion(const ImageT &inImg) const;
 
     void initImageMappers();
 

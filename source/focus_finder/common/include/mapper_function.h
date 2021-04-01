@@ -23,13 +23,13 @@
  ****************************************************************************/
 
 #ifndef SOURCE_FOCUS_FINDER_COMMON_INCLUDE_MAPPER_FUNCTION_H_
-#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_MAPPER_FUNCTION_H_
+#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_MAPPER_FUNCTION_H_ SOURCE_FOCUS_FINDER_COMMON_INCLUDE_MAPPER_FUNCTION_H_
 
 #include <string>
 
 class MapperFunctionT {
 public:
-    virtual std::string getName() const = 0;
+    [[nodiscard]] virtual std::string getName() const = 0;
 
     virtual float f(float f) = 0;
 

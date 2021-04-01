@@ -23,7 +23,7 @@
  ****************************************************************************/
 
 #ifndef SOURCE_FOCUS_FINDER_COMMON_INCLUDE_HOME_DIRECTORY_FINDER_H_
-#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_HOME_DIRECTORY_FINDER_H_
+#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_HOME_DIRECTORY_FINDER_H_ SOURCE_FOCUS_FINDER_COMMON_INCLUDE_HOME_DIRECTORY_FINDER_H_
 
 #include <unistd.h>
 #include <sys/types.h>

@@ -25,7 +25,9 @@
 #include "include/hfd.h"
 #include "include/image.h"
 
-float HfdT::calc(const ImageT &inImage, unsigned int inOuterDiameter,
+const float HfdT::outerHfdDiameter = 27.0f; // TODO: Calc?! - depends on pixel size and focal length (and seeing...) WAS 21!!!
+
+float HfdT::calc(const ImageT &inImage, float inOuterDiameter,
                  ImageT *outCenteredImg, bool inSubMean) {
 
     // TODO: Is this ok here???
@@ -56,12 +58,12 @@ float HfdT::calc(const ImageT &inImage, unsigned int inOuterDiameter,
     // TODO: Scale up image if necessary
 
     // Sum up all pixel values in whole circle
-    float outerRadius = (float) inOuterDiameter / 2.0;
+    float outerRadius = inOuterDiameter / 2.0f;
     float sum = 0;
     float sumDist = 0;
 
     cimg_forXY(aiImg, x, y) {
-            if (insideCircle(x, y, outerRadius /*centerX*/, outerRadius /*centerY*/,
+            if (insideCircle((float) x, (float) y, outerRadius /*centerX*/, outerRadius /*centerY*/,
                              outerRadius)) {
                 sum += aiImg(x, y);
                 sumDist += aiImg(x, y)
@@ -79,7 +81,7 @@ float HfdT::calc(const ImageT &inImage, unsigned int inOuterDiameter,
     }
 
     // NOTE: Multiplying with 2 is required since actually just the HFR is calculated above
-    return (sum > 0 ? 2.0 * sumDist / sum : std::sqrt(2.0) * outerRadius);
+    return (sum > 0 ? 2.0f * sumDist / sum : std::sqrt(2.0f) * outerRadius);
 }
 
 std::ostream &operator<<(std::ostream &os, const HfdT &hfd) {
@@ -91,4 +93,8 @@ HfdT::print(std::ostream &os) const {
     os << "HFD=" << mHfdValue << ", outer diameter=" << mOuterDiameter << ", max HFD limit: " << this->getMaxHfdLimit()
        << std::endl;
     return os;
+}
+
+bool HfdT::insideCircle(float inX, float inY, float inCenterX, float inCenterY, float inRadius) {
+    return (std::pow(inX - inCenterX, 2.0) + std::pow(inY - inCenterY, 2.0) <= std::pow(inRadius, 2.0));
 }

@@ -23,7 +23,7 @@
  ****************************************************************************/
 
 #ifndef SOURCE_FOCUS_FINDER_COMMON_INCLUDE_CURVE_HALF_H_
-#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_CURVE_HALF_H_
+#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_CURVE_HALF_H_ SOURCE_FOCUS_FINDER_COMMON_INCLUDE_CURVE_HALF_H_
 
 #include "enum_helper.h"
 

@@ -280,7 +280,7 @@ set(sources
         include/indi_device_manager_dialog.h
         indi_device_manager_dialog.cpp
         indi_device_manager_dialog.ui
-        )
+        ../common/wait_for.cpp)
 
 
 # 

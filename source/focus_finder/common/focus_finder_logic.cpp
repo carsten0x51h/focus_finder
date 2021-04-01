@@ -262,7 +262,7 @@ size_t FocusFinderLogicT::calcNumStarsInRegion(const ImageT &inImg) const {
 
     StarClusterAlgorithmT starClusterAlgorithm(
             2 /*defines the allowed number of dark pixels between two white pixels until they form a cluster*/);
-    std::list<StarClusterT> clusters = starClusterAlgorithm.cluster(binaryImg);
+    std::list<PixelClusterT> clusters = starClusterAlgorithm.cluster(binaryImg);
 
     LOG(debug) << "FocusFinderLogicT::calcNumStarsInRegion - Found " << clusters.size() << " stars..." << std::endl;
 

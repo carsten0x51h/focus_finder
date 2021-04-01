@@ -23,7 +23,7 @@
  ****************************************************************************/
 
 #ifndef SOURCE_FOCUS_FINDER_COMMON_INCLUDE_GLOBAL_FOCUS_FINDER_CONFIG_H_
-#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_GLOBAL_FOCUS_FINDER_CONFIG_H_
+#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_GLOBAL_FOCUS_FINDER_CONFIG_H_ SOURCE_FOCUS_FINDER_COMMON_INCLUDE_GLOBAL_FOCUS_FINDER_CONFIG_H_
 
 #include <string>
 
@@ -45,7 +45,7 @@ public:
 
     ~GlobalFocusFinderConfigT();
 
-    const TimestampT &getLastChanged() const;
+    [[nodiscard]] const TimestampT &getLastChanged() const;
 
     void setLastChanged(const TimestampT &lastChanged);
 
@@ -53,7 +53,7 @@ public:
     /**
      * Last active focus finder profile
      */
-    std::string getLastActiveFocusFinderProfileName() const;
+    [[nodiscard]] std::string getLastActiveFocusFinderProfileName() const;
 
     void setLastActiveFocusFinderProfileName(const std::string &lastActiveFocusFinderProfileName);
 
@@ -64,7 +64,7 @@ public:
      * NOTE: Currently only DUMMY and INDI is supported.
      *       ASCOM may be supported in the future well...
      */
-    DeviceManagerTypeT::TypeE getDeviceManagerType() const;
+    [[nodiscard]] DeviceManagerTypeT::TypeE getDeviceManagerType() const;
 
     void setDeviceManagerType(DeviceManagerTypeT::TypeE deviceManagerType);
 
@@ -73,7 +73,7 @@ public:
      *
      * @return
      */
-    boost::property_tree::ptree getDeviceManagerConfig() const;
+    [[nodiscard]] boost::property_tree::ptree getDeviceManagerConfig() const;
     void setDeviceManagerConfig(const boost::property_tree::ptree & deviceManagerConfig);
 
 

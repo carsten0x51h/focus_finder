@@ -23,7 +23,7 @@
  ****************************************************************************/
 
 #ifndef SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FOCUS_CURVE_RECORDER_LOGIC_H_
-#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FOCUS_CURVE_RECORDER_LOGIC_H_
+#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FOCUS_CURVE_RECORDER_LOGIC_H_ SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FOCUS_CURVE_RECORDER_LOGIC_H_
 
 #include <memory>
 
@@ -42,11 +42,11 @@ private:
     std::shared_ptr<FocusCurveRecorderT> mFocusCurveRecorder;
 
 public:
-    FocusCurveRecorderLogicT(FocusFinderLogicT &ffl);
+    explicit FocusCurveRecorderLogicT(FocusFinderLogicT &ffl);
 
     std::optional<FocusFinderProfileT> getActiveProfile();
 
-    std::shared_ptr<ProfileManagerT> getProfileManager() const;
+    [[nodiscard]] std::shared_ptr<ProfileManagerT> getProfileManager() const;
 
     std::shared_ptr<FocusCurveRecorderT> getFocusCurveRecorder();
 

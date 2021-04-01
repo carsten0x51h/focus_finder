@@ -23,7 +23,7 @@
  ****************************************************************************/
 
 #ifndef SOURCE_FOCUS_FINDER_COMMON_INCLUDE_REPORTING_H_
-#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_REPORTING_H_
+#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_REPORTING_H_ SOURCE_FOCUS_FINDER_COMMON_INCLUDE_REPORTING_H_
 
 #include <boost/signals2.hpp>
 

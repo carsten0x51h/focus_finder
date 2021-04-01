@@ -23,7 +23,7 @@
  ****************************************************************************/
 
 #ifndef SOURCE_FOCUS_FINDER_COMMON_INCLUDE_DEVICE_MANAGER_H_
-#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_DEVICE_MANAGER_H_
+#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_DEVICE_MANAGER_H_ SOURCE_FOCUS_FINDER_COMMON_INCLUDE_DEVICE_MANAGER_H_
 
 
 #include <vector>
@@ -39,9 +39,9 @@ class DeviceManagerT {
 private:
 
 public:
-    virtual DeviceManagerTypeT::TypeE getDeviceManagerType() const = 0;
+    [[nodiscard]] virtual DeviceManagerTypeT::TypeE getDeviceManagerType() const = 0;
 
-    virtual bool isReady() const = 0;
+    [[nodiscard]] virtual bool isReady() const = 0;
 
     /**
      *

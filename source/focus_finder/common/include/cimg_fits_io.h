@@ -23,7 +23,7 @@
  ****************************************************************************/
 
 #ifndef SOURCE_FOCUS_FINDER_COMMON_INCLUDE_CIMG_FITS_IO_H_
-#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_CIMG_FITS_IO_H_
+#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_CIMG_FITS_IO_H_ SOURCE_FOCUS_FINDER_COMMON_INCLUDE_CIMG_FITS_IO_H_
 
 #include "exception.h"
 #include "image.h"

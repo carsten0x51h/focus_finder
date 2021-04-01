@@ -23,26 +23,26 @@
  ****************************************************************************/
 
 #ifndef SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FOCUS_FINDER_VALIDATION_EXCEPTION_H_
-#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FOCUS_FINDER_VALIDATION_EXCEPTION_H_
+#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FOCUS_FINDER_VALIDATION_EXCEPTION_H_ SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FOCUS_FINDER_VALIDATION_EXCEPTION_H_
 
 #include <string>
 #include <exception>
+#include <utility>
 
 // TODO: Maybe later add details about the validation problem...
 class ValidationExceptionT : public std::exception {
 public:
-    ValidationExceptionT(const std::string &inMsg = "") :
-            mName("ValidationExceptionT"), mMsg(inMsg) {
+    explicit ValidationExceptionT(std::string inMsg = "") :
+            mName("ValidationExceptionT"), mMsg(std::move(inMsg)) {
     }
 
-    ~ValidationExceptionT() throw() {
-    }
+    ~ValidationExceptionT() noexcept override = default;
 
-    const char *what() const throw() {
+    [[nodiscard]] const char *what() const noexcept override {
         return mMsg.c_str();
     }
 
-    const char *getName() const throw() {
+    [[nodiscard]] const char *getName() const noexcept {
         return mName.c_str();
     }
 

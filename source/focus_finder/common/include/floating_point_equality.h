@@ -23,7 +23,7 @@
  ****************************************************************************/
 
 #ifndef SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FLOATING_POINT_EQUALITY_H_
-#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FLOATING_POINT_EQUALITY_H_
+#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FLOATING_POINT_EQUALITY_H_ SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FLOATING_POINT_EQUALITY_H_
 
 #include <limits>
 #include <cmath>  /* for std::abs(double) */

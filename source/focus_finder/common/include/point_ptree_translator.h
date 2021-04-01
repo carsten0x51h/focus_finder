@@ -23,7 +23,7 @@
  ****************************************************************************/
 
 #ifndef SOURCE_FOCUS_FINDER_COMMON_INCLUDE_POINT_PTREE_TRANSLATOR_H_
-#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_POINT_PTREE_TRANSLATOR_H_
+#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_POINT_PTREE_TRANSLATOR_H_ SOURCE_FOCUS_FINDER_COMMON_INCLUDE_POINT_PTREE_TRANSLATOR_H_
 
 #include "point.h"
 #include "validation_exception.h"
@@ -71,8 +71,7 @@ struct PointTranslatorT {
 };
 
 
-namespace boost {
-    namespace property_tree {
+namespace boost::property_tree {
 
         template<typename Ch, typename Traits, typename Alloc>
         struct translator_between<std::basic_string<Ch, Traits, Alloc>, PointT<float> > {
@@ -84,7 +83,6 @@ namespace boost {
             typedef PointTranslatorT<int> type;
         };
 
-    } // namespace property_tree
-}
+    }
 
 #endif /*SOURCE_FOCUS_FINDER_COMMON_INCLUDE_POINT_PTREE_TRANSLATOR_H_*/

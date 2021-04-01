@@ -23,36 +23,36 @@
  ****************************************************************************/
 
 #ifndef SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FOCUS_FINDER_CURVE_FIT_EXCEPTION_H_
-#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FOCUS_FINDER_CURVE_FIT_EXCEPTION_H_
+#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FOCUS_FINDER_CURVE_FIT_EXCEPTION_H_ SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FOCUS_FINDER_CURVE_FIT_EXCEPTION_H_
 
 #include <string>
 #include <exception>
+#include <utility>
 
 #include "curve_fit_summary.h"
 
 class CurveFitExceptionT : public std::exception {
 public:
-    CurveFitExceptionT(const std::string &inMsg = "") :
-            mName("CurveFitException"), mMsg(inMsg) {
+    explicit CurveFitExceptionT(std::string inMsg = "") :
+            mName("CurveFitException"), mMsg(std::move(inMsg)) {
     }
 
-    CurveFitExceptionT(const std::string &inMsg,
-                       const CurveFitSummaryT &inSummary) :
-            mName("CurveFitException"), mMsg(inMsg), mSummary(inSummary) {
+    CurveFitExceptionT(std::string inMsg,
+                       CurveFitSummaryT inSummary) :
+            mName("CurveFitException"), mMsg(std::move(inMsg)), mSummary(std::move(inSummary)) {
     }
 
-    ~CurveFitExceptionT() throw() {
-    }
+    ~CurveFitExceptionT() noexcept override = default;
 
-    const char *what() const throw() {
+    [[nodiscard]] const char *what() const noexcept override {
         return mMsg.c_str();
     }
 
-    const char *getName() const throw() {
+    [[nodiscard]] const char *getName() const noexcept {
         return mName.c_str();
     }
 
-    const CurveFitSummaryT &getSummary() const throw() {
+    [[nodiscard]] const CurveFitSummaryT &getSummary() const noexcept {
         return mSummary;
     }
 

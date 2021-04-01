@@ -39,8 +39,8 @@
  * TODO: Add LOG msgs to HfdT.
  */
 
-#ifndef _HFD_H_
-#define _HFD_H_ _HFD_H_
+#ifndef SOURCE_FOCUS_FINDER_COMMON_INCLUDE_HFD_H_
+#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_HFD_H_ SOURCE_FOCUS_FINDER_COMMON_INCLUDE_HFD_H_
 
 #include "image.h"
 #include "point.h"
@@ -52,43 +52,41 @@ DEF_Exception(Hfd);
 class HfdT {
 private:
     ImageT mImg;
-    float mHfdValue;
-    unsigned int mOuterDiameter;
+    float mHfdValue{};
+    float mOuterDiameter{};
 
 public:
 // NOTE: There is a bug in centerPosToFrame() which does not calculate the frame correct! Putting a 31 here hence leads to an exception...
 //       Fixing this bug leads to another problem where the center of the star does not seem to be calculated correctly any longer - the
 //       cross is shifted to the top-left in most of the cases.
 // NOTE: 27 gives better results with simulator! - Anyhow, 21 could be much better with real telescope.... TEST...
-    static const unsigned int outerHfdDiameter = 27; // TODO: Calc?! - depends on pixel size and focal length (and seeing...) WAS 21!!!
+    static const float outerHfdDiameter; // TODO: Calc?! - depends on pixel size and focal length (and seeing...) WAS 21!!!
 
     static bool
-    insideCircle(float inX /*pos of x*/, float inY /*pos of y*/, float inCenterX, float inCenterY, float inRadius) {
-        return (std::pow(inX - inCenterX, 2.0) + std::pow(inY - inCenterY, 2.0) <= std::pow(inRadius, 2.0));
-    }
+    insideCircle(float inX /*pos of x*/, float inY /*pos of y*/, float inCenterX, float inCenterY, float inRadius);
 
 
     HfdT() :
             mHfdValue(0), mOuterDiameter(outerHfdDiameter) {
     }
 
-    HfdT(const ImageT &inImage,
-         unsigned int inOuterDiameter = outerHfdDiameter, bool inSubMean =
+    explicit HfdT(const ImageT &inImage,
+         float inOuterDiameter = outerHfdDiameter, bool inSubMean =
     true) {
         this->set(inImage, inOuterDiameter, inSubMean);
     }
 
-    inline void set(const ImageT &inImage, unsigned int inOuterDiameter =
+    inline void set(const ImageT &inImage, float inOuterDiameter =
     outerHfdDiameter, bool inSubMean = true) {
         mHfdValue = HfdT::calc(inImage, inOuterDiameter, &mImg, inSubMean);
         mOuterDiameter = inOuterDiameter;
     }
 
-    static float calc(const ImageT &inImage, unsigned int inOuterDiameter =
-    outerHfdDiameter, ImageT *outCenteredImg = 0,
+    static float calc(const ImageT &inImage, float inOuterDiameter =
+    outerHfdDiameter, ImageT *outCenteredImg = nullptr,
                       bool inSubMean = true);
 
-    inline bool valid() const {
+    [[nodiscard]] inline bool valid() const {
         return (mHfdValue > 0 && mImg.width() > 0 && mImg.height() > 0);
     }
 
@@ -97,15 +95,15 @@ public:
         mImg.assign(); // In-place version of the default constructor CImg(). It simply resets the instance to an empty image.
     }
 
-    inline float getValue() const {
+    [[nodiscard]] inline float getValue() const {
         return mHfdValue;
     }
 
-    inline const ImageT &getResultImage() const {
+    [[nodiscard]] inline const ImageT &getResultImage() const {
         return mImg;
     }
 
-    inline float getOuterDiameter() const {
+    [[nodiscard]] inline float getOuterDiameter() const {
         return mOuterDiameter;
     }
 
@@ -113,10 +111,10 @@ public:
     // NOTE: mOuterDiameter / (2.0 * sqrt(2))
     // TODO: Why 2*sqrt(2)?
     static float getMaxHfdLimit(float inOuterHfdDiameter) {
-        return 0.353553390593 * inOuterHfdDiameter;
+        return 0.353553390593f * inOuterHfdDiameter;
     }
 
-    inline float getMaxHfdLimit() const {
+    [[nodiscard]] inline float getMaxHfdLimit() const {
         return HfdT::getMaxHfdLimit(mOuterDiameter);
     }
 

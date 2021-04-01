@@ -23,7 +23,7 @@
  ****************************************************************************/
 
 #ifndef SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FOCUS_INTERFACE_H_
-#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FOCUS_INTERFACE_H_
+#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FOCUS_INTERFACE_H_ SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FOCUS_INTERFACE_H_
 
 #include <memory>
 #include <boost/signals2.hpp>
@@ -45,36 +45,35 @@ private:
     FocusPositionChangedListenersT mFocusPositionChangedListeners;
     FocusMovementAbortedListenersT mFocusMovementAbortedListeners;
 
-    // We do not want device copies
-    FocusInterfaceT(const FocusInterfaceT &);
-
-    FocusInterfaceT &operator=(const FocusInterfaceT &);
-
 public:
-    FocusInterfaceT() {}
+    FocusInterfaceT() = default;
 
-    DeviceInterfaceTypeT::TypeE getType() const { return DeviceInterfaceTypeT::FOCUS; }
+    // We do not want device copies
+    FocusInterfaceT(const FocusInterfaceT &) = delete;
+    FocusInterfaceT &operator=(const FocusInterfaceT &) = delete;
+
+    [[nodiscard]] DeviceInterfaceTypeT::TypeE getType() const { return DeviceInterfaceTypeT::FOCUS; }
 
     /**
 	 * Temperature
 	 */
-    virtual bool isTemperatureSupported() const = 0;
+    [[nodiscard]] virtual bool isTemperatureSupported() const = 0;
 
-    virtual float getTemperature() const = 0;
+    [[nodiscard]] virtual float getTemperature() const = 0;
 
     /**
     * Generic
     */
-    virtual bool isMoving() const = 0;
+    [[nodiscard]] virtual bool isMoving() const = 0;
 
     /**
     * Positioning
     */
-    virtual bool isAbsPosSupported() const = 0;
+    [[nodiscard]] virtual bool isAbsPosSupported() const = 0;
 
-    virtual int getCurrentPos() const = 0;
+    [[nodiscard]] virtual int getCurrentPos() const = 0;
 
-    virtual int getTargetPos() const = 0;
+    [[nodiscard]] virtual int getTargetPos() const = 0;
 
     virtual void setTargetPos(unsigned int inTicks, FocusDirectionT::TypeE direction) = 0;
 
@@ -82,9 +81,9 @@ public:
 
     virtual void resetPositionCounter() = 0;
 
-    virtual int getMinAbsPos() const = 0;
+    [[nodiscard]] virtual int getMinAbsPos() const = 0;
 
-    virtual int getMaxAbsPos() const = 0;
+    [[nodiscard]] virtual int getMaxAbsPos() const = 0;
 
 
     /**
@@ -118,7 +117,7 @@ public:
     /**
     * Abort handling
     */
-    virtual bool isAbortSupported() const = 0;
+    [[nodiscard]] virtual bool isAbortSupported() const = 0;
 
     virtual void abortMotion() = 0;
 

@@ -23,7 +23,7 @@
  ****************************************************************************/
 
 #ifndef SOURCE_FOCUS_FINDER_COMMON_INCLUDE_TASK_EXECUTOR_H_
-#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_TASK_EXECUTOR_H_
+#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_TASK_EXECUTOR_H_ SOURCE_FOCUS_FINDER_COMMON_INCLUDE_TASK_EXECUTOR_H_
 
 #include <memory>
 #include <thread>
@@ -32,11 +32,6 @@
 
 template<typename Task>
 class TaskExecutorT {
-private:
-    // Prevent copy of TaskExecutor
-    TaskExecutorT(const TaskExecutorT &);
-
-    TaskExecutorT &operator=(const TaskExecutorT &);
 
 public:
     TaskExecutorT() : mTask(nullptr) {
@@ -44,6 +39,10 @@ public:
 
         reset();
     }
+
+    // Prevent copy of TaskExecutor
+    TaskExecutorT(const TaskExecutorT &) = delete;
+    TaskExecutorT &operator=(const TaskExecutorT &) = delete;
 
     ~TaskExecutorT() {
         LOG(debug) << "TaskExecutorT::~TaskExecutorT..." << std::endl;

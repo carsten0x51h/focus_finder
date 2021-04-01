@@ -23,7 +23,7 @@
  ****************************************************************************/
 
 #ifndef SOURCE_FOCUS_FINDER_COMMON_INCLUDE_PROFILE_MANAGER_H_
-#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_PROFILE_MANAGER_H_
+#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_PROFILE_MANAGER_H_ SOURCE_FOCUS_FINDER_COMMON_INCLUDE_PROFILE_MANAGER_H_
 
 #include <memory>
 #include <map>

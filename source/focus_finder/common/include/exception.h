@@ -23,18 +23,19 @@
  ****************************************************************************/
 
 #ifndef SOURCE_FOCUS_FINDER_COMMON_INCLUDE_EXCEPTION_H_
-#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_EXCEPTION_H_
+#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_EXCEPTION_H_ SOURCE_FOCUS_FINDER_COMMON_INCLUDE_EXCEPTION_H_
 
 #include <sstream>
 #include <string>
+#include <utility>
 
 class BaseExceptionT : public std::exception {
 public:
-    BaseExceptionT(const std::string &inName = "", const std::string &inMsg = "") : mName(inName), mMsg(inMsg) {}
+    explicit BaseExceptionT(std::string inName = "", std::string inMsg = "") : mName(std::move(inName)), mMsg(std::move(inMsg)) {}
 
-    ~BaseExceptionT() throw() {}
+    ~BaseExceptionT() noexcept override = default;
 
-    const char *what() const throw() { return mMsg.c_str(); }
+    [[nodiscard]] const char *what() const noexcept override { return mMsg.c_str(); }
 
 private:
     std::string mName;

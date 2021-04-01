@@ -23,7 +23,7 @@
  ****************************************************************************/
 
 #ifndef SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FOCUS_FINDER_PROFILE_H_
-#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FOCUS_FINDER_PROFILE_H_
+#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FOCUS_FINDER_PROFILE_H_ SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FOCUS_FINDER_PROFILE_H_
 
 #include <string>
 
@@ -56,26 +56,26 @@ public:
 
     ~FocusFinderProfileT();
 
-    const std::string &getName() const;
+    [[nodiscard]] const std::string &getName() const;
 
     void setName(const std::string &name);
 
-    const TimestampT &getLastChanged() const;
+    [[nodiscard]] const TimestampT &getLastChanged() const;
 
     void setLastChanged(const TimestampT &lastChanged);
 
-    const std::string &getDescription() const;
+    [[nodiscard]] const std::string &getDescription() const;
 
     void setDescription(const std::string &description);
 
     /**
      * Camera settings
      */
-    std::string getCameraDeviceName() const;
+    [[nodiscard]] std::string getCameraDeviceName() const;
 
     void setCameraDeviceName(const std::string &cameraDeviceName);
 
-    const SizeT<float> &getCameraPixelSize() const;
+    [[nodiscard]] const SizeT<float> &getCameraPixelSize() const;
 
     void setCameraPixelSize(const SizeT<float> &cameraPixelSize);
 
@@ -85,14 +85,14 @@ public:
     /**
      * Focus settings
      */
-    std::string getFocusDeviceName() const;
+    [[nodiscard]] std::string getFocusDeviceName() const;
 
     void setFocusDeviceName(const std::string &focusDeviceName);
 
     /**
      * Filter settings
      */
-    std::string getFilterDeviceName() const;
+    [[nodiscard]] std::string getFilterDeviceName() const;
 
     void setFilterDeviceName(const std::string &filterDeviceName);
 
@@ -103,39 +103,39 @@ public:
      *
      * 1. Imaging
      */
-    const SizeT<unsigned int> &getStarWindowSize() const;
+    [[nodiscard]] const SizeT<unsigned int> &getStarWindowSize() const;
 
     void setStarWindowSize(const SizeT<unsigned int> &starWindowSize);
 
-    CentroidTypeT::TypeE getCentroidMethod() const;
+    [[nodiscard]] CentroidTypeT::TypeE getCentroidMethod() const;
 
     void setCentroidMethod(CentroidTypeT::TypeE centroidMethod);
 
-    bool getEnableStarAutoTracking() const;
+    [[nodiscard]] bool getEnableStarAutoTracking() const;
 
     void setEnableStarAutoTracking(bool enableStarAutoTracking);
 
-    size_t getNumFramesPerFocusPos() const;
+    [[nodiscard]] size_t getNumFramesPerFocusPos() const;
 
     void setNumFramesPerFocusPos(size_t numFramesPerFocusPos);
 
-    size_t getStarDetectionSnrBoundary() const;
+    [[nodiscard]] size_t getStarDetectionSnrBoundary() const;
 
     void setStarDetectionSnrBoundary(float starDetectionSnrBoundary);
 
-    int getFocusingFilterPos() const;
+    [[nodiscard]] int getFocusingFilterPos() const;
 
     void setFocusingFilterPos(int focusingFilterPos);
 
-    bool getEnableCameraCooler() const;
+    [[nodiscard]] bool getEnableCameraCooler() const;
 
     void setEnableCameraCooler(bool enableCameraCooler);
 
-    int getCameraCoolerTargetTemperature() const;
+    [[nodiscard]] int getCameraCoolerTargetTemperature() const;
 
     void setCameraCoolerTargetTemperature(int cameraCoolerTargetTemperature);
 
-    std::chrono::duration<float> getExposureTime() const;
+    [[nodiscard]] std::chrono::duration<float> getExposureTime() const;
 
     void setExposureTime(std::chrono::duration<float> exposureTime);
 
@@ -143,23 +143,23 @@ public:
     /**
      * 2. Focus curve recording
      */
-    FocusMeasureTypeT::TypeE getLimitFocusMeasureType() const;
+    [[nodiscard]] FocusMeasureTypeT::TypeE getLimitFocusMeasureType() const;
 
     void setLimitFocusMeasureType(FocusMeasureTypeT::TypeE limitFocusMeasureType);
 
-    FocusMeasureTypeT::TypeE getCurveFocusMeasureType() const;
+    [[nodiscard]] FocusMeasureTypeT::TypeE getCurveFocusMeasureType() const;
 
     void setCurveFocusMeasureType(FocusMeasureTypeT::TypeE curveFocusMeasureType);
 
-    int getStepSize() const;
+    [[nodiscard]] int getStepSize() const;
 
     void setStepSize(int stepSize);
 
-    size_t getNumberCurvesToRecord() const;
+    [[nodiscard]] size_t getNumberCurvesToRecord() const;
 
     void setNumberCurvesToRecord(size_t numberCurvesToRecord);
 
-    float getFocusMeasureLimit() const;
+    [[nodiscard]] float getFocusMeasureLimit() const;
 
     void setFocusMeasureLimit(float focusMeasureLimit);
 
@@ -167,7 +167,7 @@ public:
     /**
      * 3. Focus curve matching
      */
-    CurveFitParmsT getFocusCurveMatchingParms() const;
+    [[nodiscard]] CurveFitParmsT getFocusCurveMatchingParms() const;
 
     void setFocusCurveMatchingParms(const CurveFitParmsT &focusCurveMatchingParms);
 
@@ -175,11 +175,11 @@ public:
     /**
      * Focus finder calibration data
      */
-    std::shared_ptr<FocusFinderCalibrationT> getFocusFinderCalibration() const;
+    [[nodiscard]] std::shared_ptr<FocusFinderCalibrationT> getFocusFinderCalibration() const;
 
     void setFocusFinderCalibration(std::shared_ptr<FocusFinderCalibrationT> focusFinderCalibration);
 
-    bool hasCalibrationData() const;
+    [[nodiscard]] bool hasCalibrationData() const;
 
 
     /**

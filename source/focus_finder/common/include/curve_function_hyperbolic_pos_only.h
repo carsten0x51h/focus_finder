@@ -23,7 +23,7 @@
  ****************************************************************************/
 
 #ifndef SOURCE_FOCUS_FINDER_COMMON_INCLUDE_CURVE_FUNCTION_HYPERBOLIC_POS_ONLY_H_
-#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_CURVE_FUNCTION_HYPERBOLIC_POS_ONLY_H_
+#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_CURVE_FUNCTION_HYPERBOLIC_POS_ONLY_H_ SOURCE_FOCUS_FINDER_COMMON_INCLUDE_CURVE_FUNCTION_HYPERBOLIC_POS_ONLY_H_
 
 #include "curve_function.h"
 #include "curve_parms.h"
@@ -51,17 +51,17 @@ public:
         MAC_AS_TYPE(Type, E, _Count);
     };
 
-    CurveFunctionHyperbolicPosOnlyT(const CurveParmsT &curveParms);
+    explicit CurveFunctionHyperbolicPosOnlyT(const CurveParmsT &curveParms);
 
-    std::string getName() const;
+    [[nodiscard]] std::string getName() const override;
 
-    float f(float x) const;
+    [[nodiscard]] float f(float x) const override;
 
-    float f_inv(float x) const;
+    [[nodiscard]] float f_inv(float x) const override;
 
-    PointFT min() const;
+    [[nodiscard]] PointFT min() const override;
 
-    PointFT max() const;
+    [[nodiscard]] PointFT max() const override;
 };
 
 #endif /*SOURCE_FOCUS_FINDER_COMMON_INCLUDE_CURVE_FUNCTION_HYPERBOLIC_POS_ONLY_H_*/

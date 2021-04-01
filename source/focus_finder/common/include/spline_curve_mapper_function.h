@@ -23,7 +23,7 @@
  ****************************************************************************/
 
 #ifndef SOURCE_FOCUS_FINDER_COMMON_INCLUDE_SPLINE_CURVE_MAPPER_FUNCTION_H_
-#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_SPLINE_CURVE_MAPPER_FUNCTION_H_
+#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_SPLINE_CURVE_MAPPER_FUNCTION_H_ SOURCE_FOCUS_FINDER_COMMON_INCLUDE_SPLINE_CURVE_MAPPER_FUNCTION_H_
 
 #include <string>
 
@@ -35,15 +35,15 @@ public:
 
     virtual ~SplineCurveMapperFunctionT();
 
-    std::string getName() const;
+    [[nodiscard]] std::string getName() const override;
 
     // TODO: Maybe move to parent class
-    void setSrcRange(float from, float to);
+    void setSrcRange(float from, float to) override;
 
     // TODO: Maybe move to parent class
-    void setDestRange(float from, float to);
+    void setDestRange(float from, float to) override;
 
-    float f(float f);
+    float f(float f) override;
 
 private:
 

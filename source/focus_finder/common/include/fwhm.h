@@ -46,11 +46,11 @@
  *
  */
 
-#ifndef _FWHM_H_
-#define _FWHM_H_ _FWHM_H_
+#ifndef SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FWHM_H_
+#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FWHM_H_ SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FWHM_H_
 
 #include <vector>
-#include <math.h>
+#include <cmath>
 #include <iostream>
 
 #include "size.h"
@@ -86,13 +86,13 @@ private:
 public:
     FwhmT();
 
-    FwhmT(const std::vector<float> &inValues, double inEpsAbs = 1e-1,
+    explicit FwhmT(const std::vector<float> &inValues, double inEpsAbs = 1e-1,
           double inEpsRel = 1e-1, bool inThrowIfNotValid = true);
 
     void set(const std::vector<float> &inValues, double inEpsAbs = 1e-1,
              double inEpsRel = 1e-1, bool inThrowIfNotValid = true);
 
-    bool valid() const;
+    [[nodiscard]] bool valid() const;
 
     void reset();
 
@@ -113,15 +113,15 @@ public:
         return sigma / FwhmT::SIGMA_TO_FWHM;
     }
 
-    float getValue(bool inThrowIfNotValid = true) const;
+    [[nodiscard]] float getValue(bool inThrowIfNotValid = true) const;
 
-    const std::vector<PointFT> &getImgValues() const;
+    [[nodiscard]] const std::vector<PointFT> &getImgValues() const;
 
-    const std::vector<PointFT> &getFitValues() const;
+    [[nodiscard]] const std::vector<PointFT> &getFitValues() const;
 
-    const std::vector<PointWithResidualT> &getOutlierValues() const;
+    [[nodiscard]] const std::vector<PointWithResidualT> &getOutlierValues() const;
 
-    float getStandardDeviation() const;
+    [[nodiscard]] float getStandardDeviation() const;
 
     std::ostream &print(std::ostream &os, bool inPrintDetails = false) const;
 

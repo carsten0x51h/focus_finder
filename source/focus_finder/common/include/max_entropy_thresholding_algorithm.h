@@ -23,16 +23,16 @@
  ****************************************************************************/
 
 #ifndef SOURCE_FOCUS_FINDER_COMMON_INCLUDE_MAX_ENTROPY_THRESHOLDING_ALGORITHM_H_
-#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_MAX_ENTROPY_THRESHOLDING_ALGORITHM_H_
+#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_MAX_ENTROPY_THRESHOLDING_ALGORITHM_H_ SOURCE_FOCUS_FINDER_COMMON_INCLUDE_MAX_ENTROPY_THRESHOLDING_ALGORITHM_H_
 
 #include "thresholding_algorithm.h"
 #include "image.h"
 
 class MaxEntropyThresholdingAlgorithmT : public ThresholdingAlgorithmT {
 public:
-    std::string getName() const;
+    [[nodiscard]] std::string getName() const override;
 
-    float calc(const ImageT &inImg, long bitDepth) const;
+    [[nodiscard]] float calc(const ImageT &inImg, long bitDepth) const override;
 };
 
 #endif /*SOURCE_FOCUS_FINDER_COMMON_INCLUDE_MAX_ENTROPY_THRESHOLDING_ALGORITHM_H_*/

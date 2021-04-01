@@ -23,26 +23,21 @@
  ****************************************************************************/
 
 #ifndef SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FOCUS_FINDER_H_
-#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FOCUS_FINDER_H_
+#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FOCUS_FINDER_H_ SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FOCUS_FINDER_H_
 
 #include <memory>
 #include <functional>
+#include <utility>
 
 #include "exception.h"
 
 class FocusCurveRecordT;
-
 class FocusControllerT;
 
 //DEF_Exception(FocusFinderCancelled);
 
 class FocusFinderT {
 private:
-    // Prevent copy of FocusFinder
-    FocusFinderT(const FocusFinderT &);
-
-    FocusFinderT &operator=(const FocusFinderT &);
-
     typedef boost::signals2::signal<void()> FocusFinderStartedListenersT;
     FocusFinderStartedListenersT mFocusFinderStartedListeners;
 
@@ -59,17 +54,20 @@ private:
     std::shared_ptr<FocusControllerT> mFocusController;
 
 public:
-    FocusFinderT(std::shared_ptr<FocusControllerT> focusAnalyzer) : mFocusController(focusAnalyzer) {
+    explicit FocusFinderT(std::shared_ptr<FocusControllerT> focusAnalyzer) : mFocusController(std::move(focusAnalyzer)) {
     }
 
-    virtual ~FocusFinderT() {
-    }
+    // Prevent copy of FocusFinder
+    FocusFinderT(const FocusFinderT &) = delete;
+    FocusFinderT &operator=(const FocusFinderT &) = delete;
+
+    virtual ~FocusFinderT() = default;
 
     std::shared_ptr<FocusControllerT> getFocusController() { return mFocusController; }
 
-    virtual std::string getName() const = 0;
+    [[nodiscard]] virtual std::string getName() const = 0;
 
-    virtual bool isRunning() const = 0;
+    [[nodiscard]] virtual bool isRunning() const = 0;
 
     virtual void run() = 0;
 
@@ -132,7 +130,7 @@ protected:
     void notifyFocusFinderProgressUpdate(float progress,
                                          const std::string &msg,
                                          std::shared_ptr<FocusCurveRecordT> focusCurveRecord = nullptr) const {
-        mFocusFinderProgressUpdateListeners(progress, msg, focusCurveRecord);
+        mFocusFinderProgressUpdateListeners(progress, msg, std::move(focusCurveRecord));
     }
 
     void notifyFocusFinderFinished() const {

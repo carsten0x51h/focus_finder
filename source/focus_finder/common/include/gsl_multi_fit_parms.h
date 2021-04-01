@@ -23,8 +23,9 @@
  ****************************************************************************/
 
 #ifndef SOURCE_FOCUS_FINDER_COMMON_INCLUDE_GSL_MULTI_FIT_PARMS_H_
-#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_GSL_MULTI_FIT_PARMS_H_
+#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_GSL_MULTI_FIT_PARMS_H_ SOURCE_FOCUS_FINDER_COMMON_INCLUDE_GSL_MULTI_FIT_PARMS_H_
 
+#include <utility>
 #include <vector>
 #include "point.h"
 
@@ -33,7 +34,7 @@
 ///////////////////////////////////////////////////////////////////////
 struct GslMultiFitDataT {
     //GslMultiFitDataT() : y(0.0f), sigma(0.0f) {}
-    GslMultiFitDataT(float y, float sigma, PointFT pt) : y(y), sigma(sigma), pt(pt) {}
+    GslMultiFitDataT(float y, float sigma, PointFT pt) : y(y), sigma(sigma), pt(std::move(pt)) {}
 
     float y;
     float sigma;

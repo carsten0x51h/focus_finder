@@ -23,7 +23,7 @@
  ****************************************************************************/
 
 #ifndef SOURCE_FOCUS_FINDER_COMMON_INCLUDE_DRAW_HELPER_H_
-#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_DRAW_HELPER_H_
+#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_DRAW_HELPER_H_ SOURCE_FOCUS_FINDER_COMMON_INCLUDE_DRAW_HELPER_H_
 
 #include "image.h"
 #include "point.h"

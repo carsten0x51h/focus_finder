@@ -51,7 +51,7 @@
 
 class LmCurveMatcherT {
 public:
-    LmCurveMatcherT(std::shared_ptr<LmFittingCurveT> lmFittingCurve);
+    explicit LmCurveMatcherT(std::shared_ptr<LmFittingCurveT> lmFittingCurve);
 
     // TODO: Replace CurveFitParmsT & by LmCurveMatcherParmsT... (new class which does not hold outlier stuff... -> also reduced dependencies...)
     template<typename RngT>

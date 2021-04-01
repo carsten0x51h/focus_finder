@@ -23,7 +23,7 @@
  ****************************************************************************/
 
 #ifndef SOURCE_FOCUS_FINDER_COMMON_INCLUDE_DEVICE_INTERFACE_H_
-#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_DEVICE_INTERFACE_H_
+#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_DEVICE_INTERFACE_H_ SOURCE_FOCUS_FINDER_COMMON_INCLUDE_DEVICE_INTERFACE_H_
 
 #include <memory>
 #include "device_interface_type.h"

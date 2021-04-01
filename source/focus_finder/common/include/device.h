@@ -23,7 +23,7 @@
  ****************************************************************************/
 
 #ifndef SOURCE_FOCUS_FINDER_COMMON_INCLUDE_DEVICE_H_
-#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_DEVICE_H_
+#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_DEVICE_H_ SOURCE_FOCUS_FINDER_COMMON_INCLUDE_DEVICE_H_
 
 #include <memory>
 #include <set>

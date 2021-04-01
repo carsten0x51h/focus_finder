@@ -23,7 +23,7 @@
  ****************************************************************************/
 
 #ifndef SOURCE_FOCUS_FINDER_COMMON_INCLUDE_RECT_H_
-#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_RECT_H_
+#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_RECT_H_ SOURCE_FOCUS_FINDER_COMMON_INCLUDE_RECT_H_
 
 #include <tuple>
 
@@ -88,7 +88,7 @@ public:
         std::get<3>(*this) = height;
     }
 
-    bool isSet() const {
+    [[nodiscard]] bool isSet() const {
         return mIsSet;
     }
 

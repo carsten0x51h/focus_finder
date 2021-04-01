@@ -23,7 +23,7 @@
  ****************************************************************************/
 
 #ifndef SOURCE_FOCUS_FINDER_COMMON_INCLUDE_CURVE_PARM_H_
-#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_CURVE_PARM_H_
+#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_CURVE_PARM_H_ SOURCE_FOCUS_FINDER_COMMON_INCLUDE_CURVE_PARM_H_
 
 #include <fstream>
 #include <string>

@@ -23,7 +23,7 @@
  ****************************************************************************/
 
 #ifndef SOURCE_FOCUS_FINDER_COMMON_INCLUDE_CURVE_FUNCTION_GAUSSIAN_H_
-#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_CURVE_FUNCTION_GAUSSIAN_H_
+#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_CURVE_FUNCTION_GAUSSIAN_H_ SOURCE_FOCUS_FINDER_COMMON_INCLUDE_CURVE_FUNCTION_GAUSSIAN_H_
 
 #include "curve_function.h"
 #include "curve_parms.h"

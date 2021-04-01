@@ -23,11 +23,12 @@
  ****************************************************************************/
 
 #ifndef SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FOCUS_CURVE_RECORDER_H_
-#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FOCUS_CURVE_RECORDER_H_
+#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FOCUS_CURVE_RECORDER_H_ SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FOCUS_CURVE_RECORDER_H_
 
 #include <memory>
 #include <functional>
 #include <boost/signals2.hpp>
+#include <utility>
 
 #include "exception.h"
 
@@ -40,7 +41,6 @@
 // DEF_Exception(FocusCurveRecorderCancelled);
 
 class FocusCurveRecordT;
-
 class FocusCurveRecordSetT;
 
 class FocusCurveRecorderT {
@@ -74,7 +74,7 @@ private:
     std::shared_ptr<FocusControllerT> mFocusController;
 
 public:
-    explicit FocusCurveRecorderT(std::shared_ptr<FocusControllerT> focusController) : mFocusController(focusController) {
+    explicit FocusCurveRecorderT(std::shared_ptr<FocusControllerT> focusController) : mFocusController(std::move(focusController)) {
     }
 
     virtual ~FocusCurveRecorderT() = default;

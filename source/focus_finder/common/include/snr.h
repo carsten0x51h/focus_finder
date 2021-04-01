@@ -23,7 +23,7 @@
  ****************************************************************************/
 
 #ifndef SOURCE_FOCUS_FINDER_COMMON_INCLUDE_SNR_H_
-#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_SNR_H_
+#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_SNR_H_ SOURCE_FOCUS_FINDER_COMMON_INCLUDE_SNR_H_
 
 #include "image.h"
 
@@ -33,7 +33,7 @@
 
 class SnrT {
 private:
-    SnrT() {}; // private for now
+    SnrT() = default;; // private for now
 
 public:
     /**

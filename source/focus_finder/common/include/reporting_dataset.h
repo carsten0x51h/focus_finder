@@ -23,7 +23,7 @@
  ****************************************************************************/
 
 #ifndef SOURCE_FOCUS_FINDER_COMMON_INCLUDE_REPORTING_DATASET_H_
-#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_REPORTING_DATASET_H_
+#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_REPORTING_DATASET_H_ SOURCE_FOCUS_FINDER_COMMON_INCLUDE_REPORTING_DATASET_H_
 
 #include <string>
 #include <fstream>
@@ -42,13 +42,13 @@ public:
 
     ReportingDatasetT(const std::string &sender, const std::string &title, const std::string &details);
 
-    std::time_t getTime() const;
+    [[nodiscard]] std::time_t getTime() const;
 
-    std::string getSender() const;
+    [[nodiscard]] std::string getSender() const;
 
-    std::string getTitle() const;
+    [[nodiscard]] std::string getTitle() const;
 
-    std::string getDetails() const;
+    [[nodiscard]] std::string getDetails() const;
 
     friend std::ostream &operator<<(std::ostream &os, const ReportingDatasetT &reportingDataset);
 };

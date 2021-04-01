@@ -23,7 +23,7 @@
  ****************************************************************************/
 
 #ifndef SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FRAME_H_
-#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FRAME_H_
+#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FRAME_H_ SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FRAME_H_
 
 #include <memory>
 
@@ -31,6 +31,7 @@
 #include "rect.h"
 #include "binning.h"
 
+// TODO: Should "Frame" hold an image? Or should it be renamed to ImageFrameT?
 class FrameT {
 public:
     FrameT();
@@ -38,28 +39,28 @@ public:
     void setImage(std::shared_ptr<const ImageT> image);
 
     // TODO: Does this return only the ROI as image or the entire image???
-    std::shared_ptr<const ImageT> getImage() const;
+    [[nodiscard]] std::shared_ptr<const ImageT> getImage() const;
 
-    bool isEmpty() const; // true if no image is set
+    [[nodiscard]] bool isEmpty() const; // true if no image is set
 
     void setRoi(const RectT<unsigned int> &roi);
 
-    const RectT<unsigned int> &getRoi() const;
+    [[nodiscard]] const RectT<unsigned int> &getRoi() const;
 
     void clearRoi();
 
-    RectT<unsigned int> getBounds() const;
+    [[nodiscard]] RectT<unsigned int> getBounds() const;
 
-    bool isSubFrame() const;
+    [[nodiscard]] bool isSubFrame() const;
 
-    bool isFullFrame() const;
+    [[nodiscard]] bool isFullFrame() const;
 
-    const BinningT &getBinning() const;
+    [[nodiscard]] const BinningT &getBinning() const;
 
     void setBinning(const BinningT &binning);
 
 private:
-    bool isRoiSet() const;
+    [[nodiscard]] bool isRoiSet() const;
 
     RectT<unsigned int> mRoi; // TODO: Is unsigned int always ok?
     std::shared_ptr<const ImageT> mImage;

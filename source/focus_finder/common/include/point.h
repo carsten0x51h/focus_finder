@@ -23,7 +23,7 @@
  ****************************************************************************/
 
 #ifndef SOURCE_FOCUS_FINDER_COMMON_INCLUDE_POINT_H_
-#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_POINT_H_
+#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_POINT_H_ SOURCE_FOCUS_FINDER_COMMON_INCLUDE_POINT_H_
 
 #include <tuple>
 

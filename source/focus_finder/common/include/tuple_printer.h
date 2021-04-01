@@ -22,8 +22,8 @@
  *
  ****************************************************************************/
 
-#ifndef __TUPLE_PRINTER__
-#define __TUPLE_PRINTER__ __TUPLE_PRINTER__
+#ifndef SOURCE_FOCUS_FINDER_COMMON_INCLUDE_TUPLE_PRINTER_H_
+#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_TUPLE_PRINTER_H_ SOURCE_FOCUS_FINDER_COMMON_INCLUDE_TUPLE_PRINTER_H_
 
 #include <ostream>
 #include <tuple>
@@ -53,4 +53,4 @@ std::ostream &operator<<(std::ostream &out, const std::tuple<Args...> &t) {
     return out << ')';
 }
 
-#endif /* __TUPLE_PRINTER__ */
+#endif /* SOURCE_FOCUS_FINDER_COMMON_INCLUDE_TUPLE_PRINTER_H_ */

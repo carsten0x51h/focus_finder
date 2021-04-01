@@ -33,13 +33,13 @@
 // TODO: Should this be here?
 typedef PointT<int> PixelPosT;
 typedef std::set<PixelPosT> PixelPosSetT;
-typedef std::list<PixelPosT> StarClusterT;
+typedef std::list<PixelPosT> PixelClusterT;
 
 /**
  * Usage:
  *
  * CImg<float> binImg;
- * std::list<StarClusterT> recognizedPixelClusters = StarClusterAlgorithmT::cluster(binImg);
+ * std::list<PixelClusterT> recognizedPixelClusters = StarClusterAlgorithmT::cluster(binImg);
  */
 class StarClusterAlgorithmT {
 private:
@@ -57,11 +57,11 @@ private:
      */
     void
     getAndRemoveNeighbours(const PixelPosT &inCurPixelPos, PixelPosSetT *inoutWhitePixels,
-                           StarClusterT *inoutPixelsToBeProcessed,
-                           StarClusterT *outPixelCluster);
+                           PixelClusterT *inoutPixelsToBeProcessed,
+                           PixelClusterT *outPixelCluster);
 
 public:
-    StarClusterAlgorithmT(size_t clusterRadius);
+    explicit StarClusterAlgorithmT(size_t clusterRadius);
 
-    std::list<StarClusterT> cluster(const ImageT &inImg);
+    std::list<PixelClusterT> cluster(const ImageT &inImg);
 };

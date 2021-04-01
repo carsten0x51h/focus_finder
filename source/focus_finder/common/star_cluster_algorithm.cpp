@@ -49,8 +49,8 @@ void StarClusterAlgorithmT::initOffsetPattern(int n) {
 
 void
 StarClusterAlgorithmT::getAndRemoveNeighbours(const PixelPosT &inCurPixelPos, PixelPosSetT *inoutWhitePixels,
-                                              StarClusterT *inoutPixelsToBeProcessed,
-                                              StarClusterT *outPixelCluster) {
+                                              PixelClusterT *inoutPixelsToBeProcessed,
+                                              PixelClusterT *outPixelCluster) {
     // TODO: Does not work!
 
     for (const PixelPosT &offset : mOffsets) {
@@ -68,8 +68,8 @@ StarClusterAlgorithmT::getAndRemoveNeighbours(const PixelPosT &inCurPixelPos, Pi
 }
 
 
-std::list<StarClusterT> StarClusterAlgorithmT::cluster(const ImageT &inImg) {
-    std::list<StarClusterT> recognizedClusters;
+std::list<PixelClusterT> StarClusterAlgorithmT::cluster(const ImageT &inImg) {
+    std::list<PixelClusterT> recognizedClusters;
     PixelPosSetT whitePixels;
 
     cimg_forXY(inImg, x, y) {
@@ -80,8 +80,8 @@ std::list<StarClusterT> StarClusterAlgorithmT::cluster(const ImageT &inImg) {
 
     // Iterate over white pixels as long as set is not empty
     while (!whitePixels.empty()) {
-        StarClusterT pixelCluster;
-        StarClusterT pixelsToBeProcessed;
+        PixelClusterT pixelCluster;
+        PixelClusterT pixelsToBeProcessed;
 
         PixelPosSetT::iterator itWhitePixPos = whitePixels.begin();
 

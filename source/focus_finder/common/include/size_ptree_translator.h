@@ -23,18 +23,20 @@
  ****************************************************************************/
 
 #ifndef SOURCE_FOCUS_FINDER_COMMON_INCLUDE_SIZE_PTREE_TRANSLATOR_H_
-#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_SIZE_PTREE_TRANSLATOR_H_
+#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_SIZE_PTREE_TRANSLATOR_H_ SOURCE_FOCUS_FINDER_COMMON_INCLUDE_SIZE_PTREE_TRANSLATOR_H_
 
 #include "size.h"
 #include "validation_exception.h"
 
 #include <boost/property_tree/ptree.hpp>
-//#include <boost/property_tree/json_parser.hpp>
 #include <boost/algorithm/string/predicate.hpp>
 
 #include <boost/regex.hpp>
 #include <boost/any.hpp>
 #include <boost/lexical_cast.hpp>
+
+// IDEA / TODO: Maybe JSON would be better to store the configuration...
+//#include <boost/property_tree/json_parser.hpp>
 
 // Custom translator for bool (only supports std::string)
 

@@ -37,10 +37,7 @@
 #include <boost/log/sources/global_logger_storage.hpp>
 
 #include <boost/log/sinks/text_ostream_backend.hpp>
-//#include <boost/utility/empty_deleter.hpp>
 #include <boost/log/utility/setup/console.hpp>
-
-//#include <boost/regex.hpp>
 
 #include <fstream>
 
@@ -49,7 +46,6 @@ namespace logging = boost::log;
 namespace src = boost::log::sources;
 namespace sinks = boost::log::sinks;
 namespace keywords = boost::log::keywords;
-//namespace po = boost::program_options;
 
 using namespace logging::trivial;
 

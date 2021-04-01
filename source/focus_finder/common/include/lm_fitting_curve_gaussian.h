@@ -65,9 +65,9 @@ public:
 
     float fx(float x, const gsl_vector *curveParms) const override;
 
-    std::string getName() const override;
+    [[nodiscard]] std::string getName() const override;
 
-    std::vector<std::string> getParmNames() const override;
+    [[nodiscard]] std::vector<std::string> getParmNames() const override;
 
     void makeGuess(const GslMultiFitParmsT &inData, gsl_vector *guess) override;
 

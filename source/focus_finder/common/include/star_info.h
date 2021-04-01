@@ -23,19 +23,19 @@
  ****************************************************************************/
 
 #ifndef SOURCE_FOCUS_FINDER_COMMON_INCLUDE_STAR_INFO_H_
-#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_STAR_INFO_H_
+#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_STAR_INFO_H_ SOURCE_FOCUS_FINDER_COMMON_INCLUDE_STAR_INFO_H_
 
 #include "point.h"
 
 class StarInfoT {
 public:
-    const PointT<float> &getCenter() const;
+    [[nodiscard]] const PointT<float> &getCenter() const;
 
     void setCenter(const PointT<float> &center);
 
     void setValidStarDetected(bool validStarDetected);
 
-    bool isValidStarDetected() const;
+    [[nodiscard]] bool isValidStarDetected() const;
 
 
 private:

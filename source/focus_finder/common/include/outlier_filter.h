@@ -23,7 +23,7 @@
  ****************************************************************************/
 
 #ifndef SOURCE_FOCUS_FINDER_COMMON_INCLUDE_OUTLIER_FILTER_H_
-#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_OUTLIER_FILTER_H_
+#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_OUTLIER_FILTER_H_ SOURCE_FOCUS_FINDER_COMMON_INCLUDE_OUTLIER_FILTER_H_
 
 #include <vector>
 
@@ -48,7 +48,7 @@ public:
     template<typename RangeType>
     std::vector<PointFT> filter(const RangeType &pointsWithResiduals) {
 
-        THROW_IF(OutlierFilter, mOutlierBoundary < 0, "outlierBoundary not set!");
+        THROW_IF(OutlierFilter, mOutlierBoundary < 0, "outlierBoundary not set!")
 
         mOutliers.clear();
 
@@ -81,7 +81,6 @@ public:
 
         return matchedDataPoints;
     }
-
 
     std::vector<PointWithResidualT> getOutliers() const;
 };

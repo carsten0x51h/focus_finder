@@ -27,7 +27,7 @@
 
 #include <memory>
 #include <vector>
-#include <stdint.h>
+#include <cstdint>
 
 #include "image.h"
 #include "mapper_function.h"
@@ -41,7 +41,7 @@ public:
 
     void setMapperFunction(std::shared_ptr<MapperFunctionT> mapperFunction);
 
-    std::shared_ptr<MapperFunctionT> getMapperFunction() const;
+    [[nodiscard]] std::shared_ptr<MapperFunctionT> getMapperFunction() const;
 
     void update();
 
