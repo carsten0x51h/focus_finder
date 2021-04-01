@@ -35,7 +35,7 @@ std::string CurveFunctionHyperbolicT::getName() const {
     return "CurveFunctionHyperbolicT";
 }
 
-float CurveFunctionHyperbolicT::f(float x) const {
+double CurveFunctionHyperbolicT::f(float x) const {
 
     float a = mCurveParms.get(IdxT::A_IDX).getValue();
     float b = mCurveParms.get(IdxT::B_IDX).getValue();

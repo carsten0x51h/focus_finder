@@ -83,8 +83,8 @@ private:
 
     void onImageReceived(RectT<unsigned int> roi, std::shared_ptr<const ImageT> image, bool lastFrame);
 
-    BoundaryLocationT::TypeE
-    determineBoundaryLoc(float lowerFocusMeasure, float upperFocusMeasure, float focusMeasure) const;
+    static BoundaryLocationT::TypeE
+    determineBoundaryLoc(float lowerFocusMeasure, float upperFocusMeasure, float focusMeasure) ;
 
 
     std::shared_ptr<const ImageT> mCurrentImage;
@@ -145,7 +145,7 @@ public:
     const FocusFinderProfileT &getFocusFinderProfile() const;
 
 
-    void devicesAvailabilityCheck();
+    void devicesAvailabilityCheck() const;
 
     void checkIfStarIsThere(const ImageT &img, float *outSnr = 0) const;
 
@@ -163,7 +163,7 @@ public:
     void
     boundaryScanLinear(const SelfOrientationResultT &selfOrientationResult, float stepSize, float focusMeasureLimit);
 
-    int boundaryScanWithFocusCurveSupport(std::shared_ptr<CurveFunctionT> focusCurveFunction,
+    int boundaryScanWithFocusCurveSupport(const std::shared_ptr<CurveFunctionT>& focusCurveFunction,
                                           const SelfOrientationResultT &selfOrientationResult,
                                           FocusMeasureTypeT::TypeE curveFocusMeasureType, float focusMeasureLimit,
                                           float focusMeasureDelta = 1.5F);

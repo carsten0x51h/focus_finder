@@ -37,13 +37,13 @@ protected:
     CurveParmsT mCurveParms;
 
 public:
-    CurveFunctionT(const CurveParmsT &curveParms);
+    CurveFunctionT(CurveParmsT curveParms);
 
     const CurveParmsT &getCurveParms() const;
 
     virtual std::string getName() const = 0;
 
-    virtual float f(float x) const = 0;
+    virtual double f(float x) const = 0;
 
     virtual float f_inv(float x) const = 0;
 

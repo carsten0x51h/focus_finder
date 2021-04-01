@@ -23,9 +23,11 @@
  ****************************************************************************/
 
 #include "include/curve_function.h"
+
+#include <utility>
 #include "include/curve_parms.h"
 
-CurveFunctionT::CurveFunctionT(const CurveParmsT &curveParms) : mCurveParms(curveParms) {
+CurveFunctionT::CurveFunctionT(CurveParmsT curveParms) : mCurveParms(std::move(curveParms)) {
 
 }
 

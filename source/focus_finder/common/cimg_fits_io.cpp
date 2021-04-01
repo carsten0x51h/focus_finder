@@ -26,6 +26,7 @@
 #include "include/throw_if.h"
 
 #include <CCfits/CCfits>
+#include <memory>
 #include <sstream>
 
 // TODO: As template...???
@@ -34,7 +35,7 @@ void CImgFitsIOHelperT::readFits(ImageT *outImg,
                                  const std::string &inFilename, long *outBitPix,
                                  std::stringstream *ss) {
 
-    THROW_IF(FitsIO, outImg == nullptr, "outImg expected to be set.");
+    THROW_IF(FitsIO, outImg == nullptr, "outImg expected to be set.")
 
     // TODO: Is it possible to pass a stream?
     CCfits::FITS::setVerboseMode(ss != nullptr);
@@ -56,7 +57,7 @@ void CImgFitsIOHelperT::readFits(ImageT *outImg,
         }
 
         // Set image dimensions
-        outImg->resize(image.axis(0) /*x*/, image.axis(1) /*y*/, 1/*z - HACK*/,
+        outImg->resize((size_t) image.axis(0) /*x*/, (size_t) image.axis(1) /*y*/, 1/*z - HACK*/,
                        1 /*1 color*/);
 
         // HACK / FIXME: At this point we assume that there is only 1 layer!
@@ -93,13 +94,13 @@ void CImgFitsIOHelperT::writeFits(const ImageT &inImg,
 
         std::unique_ptr<CCfits::FITS> pFits;
 
-        pFits.reset(
-                new CCfits::FITS(std::string("!") + inFilename, USHORT_IMG,
-                                 naxis, naxes));
+        pFits = std::make_unique<CCfits::FITS>(
+                std::string("!") + inFilename, USHORT_IMG,
+                                 naxis, naxes);
 
         // NOTE: At this point we assume that there is only 1 layer.
         long nelements = std::accumulate(&naxes[0], &naxes[naxis], 1,
-                                         std::multiplies<long>());
+                                             std::multiplies<>());
 
         std::valarray<typename ImageT::value_type> array(nelements);
 

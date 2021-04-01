@@ -22,9 +22,6 @@
  *
  ****************************************************************************/
 
-#include <algorithm>
-//#include <gsl/gsl_vector.h>
-
 #include "include/curve_parms.h"
 #include "include/curve_parm.h"
 
@@ -36,8 +33,7 @@
 // 		mCurveParms.push_back(CurveParmT(name, value));
 // 	}
 // }
-CurveParmsT::CurveParmsT() {
-}
+CurveParmsT::CurveParmsT() = default;
 
 CurveParmsT::CurveParmsT(size_t size) {
     mCurveParms.resize(size);

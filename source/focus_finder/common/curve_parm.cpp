@@ -26,13 +26,14 @@
 
 #include <fstream>
 #include <string>
+#include <utility>
 
 CurveParmT::CurveParmT() :
-        mName(""), mValue(0.0F) {
+        mValue(0.0F) {
 }
 
-CurveParmT::CurveParmT(const std::string &name, float value = 0.0F) :
-        mName(name), mValue(value) {
+CurveParmT::CurveParmT(std::string name, float value = 0.0F) :
+        mName(std::move(name)), mValue(value) {
 }
 
 const std::string &CurveParmT::getName() const {

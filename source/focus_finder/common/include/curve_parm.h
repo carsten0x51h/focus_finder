@@ -40,7 +40,7 @@ private:
 public:
     CurveParmT();
 
-    CurveParmT(const std::string &name, float value);
+    CurveParmT(std::string name, float value);
 
     [[nodiscard]] const std::string &getName() const;
 

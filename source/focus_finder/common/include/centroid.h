@@ -57,9 +57,9 @@ private:
                                      PointT<float> inCenter, PointT<float> *outSubPixelCenter,
                                      size_t inNumIterations = 10);
 
-    static float calcIx2(const ImageT &img, int x);
+    static double calcIx2(const ImageT &img, int x);
 
-    static float calcJy2(const ImageT &img, int y);
+    static double calcJy2(const ImageT &img, int y);
 
     /**
      * Calculate Intensity Weighted Center (IWC).

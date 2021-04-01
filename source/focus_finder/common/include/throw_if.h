@@ -27,10 +27,12 @@
 
 #include <sstream>
 
+//    type __exn__ ctor; \
+//    throw __exn__; \
+
 #define THROW_CLASS(type, ctor) \
   { \
-    type __exn__ ctor; \
-    throw __exn__; \
+    throw type ctor; \
   }
 
 #define THROW(x, m) { \

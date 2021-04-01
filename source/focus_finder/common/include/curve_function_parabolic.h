@@ -58,7 +58,7 @@ public:
 
     [[nodiscard]] std::string getName() const override;
 
-    [[nodiscard]] float f(float x) const override;
+    [[nodiscard]] double f(float x) const override;
 
     [[nodiscard]] float f_inv(float x) const override;
 

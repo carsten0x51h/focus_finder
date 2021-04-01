@@ -35,7 +35,7 @@ std::string CurveFunctionParabolicT::getName() const {
     return "CurveFunctionParabolicT";
 }
 
-float CurveFunctionParabolicT::f(float x) const {
+double CurveFunctionParabolicT::f(float x) const {
 
     float a = mCurveParms.get(IdxT::A_IDX).getValue();
     float b = mCurveParms.get(IdxT::B_IDX).getValue();

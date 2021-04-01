@@ -36,7 +36,7 @@ std::string CurveFunctionHyperbolicPosOnlyT::getName() const {
     return "CurveFunctionHyperbolicPosOnlyT";
 }
 
-float CurveFunctionHyperbolicPosOnlyT::f(float x) const {
+double CurveFunctionHyperbolicPosOnlyT::f(float x) const {
 
     float a = 15268.2; // HACK! mCurveParms.get(IdxT::A_IDX).getValue();
     float b = 11.074; // HACK! mCurveParms.get(IdxT::B_IDX).getValue();

@@ -26,9 +26,8 @@
 #include <chrono>
 #include <mutex>
 
-#include <boost/bind.hpp>
+#include <utility>
 
-#include "include/default_focus_curve_recorder.h"
 #include "include/logging.h"
 #include "include/exception.h"
 #include "include/wait_for.h"
@@ -41,12 +40,9 @@
 #include "include/focus_measure_type.h"
 #include "include/focus_curve_record.h"
 #include "include/focus_curve_record_builder.h"
-#include "include/focus_curve_record_set.h"
 #include "include/curve_fit_algorithm.h"
-#include "include/curve_parms.h"
 #include "include/curve_half.h"
 #include "include/point.h"
-#include "include/point_with_residual.h"
 #include "include/self_orientation_result.h"
 #include "include/boundary_location.h"
 #include "include/curve_function.h"
@@ -59,18 +55,23 @@
 
 
 FocusControllerT::FocusControllerT(std::shared_ptr<CameraInterfaceT> camera, std::shared_ptr<FocusInterfaceT> focus,
-                                   std::shared_ptr<FilterInterfaceT> filter) : mCancelled(false), mCamera(camera),
-                                                                               mFocus(focus), mFilter(filter) {
+                                   std::shared_ptr<FilterInterfaceT> filter) : mCamera(std::move(camera)),
+                                                                               mFocus(std::move(focus)), mFilter(std::move(filter)), mCancelled(false) {
 
     // TODO: Check if require devices are != nullptr?! Or pass by reference?
 
     // TODO / FIXME: This won't work if the profile changes and the current instance of the FocusController would stay alife. Then it would be registered to the old camera...
 
 
+//    mCameraExposureFinishedConnection =
+//            getCamera()->registerExposureCycleFinishedListener(
+//                    boost::bind(&FocusControllerT::onImageReceived,
+//                                this, boost::placeholders::_1, boost::placeholders::_2, boost::placeholders::_3));
+
     mCameraExposureFinishedConnection =
             getCamera()->registerExposureCycleFinishedListener(
-                    boost::bind(&FocusControllerT::onImageReceived,
-                                this, boost::placeholders::_1, boost::placeholders::_2, boost::placeholders::_3));
+                    [this](RectT<unsigned int> roi,
+                           std::shared_ptr<const ImageT> image, bool lastFrame) { onImageReceived(roi, std::move(image), lastFrame); });
 
     mInitialFocusPos = getFocus()->getCurrentPos();
 }
@@ -83,26 +84,14 @@ FocusControllerT::~FocusControllerT() {
 std::shared_ptr<CameraInterfaceT> FocusControllerT::getCamera() const {
     return mCamera;
 }
-// void FocusControllerT::setCamera(std::shared_ptr<CameraInterfaceT> camera)
-// {
-//   mCamera = camera;
-// }
 
 std::shared_ptr<FocusInterfaceT> FocusControllerT::getFocus() const {
     return mFocus;
 }
-// void FocusControllerT::setFocus(std::shared_ptr<FocusInterfaceT> focus)
-// {
-//   mFocus = focus;
-// }
 
 std::shared_ptr<FilterInterfaceT> FocusControllerT::getFilter() const {
     return mFilter;
 }
-// void FocusControllerT::setFilter(std::shared_ptr<FilterInterfaceT> filter)
-// {
-//   mFilter = filter;
-// }
 
 // TODO: Maybe we find a better name?!
 void FocusControllerT::setLastFocusStarPos(PointT<float> lastFocusStarPos) {
@@ -214,8 +203,8 @@ std::shared_ptr<FocusCurveRecordT> FocusControllerT::measureFocus() {
                 // get_crop() from mCurrentImage using innerRoi
                 ImageT innerSubFrameImg = mCurrentImage->get_crop(innerRoi.x() /*x0*/,
                                                                   innerRoi.y() /*y0*/,
-                                                                  innerRoi.x() + innerRoi.width() - 1/*x1*/,
-                                                                  innerRoi.y() + innerRoi.height() - 1/*y1*/
+                                                                  (int) (innerRoi.x() + innerRoi.width()) - 1/*x1*/,
+                                                                  (int) (innerRoi.y() + innerRoi.height()) - 1/*y1*/
                 );
 
                 LOG(debug)
@@ -242,8 +231,8 @@ std::shared_ptr<FocusCurveRecordT> FocusControllerT::measureFocus() {
                 }
 
                 // NOTE: Those coordinates are in coordinates of the inner subframe! We need them in "outer sub frame" coordinates!
-                int deltaX = (outerRoi.width() - innerRoi.width()) / 2;
-                int deltaY = (outerRoi.height() - innerRoi.height()) / 2;
+                int deltaX = ((int) outerRoi.width() - (int) innerRoi.width()) / 2;
+                int deltaY = ((int) outerRoi.height() - (int) innerRoi.height()) / 2;
 
                 LOG(debug)
                     << "FocusControllerT::run - deltaX=" << deltaX << ", deltaY="
@@ -251,8 +240,8 @@ std::shared_ptr<FocusCurveRecordT> FocusControllerT::measureFocus() {
 
                 PointFT newCentroidInnerRoiCoords = *newCentroidOpt;
                 PointFT newCentroidOuterRoiCoords(
-                        newCentroidInnerRoiCoords.x() + deltaX,
-                        newCentroidInnerRoiCoords.y() + deltaY);
+                        newCentroidInnerRoiCoords.x() + (float) deltaX,
+                        newCentroidInnerRoiCoords.y() + (float) deltaY);
 
                 LOG(debug)
                     << "FocusControllerT::run - new centroid (inner frame)="
@@ -284,8 +273,8 @@ std::shared_ptr<FocusCurveRecordT> FocusControllerT::measureFocus() {
                 // get_crop() from mCurrentImage using corrected innerRoi
                 ImageT innerCorrectedSubFrameImg = mCurrentImage->get_crop(
                         innerCorrectedRoi.x() /*x0*/, innerCorrectedRoi.y() /*y0*/,
-                        innerCorrectedRoi.x() + innerCorrectedRoi.width() - 1/*x1*/,
-                        innerCorrectedRoi.y() + innerCorrectedRoi.height() - 1/*y1*/
+                        (int) (innerCorrectedRoi.x() + innerCorrectedRoi.width()) - 1/*x1*/,
+                        (int) (innerCorrectedRoi.y() + innerCorrectedRoi.height()) - 1/*y1*/
                 );
 
                 LOG(debug)
@@ -375,7 +364,7 @@ std::shared_ptr<FocusCurveRecordT> FocusControllerT::measureFocus() {
 
 
             // Calculate SNR of average image
-            float averageSnr = SnrT::calculate(averageCurrentImage);
+            auto averageSnr = (float) SnrT::calculate(averageCurrentImage);
 
 
             // Calculate HFD
@@ -498,7 +487,7 @@ void FocusControllerT::boundaryScanLinear(const SelfOrientationResultT &selfOrie
             << ", focus position=" << getFocus()->getCurrentPos() << "..."
             << ", moving on..." << std::endl;
 
-        moveFocusByBlocking(limitFocusDirection, stepSize, 30000ms);
+        moveFocusByBlocking(limitFocusDirection, (int) stepSize, 30000ms);
 
         curveRecord = measureFocus();
         focusMeasure = curveRecord->getFocusMeasure(mFocusFinderProfile.getLimitFocusMeasureType());
@@ -507,9 +496,9 @@ void FocusControllerT::boundaryScanLinear(const SelfOrientationResultT &selfOrie
         //notifyFocusCurveRecorderProgressUpdate(60.0, "Phase 2 finished.", record);
 
         float maxPossibleStepsIntoLimitDirection = (limitFocusDirection == FocusDirectionT::INWARD ?
-                                                    (getFocus()->getCurrentPos() - minAbsFocusPos) / (float) stepSize :
-                                                    (maxAbsFocusPos - getFocus()->getCurrentPos()) / (float) stepSize);
-        float progressPerc = 100.0F * (stepNo / maxPossibleStepsIntoLimitDirection);
+                                                    (float) (getFocus()->getCurrentPos() - minAbsFocusPos) / (float) stepSize :
+                                                    (float) (maxAbsFocusPos - getFocus()->getCurrentPos()) / (float) stepSize);
+        float progressPerc = 100.0F * ((float) stepNo / maxPossibleStepsIntoLimitDirection);
 
         LOG(debug) << "FocusControllerT::linearBoundaryScan... pos: " << getFocus()->getCurrentPos()
                    << ", maxPossibleStepsIntoLimitDirection: " << maxPossibleStepsIntoLimitDirection
@@ -539,7 +528,7 @@ void FocusControllerT::boundaryScanLinear(const SelfOrientationResultT &selfOrie
 
 
 BoundaryLocationT::TypeE
-FocusControllerT::determineBoundaryLoc(float lowerFocusMeasure, float upperFocusMeasure, float focusMeasure) const {
+FocusControllerT::determineBoundaryLoc(float lowerFocusMeasure, float upperFocusMeasure, float focusMeasure) {
     BoundaryLocationT::TypeE boundaryLoc;
 
     if (focusMeasure < lowerFocusMeasure) {
@@ -560,7 +549,7 @@ FocusControllerT::determineBoundaryLoc(float lowerFocusMeasure, float upperFocus
  *
  * NOTE: All this fails if the self-orientation is not correct!
  */
-int FocusControllerT::boundaryScanWithFocusCurveSupport(std::shared_ptr<CurveFunctionT> focusCurveFunction,
+int FocusControllerT::boundaryScanWithFocusCurveSupport(const std::shared_ptr<CurveFunctionT>& focusCurveFunction,
                                                         const SelfOrientationResultT &selfOrientationResult,
                                                         FocusMeasureTypeT::TypeE curveFocusMeasureType,
                                                         float focusMeasureLimit, float focusMeasureDelta) {
@@ -604,7 +593,7 @@ int FocusControllerT::boundaryScanWithFocusCurveSupport(std::shared_ptr<CurveFun
     if (boundaryLoc != BoundaryLocationT::WITHIN_BOUNDARY_RANGE) {
 
         // Move focus
-        moveFocusByBlocking(selfOrientationResult.focusDirectionToLimit, moveStep1, 30000ms);
+        moveFocusByBlocking(selfOrientationResult.focusDirectionToLimit, (int) moveStep1, 30000ms);
 
         // Measure again
         auto record2 = measureFocus();
@@ -641,7 +630,7 @@ int FocusControllerT::boundaryScanWithFocusCurveSupport(std::shared_ptr<CurveFun
         while (boundaryLoc2 != BoundaryLocationT::WITHIN_BOUNDARY_RANGE) {
 
             // Move focus
-            moveFocusByBlocking(dir, stepFinetuneSize, 30000ms);
+            moveFocusByBlocking(dir, (int) stepFinetuneSize, 30000ms);
 
             // Measure again
             record2 = measureFocus();
@@ -651,10 +640,10 @@ int FocusControllerT::boundaryScanWithFocusCurveSupport(std::shared_ptr<CurveFun
             boundaryLoc2 = determineBoundaryLoc(lowerFocusMeasure, upperFocusMeasure, focusMeasure2);
 
             // Check if we maybe OVERSHOT the goal already
-            bool goalOvershot = (boundaryLoc == BoundaryLocationT::INSIDE_BOUNDARY &&
-                                 boundaryLoc2 == BoundaryLocationT::OUTSIDE_BOUNDARY ||
-                                 boundaryLoc == BoundaryLocationT::OUTSIDE_BOUNDARY &&
-                                 boundaryLoc2 == BoundaryLocationT::INSIDE_BOUNDARY);
+            goalOvershot = ((boundaryLoc == BoundaryLocationT::INSIDE_BOUNDARY &&
+                             boundaryLoc2 == BoundaryLocationT::OUTSIDE_BOUNDARY) ||
+                            (boundaryLoc == BoundaryLocationT::OUTSIDE_BOUNDARY &&
+                             boundaryLoc2 == BoundaryLocationT::INSIDE_BOUNDARY));
 
             if (goalOvershot) {
                 // Invert direction!
@@ -700,11 +689,11 @@ void FocusControllerT::cancel() {
 }
 
 // NOTE: Callback from camera device, registered in setCamera of base class FocusFinder
-void FocusControllerT::onImageReceived(RectT<unsigned int> roi,
-                                       std::shared_ptr<const ImageT> image, bool lastFrame) {
+void FocusControllerT::onImageReceived(RectT<unsigned int> /*roi*/,
+                                       std::shared_ptr<const ImageT> image, bool /*lastFrame*/) {
 
     // TODO: Store image.... roi etc...
-    mCurrentImage = image;
+    mCurrentImage = std::move(image);
 
     cv.notify_all();
 }
@@ -722,11 +711,11 @@ SelfOrientationResultT FocusControllerT::performSelfOrientation(float focusMeasu
 
     // TODO: Should this be configurable? -> YES, part of profile...?!... Just need a good name...
     const float STEP_FACTOR = 3.0F;
-    float selfOrientationStepSize = STEP_FACTOR * mFocusFinderProfile.getStepSize();
+    float selfOrientationStepSize = STEP_FACTOR * (float) mFocusFinderProfile.getStepSize();
     FocusDirectionT::TypeE initialMovingDirection = FocusDirectionT::INWARD;
 
     // TODO: Should the FocusControllerT be aware of mFocusFinderProfile? Or should parms be passed?
-    moveFocusByBlocking(initialMovingDirection, selfOrientationStepSize, 30000ms);
+    moveFocusByBlocking(initialMovingDirection, (int) selfOrientationStepSize, 30000ms);
 
     selfOrientationResult.record2 = measureFocus();
     //Notify about FocusCurve recorder update...
@@ -846,7 +835,7 @@ void FocusControllerT::runExposureBlocking(
 
 void FocusControllerT::checkIfStarIsThere(const ImageT &img,
                                           float *outSnr) const {
-    float snr = SnrT::calculate(img);
+    auto snr = (float) SnrT::calculate(img);
 
     LOG(debug)
         << "FocusControllerT::run - SNR: " << snr << std::endl;
@@ -865,7 +854,7 @@ void FocusControllerT::checkIfStarIsThere(const ImageT &img,
 }
 
 
-void FocusControllerT::devicesAvailabilityCheck() {
+void FocusControllerT::devicesAvailabilityCheck() const {
     // Check that camera is there
     if (getCamera() == nullptr) {
         LOG(error) << "No camera set." << std::endl;
