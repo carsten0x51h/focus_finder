@@ -25,7 +25,6 @@
 #include <boost/property_tree/ptree.hpp>
 
 #include "include/focus_finder_logic.h"
-#include "include/profile_manager.h"
 #include "include/curve_fit_parms.h"
 #include "include/focus_finder_calibration.h"
 #include "include/focus_curve_record_set.h"
@@ -136,7 +135,7 @@ std::shared_ptr<FocusCurveT> FocusFinderCalibrationT::getFocusCurve() const {
 
 
 void FocusFinderCalibrationT::save(boost::property_tree::ptree &pt,
-                                   std::shared_ptr<FocusFinderCalibrationT> focusFinderCalibration,
+                                   const std::shared_ptr<FocusFinderCalibrationT>& focusFinderCalibration,
                                    const std::filesystem::path &lightFramePath) {
     LOG(debug) << "FocusFinderCalibrationT::save..." << std::endl;
 

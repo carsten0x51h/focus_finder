@@ -27,7 +27,6 @@
 
 #include <cmath>
 
-
 double SnrT::calculate(const ImageT &image) {
     // 0 = Calc. variance  as "second moment" according to
     // https://kogs-www.informatik.uni-hamburg.de/~neumann/BV-WS-2010/Folien/BV-4-10.pdf

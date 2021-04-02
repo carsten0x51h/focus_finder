@@ -24,7 +24,6 @@
 
 #include <ostream>
 #include <chrono>
-#include <ratio>
 #include "include/timestamp.h"
 
 std::ostream &operator<<(std::ostream &os, const TimestampT &ts) {

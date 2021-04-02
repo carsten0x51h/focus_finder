@@ -27,9 +27,6 @@
 
 #include <sstream>
 
-//    type __exn__ ctor; \
-//    throw __exn__; \
-
 #define THROW_CLASS(type, ctor) \
   { \
     throw type ctor; \

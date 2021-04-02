@@ -38,7 +38,7 @@ void StarClusterAlgorithmT::initOffsetPattern(int n) {
         for (int j = -n; j <= n; ++j) {
             // Only add if not 0,0
             if (i != 0 || j != 0) {
-                mOffsets.push_back(PixelPosT(i, j));
+                mOffsets.emplace_back(i, j);
 
                 LOG(debug) << "Adding offset (" << i << ", " << j << ")." << std::endl;
             }
@@ -56,7 +56,7 @@ StarClusterAlgorithmT::getAndRemoveNeighbours(const PixelPosT &inCurPixelPos, Pi
     for (const PixelPosT &offset : mOffsets) {
         PixelPosT curPixPos(inCurPixelPos.x() + offset.x(), inCurPixelPos.y() + offset.y());
 
-        PixelPosSetT::iterator itPixPos = inoutWhitePixels->find(curPixPos);
+        auto itPixPos = inoutWhitePixels->find(curPixPos);
 
         if (itPixPos != inoutWhitePixels->end()) {
             const PixelPosT &curWhitePixPos = *itPixPos;
@@ -83,7 +83,7 @@ std::list<PixelClusterT> StarClusterAlgorithmT::cluster(const ImageT &inImg) {
         PixelClusterT pixelCluster;
         PixelClusterT pixelsToBeProcessed;
 
-        PixelPosSetT::iterator itWhitePixPos = whitePixels.begin();
+        auto itWhitePixPos = whitePixels.begin();
 
         pixelsToBeProcessed.push_back(*itWhitePixPos);
         whitePixels.erase(itWhitePixPos);

@@ -61,17 +61,17 @@ private:
     /**
      * Concats the directory path to the given profile.
      */
-    std::filesystem::path composeFullProfileDirectory(const std::string &profileDirectoryName) const;
+    static std::filesystem::path composeFullProfileDirectory(const std::string &profileDirectoryName) ;
 
     /**
      * Concats root path with filename.
      */
-    std::filesystem::path composeFullProfileFilePath(const std::string &profileDirectoryName) const;
+    static std::filesystem::path composeFullProfileFilePath(const std::string &profileDirectoryName) ;
 
     /**
      * Concats path to light frame directory of given profile.
      */
-    std::filesystem::path composeFullLightFrameDirectory(const std::string &profileDirectoryName) const;
+    static std::filesystem::path composeFullLightFrameDirectory(const std::string &profileDirectoryName) ;
 
     /**
      * Holds the active profile (if any).
@@ -208,7 +208,7 @@ public:
      * profile_2
      * profile_3
      */
-    std::vector<std::string> getProfileDirectoryNames() const;
+    static std::vector<std::string> getProfileDirectoryNames() ;
 
 
     /**

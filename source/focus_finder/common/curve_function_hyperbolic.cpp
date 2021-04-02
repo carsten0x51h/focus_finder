@@ -40,7 +40,7 @@ double CurveFunctionHyperbolicT::f(float x) const {
     float a = mCurveParms.get(IdxT::A_IDX).getValue();
     float b = mCurveParms.get(IdxT::B_IDX).getValue();
     float c = mCurveParms.get(IdxT::C_IDX).getValue();
-    float d = mCurveParms.get(IdxT::D_IDX).getValue();;
+    float d = mCurveParms.get(IdxT::D_IDX).getValue();
 
     return MathFunctionsT::hyperbolic(x, a, b, c, d);
 }
@@ -50,9 +50,9 @@ float CurveFunctionHyperbolicT::f_inv(float x) const {
     float a = mCurveParms.get(IdxT::A_IDX).getValue();
     float b = mCurveParms.get(IdxT::B_IDX).getValue();
     float c = mCurveParms.get(IdxT::C_IDX).getValue();
-    float d = mCurveParms.get(IdxT::D_IDX).getValue();;
+    float d = mCurveParms.get(IdxT::D_IDX).getValue();
 
-    return MathFunctionsT::hyperbolic_inv(x, a, b, c, d);
+    return (float) MathFunctionsT::hyperbolic_inv(x, a, b, c, d);
 }
 
 

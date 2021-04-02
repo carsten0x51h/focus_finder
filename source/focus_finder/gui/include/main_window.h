@@ -121,18 +121,18 @@ protected slots:
 
     void onFocusFinderCancelled();
 
-    void onFocusFinderProgressUpdate(float progress, const QString &msg, std::shared_ptr<FocusCurveRecordT> record);
+    void onFocusFinderProgressUpdate(float progress, const QString &msg, const std::shared_ptr<FocusCurveRecordT>& record);
 
 
 protected:
     const QScopedPointer<Ui::MainWindow> m_ui;
 
 private:
-    std::shared_ptr<CameraInterfaceT> getCurrentCamera();
+    static std::shared_ptr<CameraInterfaceT> getCurrentCamera();
 
-    std::shared_ptr<FocusInterfaceT> getCurrentFocus();
+    static std::shared_ptr<FocusInterfaceT> getCurrentFocus();
 
-    std::shared_ptr<FilterInterfaceT> getCurrentFilter();
+    static std::shared_ptr<FilterInterfaceT> getCurrentFilter();
 
 
     void showDeviceManagerConfigDialog();
@@ -189,14 +189,14 @@ private:
 
     void createAboutDialog();
 
-    void updateCameraDevice(std::shared_ptr<CameraInterfaceT> oldCameraInterface,
-                            std::shared_ptr<CameraInterfaceT> newCameraInterface);
+    void updateCameraDevice(const std::shared_ptr<CameraInterfaceT>& oldCameraInterface,
+                            const std::shared_ptr<CameraInterfaceT>& newCameraInterface);
 
-    void updateFocusDevice(std::shared_ptr<FocusInterfaceT> oldFocusInterface,
-                           std::shared_ptr<FocusInterfaceT> newFocusInterface);
+    void updateFocusDevice(const std::shared_ptr<FocusInterfaceT>& oldFocusInterface,
+                           const std::shared_ptr<FocusInterfaceT>& newFocusInterface);
 
-    void updateFilterDevice(std::shared_ptr<FilterInterfaceT> oldFilterInterface,
-                            std::shared_ptr<FilterInterfaceT> newFilterInterface);
+    void updateFilterDevice(const std::shared_ptr<FilterInterfaceT>& oldFilterInterface,
+                            const std::shared_ptr<FilterInterfaceT>& newFilterInterface);
 
     void updateProfile(std::optional<FocusFinderProfileT> oldProfile, std::optional<FocusFinderProfileT> newProfile);
 

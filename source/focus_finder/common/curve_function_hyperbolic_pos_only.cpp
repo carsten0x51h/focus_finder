@@ -41,7 +41,7 @@ double CurveFunctionHyperbolicPosOnlyT::f(float x) const {
     float a = 15268.2; // HACK! mCurveParms.get(IdxT::A_IDX).getValue();
     float b = 11.074; // HACK! mCurveParms.get(IdxT::B_IDX).getValue();
     float c = mCurveParms.get(IdxT::C_IDX).getValue();
-    float d = mCurveParms.get(IdxT::D_IDX).getValue();;
+    float d = mCurveParms.get(IdxT::D_IDX).getValue();
 
     return MathFunctionsT::hyperbolic(x, a, b, c, d);
 }
@@ -51,7 +51,7 @@ float CurveFunctionHyperbolicPosOnlyT::f_inv(float x) const {
     float a = 15268.2; // HACK! mCurveParms.get(IdxT::A_IDX).getValue();
     float b = 11.074; // HACK! mCurveParms.get(IdxT::B_IDX).getValue();
     float c = mCurveParms.get(IdxT::C_IDX).getValue();
-    float d = mCurveParms.get(IdxT::D_IDX).getValue();;
+    float d = mCurveParms.get(IdxT::D_IDX).getValue();
 
     return MathFunctionsT::hyperbolic_inv(x, a, b, c, d);
 }

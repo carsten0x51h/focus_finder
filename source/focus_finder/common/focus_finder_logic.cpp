@@ -35,7 +35,6 @@
 #include "include/fofi_config_manager.h"
 #include "include/global_config_manager.h"
 #include "include/profile_manager.h"
-#include "include/focus_finder_profile.h"
 #include "include/logging.h"
 #include "include/snr.h"
 #include "include/centroid.h"
@@ -198,7 +197,7 @@ void FocusFinderLogicT::updateProfile() {
     // Register to new device
     if (newCameraDevice) {
         mExposureCycleFinishedConnection = newCameraDevice->registerExposureCycleFinishedListener(
-                [&](RectT<unsigned int> roiRect, std::shared_ptr<const ImageT> resultImage, bool lastExposure) {
+                [&](RectT<unsigned int> roiRect, std::shared_ptr<const ImageT> resultImage, bool /*lastExposure*/) {
                     // TODO: "mLastFrame" needs mutex guard!!!-> or atomic?
                     mLastFrame.setImage(resultImage);  // null if no image
                     mLastFrame.setRoi(roiRect);        // "empty" - i.e. 0,0,0,0 if not set

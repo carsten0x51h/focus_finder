@@ -22,6 +22,9 @@
  *
  ****************************************************************************/
 
+// TODO: Remove mFfl... - replace by static call...
+// TODO: std::optional should not be passed as function parameter!
+
 #include <QMessageBox>
 #include <QToolBar>
 #include <QIcon>
@@ -33,8 +36,7 @@
 
 #include <memory>
 #include <iomanip>
-
-#include <fofi/fofi-version.h>
+#include <utility>
 
 #include "include/anim_menu_button.h"
 
@@ -55,22 +57,9 @@
 #include "include/device_manager_dialog_factory.h"
 #include "include/manage_device_profiles_dialog.h"
 
-
-#include "../common/include/device_interface_type.h"
-#include "../common/include/image.h"
-#include "../common/include/size.h"
-#include "../common/include/logging.h"
 #include "../common/include/focus_finder.h"
-#include "../common/include/focus_finder_logic.h"
-#include "../common/include/focus_curve_record.h"
-#include "../common/include/focus_curve_record_set.h" // TODO: Required?
-#include "../common/include/task_executor.h"
-#include "../common/include/focus_finder_factory.h"
 #include "../common/include/profile_manager.h"
 #include "../common/include/image_converter_16to8.h"
-#include "../common/include/tuple_printer.h"
-//#include "../common/include/linear_bw_stretch_mapper_function.h" // TODO: Dependency is to be removed
-#include "../common/include/focus_controller.h"
 
 #include "ui_main_window.h"
 
@@ -91,10 +80,6 @@ std::shared_ptr<CameraInterfaceT> MainWindow::getCurrentCamera() {
 std::shared_ptr<FocusInterfaceT> MainWindow::getCurrentFocus() {
     return FocusFinderLogicT::get()->getCurrentFocus();
 }
-
-std::shared_ptr<FilterInterfaceT> getCurrentFilter();
-
-std::shared_ptr<FilterInterfaceT> getCurrentFilter();
 
 std::shared_ptr<FilterInterfaceT> MainWindow::getCurrentFilter() {
     return FocusFinderLogicT::get()->getCurrentFilter();
@@ -216,7 +201,7 @@ void MainWindow::onStartFocusFinderPressed() {
         // FoFi running / status update
         focusFinder->registerFocusFinderProgressUpdateListener(
                 [&](float progress, const std::string &msg, std::shared_ptr<FocusCurveRecordT> record) {
-                    emit focusFinderProgressUpdateSignal(progress, QString::fromStdString(msg), record);
+                    emit focusFinderProgressUpdateSignal(progress, QString::fromStdString(msg), std::move(record));
                 });
 
         // FoFi finished
@@ -267,7 +252,7 @@ void MainWindow::createManageDeviceProfilesButton() {
 // Image Converter Panel
 /////////////////////////////////////////////////////////////////////////
 void MainWindow::createImageConverterPanel() {
-    QDockWidget *dock = new QDockWidget(tr("Brightness curve"), this); // TODO: Cleanup?
+    auto *dock = new QDockWidget(tr("Brightness curve"), this); // TODO: Cleanup?
     dock->setAllowedAreas(Qt::RightDockWidgetArea);
 
     mImageConverterPanel = new ImageConverterPanelT(dock, mFfl);
@@ -299,7 +284,7 @@ void MainWindow::createImageConverterPanel() {
 }
 
 void MainWindow::createReportingViewerPanel() {
-    QDockWidget *dock = new QDockWidget(tr("Reporting"), this);
+    auto *dock = new QDockWidget(tr("Reporting"), this);
     dock->setAllowedAreas(Qt::BottomDockWidgetArea);
 
     mReportingViewerPanel = new ReportingViewerPanelT(dock);
@@ -313,7 +298,7 @@ void MainWindow::createReportingViewerPanel() {
 }
 
 void MainWindow::createFocusCntlPanel() {
-    QDockWidget *dock = new QDockWidget(tr("Focus control"), this); // TODO: Cleanup
+    auto *dock = new QDockWidget(tr("Focus control"), this); // TODO: Cleanup
     dock->setAllowedAreas(Qt::LeftDockWidgetArea);
 
     mFocusCntlPanel = new FocusCntlPanelT(dock, mFfl);
@@ -328,7 +313,7 @@ void MainWindow::createFocusCntlPanel() {
 }
 
 void MainWindow::createFilterCntlPanel() {
-    QDockWidget *dock = new QDockWidget(tr("Filter control"), this);
+    auto *dock = new QDockWidget(tr("Filter control"), this);
     dock->setAllowedAreas(Qt::LeftDockWidgetArea);
 
     mFilterCntlPanel = new FilterCntlPanelT(dock, mFfl);
@@ -343,7 +328,7 @@ void MainWindow::createFilterCntlPanel() {
 }
 
 void MainWindow::createHfdViewPanel() {
-    QDockWidget *dock = new QDockWidget(tr("HFD View"), this);
+    auto *dock = new QDockWidget(tr("HFD View"), this);
     dock->setAllowedAreas(Qt::RightDockWidgetArea);
 
     mHfdViewPanel = new HfdViewPanelT(dock);
@@ -359,7 +344,7 @@ void MainWindow::createHfdViewPanel() {
 
 void MainWindow::createFwhmViewPanels() {
     {
-        QDockWidget *dock = new QDockWidget(tr("FWHM(Horz) View"), this);
+        auto *dock = new QDockWidget(tr("FWHM(Horz) View"), this);
         dock->setAllowedAreas(Qt::RightDockWidgetArea);
 
         mFwhmHorzViewPanel = new FwhmViewPanelT(dock, mFfl);
@@ -374,7 +359,7 @@ void MainWindow::createFwhmViewPanels() {
     }
 
     {
-        QDockWidget *dock = new QDockWidget(tr("FWHM(Vert) View"), this);
+        auto *dock = new QDockWidget(tr("FWHM(Vert) View"), this);
         dock->setAllowedAreas(Qt::RightDockWidgetArea);
 
         mFwhmVertViewPanel = new FwhmViewPanelT(dock, mFfl);
@@ -782,10 +767,9 @@ void MainWindow::updateExposureTimeSelector() {
     bool hasActiveProfile = activeProfile.has_value();
     bool cameraSelected = (currentCamera != nullptr);
     bool cameraConnected =
-            (currentCamera ?
-             currentCamera->getParentDevice()->isConnected() : false);
+            currentCamera && currentCamera->getParentDevice()->isConnected();
 
-    bool exposureRunning = (currentCamera ? currentCamera->isExposureRunning() : false);
+    bool exposureRunning = currentCamera && currentCamera->isExposureRunning();
     bool enableExposureTimeSelector =
             hasActiveProfile && cameraSelected && cameraConnected && !exposureRunning && !focusFinderRunning;
 
@@ -819,12 +803,6 @@ void MainWindow::updateExposureTimeSelector() {
                 std::stringstream stream;
                 stream << std::fixed << std::setprecision(2) << seconds.count()
                        << "s";
-
-                // NOTE: This log pollutes the logfile...
-                // LOG(debug)
-                // << "MainWindow::updateExposureTimeSelector... adding '"
-                // 		<< stream.str() << "', setting t=" << t.count()
-                // 		<< "ms to CBX userdata." << std::endl;
 
                 QVariant data;
                 data.setValue(t);
@@ -890,7 +868,8 @@ void MainWindow::updateCurrentCameraConnectionStateUI() {
                 updateFocusFinderMainMenuBar();
                 break;
             }
-            case DeviceConnectionStateT::DISCONNECTED: {
+            case DeviceConnectionStateT::DISCONNECTED:
+            default:
                 setStatusIcon(mCameraConnectionStatusLabel,
                               ":/res/red_dot_64x64.png", "Camera disconnected");
 
@@ -901,19 +880,6 @@ void MainWindow::updateCurrentCameraConnectionStateUI() {
 
                 updateFocusFinderMainMenuBar();
                 break;
-            }
-            default: {
-                setStatusIcon(mCameraConnectionStatusLabel,
-                              ":/res/red_dot_64x64.png", "Camera disconnected");
-
-                // Update the UI - get exposure status from new camera and set the exposure button accordingly
-                if (currentCamera) {
-                    setExposureButtonState(currentCamera->isExposureRunning());
-                }
-
-                updateFocusFinderMainMenuBar();
-                break;
-            }
         }
     } else {
         setStatusIcon(mCameraConnectionStatusLabel, ":/res/red_dot_64x64.png",
@@ -928,8 +894,8 @@ void MainWindow::updateCurrentCameraConnectionStateUI() {
     }
 }
 
-void MainWindow::updateCameraDevice(std::shared_ptr<CameraInterfaceT> oldCameraInterface,
-                                    std::shared_ptr<CameraInterfaceT> newCameraInterface) {
+void MainWindow::updateCameraDevice(const std::shared_ptr<CameraInterfaceT>& oldCameraInterface,
+                                    const std::shared_ptr<CameraInterfaceT>& newCameraInterface) {
 
     if (oldCameraInterface == newCameraInterface) {
         return;
@@ -985,7 +951,7 @@ void MainWindow::updateCameraDevice(std::shared_ptr<CameraInterfaceT> oldCameraI
 
         mExposureCycleFinishedConnection =
                 newCameraInterface->registerExposureCycleFinishedListener(
-                        [&](RectT<unsigned int> /*roiRect*/, std::shared_ptr<const ImageT> /*resultImage*/,
+                        [&](RectT<unsigned int> /*roiRect*/, const std::shared_ptr<const ImageT>& /*resultImage*/,
                             bool lastExposure) {
                             emit exposureCycleFinishedSignal(lastExposure);
                         });
@@ -1063,20 +1029,13 @@ void MainWindow::updateCurrentFilterConnectionStateUI() {
                 updateFocusFinderMainMenuBar();
                 break;
             }
-            case DeviceConnectionStateT::DISCONNECTED: {
+            case DeviceConnectionStateT::DISCONNECTED:
+            default:
                 setStatusIcon(mFilterConnectionStatusLabel,
                               ":/res/red_dot_64x64.png", "Filter disconnected");
 
                 updateFocusFinderMainMenuBar();
                 break;
-            }
-            default: {
-                setStatusIcon(mFilterConnectionStatusLabel,
-                              ":/res/red_dot_64x64.png", "Filter disconnected");
-
-                updateFocusFinderMainMenuBar();
-                break;
-            }
         }
     } else {
         setStatusIcon(mFilterConnectionStatusLabel, ":/res/red_dot_64x64.png",
@@ -1086,8 +1045,8 @@ void MainWindow::updateCurrentFilterConnectionStateUI() {
     }
 }
 
-void MainWindow::updateFocusDevice(std::shared_ptr<FocusInterfaceT> oldFocusInterface,
-                                   std::shared_ptr<FocusInterfaceT> newFocusInterface) {
+void MainWindow::updateFocusDevice(const std::shared_ptr<FocusInterfaceT>& oldFocusInterface,
+                                   const std::shared_ptr<FocusInterfaceT>& newFocusInterface) {
 
     if (oldFocusInterface == newFocusInterface) {
         return;
@@ -1133,8 +1092,8 @@ void MainWindow::updateFocusDevice(std::shared_ptr<FocusInterfaceT> oldFocusInte
     updateCurrentFocusConnectionStateUI();
 }
 
-void MainWindow::updateFilterDevice(std::shared_ptr<FilterInterfaceT> oldFilterInterface,
-                                    std::shared_ptr<FilterInterfaceT> newFilterInterface) {
+void MainWindow::updateFilterDevice(const std::shared_ptr<FilterInterfaceT>& oldFilterInterface,
+                                    const std::shared_ptr<FilterInterfaceT>& newFilterInterface) {
     if (oldFilterInterface == newFilterInterface) {
         return;
     }
@@ -1282,11 +1241,11 @@ void MainWindow::onFocusFinderCancelled() {
 }
 
 void MainWindow::onFocusFinderProgressUpdate(float progress,
-                                             const QString &msg, std::shared_ptr<FocusCurveRecordT> record) {
+                                             const QString &msg, const std::shared_ptr<FocusCurveRecordT>& record) {
 
     LOG(debug)
         << "MainWindow::onFocusFinderProgressUpdate(progress=" << progress
-        << ", msg=" << msg.toStdString() << ", ....)..." << std::endl;
+        << ", msg=" << msg.toStdString() << ", ...)..." << std::endl;
 
     if (record != nullptr) {
         LOG(debug) << "    -> record=" << *record << std::endl;
@@ -1303,7 +1262,7 @@ void MainWindow::onFocusFinderProgressUpdate(float progress,
 void MainWindow::onRecalibrationPressed() {
     LOG(debug) << "MainWindow::onRecalibrationPressed..." << std::endl;
 
-    FocusCurveRecorderDialogT *focusCurveRecorderDialog = new FocusCurveRecorderDialogT(this,
+    auto *focusCurveRecorderDialog = new FocusCurveRecorderDialogT(this,
                                                                                         mFfl.getFocusCurveRecorderLogic());
     focusCurveRecorderDialog->exec();
 
@@ -1394,7 +1353,7 @@ void MainWindow::onRoiSelectedSlot(const QRect &roiRect,
     }
 
     // TODO: DO NOT USE THE ROI IMAGE - it will be removed! Instead use the roiRect to query the ffl to get the image or subframe as CImg...
-    Q_UNUSED(roiImage);
+    Q_UNUSED(roiImage)
 
     updateFocusFinderMainMenuBar();
 }
@@ -1508,28 +1467,28 @@ void MainWindow::createFocusFinderMainMenuBar() {
     createManageDeviceProfilesButton();
     createExposureButton();
 
-    QSpacerItem *spacer1 = new QSpacerItem(10, 10);
+    auto *spacer1 = new QSpacerItem(10, 10);
     getFocusFinderMainMenuBar()->addItem(spacer1);
 
     createExposureTimeSelector();
 
-    QSpacerItem *spacer2 = new QSpacerItem(10, 10);
+    auto *spacer2 = new QSpacerItem(10, 10);
     getFocusFinderMainMenuBar()->addItem(spacer2);
 
     createSelectSubFrameButton();
 
-    QSpacerItem *spacer3 = new QSpacerItem(10, 10);
+    auto *spacer3 = new QSpacerItem(10, 10);
     getFocusFinderMainMenuBar()->addItem(spacer3);
 
     createSelectFocusStarButton();
 
-    QSpacerItem *spacer4 = new QSpacerItem(10, 10);
+    auto *spacer4 = new QSpacerItem(10, 10);
     getFocusFinderMainMenuBar()->addItem(spacer4);
 
-    QSpacerItem *spacer5 = new QSpacerItem(10, 10);
+    auto *spacer5 = new QSpacerItem(10, 10);
     getFocusFinderMainMenuBar()->addItem(spacer5);
 
-    QSpacerItem *spacer6 = new QSpacerItem(10, 10);
+    auto *spacer6 = new QSpacerItem(10, 10);
     getFocusFinderMainMenuBar()->addItem(spacer6);
 
     createStartFocusFinderButton();
@@ -1594,13 +1553,15 @@ void MainWindow::updateFocusFinderMainMenuBar() {
             hasActiveProfile && cameraSelected && !focusFinderRunning
             && !inPoiMode && hasImage && !exposureRunning);
 
-    // mSelectFocusStarButton - enable if
-    //   -"focus finder profile" is active
-    //	 -AND camera device is selected
-    //	 [-AND camera device is connected (?)]
-    //	 -Focus finder not running
-    //	 -Not currently in ROI select mode
-    //	 -AND a picture is there
+    /**
+     * mSelectFocusStarButton - enable if
+     *  -"focus finder profile" is active
+     *	-AND camera device is selected
+     *	[-AND camera device is connected (?)]
+     *	-Focus finder not running
+     *	-Not currently in ROI select mode
+     *	-AND a picture is there
+     */
     bool inRoiMode = (mImageViewerPanel->getMode()
                       == ImageViewerModeT::ROI_SELECT);
 
@@ -1609,16 +1570,17 @@ void MainWindow::updateFocusFinderMainMenuBar() {
             && !inRoiMode && hasImage && !exposureRunning);
 
 
-
-    // mStartFocusFinderButton - enable when
-    //   -"focus finder profile" is active
-    //   -AND camera device is selected
-    //	 -AND camera device is connected
-    //	 -AND focus device is selected
-    //   -AND focus device is connected (filter only optional?!)
-    //   -AND valid focus star selected
-    //   -AND calibration data is available
-    //   -AND no exposure is currently running
+    /**
+     * mStartFocusFinderButton - enable when
+     *  -"focus finder profile" is active
+     *  -AND camera device is selected
+     *	-AND camera device is connected
+     *	-AND focus device is selected
+     *  -AND focus device is connected (filter only optional?!)
+     *  -AND valid focus star selected
+     *  -AND calibration data is available
+     *  -AND no exposure is currently running
+     */
     auto currentFocus = mFfl.getCurrentFocus();
     bool focusSelected = (currentFocus != nullptr);
 
@@ -1643,25 +1605,29 @@ void MainWindow::updateFocusFinderMainMenuBar() {
 
     mEditCalibrationDataAction->setEnabled(enableEditCalibrationAction);
 
-    // NOTE: Problem here is, that disabling the main functionality of this button, also disables the
-    //       menu... Therefore, it is enabled when it is at least ready for calibration. If there
-    //       is no calibration, it is proposed to the user when the button is pressed. Otherwise,
-    //       the focus finder just starts with the calibration available.
+    /**
+     * NOTE: Problem here is, that disabling the main functionality of this button, also disables the
+     *       menu... Therefore, it is enabled when it is at least ready for calibration. If there
+     *       is no calibration, it is proposed to the user when the button is pressed. Otherwise,
+     *       the focus finder just starts with the calibration available.
+     */
     mStartFocusFinderButton->setEnabled(readyForCalibration);
 
 
-    // mManageDeviceProfilesButton - enabled if
-    //   [-INDI server connected (?)]
-    //   -Focus finder not running
-    //
-    //   TODO: Not sure if this button should even bie disabled in case the focus
-    //         finder is running...
-    //
-    //   TODO: Also disable if any device action is in progress? -> I guess no...
-    //         User wants to have control about connecting / disconnecting devices.
-    //         A device could behave strange and user maybe wants to disconnect it.
-    //         A device could be "busy" all the time and user would never be able
-    //         to disconnect.
+    /**
+     * mManageDeviceProfilesButton - enabled if
+     *   [-INDI server connected (?)]
+     *   -Focus finder not running
+     *
+     *   TODO: Not sure if this button should even bie disabled in case the focus
+     *         finder is running...
+     *
+     *   TODO: Also disable if any device action is in progress? -> I guess no...
+     *         User wants to have control about connecting / disconnecting devices.
+     *         A device could behave strange and user maybe wants to disconnect it.
+     *         A device could be "busy" all the time and user would never be able
+     *         to disconnect.
+     */
     mManageDeviceProfilesButton->setEnabled(!focusFinderRunning);
 }
 
@@ -1671,7 +1637,7 @@ void MainWindow::onUpdateProfileSlot(std::optional<FocusFinderProfileT> oldProfi
         << "MainWindow::onUp"
            "dateProfileSlot..." << std::endl;
 
-    updateProfile(oldProfile, newProfile);
+    updateProfile(std::move(oldProfile), std::move(newProfile));
     updateFocusFinderMainMenuBar();
 }
 
@@ -1688,7 +1654,8 @@ MainWindow::MainWindow() :
 
     // Register at profile manager to get notified if selected profile / device changes...
     mFfl.getProfileManager()->registerActiveProfileChangedListener(
-            boost::bind(&MainWindow::onUpdateProfileSlot, this, boost::placeholders::_1, boost::placeholders::_2));
+            [this](std::optional<FocusFinderProfileT> oldProfile,
+                   std::optional<FocusFinderProfileT> newProfile) { onUpdateProfileSlot(std::move(oldProfile), std::move(newProfile)); });
 
     createImageViewerPanel();
     createReportingViewerPanel();

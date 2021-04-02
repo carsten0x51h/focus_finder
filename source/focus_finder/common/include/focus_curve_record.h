@@ -57,8 +57,8 @@ private:
 public:
     FocusCurveRecordT(TimestampT creationTimestamp, int currentAbsoluteFocusPos,
                       std::chrono::duration<float> exposureTime, float snr,
-                      const FwhmT &fwhmHorz, const FwhmT &fwhmVert, const HfdT &hfd,
-                      const ImageT &correctedStarImage, const std::tuple<float, float> &drift);
+                      FwhmT fwhmHorz, FwhmT fwhmVert, HfdT hfd,
+                      ImageT correctedStarImage, std::tuple<float, float> drift);
 
     TimestampT getCreationTimestamp() const;
 
@@ -81,7 +81,7 @@ public:
     const std::tuple<float, float> &getDrift() const;
 
     static float
-    getFocusMeasure(std::shared_ptr<FocusCurveRecordT> focusCurveRecord, FocusMeasureTypeT::TypeE focusMeasureType);
+    getFocusMeasure(const std::shared_ptr<FocusCurveRecordT>& focusCurveRecord, FocusMeasureTypeT::TypeE focusMeasureType);
 
     float getFocusMeasure(FocusMeasureTypeT::TypeE focusMeasureType);
 

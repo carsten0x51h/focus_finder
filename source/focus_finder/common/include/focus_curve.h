@@ -48,8 +48,8 @@ private:
 
     FocusMeasureTypeT::TypeE mFocusMeasureType; // < Focus measure type used to record the data points - e.g. HFD
 
-    float mLowerFocusPos; // TODO: Required?
-    float mUpperFocusPos; // TODO: Required?
+    float mLowerFocusPos{}; // TODO: Required?
+    float mUpperFocusPos{}; // TODO: Required?
     float mFocusMeasureLimit;
 
     std::time_t mDateTime;
@@ -60,7 +60,7 @@ private:
     std::shared_ptr<CurveFunctionT> mFocusCurveFunction;
 
 public:
-    FocusCurveT(std::shared_ptr<const FocusCurveRecordSetT> focusCurveRecordSet, const CurveFitParmsT &curveFitParms);
+    FocusCurveT(const std::shared_ptr<const FocusCurveRecordSetT>& focusCurveRecordSet, const CurveFitParmsT &curveFitParms);
 
     ~FocusCurveT();
 
@@ -75,7 +75,7 @@ public:
     [[nodiscard]] float calcFocusMeasureByFocusPosition(float focusPosition) const;
 
     static std::vector<float>
-    calcFocusPositionByFocusMeasure(std::shared_ptr<const CurveFunctionT> curveFunction, float focusMeasure);
+    calcFocusPositionByFocusMeasure(const std::shared_ptr<const CurveFunctionT>& curveFunction, float focusMeasure);
 
     [[nodiscard]] std::vector<float> calcFocusPositionByFocusMeasure(float focusMeasure) const;
 

@@ -23,10 +23,11 @@
  ****************************************************************************/
 
 #include <ostream>
+#include <utility>
 
 #include "include/point_with_residual.h"
 
-PointWithResidualT::PointWithResidualT(const PointFT &point, float residual) : point(point), residual(residual) {
+PointWithResidualT::PointWithResidualT(PointFT point, float residual) : point(std::move(point)), residual(residual) {
 
 }
 

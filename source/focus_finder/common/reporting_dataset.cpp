@@ -24,16 +24,15 @@
 
 #include <chrono>
 #include <ctime>
+#include <utility>
 
 #include "include/reporting_dataset.h"
 
-ReportingDatasetT::ReportingDatasetT() {
+ReportingDatasetT::ReportingDatasetT() = default;
 
-}
-
-ReportingDatasetT::ReportingDatasetT(const std::string &sender,
-                                     const std::string &title, const std::string &details) :
-        mSender(sender), mTitle(title), mDetails(details) {
+ReportingDatasetT::ReportingDatasetT(std::string sender,
+                                     std::string title, std::string details) :
+        mSender(std::move(sender)), mTitle(std::move(title)), mDetails(std::move(details)) {
 
     mTime = std::chrono::system_clock::to_time_t(
             std::chrono::system_clock::now());

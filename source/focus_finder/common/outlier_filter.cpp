@@ -22,17 +22,19 @@
  *
  ****************************************************************************/
 
+
 // See https://en.cppreference.com/w/cpp/ranges
 // TODO: Noet yet part of gcc-9
 // See https://stackoverflow.com/questions/56118941/do-we-have-c20-ranges-library-in-gcc-9
 //#include <ranges>
+
+
 // Using boost as long as ranges lib made it into the std.
 #include <boost/range/adaptors.hpp>
 #include <boost/range/algorithm.hpp>
 
-#include "include/throw_if.h"
 #include "include/outlier_filter.h"
-
+#include "include/throw_if.h"
 
 OutlierFilterT::OutlierFilterT() : mOutlierBoundary(-1) {
 }
@@ -47,4 +49,41 @@ bool OutlierFilterT::isSet() const {
 
 std::vector<PointWithResidualT> OutlierFilterT::getOutliers() const {
     return mOutliers;
+}
+
+template<typename RangeType>
+std::vector<PointFT> OutlierFilterT::filter(const RangeType &pointsWithResiduals) {
+
+    THROW_IF(OutlierFilter, mOutlierBoundary < 0, "outlierBoundary not set!")
+
+    mOutliers.clear();
+
+    size_t numInitialDataPoints = std::distance(pointsWithResiduals.begin(), pointsWithResiduals.end());
+
+    std::vector<PointFT> matchedDataPoints;
+
+    auto greaterThanBoundaryFunction = [&](const auto &pointWithResidual) {
+        return pointWithResidual.residual > mOutlierBoundary;
+    };
+    auto notGreaterThanBoundaryFunction = [&](const auto &pointWithResidual) {
+        return pointWithResidual.residual <= mOutlierBoundary;
+    };
+
+    // TODO: Is there a better way? Like collectAs?
+    // TODO: Maybe better use boost::push-back?
+    boost::range::copy(pointsWithResiduals | boost::adaptors::filtered(greaterThanBoundaryFunction),
+                       std::back_inserter(mOutliers));
+
+    // TODO: Is there a better way? Like collectAs?
+    boost::range::copy(pointsWithResiduals | boost::adaptors::filtered(notGreaterThanBoundaryFunction) |
+                       boost::adaptors::transformed(
+                               [](const auto &pointWithResidual) { return pointWithResidual.point; }),
+                       std::back_inserter(matchedDataPoints));
+
+    size_t numDataPointsRemoved = numInitialDataPoints - matchedDataPoints.size();
+
+    LOG(debug) << "OutlierFilterT::filter() - matchedDataPoints.size(): " << matchedDataPoints.size()
+               << ", removed: " << numDataPointsRemoved << "..." << std::endl;
+
+    return matchedDataPoints;
 }

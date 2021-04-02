@@ -21,8 +21,7 @@ message(STATUS "Example ${target}")
 # Sources
 # 
 set(sources
-	../common/test2.cpp
-    main_cmd.cpp
+        main_cmd.cpp
 )
 
 

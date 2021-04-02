@@ -26,9 +26,9 @@
 #include "include/logging.h"
 
 #include "include/timestamp.h"
-#include "include/timestamp_ptree_translator.h"
-
 #include "include/device_manager_type.h"
+
+#include "include/timestamp_ptree_translator.h"
 #include "include/device_manager_type_ptree_translator.h"
 
 #include <chrono>

@@ -44,7 +44,7 @@ double CurveFunctionParabolicT::f(float x) const {
     return MathFunctionsT::parabolic(x, a, b, c);
 }
 
-float CurveFunctionParabolicT::f_inv(float x) const {
+float CurveFunctionParabolicT::f_inv(float /*x*/) const {
     // TODO: IMPLEMENT
     throw CurveFunctionExceptionT("CurveFunctionParabolicT::f_inv() not implemented.");
 }

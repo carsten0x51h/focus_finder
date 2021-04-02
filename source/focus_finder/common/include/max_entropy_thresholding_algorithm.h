@@ -30,6 +30,8 @@
 
 class MaxEntropyThresholdingAlgorithmT : public ThresholdingAlgorithmT {
 public:
+    static const size_t NUM_BINS = 256;
+
     [[nodiscard]] std::string getName() const override;
 
     [[nodiscard]] float calc(const ImageT &inImg, long bitDepth) const override;

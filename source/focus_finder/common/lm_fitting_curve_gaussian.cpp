@@ -43,7 +43,7 @@ LmFittingCurveGaussianT::getParmNames() const { return LmFittingCurveT::getParmN
  */
 void LmFittingCurveGaussianT::makeGuess(const GslMultiFitParmsT &inData,
                                         gsl_vector *guess) {
-    THROW_IF(LmCurveMatcher, inData.size() < 2, "inData.size() < 2!");
+    THROW_IF(LmCurveMatcher, inData.size() < 2, "inData.size() < 2!")
 
     size_t numDataPoints = inData.size();
     float y_mean = 0;
@@ -78,7 +78,7 @@ float LmFittingCurveGaussianT::fx(float x, const gsl_vector *curveParms) const {
     double c = gsl_vector_get(curveParms, IdxT::C_IDX);
     double w = gsl_vector_get(curveParms, IdxT::W_IDX);
 
-    return MathFunctionsT::gaussian(x, b, p, c, w);
+    return (float) MathFunctionsT::gaussian(x, b, p, c, w);
 }
 
 
@@ -106,18 +106,18 @@ int LmFittingCurveGaussianT::gslFx(const gsl_vector *curveParms, const GslMultiF
 int LmFittingCurveGaussianT::gslDfx(const gsl_vector *x, const GslMultiFitParmsT *gslParms, gsl_matrix *J) {
 
     // Store current coefficients
-    float p = gsl_vector_get(x, IdxT::P_IDX);
-    float c = gsl_vector_get(x, IdxT::C_IDX);
-    float w = gsl_vector_get(x, IdxT::W_IDX);
+    double p = gsl_vector_get(x, IdxT::P_IDX);
+    double c = gsl_vector_get(x, IdxT::C_IDX);
+    double w = gsl_vector_get(x, IdxT::W_IDX);
 
     // Store non-changing calculations
-    float w2 = w * w;
-    float w3 = w2 * w;
+    double w2 = w * w;
+    double w3 = w2 * w;
 
     for (size_t i = 0; i < gslParms->size(); ++i) {
         const GslMultiFitDataT &gslData = gslParms->at(i);
-        float x_minus_c = (gslData.pt.x() - c);
-        float e = exp(-0.5F * (x_minus_c / w) * (x_minus_c / w));
+        double x_minus_c = (gslData.pt.x() - c);
+        double e = std::exp(-0.5F * (x_minus_c / w) * (x_minus_c / w));
 
         gsl_matrix_set(J, i, IdxT::B_IDX, 1 / gslData.sigma);
         gsl_matrix_set(J, i, IdxT::P_IDX, e / gslData.sigma);

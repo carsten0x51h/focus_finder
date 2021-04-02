@@ -23,7 +23,6 @@
  ****************************************************************************/
 
 #include "include/reporting.h"
-#include "include/logging.h"
 
 ReportingT::NewReportListenersT ReportingT::sNewReportListeners;
 

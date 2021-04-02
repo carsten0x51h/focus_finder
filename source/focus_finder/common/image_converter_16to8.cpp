@@ -28,9 +28,10 @@
 #include "include/throw_if.h"
 
 #include <limits>
-#include <stdint.h>
+#include <cstdint>
 
 #include <cmath>
+#include <utility>
 
 ImageConverter16To8T::ImageConverter16To8T() {
     mLut.resize(std::numeric_limits<uint16_t>::max() + 1);
@@ -40,7 +41,7 @@ void ImageConverter16To8T::setMapperFunction(
         std::shared_ptr<MapperFunctionT> mapperFunction) {
     LOG(debug) << "ImageConverter16To8T::setMapperFunction..." << std::endl;
 
-    mMapperFunction = mapperFunction;
+    mMapperFunction = std::move(mapperFunction);
 
     mMapperFunction->setSrcRange(0, std::numeric_limits<uint16_t>::max() + 1);
     mMapperFunction->setDestRange(0, std::numeric_limits<unsigned char>::max() + 1);
@@ -61,7 +62,7 @@ void ImageConverter16To8T::convert(const cimg_library::CImg<uint16_t> &src,
 
     LOG(debug) << "ImageConverter16To8T::convert..." << std::endl;
 
-    THROW_IF(ImageConverter16To8, dest == nullptr, "dest expected to be set.");
+    THROW_IF(ImageConverter16To8, dest == nullptr, "dest expected to be set.")
 
     dest->assign(src.width(), src.height());
 

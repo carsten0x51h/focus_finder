@@ -35,12 +35,12 @@ private:
     std::string mSender;
     std::string mTitle;
     std::string mDetails;
-    std::time_t mTime;
+    std::time_t mTime{};
 
 public:
     ReportingDatasetT();
 
-    ReportingDatasetT(const std::string &sender, const std::string &title, const std::string &details);
+    ReportingDatasetT(std::string sender, std::string title, std::string details);
 
     [[nodiscard]] std::time_t getTime() const;
 

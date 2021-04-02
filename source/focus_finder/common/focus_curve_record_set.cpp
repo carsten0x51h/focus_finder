@@ -52,8 +52,8 @@ std::pair<int, int> FocusCurveRecordSetT::minmaxFocusPos() const {
 
     std::tie(itMin, itMax) = std::minmax_element(std::begin(*this),
                                                  std::end(*this),
-                                                 [](std::shared_ptr<const FocusCurveRecordT> focusCurveRecord1,
-                                                    std::shared_ptr<const FocusCurveRecordT> focusCurveRecord2) {
+                                                 [](const std::shared_ptr<const FocusCurveRecordT>& focusCurveRecord1,
+                                                    const std::shared_ptr<const FocusCurveRecordT>& focusCurveRecord2) {
                                                      return focusCurveRecord1->getCurrentAbsoluteFocusPos() <
                                                             focusCurveRecord2->getCurrentAbsoluteFocusPos();
                                                  });
@@ -63,7 +63,7 @@ std::pair<int, int> FocusCurveRecordSetT::minmaxFocusPos() const {
 
 
 void FocusCurveRecordSetT::save(boost::property_tree::ptree &focusCurvesPt,
-                                std::shared_ptr<FocusCurveRecordSetT> focusCurveRecordSet,
+                                const std::shared_ptr<FocusCurveRecordSetT>& focusCurveRecordSet,
                                 const std::filesystem::path &lightFramePath) {
     LOG(debug) << "FocusCurveRecordSetT::save... Storing " << focusCurveRecordSet->size() << " records..." << std::endl;
 
@@ -120,7 +120,7 @@ FocusCurveRecordSetT::print(std::ostream &os, size_t indent) const {
 
     os << prefix << "--- FocusCurveRecordSet (#" << this->size() << " data points) ---" << std::endl << std::endl;
 
-    for (FocusCurveRecordSetT::const_iterator it = this->begin(); it != this->end(); ++it) {
+    for (auto it = this->begin(); it != this->end(); ++it) {
         const FocusCurveRecordT &fcr = **it;
         fcr.print(os, indent + 4);
         os << std::endl;

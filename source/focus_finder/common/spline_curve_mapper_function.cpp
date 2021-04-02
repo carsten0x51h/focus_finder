@@ -36,9 +36,7 @@ SplineCurveMapperFunctionT::SplineCurveMapperFunctionT() :
 
 }
 
-SplineCurveMapperFunctionT::~SplineCurveMapperFunctionT() {
-
-}
+SplineCurveMapperFunctionT::~SplineCurveMapperFunctionT() = default;
 
 std::string SplineCurveMapperFunctionT::getName() const {
     return "SplineCurveMapperFunction";
@@ -46,7 +44,7 @@ std::string SplineCurveMapperFunctionT::getName() const {
 
 // TODO: Maybe move to parent class
 void SplineCurveMapperFunctionT::setSrcRange(float from, float to) {
-    // TODO: Check that from <= to
+    // TODO: Check that from <= to -> if to > from, switch to and from...
     LOG(debug) << "SplineCurveMapperFunctionT::setSrcRange... [" << from << ", " << to << "]" << std::endl;
 
     mSrcFrom = from;
@@ -55,7 +53,7 @@ void SplineCurveMapperFunctionT::setSrcRange(float from, float to) {
 
 // TODO: Maybe move to parent class
 void SplineCurveMapperFunctionT::setDestRange(float from, float to) {
-    // TODO: Check that from <= to
+    // TODO: Check that from <= to -> if to > from, switch to and from...
     LOG(debug) << "SplineCurveMapperFunctionT::setDestRange... [" << from << ", " << to << "]" << std::endl;
 
     mDestFrom = from;

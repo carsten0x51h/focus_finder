@@ -22,11 +22,10 @@
  *
  ****************************************************************************/
 
-#ifndef SOURCE_FOCUS_FINDER_COMMON_FRAME_CPP_
-#define SOURCE_FOCUS_FINDER_COMMON_FRAME_CPP_
-
 #include "include/rect.h"
 #include "include/frame.h"
+
+#include <utility>
 #include "include/binning.h"
 
 
@@ -41,7 +40,7 @@ FrameT::FrameT() :
 }
 
 void FrameT::setImage(std::shared_ptr<const ImageT> image) {
-    mImage = image;
+    mImage = std::move(image);
 }
 // TODO: Needs clearImage() ?
 
@@ -95,5 +94,3 @@ const BinningT &FrameT::getBinning() const {
 void FrameT::setBinning(const BinningT &binning) {
     mBinning = binning;
 }
-
-#endif /* SOURCE_FOCUS_FINDER_COMMON_FRAME_CPP_ */

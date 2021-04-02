@@ -25,13 +25,10 @@
 #include "include/focus_curve_recorder_logic.h"
 
 #include "include/focus_finder_logic.h"
-#include "include/point.h"
-#include "include/point_with_residual.h"
 #include "include/focus_curve_recorder_type.h"
 #include "include/focus_curve_recorder_factory.h"
 #include "include/focus_curve_recorder.h"
 #include "include/profile_manager.h"
-#include "include/focus_curve.h"
 #include "include/focus_controller.h"
 
 class FocusCurveRecordSetT;

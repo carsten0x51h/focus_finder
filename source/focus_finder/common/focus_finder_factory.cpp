@@ -30,7 +30,7 @@
 class FocusControllerT;
 
 std::shared_ptr<FocusFinderT> FocusFinderFactoryT::getInstance(
-        const FocusFinderStrategyT::TypeE &strategy, std::shared_ptr<FocusControllerT> focusAnalyzer) {
+        const FocusFinderStrategyT::TypeE &strategy, const std::shared_ptr<FocusControllerT>& focusAnalyzer) {
 
     switch (strategy) {
         case FocusFinderStrategyT::FAST_CURVE_LOOKUP:

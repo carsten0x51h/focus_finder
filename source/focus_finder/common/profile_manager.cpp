@@ -38,7 +38,7 @@
 const std::string ProfileManagerT::PROFILE_CFG_FILENAME = "profile.cfg";
 
 
-std::filesystem::path ProfileManagerT::composeFullProfileDirectory(const std::string &profileDirectoryName) const {
+std::filesystem::path ProfileManagerT::composeFullProfileDirectory(const std::string &profileDirectoryName) {
 
     std::filesystem::path fullPath = ProfileManagerT::getProfilesRootDirectory();
 
@@ -49,7 +49,7 @@ std::filesystem::path ProfileManagerT::composeFullProfileDirectory(const std::st
 
 
 std::filesystem::path ProfileManagerT::composeFullProfileFilePath(
-        const std::string &profileDirectoryName) const {
+        const std::string &profileDirectoryName) {
 
     std::filesystem::path fullPath = ProfileManagerT::composeFullProfileDirectory(profileDirectoryName);
 
@@ -58,7 +58,7 @@ std::filesystem::path ProfileManagerT::composeFullProfileFilePath(
     return fullPath;
 }
 
-std::filesystem::path ProfileManagerT::composeFullLightFrameDirectory(const std::string &profileDirectoryName) const {
+std::filesystem::path ProfileManagerT::composeFullLightFrameDirectory(const std::string &profileDirectoryName) {
 
     std::filesystem::path fullPath = ProfileManagerT::composeFullProfileDirectory(profileDirectoryName);
 
@@ -77,8 +77,7 @@ ProfileManagerT::ProfileManagerT() :
     std::filesystem::create_directories(ProfileManagerT::getProfilesRootDirectory());
 }
 
-ProfileManagerT::~ProfileManagerT() {
-}
+ProfileManagerT::~ProfileManagerT() = default;
 
 std::optional<FocusFinderProfileT> ProfileManagerT::getActiveProfile() const {
     return mActiveProfile;
@@ -258,11 +257,11 @@ std::filesystem::path ProfileManagerT::getProfilesRootDirectory() {
 }
 
 
-std::vector<std::string> ProfileManagerT::getProfileDirectoryNames() const {
+std::vector<std::string> ProfileManagerT::getProfileDirectoryNames() {
     std::vector<std::string> profileDirectoryNames;
     std::error_code ec;
 
-    for (auto &p : std::filesystem::directory_iterator(ProfileManagerT::getProfilesRootDirectory())) {
+    for (const auto &p : std::filesystem::directory_iterator(ProfileManagerT::getProfilesRootDirectory())) {
 
         auto fullProfileFilePath = p.path();
         fullProfileFilePath /= PROFILE_CFG_FILENAME;

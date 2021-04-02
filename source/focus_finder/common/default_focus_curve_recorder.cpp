@@ -25,30 +25,22 @@
 #include <chrono>
 
 #include <boost/bind.hpp>
+#include <utility>
 
 #include "include/default_focus_curve_recorder.h"
 #include "include/logging.h"
 #include "include/exception.h"
 #include "include/wait_for.h"
 
-#include "include/snr.h"
-#include "include/centroid.h"
-#include "include/hfd.h"
-#include "include/fwhm.h"
-#include "include/image_slicer.h"
 #include "include/focus_measure_type.h"
 #include "include/focus_curve_record.h"
-#include "include/focus_curve_record_builder.h"
 #include "include/focus_curve_record_set.h"
 #include "include/curve_fit_algorithm.h"
-#include "include/curve_parms.h"
-#include "include/point.h"
-#include "include/point_with_residual.h"
 #include "include/curve_half.h"
 #include "include/focus_direction.h"
 
 DefaultFocusCurveRecorderT::DefaultFocusCurveRecorderT(std::shared_ptr<FocusControllerT> focusController)
-        : FocusCurveRecorderT(focusController),
+        : FocusCurveRecorderT(std::move(focusController)),
           mCancelled(false),
           mIsRunning(false) {
     using namespace std::placeholders;
@@ -61,12 +53,12 @@ DefaultFocusCurveRecorderT::DefaultFocusCurveRecorderT(std::shared_ptr<FocusCont
 
     // Hand focus controller events through
     getFocusController()->registerFocusControllerProgressUpdateListener(
-            boost::bind(&DefaultFocusCurveRecorderT::onFocusControllerProgressUpdate,
-                        this, boost::placeholders::_1, boost::placeholders::_2, boost::placeholders::_3)
+            [this](float progress,
+                   const std::string &msg,
+                   std::shared_ptr<FocusCurveRecordT> focusCurveRecord) { onFocusControllerProgressUpdate(progress, msg, std::move(focusCurveRecord)); }
     );
     getFocusController()->registerFocusControllerNewRecordListener(
-            boost::bind(&DefaultFocusCurveRecorderT::onFocusControllerNewRecord,
-                        this, boost::placeholders::_1)
+            [this](std::shared_ptr<FocusCurveRecordT> focusCurveRecord) { onFocusControllerNewRecord(std::move(focusCurveRecord)); }
     );
 }
 
@@ -77,7 +69,7 @@ void DefaultFocusCurveRecorderT::onFocusControllerProgressUpdate(float progress,
         << "DefaultFocusCurveRecorderT::onFocusControllerProgressUpdate... handing through FocusControllerProgressUpdate..."
         << std::endl;
 
-    notifyFocusCurveRecorderProgressUpdate(progress, msg, focusCurveRecord);
+    notifyFocusCurveRecorderProgressUpdate(progress, msg, std::move(focusCurveRecord));
 }
 
 void DefaultFocusCurveRecorderT::onFocusControllerNewRecord(std::shared_ptr<FocusCurveRecordT> focusCurveRecord) {
@@ -85,7 +77,7 @@ void DefaultFocusCurveRecorderT::onFocusControllerNewRecord(std::shared_ptr<Focu
         << "DefaultFocusCurveRecorderT::onFocusControllerNewRecord... handing through FocusControllerNewRecord..."
         << std::endl;
 
-    notifyFocusCurveRecorderNewRecord(focusCurveRecord);
+    notifyFocusCurveRecorderNewRecord(std::move(focusCurveRecord));
 }
 
 
@@ -137,7 +129,7 @@ CurveHalfT::TypeE DefaultFocusCurveRecorderT::locateStartingPosition() {
     SelfOrientationResultT selfOrientationResult = getFocusController()->performSelfOrientation(getFocusMeasureLimit());
 
     // Move close to the limiting focus measure (into the determined direction)
-    getFocusController()->boundaryScanLinear(selfOrientationResult, getStepSize(), getFocusMeasureLimit());
+    getFocusController()->boundaryScanLinear(selfOrientationResult, (float) getStepSize(), getFocusMeasureLimit());
 
     return selfOrientationResult.curveHalf;
 }
@@ -170,7 +162,7 @@ DefaultFocusCurveRecorderT::recordFocusCurveRecordSet(CurveHalfT::TypeE curveHal
     // Notify about FocusCurve recorder update...
     notifyFocusCurveRecorderProgressUpdate(0, "Starting to record curve...", curveRecord);
 
-    bool continueRecording = true;
+    bool continueRecording;
 
     do {
         notifyFocusCurveRecorderRecordSetUpdate(focusCurveRecordSet);
@@ -379,7 +371,7 @@ void DefaultFocusCurveRecorderT::run() {
 
         // 		// Use newly calculated center (newCentroidOuterRoiCoords) to again get sub-frame from mCurrentImage
         // 		// TODO: Currently we just round() the float position to the closest int. This may be
-        // 		//       improved by introducing sub-pixel accurracy...
+        // 		//       improved by introducing sub-pixel accuracy...
         // 		// TODO: We may introduce a round() function for conversion from PointTF to PointT...?
         // 		PointT<unsigned int> newCentroidRoundedToNextInt(
         // 				std::round(newCentroidOuterRoiCoords.x()),
@@ -589,7 +581,7 @@ void DefaultFocusCurveRecorderT::run() {
         notifyFocusCurveRecorderCancelled();
     }
     catch (CurveFitExceptionT &exc) {
-        // TODO: This should be catched already earlier and should not cancel the entire FocusCurveRecorder
+        // TODO: This should be caught already earlier and should not cancel the entire FocusCurveRecorder
         LOG(warning)
             << "Matching the focus curve failed." << std::endl;
 

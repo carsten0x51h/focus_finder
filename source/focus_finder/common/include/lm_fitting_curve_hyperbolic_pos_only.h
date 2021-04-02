@@ -41,7 +41,7 @@ private:
     float mA;
     float mB;
 
-    [[nodiscard]] float phi(float x, float a, float c) const;
+    [[nodiscard]] static float phi(float x, float a, float c) ;
 
 public:
     LmFittingCurveHyperbolicPosOnlyT();

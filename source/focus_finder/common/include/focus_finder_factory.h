@@ -37,7 +37,7 @@ class FocusControllerT;
 class FocusFinderFactoryT {
 public:
     static std::shared_ptr<FocusFinderT>
-    getInstance(const FocusFinderStrategyT::TypeE &strategy, std::shared_ptr<FocusControllerT> focusAnalyzer);
+    getInstance(const FocusFinderStrategyT::TypeE &strategy, const std::shared_ptr<FocusControllerT>& focusAnalyzer);
 };
 
 

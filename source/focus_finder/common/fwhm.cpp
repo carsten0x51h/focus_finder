@@ -27,7 +27,6 @@
 #include <vector>
 
 #include "include/fwhm.h"
-#include "include/logging.h"
 #include "include/throw_if.h"
 #include "include/point.h"
 #include "include/point_with_residual.h"

@@ -25,7 +25,6 @@
 #include "include/self_orientation_result.h"
 #include "include/focus_curve_record.h"
 
-
 std::ostream &
 SelfOrientationResultT::print(std::ostream &os) const {
     os << "--- SelfOrientationResultT ---" << std::endl

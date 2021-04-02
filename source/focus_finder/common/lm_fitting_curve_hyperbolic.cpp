@@ -43,7 +43,7 @@ LmFittingCurveHyperbolicT::getParmNames() const { return LmFittingCurveT::getPar
  */
 void LmFittingCurveHyperbolicT::makeGuess(const GslMultiFitParmsT &inData,
                                           gsl_vector *guess) {
-    THROW_IF(LmCurveMatcher, inData.size() < 2, "inData.size() < 2!");
+    THROW_IF(LmCurveMatcher, inData.size() < 2, "inData.size() < 2!")
 
     // Find min HFD -> good start value for c
     GslMultiFitParmsT::const_iterator minEl;
@@ -65,21 +65,21 @@ void LmFittingCurveHyperbolicT::makeGuess(const GslMultiFitParmsT &inData,
  * Phi() is a repeating part of the function calculation used by
  * different derivations.
  */
-float LmFittingCurveHyperbolicT::phi(float x, float a, float c) const {
+float LmFittingCurveHyperbolicT::phi(float x, float a, float c) {
     const float a2 = a * a;
     const float diff = x - c;
     const float diff2 = diff * diff;
 
-    return sqrt(1.0 + (diff2 / a2));
+    return (float) std::sqrt(1.0 + (diff2 / a2));
 }
 
 /* Calculate H(x) */
 float LmFittingCurveHyperbolicT::fx(float x, const gsl_vector *curveParms) const {
 
-    float a = gsl_vector_get(curveParms, CurveFunctionHyperbolicT::IdxT::A_IDX);
-    float b = gsl_vector_get(curveParms, CurveFunctionHyperbolicT::IdxT::B_IDX);
-    float c = gsl_vector_get(curveParms, CurveFunctionHyperbolicT::IdxT::C_IDX);
-    float d = gsl_vector_get(curveParms, CurveFunctionHyperbolicT::IdxT::D_IDX);
+    float a = (float) gsl_vector_get(curveParms, CurveFunctionHyperbolicT::IdxT::A_IDX);
+    float b = (float) gsl_vector_get(curveParms, CurveFunctionHyperbolicT::IdxT::B_IDX);
+    float c = (float) gsl_vector_get(curveParms, CurveFunctionHyperbolicT::IdxT::C_IDX);
+    float d = (float) gsl_vector_get(curveParms, CurveFunctionHyperbolicT::IdxT::D_IDX);
 
     // We could write a TMPL for that... but question is if this is not
     // too slow since fx() will be called very often by the LM algorithm.
@@ -95,10 +95,10 @@ float LmFittingCurveHyperbolicT::fx(float x, const gsl_vector *curveParms) const
     // CurveFunctionHyperbolicT hyperbolicFunc(parms);
     // return hyperbolicFunc.f(x);
 
-    return MathFunctionsT::hyperbolic(x, a, b, c, d);
+    return (float) MathFunctionsT::hyperbolic(x, a, b, c, d);
 }
 
-/* Calculates fitting funtion for H(x) for each data point. */
+/* Calculates fitting function for H(x) for each data point. */
 int LmFittingCurveHyperbolicT::gslFx(const gsl_vector *curveParms,
                                      const GslMultiFitParmsT *gslParms, gsl_vector *outResultVec) {
 
@@ -118,13 +118,13 @@ int LmFittingCurveHyperbolicT::gslFx(const gsl_vector *curveParms,
 }
 
 /* Calculates the Jacobian (derivative) matrix  */
-int LmFittingCurveHyperbolicT::gslDfx(const gsl_vector *x, const GslMultiFitParmsT *gslParms,
+int LmFittingCurveHyperbolicT::gslDfx(const gsl_vector *xv, const GslMultiFitParmsT *gslParms,
                                       gsl_matrix *J) {
 
     // Store current coefficients
-    float a = gsl_vector_get(x, CurveFunctionHyperbolicT::IdxT::A_IDX);
-    float b = gsl_vector_get(x, CurveFunctionHyperbolicT::IdxT::B_IDX);
-    float c = gsl_vector_get(x, CurveFunctionHyperbolicT::IdxT::C_IDX);
+    auto a = (float) gsl_vector_get(xv, CurveFunctionHyperbolicT::IdxT::A_IDX);
+    auto b = (float) gsl_vector_get(xv, CurveFunctionHyperbolicT::IdxT::B_IDX);
+    auto c = (float) gsl_vector_get(xv, CurveFunctionHyperbolicT::IdxT::C_IDX);
 
     // Store non-changing calculations
     const float a2 = a * a;
@@ -150,10 +150,10 @@ int LmFittingCurveHyperbolicT::gslDfx(const gsl_vector *x, const GslMultiFitParm
 }
 
 /* Invokes f(x) and f'(x) */
-int LmFittingCurveHyperbolicT::gslFdfx(const gsl_vector *x, const GslMultiFitParmsT *gslParms,
+int LmFittingCurveHyperbolicT::gslFdfx(const gsl_vector *xv, const GslMultiFitParmsT *gslParms,
                                        gsl_vector *f, gsl_matrix *J) {
-    gslFx(x, gslParms, f);
-    gslDfx(x, gslParms, J);
+    gslFx(xv, gslParms, f);
+    gslDfx(xv, gslParms, J);
 
     return GSL_SUCCESS;
 }

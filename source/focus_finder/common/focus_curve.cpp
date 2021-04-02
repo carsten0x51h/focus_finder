@@ -33,7 +33,7 @@
 // }
 
 
-FocusCurveT::FocusCurveT(std::shared_ptr<const FocusCurveRecordSetT> focusCurveRecordSet,
+FocusCurveT::FocusCurveT(const std::shared_ptr<const FocusCurveRecordSetT>& focusCurveRecordSet,
                          const CurveFitParmsT &curveFitParms) {
 
     mFocusMeasureType = focusCurveRecordSet->getFocusMeasureType(); // TODO: Good idea to store the focus measure type in the RecordSet?
@@ -71,8 +71,7 @@ FocusCurveT::FocusCurveT(std::shared_ptr<const FocusCurveRecordSetT> focusCurveR
     mDateTime = std::time(nullptr);
 }
 
-FocusCurveT::~FocusCurveT() {
-}
+FocusCurveT::~FocusCurveT() = default;
 
 float FocusCurveT::getLowerFocusPos() const {
     return mLowerFocusPos;
@@ -103,12 +102,12 @@ const CurveParmsT &FocusCurveT::getCurveParms() const {
 float FocusCurveT::calcFocusMeasureByFocusPosition(float focusPosition) const {
     // TODO: Check the boundaries??
 
-    return mFocusCurveFunction->f(focusPosition);
+    return (float) mFocusCurveFunction->f(focusPosition);
 }
 
 // TODO: static version? -> pass in focusCurveFunction
 std::vector<float>
-FocusCurveT::calcFocusPositionByFocusMeasure(std::shared_ptr<const CurveFunctionT> curveFunction, float focusMeasure) {
+FocusCurveT::calcFocusPositionByFocusMeasure(const std::shared_ptr<const CurveFunctionT>& curveFunction, float focusMeasure) {
     std::vector<float> results;
 
     // TODO: Check the boundaries??

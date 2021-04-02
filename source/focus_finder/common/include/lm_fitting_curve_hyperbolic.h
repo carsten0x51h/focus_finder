@@ -38,7 +38,7 @@
 
 class LmFittingCurveHyperbolicT : public LmFittingCurveT {
 private:
-    float phi(float x, float a, float c) const;
+    static float phi(float x, float a, float c) ;
 
 public:
     // struct IdxT {

@@ -31,7 +31,7 @@
 
 class PointWithResidualT {
 public:
-    PointWithResidualT(const PointFT &point, float residual);
+    PointWithResidualT(PointFT point, float residual);
 
     PointFT point;
     float residual;

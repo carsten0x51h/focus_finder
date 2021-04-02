@@ -26,7 +26,6 @@
 #include "include/global_config_manager.h"
 #include "include/profile_manager.h"
 
-
 FoFiConfigManagerT::FoFiConfigManagerT() {
     mGlobalConfigManager = std::make_shared<GlobalConfigManagerT>();
     mProfileManager = std::make_shared<ProfileManagerT>();

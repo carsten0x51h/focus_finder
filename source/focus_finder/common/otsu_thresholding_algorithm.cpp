@@ -32,10 +32,10 @@ float OtsuThresholdingAlgorithmT::calc(const ImageT &inImg, long bitDepth) const
 
     LOG(debug) << "OtsuThresholdingAlgorithmT::calc..." << std::endl;
 
-    size_t numBuckets = pow(2.0, bitDepth);
+    size_t numBuckets = std::pow(2.0F, bitDepth);
     std::vector<float> hist(numBuckets, 0.0F);
 
-    float numPixels = inImg.width() * inImg.height();
+    float numPixels = (float) inImg.width() * (float) inImg.height();
     float sumB = 0.0F;
     float wB = 0.0F;
     float max = 0.0F;
@@ -51,12 +51,12 @@ float OtsuThresholdingAlgorithmT::calc(const ImageT &inImg, long bitDepth) const
         }
 
     float sum = 0;
-    for (int pos = 0; pos < numBuckets; ++pos) {
+    for (size_t pos = 0; pos < numBuckets; ++pos) {
         sum += pos * hist[pos];
     }
 
 
-    for (int i = 0; i < numBuckets; ++i) {
+    for (size_t i = 0; i < numBuckets; ++i) {
         wB += hist[i];
 
         if (isAlmostEqual(wB, 0.0F)) { continue; }
@@ -70,7 +70,7 @@ float OtsuThresholdingAlgorithmT::calc(const ImageT &inImg, long bitDepth) const
         float mF = (sum - sumB) / wF;
         float mB = sumB / wB;
         float diff = mB - mF;
-        float bw = wB * wF * pow(diff, 2.0);
+        float bw = wB * wF * std::pow(diff, 2.0F);
 
         if (bw >= max) {
             threshold1 = i;
@@ -84,5 +84,5 @@ float OtsuThresholdingAlgorithmT::calc(const ImageT &inImg, long bitDepth) const
     LOG(debug) << "OtsuThresholdingAlgorithmT::calc - threshold1: " << threshold1 << ", threshold2: " << threshold2
                << std::endl;
 
-    return (threshold1 + threshold2) / 2.0;
+    return (threshold1 + threshold2) / 2.0F;
 }

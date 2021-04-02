@@ -39,7 +39,7 @@ float MaxEntropyThresholdingAlgorithmT::calc(const ImageT &img, long bitDepth) c
 
     LOG(debug) << "MaxEntropyThresholdingAlgorithmT::calc..." << std::endl;
 
-    size_t numBins = 256;
+    size_t numBins = NUM_BINS;
     std::vector<float> hist(numBins, 0);
 
     // TODO: Use min_max()...
@@ -58,16 +58,15 @@ float MaxEntropyThresholdingAlgorithmT::calc(const ImageT &img, long bitDepth) c
      * later (see comment below).
      */
     cimg_forXY(img, x, y) {
-            int idx = (numBins - 1) * (img(x, y) - min) / (max - min);
+            int idx = (int) ((float) (numBins - 1) * (img(x, y) - min) / (max - min));
             ++hist[idx];
         }
 
-
     // Normalize histogram (sum of all is 1)
-    float sum = img.width() * img.height();
+    float sum = (float) img.width() * (float) img.height();
 
     std::vector<float> normHist(hist);
-    for (std::vector<float>::iterator it = normHist.begin(); it != normHist.end(); ++it) {
+    for (auto it = normHist.begin(); it != normHist.end(); ++it) {
         *it = *it / sum;
     }
 

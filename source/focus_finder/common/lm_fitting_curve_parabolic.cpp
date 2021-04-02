@@ -42,14 +42,14 @@ LmFittingCurveParabolicT::getParmNames() const { return LmFittingCurveT::getParm
  */
 void LmFittingCurveParabolicT::makeGuess(const GslMultiFitParmsT &inData,
                                          gsl_vector *guess) {
-    THROW_IF(LmCurveMatcher, inData.size() < 2, "inData.size() < 2!");
+    THROW_IF(LmCurveMatcher, inData.size() < 2, "inData.size() < 2!")
 
     float xMin = inData.at(0).pt.x();
     float yMin = inData.at(0).pt.y();
 
     // Find minimum y value...
-    for (size_t i = 0; i < inData.size(); ++i) {
-        const PointFT &dataPoint = inData.at(i).pt;
+    for (const auto & i : inData) {
+        const PointFT &dataPoint = i.pt;
         if (dataPoint.y() < yMin) {
             xMin = dataPoint.x();
             yMin = dataPoint.y();
@@ -88,11 +88,11 @@ void LmFittingCurveParabolicT::makeGuess(const GslMultiFitParmsT &inData,
 /* y = a * x^2 + b * x + c */
 float LmFittingCurveParabolicT::fx(float x, const gsl_vector *curveParms) const {
 
-    float a = gsl_vector_get(curveParms, IdxT::A_IDX);
-    float b = gsl_vector_get(curveParms, IdxT::B_IDX);
-    float c = gsl_vector_get(curveParms, IdxT::C_IDX);
+    auto a = (float) gsl_vector_get(curveParms, IdxT::A_IDX);
+    auto b = (float) gsl_vector_get(curveParms, IdxT::B_IDX);
+    auto c = (float) gsl_vector_get(curveParms, IdxT::C_IDX);
 
-    return MathFunctionsT::parabolic(x, a, b, c);
+    return (float) MathFunctionsT::parabolic(x, a, b, c);
 }
 
 /* Calculates f(x) = a*x^2 + b*x + c for each data point */
@@ -118,11 +118,7 @@ int LmFittingCurveParabolicT::gslFx(const gsl_vector *curveParms, const GslMulti
  * See: http://de.wikipedia.org/wiki/Jacobi-Matrix
  * See: http://de.wikipedia.org/wiki/Levenberg-Marquardt-Algorithmus
  */
-int LmFittingCurveParabolicT::gslDfx(const gsl_vector *x, const GslMultiFitParmsT *gslParms, gsl_matrix *J) {
-    /* Store current coefficients */
-    // float a = gsl_vector_get(x, IdxT::A_IDX);
-    // float b = gsl_vector_get(x, IdxT::B_IDX);
-    // float c = gsl_vector_get(x, IdxT::C_IDX);
+int LmFittingCurveParabolicT::gslDfx(const gsl_vector *, const GslMultiFitParmsT *gslParms, gsl_matrix *J) {
 
     for (size_t i = 0; i < gslParms->size(); ++i) {
         const GslMultiFitDataT &gslData = gslParms->at(i);

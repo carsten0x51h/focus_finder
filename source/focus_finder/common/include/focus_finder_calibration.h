@@ -51,7 +51,7 @@ public:
 
     size_t numRecordSets() const;
 
-    static void save(boost::property_tree::ptree &pt, std::shared_ptr<FocusFinderCalibrationT> focusFinderCalibration,
+    static void save(boost::property_tree::ptree &pt, const std::shared_ptr<FocusFinderCalibrationT>& focusFinderCalibration,
                      const std::filesystem::path &lightFramePath);
 
     static std::shared_ptr<FocusFinderCalibrationT>

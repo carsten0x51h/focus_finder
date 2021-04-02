@@ -50,7 +50,7 @@ LmFittingCurveHyperbolicPosOnlyT::getParmNames() const { return LmFittingCurveT:
  */
 void LmFittingCurveHyperbolicPosOnlyT::makeGuess(const GslMultiFitParmsT &inData,
                                                  gsl_vector *guess) {
-    THROW_IF(LmCurveMatcher, inData.size() < 2, "inData.size() < 2!");
+    THROW_IF(LmCurveMatcher, inData.size() < 2, "inData.size() < 2!")
 
     // Find min HFD -> good start value for c
     GslMultiFitParmsT::const_iterator minEl;
@@ -71,12 +71,12 @@ void LmFittingCurveHyperbolicPosOnlyT::makeGuess(const GslMultiFitParmsT &inData
  * Phi() is a repeating part of the function calculation used by
  * different derivations.
  */
-float LmFittingCurveHyperbolicPosOnlyT::phi(float x, float a, float c) const {
+float LmFittingCurveHyperbolicPosOnlyT::phi(float x, float a, float c) {
     const float a2 = a * a;
     const float diff = x - c;
     const float diff2 = diff * diff;
 
-    return sqrt(1.0 + (diff2 / a2));
+    return (float) std::sqrt(1.0 + (diff2 / a2));
 }
 
 void LmFittingCurveHyperbolicPosOnlyT::setA(float a) {
@@ -91,13 +91,13 @@ void LmFittingCurveHyperbolicPosOnlyT::setB(float b) {
 /* Calculate H(x) */
 float LmFittingCurveHyperbolicPosOnlyT::fx(float x, const gsl_vector *curveParms) const {
 
-    float c = gsl_vector_get(curveParms, CurveFunctionHyperbolicPosOnlyT::IdxT::C_IDX);
-    float d = gsl_vector_get(curveParms, CurveFunctionHyperbolicPosOnlyT::IdxT::D_IDX);
+    auto c = (float) gsl_vector_get(curveParms, CurveFunctionHyperbolicPosOnlyT::IdxT::C_IDX);
+    auto d = (float) gsl_vector_get(curveParms, CurveFunctionHyperbolicPosOnlyT::IdxT::D_IDX);
 
-    return MathFunctionsT::hyperbolic(x, mA, mB, c, d);
+    return (float) MathFunctionsT::hyperbolic(x, mA, mB, c, d);
 }
 
-/* Calculates fitting funtion for H(x) for each data point. */
+/* Calculates fitting function for H(x) for each data point. */
 int LmFittingCurveHyperbolicPosOnlyT::gslFx(const gsl_vector *curveParms,
                                             const GslMultiFitParmsT *gslParms, gsl_vector *outResultVec) {
 
@@ -114,13 +114,11 @@ int LmFittingCurveHyperbolicPosOnlyT::gslFx(const gsl_vector *curveParms,
 }
 
 /* Calculates the Jacobian (derivative) matrix  */
-int LmFittingCurveHyperbolicPosOnlyT::gslDfx(const gsl_vector *x, const GslMultiFitParmsT *gslParms,
+int LmFittingCurveHyperbolicPosOnlyT::gslDfx(const gsl_vector *xv, const GslMultiFitParmsT *gslParms,
                                              gsl_matrix *J) {
 
     // Store current coefficients
-    //float a = gsl_vector_get(x, CurveFunctionHyperbolicT::IdxT::A_IDX);
-    //float b = gsl_vector_get(x, CurveFunctionHyperbolicT::IdxT::B_IDX);
-    float c = gsl_vector_get(x, CurveFunctionHyperbolicPosOnlyT::IdxT::C_IDX);
+    auto c = (float) gsl_vector_get(xv, CurveFunctionHyperbolicPosOnlyT::IdxT::C_IDX);
 
     // Store non-changing calculations
     const float a2 = mA * mA;
