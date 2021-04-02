@@ -23,7 +23,7 @@
  ****************************************************************************/
 
 #ifndef SOURCE_FOCUS_FINDER_GUI_INCLUDE_ABOUT_DIALOG_H_
-#define SOURCE_FOCUS_FINDER_GUI_INCLUDE_ABOUT_DIALOG_H_
+#define SOURCE_FOCUS_FINDER_GUI_INCLUDE_ABOUT_DIALOG_H_ SOURCE_FOCUS_FINDER_GUI_INCLUDE_ABOUT_DIALOG_H_
 
 // Qt includes
 #include <QDialog>

@@ -167,7 +167,7 @@ void FocusFinderCalibrationT::save(boost::property_tree::ptree &pt,
         // TODO: throw!?
     }
 
-    for (auto &focusCurveRecordSet : focusCurveRecordSets) {
+    for (const auto &focusCurveRecordSet : focusCurveRecordSets) {
         FocusCurveRecordSetT::save(focusCurvesPt, focusCurveRecordSet, lightFramePath);
     }
 
@@ -187,7 +187,7 @@ FocusFinderCalibrationT::load(const boost::property_tree::ptree &pt, const Curve
     const auto &focusCurvesNode = pt.get_child("focus_curves");
     FocusCurveRecordSetContainerT focusCurveRecordSets;
 
-    for (auto &focusCurveRecordSetPt : focusCurvesNode) {
+    for (const auto &focusCurveRecordSetPt : focusCurvesNode) {
         focusCurveRecordSets.push_back(FocusCurveRecordSetT::load(focusCurveRecordSetPt.second, lightFramePath));
     }
 

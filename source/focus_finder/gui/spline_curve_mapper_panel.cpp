@@ -24,8 +24,6 @@
 
 #include "include/spline_curve_mapper_panel.h"
 
-#include "../common/include/logging.h"
-
 #include "ui_spline_curve_mapper_panel.h"
 
 SplineCurveMapperPanelT::SplineCurveMapperPanelT(QWidget *parent, FocusFinderLogicT &ffl,

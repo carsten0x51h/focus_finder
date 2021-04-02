@@ -27,10 +27,7 @@
 #include "include/anim_menu_button.h"
 #include "include/manage_device_entry_panel.h"
 
-#include "../common/include/logging.h"
-
 #include "../common/include/device_manager.h"
-#include "../common/include/device.h"
 
 #include "ui_manage_device_entry_panel.h"
 

@@ -89,7 +89,7 @@ public:
     static void save(const std::string &fullGlobalFocusFinderConfigPath,
                      const GlobalFocusFinderConfigT &profile);
 
-    std::ostream &print(std::ostream &os, size_t ident = 0) const;
+    std::ostream &print(std::ostream &os, size_t indent = 0) const;
 
 
     static const GlobalFocusFinderConfigT &defaults();

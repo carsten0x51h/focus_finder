@@ -136,7 +136,7 @@ void FwhmViewWidgetT::paintEvent(QPaintEvent *event) {
             //float residualRadius = xValueToDispScaleFactor * outlierValues.at(idx).residual;
             //drawCircle(p, toScreenCoords(outlierValues.at(idx).point), QColor(255, 255, 0, 255), penWidth, residualRadius);
 
-            drawCircle(p, toScreenCoords(outlierValues.at(idx).point), QColor(255, 255, 0, 255), penWidth, 10.0f);
+            drawCircle(p, toScreenCoords(outlierValues.at(idx).point), QColor(255, 255, 0, 255), penWidth, 10.0F);
         }
 
 

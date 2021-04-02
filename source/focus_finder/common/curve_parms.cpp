@@ -27,7 +27,7 @@
 
 // CurveParmsT::CurveParmsT(const gsl_vector * inVec = 0, const std::vector<std::string> & inNames = {}) {
 // 	for (size_t idx = 0; idx < inVec->size; ++idx) {
-// 		float value = (inVec ? gsl_vector_get(inVec, idx) : 0.0f);
+// 		float value = (inVec ? gsl_vector_get(inVec, idx) : 0.0F);
 // 		std::string name = (inNames.size() > idx ? inNames.at(idx) : "<unknown>");
 
 // 		mCurveParms.push_back(CurveParmT(name, value));

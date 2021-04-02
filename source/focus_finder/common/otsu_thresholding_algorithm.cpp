@@ -39,7 +39,8 @@ float OtsuThresholdingAlgorithmT::calc(const ImageT &inImg, long bitDepth) const
     float sumB = 0.0F;
     float wB = 0.0F;
     float max = 0.0F;
-    float threshold1 = 0.0F, threshold2 = 0.0F;
+    float threshold1 = 0.0F;
+    float threshold2 = 0.0F;
 
     LOG(debug) << "OtsuThresholdingAlgorithmT::calc - numBuckets: " << numBuckets << ", numPixels: " << numPixels
                << std::endl;

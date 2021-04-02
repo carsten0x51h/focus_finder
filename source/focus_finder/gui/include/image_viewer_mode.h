@@ -23,7 +23,7 @@
  ****************************************************************************/
 
 #ifndef SOURCE_FOCUS_FINDER_GUI_INCLUDE_IMAGE_VIEWER_MODE_H_
-#define SOURCE_FOCUS_FINDER_GUI_INCLUDE_IMAGE_VIEWER_MODE_H_
+#define SOURCE_FOCUS_FINDER_GUI_INCLUDE_IMAGE_VIEWER_MODE_H_ SOURCE_FOCUS_FINDER_GUI_INCLUDE_IMAGE_VIEWER_MODE_H_
 
 /**
  * ImageViewerModeT

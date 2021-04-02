@@ -24,19 +24,14 @@
 
 #include <QPushButton>
 
-//#include <algorithm>
-
 #include "include/profile_settings_dialog.h"
-
-#include "../common/include/logging.h"
-//#include "../common/include/profile_manager.h"
-
 #include "ui_profile_settings_dialog.h"
 
 
-//IDEE: Späääter, im cfg dialog hinter jedes Feld ein blaues Info Icon mit Mouse-over text zum Erklären der FUnktion.....?!
-//IDEE: Später: Im cfg. Dialog einige Dinge "visualisieren" - z.B. Star window mit Grafik und Stern, das sich je nach Window size verändert....
-
+/**
+ * IDEA: Later, add in the CFG dialog for each field an "info icon" with mouse-over text to explain the fields function.
+ * IDEA: Later, add in the CFG dialog some visualizations - e.g. "star window" with picture of star which changes depending on the star window.
+ */
 
 ProfileSettingsDialogT::ProfileSettingsDialogT(QWidget *parent, FocusFinderLogicT &ffl) : QDialog(parent),
                                                                                           m_ui(new Ui::ProfileSettingsDialog),
@@ -49,8 +44,7 @@ ProfileSettingsDialogT::ProfileSettingsDialogT(QWidget *parent, FocusFinderLogic
 //	connect(m_ui->buttonBox, & QDialogButtonBox::rejected, this, & NewProfileDialogT::onRejectedSlot);
 }
 
-ProfileSettingsDialogT::~ProfileSettingsDialogT() {
-}
+ProfileSettingsDialogT::~ProfileSettingsDialogT() = default;
 
 void ProfileSettingsDialogT::onFocusMeasureSelectionChanged() {
 

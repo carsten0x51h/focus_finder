@@ -330,10 +330,10 @@ void FocusFinderFastCurveLookupT::run() {
 
         float startAbsPos = getFocusController()->getFocus()->getCurrentPos();
         float currentAbsPos;
-        float stepsMovedSoFar = 0.0f;
+        float stepsMovedSoFar = 0.0F;
 
         std::shared_ptr<FocusCurveT> focusCurve = nullptr;
-        float focusMeasure = 0.0f;
+        float focusMeasure = 0.0F;
         bool endRecording = false;
 
         do {

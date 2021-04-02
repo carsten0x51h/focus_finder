@@ -50,8 +50,8 @@
 // HACK: TODO: Do not hardcode!! Move away...
 int FocusCurveViewWidgetT::minFocusPos = 0;
 int FocusCurveViewWidgetT::maxFocusPos = 80000;
-float FocusCurveViewWidgetT::minFocusMeasure = 0.0f;
-float FocusCurveViewWidgetT::maxFocusMeasure = 20.0f;
+float FocusCurveViewWidgetT::minFocusMeasure = 0.0F;
+float FocusCurveViewWidgetT::maxFocusMeasure = 20.0F;
 
 
 FocusCurveViewWidgetT::FocusCurveViewWidgetT(QWidget *parent,

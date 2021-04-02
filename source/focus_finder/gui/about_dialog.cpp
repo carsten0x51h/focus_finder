@@ -36,5 +36,4 @@ AboutDialogT::AboutDialogT(QWidget *parent) : QDialog(parent),
     setFixedSize(size());
 }
 
-AboutDialogT::~AboutDialogT() {
-}
+AboutDialogT::~AboutDialogT() = default;

@@ -36,13 +36,14 @@
 #include "point.h"
 #include "timestamp.h"
 
+using namespace std::chrono_literals;
+
 class FocusCurveRecordBuilderT {
 private:
     TimestampT mCreationTimestamp;
     int mCurrentFocusPos;
     std::tuple<float, float> mDrift;
     std::chrono::duration<float> mExposureTime;
-
     float mSnr;
     FwhmT mFwhmHorz;
     FwhmT mFwhmVert;
@@ -51,7 +52,7 @@ private:
 
 public:
     FocusCurveRecordBuilderT() :
-            mCurrentFocusPos(0), mSnr(0), mDrift(0, 0) {
+            mCurrentFocusPos(0), mDrift(0, 0), mExposureTime(0s), mSnr(0) {
         // TODO: Automatically sets the creation date and time (?)
     }
 

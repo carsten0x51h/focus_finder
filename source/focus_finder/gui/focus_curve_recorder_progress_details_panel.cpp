@@ -26,13 +26,12 @@
 
 #include <QWidget>
 #include <QMovie>
+#include <utility>
 
 #include "include/focus_curve_recorder_progress_details_panel.h"
 #include "include/hfd_view_panel.h"
 
-#include "../common/include/logging.h"
 #include "../common/include/focus_curve_recorder_logic.h"
-#include "../common/include/focus_curve_record.h"
 
 #include "ui_focus_curve_recorder_progress_details_panel.h"
 
@@ -40,7 +39,7 @@ FocusCurveRecorderProgressDetailsPanelT::FocusCurveRecorderProgressDetailsPanelT
                                                                                  std::shared_ptr<FocusCurveRecorderLogicT> focusCurveRecorderLogic)
         : QWidget(parent),
           m_ui(new Ui::FocusCurveRecorderProgressDetailsPanel),
-          mFocusCurveRecorderLogic(focusCurveRecorderLogic),
+          mFocusCurveRecorderLogic(std::move(focusCurveRecorderLogic)),
           mMovie(nullptr) {
     // Setup UI
     m_ui->setupUi(this);
@@ -152,7 +151,7 @@ void FocusCurveRecorderProgressDetailsPanelT::setButtonIcon(int /*frame*/) {
 
 // TODO
 void FocusCurveRecorderProgressDetailsPanelT::setCurrentFocusCurveRecord(
-        std::shared_ptr<FocusCurveRecordT> focusCurveRecord) {
+        const std::shared_ptr<FocusCurveRecordT>& focusCurveRecord) {
     // For FWHM, show both FWHMs and the star image. For HFD just show the "all-in-one HFD" panel...
     // A representation which combines all would be a 3D rep.
     // TODO: Not only HFD in the future.... displayed view depends on selected focus measure...

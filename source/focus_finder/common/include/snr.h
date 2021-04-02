@@ -33,7 +33,7 @@
 
 class SnrT {
 private:
-    SnrT() = default;; // private for now
+    SnrT() = default; // private for now
 
 public:
     /**

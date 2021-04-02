@@ -29,7 +29,6 @@
 
 #include "include/focus_cntl_panel.h"
 
-#include "../common/include/logging.h"
 #include "../common/include/device_manager.h"
 #include "../common/include/profile_manager.h"
 #include "../common/include/focus_interface.h"
@@ -162,9 +161,7 @@ void FocusCntlPanelT::updateProfile() {
 
     auto newFocusDevice = mFfl.getCurrentFocus();
     bool hasOldFocus = (mFocusDevice != nullptr);
-    bool enablePanel = (
-            newFocusDevice ?
-            newFocusDevice->getParentDevice()->isConnected() : false);
+    bool enablePanel = newFocusDevice && newFocusDevice->getParentDevice()->isConnected();
 
     this->setEnabled(enablePanel);
 

@@ -43,20 +43,18 @@ FwhmT::FwhmT() : mValid(false) {
 }
 
 // TODO: Fwhm as template ??
-FwhmT::FwhmT(const std::vector<float> &inValues, double inEpsAbs,
-             double inEpsRel, bool inThrowIfNotValid) {
-    this->set(inValues, inEpsAbs, inEpsRel, inThrowIfNotValid);
+FwhmT::FwhmT(const std::vector<float> &inValues, FwhmFitParmsT fwhmFitParms, bool inThrowIfNotValid) : mValid(false) {
+    this->set(inValues, fwhmFitParms, inThrowIfNotValid);
 }
 
-void FwhmT::set(const std::vector<float> &inValues, double inEpsAbs,
-                double inEpsRel, bool inThrowIfNotValid) {
+void FwhmT::set(const std::vector<float> &inValues, FwhmFitParmsT fwhmFitParms, bool inThrowIfNotValid) {
     // Make a copy
     mImgValues.reserve(inValues.size());
     boost::range::copy(inValues | boost::adaptors::indexed(0) |
                        boost::adaptors::transformed([](const auto &e) { return PointFT(e.index(), e.value()); }),
                        std::back_inserter(mImgValues));
 
-    mGaussParms = fitValues(mImgValues, inEpsAbs, inEpsRel);
+    mGaussParms = fitValues(mImgValues, fwhmFitParms);
 
     calcIsValid();
 
@@ -76,8 +74,8 @@ void FwhmT::throwIfNotValid() const {
     }
 }
 
-CurveParmsT FwhmT::fitValues(const std::vector<PointFT> &imgValues, double inEpsAbs,
-                             double inEpsRel) {
+CurveParmsT
+FwhmT::fitValues(const std::vector<PointFT> &imgValues, FwhmFitParmsT fwhmFitParms) {
 
     mFitValues.reserve(imgValues.size());
 
@@ -85,16 +83,14 @@ CurveParmsT FwhmT::fitValues(const std::vector<PointFT> &imgValues, double inEps
     CurveFitSummaryT curveFitSummary;
 
     try {
-        // TODO: Optionally pass in as FwhmParmsT... (put inEpsRel and inEpsAbs in there as well...)
-        // TODO: Include FittingCurveTypeT::TypeE into the curveFitParms - it belongs there since it also determines against what should be fit
         CurveFitParmsT curveFitParms(
                 FittingCurveTypeT::GAUSSIAN,
-                inEpsRel, /*epsrel*/
-                inEpsAbs, /*epsabs*/
-                10000, /*maxnumiter*/
-                true, /*enable outlier detection*/
-                1.5F, /*outlier boundary factor*/
-                20.0F /* max. accepted outliers perc. */
+                fwhmFitParms.getMaxAcceptedRelativeError(),
+                fwhmFitParms.getMaxAcceptedAbsoluteError(),
+                fwhmFitParms.getNumMaxIterations(),
+                fwhmFitParms.isOutlierDetectionEnabled(),
+                fwhmFitParms.getOutlierBoundaryFactor(),
+                fwhmFitParms.getMaxAcceptedOutliersPerc()
         );
 
         curveParms = CurveFitAlgorithmT::fitCurve(imgValues,
@@ -126,7 +122,7 @@ float FwhmT::getValue(bool inThrowIfNotValid) const {
         throwIfNotValid();
     }
 
-    return sigmaToFwhm(mGaussParms.get("W_IDX").getValue());
+    return (float) sigmaToFwhm(mGaussParms.get("W_IDX").getValue());
 }
 
 const std::vector<PointFT> &FwhmT::getImgValues() const {
@@ -155,10 +151,10 @@ float FwhmT::getStandardDeviation() const {
     for (const auto &v : mFitValues) {
         float yFit = v.y();
         float yImg = mImgValues[v.x()].y();
-        mse += std::pow(yFit - yImg, 2.0);
+        mse += std::pow(yFit - yImg, 2.0F);
     }
 
-    mse = std::sqrt(mse / ((float) mFitValues.size() - 1.0));
+    mse = std::sqrt(mse / ((float) mFitValues.size() - 1.0F));
     return mse;
 }
 
@@ -166,7 +162,7 @@ void FwhmT::calcIsValid() {
     float sigma = mGaussParms.get("W_IDX").getValue();
     bool calculatedSigmaNotValid = (sigma > mImgValues.size() || sigma <= 0);
 
-    mValid = (!calculatedSigmaNotValid && mImgValues.size() > 0 && mFitValues.size() > 0);
+    mValid = (!calculatedSigmaNotValid && ! mImgValues.empty() && ! mFitValues.empty());
 }
 
 bool FwhmT::valid() const {
@@ -197,17 +193,17 @@ FwhmT::print(std::ostream &os, bool inPrintDetails) const {
     if (inPrintDetails) {
 
         os << std::endl << "   Img values: ";
-        for (std::vector<PointFT>::const_iterator it = mImgValues.begin();
+        for (auto it = mImgValues.begin();
              it != mImgValues.end(); ++it) {
             os << *it << "; ";
         }
         os << ", Fit values: ";
-        for (std::vector<PointFT>::const_iterator it = mFitValues.begin();
+        for (auto it = mFitValues.begin();
              it != mFitValues.end(); ++it) {
             os << *it << "; ";
         }
         os << ", Outliers: ";
-        for (std::vector<PointWithResidualT>::const_iterator it = mOutlierValues.begin();
+        for (auto it = mOutlierValues.begin();
              it != mOutlierValues.end(); ++it) {
             os << *it << "; ";
         }

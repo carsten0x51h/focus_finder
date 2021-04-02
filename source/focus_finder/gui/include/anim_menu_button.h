@@ -23,7 +23,7 @@
  ****************************************************************************/
 
 #ifndef SOURCE_FOCUS_FINDER_GUI_INCLUDE_ANIM_MENU_BUTTON_H_
-#define SOURCE_FOCUS_FINDER_GUI_INCLUDE_ANIM_MENU_BUTTON_H_
+#define SOURCE_FOCUS_FINDER_GUI_INCLUDE_ANIM_MENU_BUTTON_H_ SOURCE_FOCUS_FINDER_GUI_INCLUDE_ANIM_MENU_BUTTON_H_
 
 #include <QToolButton>
 #include <QDebug>
@@ -33,9 +33,9 @@
 class AnimMenuButtonT : public QToolButton {
 Q_OBJECT
 public:
-    explicit AnimMenuButtonT(QWidget *parent = 0);
+    explicit AnimMenuButtonT(QWidget *parent = nullptr);
 
-    ~AnimMenuButtonT();
+    ~AnimMenuButtonT() override;
 
     void startAnimation();
 

@@ -33,7 +33,7 @@
 // Helper classes
 ///////////////////////////////////////////////////////////////////////
 struct GslMultiFitDataT {
-    //GslMultiFitDataT() : y(0.0f), sigma(0.0f) {}
+    //GslMultiFitDataT() : y(0.0f), sigma(0.0F) {}
     GslMultiFitDataT(float y, float sigma, PointFT pt) : y(y), sigma(sigma), pt(std::move(pt)) {}
 
     float y;

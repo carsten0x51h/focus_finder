@@ -63,7 +63,79 @@
 DEF_Exception(Fwhm);
 
 
-// TODO: Make this a template!
+class FwhmFitParmsT {
+
+public:
+    FwhmFitParmsT(float maxAcceptedRelativeError = 0.1F, float maxAcceptedAbsoluteError = 0.1F, size_t numMaxIterations = 10000, bool enableOutlierDetection = true, float outlierBoundaryFactor = 1.5F, float acceptOutliersPerc = 20.0F) :
+            mMaxAcceptedRelativeError(maxAcceptedRelativeError),
+            mMaxAcceptedAbsoluteError(maxAcceptedAbsoluteError),
+            mNumMaxIterations(numMaxIterations),
+            mEnableOutlierDetection(enableOutlierDetection),
+            mOutlierBoundaryFactor(outlierBoundaryFactor),
+            mMaxAcceptedOutliersPerc(acceptOutliersPerc)
+    {
+    }
+
+    [[nodiscard]] float getMaxAcceptedRelativeError() const {
+        return mMaxAcceptedRelativeError;
+    }
+
+    void setMaxAcceptedRelativeError(float maxAcceptedRelativeError) {
+        mMaxAcceptedRelativeError = maxAcceptedRelativeError;
+    }
+
+    [[nodiscard]] float getMaxAcceptedAbsoluteError() const {
+        return mMaxAcceptedAbsoluteError;
+    }
+
+    void setMaxAcceptedAbsoluteError(float maxAcceptedAbsoluteError) {
+        mMaxAcceptedAbsoluteError = maxAcceptedAbsoluteError;
+    }
+
+    [[nodiscard]] size_t getNumMaxIterations() const {
+        return mNumMaxIterations;
+    }
+
+    void setNumMaxIterations(size_t numMaxIterations) {
+        mNumMaxIterations = numMaxIterations;
+    }
+
+    [[nodiscard]] bool isOutlierDetectionEnabled() const {
+        return mEnableOutlierDetection;
+    }
+
+    void setEnableOutlierDetection(bool enableOutlierDetection) {
+        mEnableOutlierDetection = enableOutlierDetection;
+    }
+
+    [[nodiscard]] float getOutlierBoundaryFactor() const {
+        return mOutlierBoundaryFactor;
+    }
+
+    void setOutlierBoundaryFactor(float outlierBoundaryFactor) {
+        mOutlierBoundaryFactor = outlierBoundaryFactor;
+    }
+
+    [[nodiscard]] float getMaxAcceptedOutliersPerc() const {
+        return mMaxAcceptedOutliersPerc;
+    }
+
+    void setMaxAcceptedOutliersPerc(float maxAcceptedOutliersPerc) {
+        mMaxAcceptedOutliersPerc = maxAcceptedOutliersPerc;
+    }
+
+
+private:
+    float mMaxAcceptedRelativeError;
+    float mMaxAcceptedAbsoluteError;
+    size_t mNumMaxIterations;
+    bool mEnableOutlierDetection;
+    float mOutlierBoundaryFactor;
+    float mMaxAcceptedOutliersPerc;
+};
+
+
+// TODO: Make this a template for float / double?!
 class FwhmT {
 
 private:
@@ -76,8 +148,8 @@ private:
 
     static const double SIGMA_TO_FWHM;
 
-    CurveParmsT fitValues(const std::vector<PointFT> &imgValues,
-                          double inEpsAbs = 1e-1, double inEpsRel = 1e-1);
+    CurveParmsT
+    fitValues(const std::vector<PointFT> &imgValues, FwhmFitParmsT fwhmFitParms);
 
     void calcIsValid();
 
@@ -86,11 +158,9 @@ private:
 public:
     FwhmT();
 
-    explicit FwhmT(const std::vector<float> &inValues, double inEpsAbs = 1e-1,
-          double inEpsRel = 1e-1, bool inThrowIfNotValid = true);
+    explicit FwhmT(const std::vector<float> &inValues, FwhmFitParmsT fwhmFitParms = FwhmFitParmsT(), bool inThrowIfNotValid = false);
 
-    void set(const std::vector<float> &inValues, double inEpsAbs = 1e-1,
-             double inEpsRel = 1e-1, bool inThrowIfNotValid = true);
+    void set(const std::vector<float> &inValues, FwhmFitParmsT fwhmFitParms, bool inThrowIfNotValid);
 
     [[nodiscard]] bool valid() const;
 

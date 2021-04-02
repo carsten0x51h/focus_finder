@@ -23,7 +23,7 @@
  ****************************************************************************/
 
 #ifndef SOURCE_FOCUS_FINDER_GUI_INCLUDE_FOCUS_CURVE_RECORD_SET_CONTAINER_TREE_MODEL_H_
-#define SOURCE_FOCUS_FINDER_GUI_INCLUDE_FOCUS_CURVE_RECORD_SET_CONTAINER_TREE_MODEL_H_
+#define SOURCE_FOCUS_FINDER_GUI_INCLUDE_FOCUS_CURVE_RECORD_SET_CONTAINER_TREE_MODEL_H_ SOURCE_FOCUS_FINDER_GUI_INCLUDE_FOCUS_CURVE_RECORD_SET_CONTAINER_TREE_MODEL_H_
 
 // #include <QAbstractItemModel>
 // Based on https://doc.qt.io/archives/4.6/itemviews-simpletreemodel.html

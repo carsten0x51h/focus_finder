@@ -23,7 +23,7 @@
  ****************************************************************************/
 
 #ifndef SOURCE_FOCUS_FINDER_GUI_INCLUDE_FOCUS_CURVE_RECORDER_CURVE_DETAILS_PANEL_H_
-#define SOURCE_FOCUS_FINDER_GUI_INCLUDE_FOCUS_CURVE_RECORDER_CURVE_DETAILS_PANEL_H_
+#define SOURCE_FOCUS_FINDER_GUI_INCLUDE_FOCUS_CURVE_RECORDER_CURVE_DETAILS_PANEL_H_ SOURCE_FOCUS_FINDER_GUI_INCLUDE_FOCUS_CURVE_RECORDER_CURVE_DETAILS_PANEL_H_
 
 // std includes
 #include <memory>
@@ -59,7 +59,7 @@ public:
      *  @brief
      *    Destructor
      */
-    virtual ~FocusCurveRecorderCurveDetailsPanelT();
+    ~FocusCurveRecorderCurveDetailsPanelT() override;
 
     void reset();
 

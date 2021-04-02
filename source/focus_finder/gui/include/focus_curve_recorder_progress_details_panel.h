@@ -23,7 +23,7 @@
  ****************************************************************************/
 
 #ifndef SOURCE_FOCUS_FINDER_GUI_INCLUDE_FOCUS_CURVE_RECORDER_PROGRESS_DETAILS_PANEL_H_
-#define SOURCE_FOCUS_FINDER_GUI_INCLUDE_FOCUS_CURVE_RECORDER_PROGRESS_DETAILS_PANEL_H_
+#define SOURCE_FOCUS_FINDER_GUI_INCLUDE_FOCUS_CURVE_RECORDER_PROGRESS_DETAILS_PANEL_H_ SOURCE_FOCUS_FINDER_GUI_INCLUDE_FOCUS_CURVE_RECORDER_PROGRESS_DETAILS_PANEL_H_
 
 // std includes
 
@@ -61,7 +61,7 @@ public:
      *  @brief
      *    Destructor
      */
-    virtual ~FocusCurveRecorderProgressDetailsPanelT();
+    ~FocusCurveRecorderProgressDetailsPanelT() override;
 
     void reset();
 
@@ -75,7 +75,7 @@ public:
 
     void setTotalProgressText(const QString &totalProgressText);
 
-    void setCurrentFocusCurveRecord(std::shared_ptr<FocusCurveRecordT> focusCurveRecord);
+    void setCurrentFocusCurveRecord(const std::shared_ptr<FocusCurveRecordT>& focusCurveRecord);
 
     void startAnimation();
 
@@ -92,7 +92,7 @@ protected:
     const QScopedPointer<Ui::FocusCurveRecorderProgressDetailsPanel> m_ui;
 
 private:
-    void setProgress(QProgressBar *progressBar, int progressPerc);
+    static void setProgress(QProgressBar *progressBar, int progressPerc);
 
     std::shared_ptr<FocusCurveRecorderLogicT> mFocusCurveRecorderLogic;
     QMovie *mMovie;

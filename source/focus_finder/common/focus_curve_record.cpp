@@ -217,7 +217,6 @@ FocusCurveRecordT::load(const boost::property_tree::ptree &pt, const std::filesy
     size_t centerIdxVert = std::floor(img.width() / 2);
     FwhmT fwhmVert(ImageSlicerT::slice<SliceDirectionT::VERT>(img, centerIdxVert));
 
-
     auto record = FocusCurveRecordBuilderT()
             .setCreationTimestamp(creationTimestamp)
             .setAbsoluteFocusPos(pt.get<int>("<xmlattr>.abs_focus_pos"))

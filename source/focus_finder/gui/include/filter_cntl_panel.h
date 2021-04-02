@@ -23,7 +23,7 @@
  ****************************************************************************/
 
 #ifndef SOURCE_FOCUS_FINDER_GUI_INCLUDE_FILTER_CNTL_PANEL_H_
-#define SOURCE_FOCUS_FINDER_GUI_INCLUDE_FILTER_CNTL_PANEL_H_
+#define SOURCE_FOCUS_FINDER_GUI_INCLUDE_FILTER_CNTL_PANEL_H_ SOURCE_FOCUS_FINDER_GUI_INCLUDE_FILTER_CNTL_PANEL_H_
 
 // std includes
 

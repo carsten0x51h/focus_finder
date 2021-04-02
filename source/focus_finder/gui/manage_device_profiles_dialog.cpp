@@ -25,18 +25,14 @@
 #include <QMessageBox>
 
 #include <optional>
+#include <utility>
 
 #include "include/manage_device_profiles_dialog.h"
 #include "include/manage_device_entry_panel.h"
 #include "include/profile_settings_dialog.h"
 
-#include "../common/include/exception.h"
-#include "../common/include/throw_if.h"
-#include "../common/include/logging.h"
 #include "../common/include/device_manager.h"
 #include "../common/include/profile_manager.h"
-#include "../common/include/focus_finder_profile.h"
-#include "../common/include/device.h"
 #include "../common/include/camera_interface.h"
 #include "../common/include/focus_interface.h"
 #include "../common/include/filter_interface.h"
@@ -46,7 +42,7 @@
 DEF_Exception(ManageDeviceProfilesDialog);
 
 
-int ManageDeviceProfilesDialogT::showDeleteWarningMessage(const std::string &profileName) const {
+int ManageDeviceProfilesDialogT::showDeleteWarningMessage(const std::string &profileName) {
     QMessageBox msgBox;
     msgBox.setText(QString::fromStdString("Profile '" + profileName + "' will be removed."));
     msgBox.setInformativeText(QString::fromStdString("Do you want to proceed ?"));
@@ -187,8 +183,8 @@ void ManageDeviceProfilesDialogT::profileToUI(std::optional<FocusFinderProfileT>
     updateMenuStatus();
 }
 
-void ManageDeviceProfilesDialogT::onActiveProfileChangedSlot(std::optional<FocusFinderProfileT> oldProfile,
-                                                             std::optional<FocusFinderProfileT> newProfile) {
+void ManageDeviceProfilesDialogT::onActiveProfileChangedSlot(const std::optional<FocusFinderProfileT>& oldProfile,
+                                                             const std::optional<FocusFinderProfileT>& newProfile) {
 
     LOG(debug) << "ManageDeviceProfilesDialogT::onActiveProfileChangedSlot..." << std::endl;
 
@@ -275,7 +271,7 @@ ManageDeviceProfilesDialogT::ManageDeviceProfilesDialogT(
 
     mFfl.getProfileManager()->registerActiveProfileChangedListener(
             [&](std::optional<FocusFinderProfileT> oldProfile, std::optional<FocusFinderProfileT> newProfile) {
-                emit activeProfileChangedSignal(oldProfile, newProfile);
+                emit activeProfileChangedSignal(std::move(oldProfile), std::move(newProfile));
             }
     );
 

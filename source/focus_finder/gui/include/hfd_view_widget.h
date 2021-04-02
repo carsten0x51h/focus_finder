@@ -23,7 +23,7 @@
  ****************************************************************************/
 
 #ifndef SOURCE_FOCUS_FINDER_GUI_INCLUDE_HFD_VIEW_WIDGET_H_
-#define SOURCE_FOCUS_FINDER_GUI_INCLUDE_HFD_VIEW_WIDGET_H_
+#define SOURCE_FOCUS_FINDER_GUI_INCLUDE_HFD_VIEW_WIDGET_H_ SOURCE_FOCUS_FINDER_GUI_INCLUDE_HFD_VIEW_WIDGET_H_
 
 // std includes
 

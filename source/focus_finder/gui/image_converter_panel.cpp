@@ -27,7 +27,6 @@
 #include "include/linear_bw_stretch_mapper_panel.h"
 #include "include/spline_curve_mapper_panel.h"
 
-#include "../common/include/logging.h"
 #include "../common/include/image_converter_16to8.h"
 #include "../common/include/profile_manager.h"
 #include "../common/include/camera_interface.h"
@@ -103,8 +102,7 @@ ImageConverterPanelT::ImageConverterPanelT(QWidget *parent,
             &ImageConverterPanelT::currentIndexChanged);
 }
 
-ImageConverterPanelT::~ImageConverterPanelT() {
-}
+ImageConverterPanelT::~ImageConverterPanelT() = default;
 
 void ImageConverterPanelT::updateProfile() {
 
@@ -126,7 +124,7 @@ void ImageConverterPanelT::updateProfile() {
     if (newCameraDevice) {
         mExposureCycleFinishedConnection =
                 newCameraDevice->registerExposureCycleFinishedListener(
-                        [&](RectT<unsigned int> /*roiRect*/, std::shared_ptr<const ImageT> /*resultImage*/,
+                        [&](RectT<unsigned int> /*roiRect*/, const std::shared_ptr<const ImageT>& /*resultImage*/,
                             bool lastExposure) {
                             LOG(info) << "ImageConverterPanelT::new image set! -> emit!" << lastExposure << std::endl;
                             emit newImageReceivedSignal();

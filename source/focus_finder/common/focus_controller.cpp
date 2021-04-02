@@ -166,8 +166,8 @@ std::shared_ptr<FocusCurveRecordT> FocusControllerT::measureFocus() {
             size_t sampleNo = 1;
             ImageT sumImg;
             ImageT averageCurrentImage;
-            float sumDriftX = 0.0f;
-            float sumDriftY = 0.0f;
+            float sumDriftX = 0.0F;
+            float sumDriftY = 0.0F;
             std::tuple<float, float> averageDrift;
 
             // TODO: Better pass in the exposure time as parameter? Because Using the following function limits the more generic measureFocus() function to the context of curve recording...
@@ -706,7 +706,7 @@ SelfOrientationResultT FocusControllerT::performSelfOrientation(float focusMeasu
 
     selfOrientationResult.record1 = measureFocus();
     //Notify about FocusCurve recorder update...
-    notifyFocusControllerProgressUpdate(0.0f, "Self orientation running....", selfOrientationResult.record1);
+    notifyFocusControllerProgressUpdate(0.0F, "Self orientation running....", selfOrientationResult.record1);
     notifyFocusControllerNewRecord(selfOrientationResult.record1);
 
     // TODO: Should this be configurable? -> YES, part of profile...?!... Just need a good name...

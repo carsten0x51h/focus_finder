@@ -23,7 +23,7 @@
  ****************************************************************************/
 
 #ifndef SOURCE_FOCUS_FINDER_GUI_INCLUDE_IMAGE_VIEWER_PANEL_H_
-#define SOURCE_FOCUS_FINDER_GUI_INCLUDE_IMAGE_VIEWER_PANEL_H_
+#define SOURCE_FOCUS_FINDER_GUI_INCLUDE_IMAGE_VIEWER_PANEL_H_ SOURCE_FOCUS_FINDER_GUI_INCLUDE_IMAGE_VIEWER_PANEL_H_
 
 // std includes
 
@@ -57,20 +57,20 @@ public:
     *  @brief
     *    Constructor
     */
-    ImageViewerPanelT(FocusFinderLogicT &ffl);
+    explicit ImageViewerPanelT(FocusFinderLogicT &ffl);
 
     /**
     *  @brief
     *    Destructor
     */
-    virtual ~ImageViewerPanelT();
+    ~ImageViewerPanelT() override;
 
     void setFrame(const QImage &image);
 
     void setSubFrame(const QRect &roiRect,
                      const QImage &image); // TODO: Rename to setRoi?! Or rename setFrame() to setImage() amd rename setSubFrame() to setFrame()...
 
-    bool isPoiSet() const;
+    [[nodiscard]] bool isPoiSet() const;
 
     void setPoi(const QPointF &poi);
 
@@ -82,7 +82,7 @@ public:
 
     void setMode(ImageViewerModeT::TypeE mode);
 
-    ImageViewerModeT::TypeE getMode() const;
+    [[nodiscard]] ImageViewerModeT::TypeE getMode() const;
 
 
 signals:

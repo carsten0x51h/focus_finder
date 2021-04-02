@@ -29,7 +29,6 @@
 
 #include "include/filter_cntl_panel.h"
 
-#include "../common/include/logging.h"
 #include "../common/include/device_manager.h"
 #include "../common/include/profile_manager.h"
 #include "../common/include/filter_interface.h"
@@ -125,7 +124,7 @@ void FilterCntlPanelT::updateProfile() {
 
     auto newFilterDevice = mFfl.getCurrentFilter();
     bool hasOldFilter = (mFilterDevice != nullptr);
-    bool enablePanel = (newFilterDevice ? newFilterDevice->getParentDevice()->isConnected() : false);
+    bool enablePanel = newFilterDevice && newFilterDevice->getParentDevice()->isConnected();
 
     this->setEnabled(enablePanel);
 

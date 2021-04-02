@@ -87,8 +87,8 @@ protected slots:
 
     void onProfileSelectionChangedSlot(const QString &selectedProfileNameQtStr);
 
-    void onActiveProfileChangedSlot(std::optional<FocusFinderProfileT> oldProfile,
-                                    std::optional<FocusFinderProfileT> newProfile);
+    void onActiveProfileChangedSlot(const std::optional<FocusFinderProfileT>& oldProfile,
+                                    const std::optional<FocusFinderProfileT>& newProfile);
 
     void onProfileListChangedSlot();
 
@@ -98,7 +98,7 @@ protected:
 private:
     void updateMenuStatus();
 
-    int showDeleteWarningMessage(const std::string &profileName) const;
+    static int showDeleteWarningMessage(const std::string &profileName) ;
 
     void profileToUI(std::optional<FocusFinderProfileT> profileOpt);
 

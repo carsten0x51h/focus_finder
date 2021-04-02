@@ -24,7 +24,6 @@
 
 #include <QStandardItem>
 #include <QList>
-#include <QStandardItem>
 
 #include <memory>
 #include <ctime>
@@ -33,7 +32,6 @@
 
 #include "../common/include/logging.h"
 #include "../common/include/reporting.h"
-#include "../common/include/reporting_dataset.h"
 
 #include "ui_reporting_viewer_panel.h"
 

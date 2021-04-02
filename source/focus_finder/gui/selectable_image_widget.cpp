@@ -26,35 +26,32 @@
 
 #include "../common/include/logging.h"
 
+// std includes
+#include <cmath>
+
 // Qt includes
 #include <QPainter>
 #include <QPixmap>
 #include <QMouseEvent>
 #include <QDebug>
-#include <QAction>
-#include <QFileDialog>
 #include <QtMath>
 #include <QScrollArea>
 #include <QScrollBar>
 #include <QLayout>
 #include <QCursor>
 
-// std includes
-#include <cmath>
 
 SelectableImageWidgetT::SelectableImageWidgetT(QWidget *parent) :
         QLabel(parent), selectionStarted(false), moveStarted(false), mMoveDelta(
-        0, 0), mImageViewerMode(ImageViewerModeT::NAVIGATION), mScaleFactor(
-        1.0), mPixmapRect(0, 0, 0, 0), mSubFrameRect(0, 0, 0, 0), mPoi(
-        -1.0f, -1.0f), mPoiWindowSize(32, 32) {
-    mParentScrollArea = static_cast<QScrollArea *>(parent);
+        0, 0), mSubFrameRect(0, 0, 0, 0), mImageViewerMode(ImageViewerModeT::NAVIGATION), mPixmapRect(0, 0, 0, 0), mScaleFactor(
+        1.0F), mPoi(-1.0F, -1.0F), mPoiWindowSize(32, 32) {
+    mParentScrollArea = dynamic_cast<QScrollArea *>(parent);
 
     //QAction *saveAction=contextMenu.addAction("Save");
     //connect(saveAction,SIGNAL(triggered()),this,SLOT(saveSlot()));
 }
 
-SelectableImageWidgetT::~SelectableImageWidgetT() {
-}
+SelectableImageWidgetT::~SelectableImageWidgetT() = default;
 
 void SelectableImageWidgetT::clearSelection() {
     mSelectionRect.setHeight(0);
@@ -81,15 +78,15 @@ QPoint SelectableImageWidgetT::translateToBase(const QPoint &p) const {
 
 QRect SelectableImageWidgetT::translateToBase(const QRect &r) const {
     QRect res(r);
-    const float inverseScaleFactor = 1.0 / mScaleFactor;
+    const auto inverseScaleFactor = (float) (1.0 / mScaleFactor);
 
     res.setTopLeft((r.topLeft()) * inverseScaleFactor);
     //res.setTopLeft((r.topLeft() - mLastMousePos) * inverseScaleFactor);
     //res.setTopLeft((r.topLeft() - rect().center()) * inverseScaleFactor);
 
     // Also adjust width and height
-    res.setWidth(r.width() * inverseScaleFactor);
-    res.setHeight(r.height() * inverseScaleFactor);
+    res.setWidth((int) ((float) r.width() * inverseScaleFactor));
+    res.setHeight((int) ((float) r.height() * inverseScaleFactor));
 
     LOG(debug) << "SelectableImageWidgetT::translateToBase..."
                << "IN rect: [x=" << r.x() << ", y=" << r.y() << ", w=" << r.width()
@@ -148,7 +145,7 @@ void SelectableImageWidgetT::paintEvent(QPaintEvent *event) {
         if (mPoi.x() > 0 && mPoi.y() > 0) {
 
             // Draw cross
-            const float lineLengthPx = 0.9
+            const float lineLengthPx = 0.9F
                                        * std::min(mPoiWindowSize.width(), mPoiWindowSize.height());
 
             //TODO: Debug line coordinates - does it actually allow floats??? Probably not...!?
@@ -180,15 +177,15 @@ void SelectableImageWidgetT::paintEvent(QPaintEvent *event) {
             // Draw rectangle
             p.setPen(QPen(QBrush(QColor(0, 0, 255, 180)), 1, Qt::SolidLine));
 
-            const float windowWidth = mPoiWindowSize.width();
-            const float windowHeight = mPoiWindowSize.height();
-            const float halfWidth = windowWidth / 2.0;
-            const float halfHeight = windowHeight / 2.0;
+            const auto windowWidth = (float) mPoiWindowSize.width();
+            const auto windowHeight = (float) mPoiWindowSize.height();
+            const auto halfWidth = (float) windowWidth / 2.0F;
+            const auto halfHeight = (float) windowHeight / 2.0F;
 
             p.drawRect(QRectF(mPoi.x() - halfWidth, mPoi.y() - halfHeight, windowWidth, windowHeight));
         }
     }
-    Q_UNUSED(event);
+    Q_UNUSED(event)
 }
 
 void SelectableImageWidgetT::handleMousePressedEventNavigation(
@@ -282,8 +279,8 @@ void SelectableImageWidgetT::handleMouseMoveEventNavigation(
         LOG(debug) << "vMax: " << vMax << ", hMax: " << hMax << std::endl;
 
         if (hMax > 0) {
-            int newPosX = mParentScrollArea->horizontalScrollBar()->value()
-                          - d.x();
+            int newPosX = (int) (mParentScrollArea->horizontalScrollBar()->value()
+                          - d.x());
             mParentScrollArea->horizontalScrollBar()->setValue(newPosX);
             LOG(debug) << "newPosX: " << newPosX << std::endl;
         } else {
@@ -291,8 +288,8 @@ void SelectableImageWidgetT::handleMouseMoveEventNavigation(
         }
 
         if (vMax > 0) {
-            int newPosY = mParentScrollArea->verticalScrollBar()->value()
-                          - d.y();
+            int newPosY = (int) (mParentScrollArea->verticalScrollBar()->value()
+                          - d.y());
             mParentScrollArea->verticalScrollBar()->setValue(newPosY);
             LOG(debug) << "newPosY: " << newPosY << std::endl;
         } else {
@@ -333,7 +330,7 @@ void SelectableImageWidgetT::handleMouseReleaseEventNavigation(
         //qApp->restoreOverrideCursor();
 
         setMouseTracking(false);
-        Q_UNUSED(event);
+        Q_UNUSED(event)
     }
 }
 
@@ -355,7 +352,7 @@ void SelectableImageWidgetT::handleMouseReleaseEventRoiSelect(
         }
         repaint();
     }
-    Q_UNUSED(event);
+    Q_UNUSED(event)
 }
 
 void SelectableImageWidgetT::mouseReleaseEvent(QMouseEvent *event) {
@@ -373,7 +370,7 @@ void SelectableImageWidgetT::wheelEvent(QWheelEvent *event) {
         LOG(debug) << "angle: " << angle << ", factor: " << factor
                    << std::endl;
 
-        zoomBy(factor);
+        zoomBy((float) factor);
 
         // This call avoids propagation of mouse wheel events to parent scroll area
         // which would then move the scroll bars.
@@ -424,8 +421,8 @@ void SelectableImageWidgetT::zoomBy(float factor) {
 
     update(); // TODO: here?! or later?
 
-    int newPosX = mParentScrollArea->horizontalScrollBar()->value() + dist.x();
-    int newPosY = mParentScrollArea->verticalScrollBar()->value() + dist.y();
+    int newPosX = (int) (mParentScrollArea->horizontalScrollBar()->value() + dist.x());
+    int newPosY = (int) (mParentScrollArea->verticalScrollBar()->value() + dist.y());
 
     LOG(debug) << "horzValue: "
                << mParentScrollArea->horizontalScrollBar()->value() << " (max="
@@ -449,7 +446,7 @@ void SelectableImageWidgetT::zoomIn() {
                << mLastMousePos.y() << std::endl;
 
     double factor = qPow(1.0015, 120);
-    zoomBy(factor);
+    zoomBy((float) factor);
 }
 
 void SelectableImageWidgetT::zoomOut() {
@@ -458,7 +455,7 @@ void SelectableImageWidgetT::zoomOut() {
                << mLastMousePos.y() << std::endl;
 
     double factor = qPow(1.0015, -120);
-    zoomBy(factor);
+    zoomBy( (float) factor);
 }
 
 void SelectableImageWidgetT::update() {
@@ -482,8 +479,8 @@ void SelectableImageWidgetT::update() {
         int viewportHeight = mParentScrollArea->viewport()->height()
                              - margins.top() - margins.bottom();
 
-        int lblWidth = this->pixmap()->width() * mScaleFactor;
-        int lblHeight = this->pixmap()->height() * mScaleFactor;
+        auto lblWidth = (int) (this->pixmap()->width() * mScaleFactor);
+        auto lblHeight = (int) (this->pixmap()->height() * mScaleFactor);
 
         LOG(debug) << "New lbl size: " << lblWidth << "x" << lblHeight
                    << std::endl;
