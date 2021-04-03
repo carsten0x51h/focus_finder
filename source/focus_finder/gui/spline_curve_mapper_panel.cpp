@@ -26,6 +26,7 @@
 
 #include "ui_spline_curve_mapper_panel.h"
 
+// TEST
 SplineCurveMapperPanelT::SplineCurveMapperPanelT(QWidget *parent, FocusFinderLogicT &ffl,
                                                  const std::string &functionMapperName, bool visible)
         : AbstractMapperPanelT(parent),
