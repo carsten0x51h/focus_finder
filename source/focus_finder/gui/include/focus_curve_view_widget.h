@@ -92,7 +92,7 @@ protected:
 
 private:
     void drawFocusCurveRecordSet(QPainter *p, const std::vector<PointFT> &dataPoints,
-                                 const FocusFinderProfileT &focusFinderProfile, QColor color);
+                                 const FocusFinderProfileT &focusFinderProfile, const QColor& color);
 
     void drawFocusCurveRecordSets(QPainter *p);
 

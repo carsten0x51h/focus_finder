@@ -29,6 +29,7 @@
 
 #include <QWidget>
 #include <QHBoxLayout>
+#include <utility>
 
 #include "include/focus_curve_recorder_point_details_panel.h"
 
@@ -42,7 +43,7 @@ FocusCurveRecorderPointDetailsPanelT::FocusCurveRecorderPointDetailsPanelT(QWidg
                                                                            std::shared_ptr<FocusCurveRecorderLogicT> focusCurveRecorderLogic)
         : QWidget(parent),
           m_ui(new Ui::FocusCurveRecorderPointDetailsPanel),
-          mFocusCurveRecorderLogic(focusCurveRecorderLogic) {
+          mFocusCurveRecorderLogic(std::move(focusCurveRecorderLogic)) {
     // Setup UI
     m_ui->setupUi(this);
 
@@ -66,14 +67,13 @@ FocusCurveRecorderPointDetailsPanelT::FocusCurveRecorderPointDetailsPanelT(QWidg
     reset();
 }
 
-FocusCurveRecorderPointDetailsPanelT::~FocusCurveRecorderPointDetailsPanelT() {
-}
+FocusCurveRecorderPointDetailsPanelT::~FocusCurveRecorderPointDetailsPanelT() = default;
 
 void FocusCurveRecorderPointDetailsPanelT::reset() {
 }
 
 
-void FocusCurveRecorderPointDetailsPanelT::setPointDetails(std::shared_ptr<FocusCurveRecordT> focusCurveRecord) {
+void FocusCurveRecorderPointDetailsPanelT::setPointDetails(const std::shared_ptr<FocusCurveRecordT>& focusCurveRecord) {
     std::stringstream ss;
 
     // TODO: focusCurveRecord->getDateTime() changed to time_point...

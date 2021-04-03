@@ -30,9 +30,6 @@
 #include "include/focus_curve_view_panel.h"
 #include "include/focus_curve_view_widget.h"
 
-#include "../common/include/logging.h"
-#include "../common/include/focus_curve.h"
-
 #include "ui_focus_curve_view_panel.h"
 
 

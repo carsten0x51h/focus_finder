@@ -54,7 +54,7 @@ public:
     FocusCurveRecorderPointDetailsPanelT(QWidget *parent,
                                          std::shared_ptr<FocusCurveRecorderLogicT> focusCurveRecorderLogic);
 
-    void setPointDetails(std::shared_ptr<FocusCurveRecordT> focusCurveRecord);
+    void setPointDetails(const std::shared_ptr<FocusCurveRecordT>& focusCurveRecord);
 
     /**
      *  @brief

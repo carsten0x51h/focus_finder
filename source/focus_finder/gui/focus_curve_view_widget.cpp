@@ -23,9 +23,7 @@
  ****************************************************************************/
 
 #include <QPainter>
-#include <QPixmap>
 #include <QPen>
-#include <QPixmap>
 #include <QPoint>
 #include <QResizeEvent>
 #include <QLabel>
@@ -35,19 +33,14 @@
 
 #include <boost/range/adaptors.hpp>
 #include <boost/range/algorithm.hpp>
+#include <utility>
 
 #include "include/focus_curve_view_widget.h"
 
-#include "../common/include/logging.h"
-#include "../common/include/image.h"
-#include "../common/include/focus_curve_record_set.h"
 #include "../common/include/focus_curve_recorder_logic.h"
-#include "../common/include/focus_measure_type.h"
-#include "../common/include/focus_curve.h"
-#include "../common/include/point.h"
 
 
-// HACK: TODO: Do not hardcode!! Move away...
+// HACK /  TODO / FIXME: Do not hardcode!! Move away...
 int FocusCurveViewWidgetT::minFocusPos = 0;
 int FocusCurveViewWidgetT::maxFocusPos = 80000;
 float FocusCurveViewWidgetT::minFocusMeasure = 0.0F;
@@ -56,7 +49,7 @@ float FocusCurveViewWidgetT::maxFocusMeasure = 20.0F;
 
 FocusCurveViewWidgetT::FocusCurveViewWidgetT(QWidget *parent,
                                              std::shared_ptr<FocusCurveRecorderLogicT> focusCurveRecorderLogic)
-        : QLabel(parent), mFocusCurveRecorderLogic(focusCurveRecorderLogic), mFocusCurveHack(nullptr) {
+        : QLabel(parent), mFocusCurveRecorderLogic(std::move(focusCurveRecorderLogic)), mFocusCurveHack(nullptr) {
     QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     sizePolicy.setHorizontalStretch(100);
     sizePolicy.setVerticalStretch(100);
@@ -73,25 +66,23 @@ QPointF FocusCurveViewWidgetT::transformToScreenCoordinates(float focusPos, floa
     float deltaFocusMeasure = maxFocusMeasure - minFocusMeasure;
 
     // Transform coordinates
-    float xpos = (focusPos / (float) deltaFocusPos) * width();
-    float ypos = (1.0F - (focusMeasure / deltaFocusMeasure)) * height();
+    float xpos = (focusPos / (float) deltaFocusPos) * (float) width();
+    float ypos = (1.0F - (focusMeasure / deltaFocusMeasure)) * (float) height();
 
     return QPointF(xpos, ypos);
 }
 
-FocusCurveViewWidgetT::~FocusCurveViewWidgetT() {
-}
+FocusCurveViewWidgetT::~FocusCurveViewWidgetT() = default;
 
-std::vector<PointFT> dataPoints;
 
 void FocusCurveViewWidgetT::drawFocusCurveRecordSet(QPainter *p, const std::vector<PointFT> &dataPoints,
-                                                    const FocusFinderProfileT &focusFinderProfile, QColor color) {
+                                                    const FocusFinderProfileT &focusFinderProfile, const QColor& color) {
 
     // Min / max focus positions
     int deltaFocusPos = maxFocusPos - minFocusPos;
     float deltaFocusMeasure = maxFocusMeasure - minFocusMeasure;
 
-    for (std::vector<PointFT>::const_iterator it = dataPoints.begin(); it != dataPoints.end(); ++it) {
+    for (auto it = dataPoints.begin(); it != dataPoints.end(); ++it) {
 
         float focusPos = it->x();
         float focusMeasure = it->y();
@@ -156,7 +147,7 @@ void FocusCurveViewWidgetT::drawFocusCurveRecordSets(QPainter *p) {
 
             std::vector<PointFT> dataPoints;
 
-            auto transformRecordSetToPointFunction = [&](std::shared_ptr<FocusCurveRecordT> rs) {
+            auto transformRecordSetToPointFunction = [&](const std::shared_ptr<FocusCurveRecordT>& rs) {
                 return PointFT(
                         rs->getCurrentAbsoluteFocusPos(),
                         rs->getFocusMeasure(focusFinderProfile.getCurveFocusMeasureType())
@@ -190,7 +181,7 @@ void FocusCurveViewWidgetT::update() {
 
 
 void FocusCurveViewWidgetT::drawCurveHack(std::shared_ptr<FocusCurveT> focusCurve) {
-    mFocusCurveHack = focusCurve;
+    mFocusCurveHack = std::move(focusCurve);
     repaint();
 }
 
@@ -208,13 +199,13 @@ void FocusCurveViewWidgetT::paintEvent(QPaintEvent *event) {
 
     if (mFocusCurveHack != nullptr) {
         // TODO: Later use the boundaries of the curve instead of min/max focus pos!
-        int lowerFocusPos = mFocusCurveHack->getLowerFocusPos();
-        int upperFocusPos = mFocusCurveHack->getUpperFocusPos();
+        int lowerFocusPos = (int) mFocusCurveHack->getLowerFocusPos();
+        int upperFocusPos = (int) mFocusCurveHack->getUpperFocusPos();
 
         for (int xScreen = 0; xScreen < width(); ++xScreen) {
 
             float focusPos =
-                    lowerFocusPos + ((float) xScreen / (float) width()) * (float) (upperFocusPos - lowerFocusPos);
+                    (float) lowerFocusPos + ((float) xScreen / (float) width()) * (float) ((float) upperFocusPos - (float) lowerFocusPos);
             float focusMeasure = mFocusCurveHack->calcFocusMeasureByFocusPosition(focusPos);
 
             QPointF center = transformToScreenCoordinates(focusPos, focusMeasure);
@@ -275,7 +266,7 @@ void FocusCurveViewWidgetT::paintEvent(QPaintEvent *event) {
     p.drawLine(QPointF(mLastMousePos.x(), 0), QPointF(mLastMousePos.x(), height()));
     p.drawLine(QPointF(0, mLastMousePos.y()), QPointF(width(), mLastMousePos.y()));
 
-    Q_UNUSED(event);
+    Q_UNUSED(event)
 }
 
 void FocusCurveViewWidgetT::reset() {
