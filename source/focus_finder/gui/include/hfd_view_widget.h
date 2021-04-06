@@ -47,13 +47,13 @@ public:
     *  @brief
     *    Constructor
     */
-    HfdViewWidgetT(QWidget *parent);
+    explicit HfdViewWidgetT(QWidget *parent);
 
     /**
     *  @brief
     *    Destructor
     */
-    virtual ~HfdViewWidgetT();
+    ~HfdViewWidgetT() override;
 
     void reset();
 
@@ -68,7 +68,7 @@ protected slots:
 protected:
 
 private:
-    QPixmap convertToPixmap(const ImageT &img);
+    static QPixmap convertToPixmap(const ImageT &img);
 
     HfdT mHfd;
     QPixmap mStarPixmap;

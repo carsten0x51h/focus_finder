@@ -90,7 +90,6 @@ set(sources
         ../common/focus_curve_recorder_factory.cpp
         ../common/include/image_slicer.h
         ../common/include/wait_for.h
-        ../common/wait_for.cpp
         ../common/include/reporting_dataset.h
         ../common/reporting_dataset.cpp
         ../common/include/reporting.h
@@ -281,7 +280,7 @@ set(sources
         include/indi_device_manager_dialog.h
         indi_device_manager_dialog.cpp
         indi_device_manager_dialog.ui
-        ../common/wait_for.cpp)
+        )
 
 
 # 

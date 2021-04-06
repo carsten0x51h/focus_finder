@@ -23,7 +23,7 @@
  ****************************************************************************/
 
 #ifndef SOURCE_FOCUS_FINDER_GUI_INCLUDE_MANAGE_DEVICE_PROFILES_DIALOG_H_
-#define SOURCE_FOCUS_FINDER_GUI_INCLUDE_MANAGE_DEVICE_PROFILES_DIALOG_H_
+#define SOURCE_FOCUS_FINDER_GUI_INCLUDE_MANAGE_DEVICE_PROFILES_DIALOG_H_ SOURCE_FOCUS_FINDER_GUI_INCLUDE_MANAGE_DEVICE_PROFILES_DIALOG_H_
 
 // Qt includes
 #include <QDialog>
@@ -46,8 +46,6 @@ class ManageDeviceEntryPanelT;
 
 class NewProfileDialogT;
 
-class RenameProfileDialogT;
-
 class ProfileSettingsDialogT;
 
 /**
@@ -62,13 +60,13 @@ public:
     *  @brief
     *    Constructor
     */
-    ManageDeviceProfilesDialogT(FocusFinderLogicT &ffl);
+    explicit ManageDeviceProfilesDialogT(FocusFinderLogicT &ffl);
 
     /**
     *  @brief
     *    Destructor
     */
-    virtual ~ManageDeviceProfilesDialogT();
+    ~ManageDeviceProfilesDialogT() override;
 
 signals:
 

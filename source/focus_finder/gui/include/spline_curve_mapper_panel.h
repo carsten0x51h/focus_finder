@@ -23,7 +23,7 @@
  ****************************************************************************/
 
 #ifndef SOURCE_FOCUS_FINDER_GUI_INCLUDE_SPLINE_CURVE_MAPPER_PANEL_H_
-#define SOURCE_FOCUS_FINDER_GUI_INCLUDE_SPLINE_CURVE_MAPPER_PANEL_H_
+#define SOURCE_FOCUS_FINDER_GUI_INCLUDE_SPLINE_CURVE_MAPPER_PANEL_H_ SOURCE_FOCUS_FINDER_GUI_INCLUDE_SPLINE_CURVE_MAPPER_PANEL_H_
 
 // std includes
 #include <memory>
@@ -56,16 +56,16 @@ public:
     SplineCurveMapperPanelT(QWidget *parent, FocusFinderLogicT &ffl, const std::string &functionMapperName,
                             bool visible);
 
-    ~SplineCurveMapperPanelT();
+    ~SplineCurveMapperPanelT() override;
 
-    void notifyNewImage();
+    void notifyNewImage() override;
 
-    std::shared_ptr<MapperFunctionT> getMapperFunction() const;
+    [[nodiscard]] std::shared_ptr<MapperFunctionT> getMapperFunction() const override;
 
 
 signals:
 
-    void valueChangedSignal();
+    void valueChangedSignal() override;
 
 protected slots:
     //void onRoiClearedSlot();

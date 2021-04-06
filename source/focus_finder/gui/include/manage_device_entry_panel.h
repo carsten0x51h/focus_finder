@@ -23,7 +23,7 @@
  ****************************************************************************/
 
 #ifndef SOURCE_FOCUS_FINDER_GUI_INCLUDE_MANAGE_DEVICE_ENTRY_PANEL_H_
-#define SOURCE_FOCUS_FINDER_GUI_INCLUDE_MANAGE_DEVICE_ENTRY_PANEL_H_
+#define SOURCE_FOCUS_FINDER_GUI_INCLUDE_MANAGE_DEVICE_ENTRY_PANEL_H_ SOURCE_FOCUS_FINDER_GUI_INCLUDE_MANAGE_DEVICE_ENTRY_PANEL_H_
 
 // std includes
 #include <vector>
@@ -62,7 +62,7 @@ public:
     *  @brief
     *    Destructor
     */
-    virtual ~ManageDeviceEntryPanelT();
+    ~ManageDeviceEntryPanelT() override;
 
     void setDeviceName(const std::string &deviceName);
 

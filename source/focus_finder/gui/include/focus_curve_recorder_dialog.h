@@ -74,7 +74,7 @@ public:
      *  @brief
      *    Destructor
      */
-    virtual ~FocusCurveRecorderDialogT();
+    ~FocusCurveRecorderDialogT() override;
 
     void reset();
 
@@ -111,9 +111,9 @@ protected slots:
 protected:
     //void closeEvent(QCloseEvent *event) override;
 
-    virtual void accept() override;
+    void accept() override;
 
-    virtual void reject() override;
+    void reject() override;
 
     void buttonBoxClicked(QAbstractButton *button);
 
@@ -141,7 +141,7 @@ private:
 
     void setBtnIcon(QAbstractButton *btn, const std::string &filename);
 
-    bool deviceCheck() const;
+    [[nodiscard]] bool deviceCheck() const;
 
     void createMainToolBar();
 

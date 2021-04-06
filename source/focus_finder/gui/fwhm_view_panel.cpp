@@ -30,9 +30,6 @@
 #include "include/fwhm_view_panel.h"
 #include "include/fwhm_view_widget.h"
 
-#include "../common/include/logging.h"
-#include "../common/include/fwhm.h"
-
 #include "ui_fwhm_view_panel.h"
 
 

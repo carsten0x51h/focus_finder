@@ -32,13 +32,7 @@
 #include <boost/range/adaptors.hpp>
 #include <boost/range/algorithm.hpp>
 
-//#include <boost/phoenix.hpp>
-
 #include "include/fwhm_view_widget.h"
-
-#include "../common/include/logging.h"
-#include "../common/include/fwhm.h"
-#include "../common/include/image.h"
 
 
 FwhmViewWidgetT::FwhmViewWidgetT(QWidget *parent) : QLabel(parent) {
@@ -52,9 +46,9 @@ FwhmViewWidgetT::FwhmViewWidgetT(QWidget *parent) : QLabel(parent) {
     reset();
 }
 
-FwhmViewWidgetT::~FwhmViewWidgetT() {
-}
+FwhmViewWidgetT::~FwhmViewWidgetT() = default;
 
+// TODO: Maybe use "DrawHelperT" ?
 void FwhmViewWidgetT::drawCross(QPainter &p, const QPointF &center, const QColor &crossColor, int penWidth,
                                 int halfCrossLength) {
     p.setPen(QPen(QBrush(crossColor), penWidth, Qt::SolidLine));
@@ -98,12 +92,12 @@ void FwhmViewWidgetT::paintEvent(QPaintEvent *event) {
         auto maxIt = std::max_element(values.begin(), values.end());
 
         const float max = 1.1f * *maxIt; // Add 10% border
-        const float xValueToDispScaleFactor = width() / (float) imgValues.size();
-        const float yValueToDispScaleFactor = height() / max;
+        const float xValueToDispScaleFactor = (float) width() / (float) imgValues.size();
+        const float yValueToDispScaleFactor = (float) height() / max;
 
         auto toScreenCoords = [&](const PointFT &p) -> QPointF {
             return QPointF(p.x() * xValueToDispScaleFactor,
-                           (height() - yValueToDispScaleFactor * p.y()));
+                           ((float) height() - yValueToDispScaleFactor * p.y()));
         };
 
 
@@ -119,24 +113,24 @@ void FwhmViewWidgetT::paintEvent(QPaintEvent *event) {
         LOG(debug) << "FwhmViewWidgetT::paintEvent - imgValues.size(): " << imgValues.size() << ", fitValues.size(): "
                    << fitValues.size() << std::endl;
 
-        for (size_t idx = 0; idx < imgValues.size(); ++idx) {
-            drawCross(p, toScreenCoords(imgValues.at(idx)), QColor(255, 0, 0, 255), penWidth, halfCrossLength);
+        for (const auto & imgValue : imgValues) {
+            drawCross(p, toScreenCoords(imgValue), QColor(255, 0, 0, 255), penWidth, halfCrossLength);
         }
 
-        for (size_t idx = 0; idx < fitValues.size(); ++idx) {
-            drawCross(p, toScreenCoords(fitValues.at(idx)), QColor(0, 255, 0, 255), penWidth, halfCrossLength);
+        for (const auto & fitValue : fitValues) {
+            drawCross(p, toScreenCoords(fitValue), QColor(0, 255, 0, 255), penWidth, halfCrossLength);
         }
 
         //Draw outliers
-        for (size_t idx = 0; idx < outlierValues.size(); ++idx) {
-            drawCross(p, toScreenCoords(outlierValues.at(idx).point), QColor(255, 255, 0, 255), penWidth,
+        for (const auto & outlierValue : outlierValues) {
+            drawCross(p, toScreenCoords(outlierValue.point), QColor(255, 255, 0, 255), penWidth,
                       halfCrossLength);
 
             // IDEA: Draw circle radius depending on residual size
             //float residualRadius = xValueToDispScaleFactor * outlierValues.at(idx).residual;
             //drawCircle(p, toScreenCoords(outlierValues.at(idx).point), QColor(255, 255, 0, 255), penWidth, residualRadius);
 
-            drawCircle(p, toScreenCoords(outlierValues.at(idx).point), QColor(255, 255, 0, 255), penWidth, 10.0F);
+            drawCircle(p, toScreenCoords(outlierValue.point), QColor(255, 255, 0, 255), penWidth, 10.0F);
         }
 
 
@@ -156,7 +150,7 @@ void FwhmViewWidgetT::paintEvent(QPaintEvent *event) {
         p.drawPolyline(polygon);
     }
 
-    Q_UNUSED(event);
+    Q_UNUSED(event)
 }
 
 void FwhmViewWidgetT::reset() {

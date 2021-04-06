@@ -36,17 +36,17 @@ class AbstractMapperPanelT : public QWidget {
 Q_OBJECT
 
 public:
-    AbstractMapperPanelT(QWidget *parent) : QWidget(parent) {}
+    explicit AbstractMapperPanelT(QWidget *parent) : QWidget(parent) {}
 
-    virtual ~AbstractMapperPanelT() {};
+    ~AbstractMapperPanelT() override {};
 
-    virtual std::shared_ptr<MapperFunctionT> getMapperFunction() const = 0;
+    [[nodiscard]] virtual std::shared_ptr<MapperFunctionT> getMapperFunction() const = 0;
 
     virtual void notifyNewImage() = 0;
 
 signals:
 
-    void valueChangedSignal();
+    virtual void valueChangedSignal();
 };
 
 #endif /* SOURCE_FOCUS_FINDER_GUI_INCLUDE_ABSTRACT_MAPPER_PANEL_H_ */

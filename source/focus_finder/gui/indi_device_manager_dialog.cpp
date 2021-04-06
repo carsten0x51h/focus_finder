@@ -24,6 +24,8 @@
 
 #include "include/indi_device_manager_dialog.h"
 
+#include <utility>
+
 #include "../common/include/logging.h"
 #include "../common/include/indi_device_manager.h"
 
@@ -148,7 +150,7 @@ void IndiDeviceManagerDialogT::setButtonConnectionState(
                << std::endl;
 
     switch (btnConnState) {
-        case DeviceConnectionStateT::DISCONNECTED: {
+        case IndiServerConnectionStateT::DISCONNECTED: {
             mConnectIndiServerButton->stopAnimation();
             mConnectIndiServerButton->setEnabled(true);
 
@@ -161,7 +163,7 @@ void IndiDeviceManagerDialogT::setButtonConnectionState(
 
             break;
         }
-        case DeviceConnectionStateT::CONNECTED: {
+        case IndiServerConnectionStateT::CONNECTED: {
             mConnectIndiServerButton->stopAnimation();
 
             setBtnIcon(":/res/indi_server_connected_64x64.png", "Disconnect");
@@ -174,7 +176,7 @@ void IndiDeviceManagerDialogT::setButtonConnectionState(
 
             break;
         }
-        case DeviceConnectionStateT::CONNECTING: {
+        case IndiServerConnectionStateT::CONNECTING: {
             mConnectIndiServerButton->startAnimation();
             mConnectIndiServerButton->setChecked(true);
 
@@ -193,7 +195,7 @@ void IndiDeviceManagerDialogT::setButtonConnectionState(
 
             break;
         }
-        case DeviceConnectionStateT::DISCONNECTING: {
+        case IndiServerConnectionStateT::DISCONNECTING: {
             mConnectIndiServerButton->startAnimation();
             mConnectIndiServerButton->setChecked(true);
             mConnectIndiServerButton->setEnabled(false);
@@ -251,8 +253,8 @@ IndiDeviceManagerDialogT::IndiDeviceManagerDialogT(QWidget *parent,
                                                    std::shared_ptr<IndiDeviceManagerT> indiDeviceManager) : QDialog(
         parent),
                                                                                                             m_ui(new Ui::IndiDeviceManagerDialog),
-                                                                                                            mIndiDeviceManager(
-                                                                                                                    indiDeviceManager) {
+                                                                                                            mIndiDeviceManager(std::move(
+                                                                                                                    indiDeviceManager)), mConnectIndiServerButton(nullptr), mIndiServerConnectionState(IndiServerConnectionStateT::DISCONNECTED) {
     LOG(debug) << "IndiDeviceManagerDialogT::IndiDeviceManagerDialogT..." << std::endl;
 
     qRegisterMetaType<IndiServerConnectionStateT::TypeE>("IndiServerConnectionStateT::TypeE");
@@ -264,7 +266,7 @@ IndiDeviceManagerDialogT::IndiDeviceManagerDialogT(QWidget *parent,
 
     // Populate the INDI server fields...
     m_ui->editHostname->setText(QString::fromStdString(mIndiDeviceManager->getHostname()));
-    m_ui->editSpinPort->setValue(mIndiDeviceManager->getPort());
+    m_ui->editSpinPort->setValue((int) mIndiDeviceManager->getPort());
 
     createConnectIndiServerButton();
 

@@ -44,13 +44,13 @@ public:
      *  @brief
      *    Constructor
      */
-    AboutDialogT(QWidget *parent);
+    explicit AboutDialogT(QWidget *parent);
 
     /**
      *  @brief
      *    Destructor
      */
-    virtual ~AboutDialogT();
+    ~AboutDialogT() override;
 
 signals:
 

@@ -25,7 +25,6 @@
 #include <QPainter>
 #include <QPixmap>
 #include <QPen>
-#include <QPixmap>
 #include <QPoint>
 #include <QResizeEvent>
 #include <QLabel>
@@ -33,10 +32,6 @@
 #include <memory>
 
 #include "include/hfd_view_widget.h"
-
-#include "../common/include/logging.h"
-#include "../common/include/hfd.h"
-#include "../common/include/image.h"
 
 
 HfdViewWidgetT::HfdViewWidgetT(QWidget *parent) : QLabel(parent) {
@@ -50,8 +45,7 @@ HfdViewWidgetT::HfdViewWidgetT(QWidget *parent) : QLabel(parent) {
     reset();
 }
 
-HfdViewWidgetT::~HfdViewWidgetT() {
-}
+HfdViewWidgetT::~HfdViewWidgetT() = default;
 
 void HfdViewWidgetT::paintEvent(QPaintEvent *event) {
     LOG(debug) << "HfdViewWidgetT::paintEvent..." << std::endl;
@@ -82,13 +76,13 @@ void HfdViewWidgetT::paintEvent(QPaintEvent *event) {
         LOG(debug) << "HfdViewWidgetT::paintEvent...  drawing circles with center at (" << center.x() << ", "
                    << center.y() << ")..." << std::endl;
 
-        float penWidth = 2.0 * 1.0 / (float) scale /*border width*/;
-        float hfdRadius = mHfd.getValue() / 2.0;
+        float penWidth = 2.0F * 1.0F / (float) scale /*border width*/;
+        float hfdRadius = (float) mHfd.getValue() / 2.0F;
         p.setPen(QPen(QBrush(QColor(0, 255, 0, 255)), penWidth, Qt::SolidLine));
         p.setBrush(QBrush(QColor(255, 255, 255, 0)));
         p.drawEllipse(center, hfdRadius, hfdRadius);
 
-        float outerRadius = mHfd.getOuterDiameter() / 2.0;
+        float outerRadius = (float) mHfd.getOuterDiameter() / 2.0F;
         p.setPen(QPen(QBrush(QColor(255, 255, 0, 255)), penWidth, Qt::SolidLine));
         p.setBrush(QBrush(QColor(255, 255, 255, 0)));
         p.drawEllipse(center, outerRadius, outerRadius);
@@ -103,7 +97,7 @@ void HfdViewWidgetT::paintEvent(QPaintEvent *event) {
                    QPointF(center.x() + halfCrossLength, center.y()));
     }
 
-    Q_UNUSED(event);
+    Q_UNUSED(event)
 }
 
 void HfdViewWidgetT::reset() {
@@ -127,7 +121,7 @@ QPixmap HfdViewWidgetT::convertToPixmap(const ImageT &img) {
 
     cimg_forXY(img, x, y) {
             //int pixValue = displayImg(x, y, 0);
-            int pixValue = 255.0 * (img(x, y, 0) - min) / mm;
+            int pixValue = (int) (255.0F * (float) (img(x, y, 0) - min) / mm);
             qtImage.setPixel(x, y, qRgb(pixValue, pixValue, pixValue));
         }
 

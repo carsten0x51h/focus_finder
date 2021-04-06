@@ -24,8 +24,6 @@
 
 #include "include/linear_bw_stretch_mapper_panel.h"
 
-#include "../common/include/logging.h"
-
 #include "ui_linear_bw_stretch_mapper_panel.h"
 
 LinearBWStretchMapperPanelT::LinearBWStretchMapperPanelT(QWidget *parent,
@@ -75,8 +73,7 @@ LinearBWStretchMapperPanelT::LinearBWStretchMapperPanelT(QWidget *parent,
             &LinearBWStretchMapperPanelT::onWhitePointSpinBoxChangedSlot);
 }
 
-LinearBWStretchMapperPanelT::~LinearBWStretchMapperPanelT() {
-}
+LinearBWStretchMapperPanelT::~LinearBWStretchMapperPanelT() = default;
 
 void LinearBWStretchMapperPanelT::performFit() {
     const FrameT &frame = mFfl.getLastFrame();
@@ -232,8 +229,8 @@ void LinearBWStretchMapperPanelT::updateMapperFunction() {
         << "LinearBWStretchMapperPanelT::update - Black: " << blackPoint
         << ", white: " << whitePoint << std::endl;
 
-    mFunctionMapper->setBlackPoint(blackPoint);
-    mFunctionMapper->setWhitePoint(whitePoint);
+    mFunctionMapper->setBlackPoint((float) blackPoint);
+    mFunctionMapper->setWhitePoint((float) whitePoint);
 
     // MainWindow can register on this signal ... and call updateImage() then...
     emit valueChangedSignal();

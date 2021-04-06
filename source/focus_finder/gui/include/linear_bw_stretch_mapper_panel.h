@@ -23,7 +23,7 @@
  ****************************************************************************/
 
 #ifndef SOURCE_FOCUS_FINDER_GUI_INCLUDE_LINEAR_BW_STRETCH_MAPPER_PANEL_H_
-#define SOURCE_FOCUS_FINDER_GUI_INCLUDE_LINEAR_BW_STRETCH_MAPPER_PANEL_H_
+#define SOURCE_FOCUS_FINDER_GUI_INCLUDE_LINEAR_BW_STRETCH_MAPPER_PANEL_H_ SOURCE_FOCUS_FINDER_GUI_INCLUDE_LINEAR_BW_STRETCH_MAPPER_PANEL_H_
 
 // std includes
 #include <memory>
@@ -57,21 +57,21 @@ public:
     LinearBWStretchMapperPanelT(QWidget *parent, FocusFinderLogicT &ffl, const std::string &functionMapperName,
                                 bool visible);
 
-    ~LinearBWStretchMapperPanelT();
+    ~LinearBWStretchMapperPanelT() override;
 
-    std::shared_ptr<MapperFunctionT> getMapperFunction() const;
+    [[nodiscard]] std::shared_ptr<MapperFunctionT> getMapperFunction() const override;
 
-    void notifyNewImage();
+    void notifyNewImage() override;
 
-    int getMaxPixelValue() const;
+    [[nodiscard]] int getMaxPixelValue() const;
 
     void setMaxPixelValue(int maxPixelValue);
 
-    int getBlackPoint() const;
+    [[nodiscard]] int getBlackPoint() const;
 
     void setBlackPoint(int blackPoint);
 
-    int getWhitePoint() const;
+    [[nodiscard]] int getWhitePoint() const;
 
     void setWhitePoint(int whitePoint);
 

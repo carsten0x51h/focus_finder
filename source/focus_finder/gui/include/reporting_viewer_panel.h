@@ -23,7 +23,7 @@
  ****************************************************************************/
 
 #ifndef SOURCE_FOCUS_FINDER_GUI_INCLUDE_REPORTING_VIEWER_PANEL_H_
-#define SOURCE_FOCUS_FINDER_GUI_INCLUDE_REPORTING_VIEWER_PANEL_H_
+#define SOURCE_FOCUS_FINDER_GUI_INCLUDE_REPORTING_VIEWER_PANEL_H_ SOURCE_FOCUS_FINDER_GUI_INCLUDE_REPORTING_VIEWER_PANEL_H_
 
 // std includes
 
@@ -50,13 +50,13 @@ public:
     *  @brief
     *    Constructor
     */
-    ReportingViewerPanelT(QWidget *parent);
+    explicit ReportingViewerPanelT(QWidget *parent);
 
     /**
     *  @brief
     *    Destructor
     */
-    virtual ~ReportingViewerPanelT();
+    ~ReportingViewerPanelT() override;
 
 signals:
 

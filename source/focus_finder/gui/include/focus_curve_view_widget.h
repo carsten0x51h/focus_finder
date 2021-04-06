@@ -67,7 +67,7 @@ public:
     *  @brief
     *    Destructor
     */
-    virtual ~FocusCurveViewWidgetT();
+    ~FocusCurveViewWidgetT() override;
 
     void reset();
 

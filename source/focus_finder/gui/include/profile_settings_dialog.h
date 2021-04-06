@@ -23,7 +23,7 @@
  ****************************************************************************/
 
 #ifndef SOURCE_FOCUS_FINDER_GUI_INCLUDE_PROFILE_SETTINGS_DIALOG_H_
-#define SOURCE_FOCUS_FINDER_GUI_INCLUDE_PROFILE_SETTINGS_DIALOG_H_
+#define SOURCE_FOCUS_FINDER_GUI_INCLUDE_PROFILE_SETTINGS_DIALOG_H_ SOURCE_FOCUS_FINDER_GUI_INCLUDE_PROFILE_SETTINGS_DIALOG_H_
 
 // Qt includes
 #include <QDialog>
@@ -52,7 +52,7 @@ public:
      *  @brief
      *    Destructor
      */
-    virtual ~ProfileSettingsDialogT();
+    ~ProfileSettingsDialogT() override;
 
 signals:
 

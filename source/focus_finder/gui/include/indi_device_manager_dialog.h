@@ -23,7 +23,7 @@
  ****************************************************************************/
 
 #ifndef SOURCE_FOCUS_FINDER_GUI_INCLUDE_INDI_DEVICE_MANAGER_DIALOG_H_
-#define SOURCE_FOCUS_FINDER_GUI_INCLUDE_INDI_DEVICE_MANAGER_DIALOG_H_
+#define SOURCE_FOCUS_FINDER_GUI_INCLUDE_INDI_DEVICE_MANAGER_DIALOG_H_ SOURCE_FOCUS_FINDER_GUI_INCLUDE_INDI_DEVICE_MANAGER_DIALOG_H_
 
 #include <memory>
 
@@ -62,7 +62,7 @@ public:
      *  @brief
      *    Destructor
      */
-    virtual ~IndiDeviceManagerDialogT();
+    ~IndiDeviceManagerDialogT() override;
 
 signals:
 

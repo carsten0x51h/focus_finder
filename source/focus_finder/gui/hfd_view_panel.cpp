@@ -30,9 +30,6 @@
 #include "include/hfd_view_panel.h"
 #include "include/hfd_view_widget.h"
 
-#include "../common/include/logging.h"
-#include "../common/include/hfd.h"
-
 #include "ui_hfd_view_panel.h"
 
 

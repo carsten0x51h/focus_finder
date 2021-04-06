@@ -22,8 +22,8 @@
  *
  ****************************************************************************/
 
-#pragma once
-
+#ifndef SOURCE_FOCUS_FINDER_GUI_INCLUDE_MAIN_WINDOW_H_
+#define SOURCE_FOCUS_FINDER_GUI_INCLUDE_MAIN_WINDOW_H_ SOURCE_FOCUS_FINDER_GUI_INCLUDE_MAIN_WINDOW_H_
 
 // Qt includes
 #include <QHBoxLayout>
@@ -96,7 +96,7 @@ public:
     *  @brief
     *    Destructor
     */
-    virtual ~MainWindow();
+    ~MainWindow() override;
 
 protected slots:
 
@@ -384,3 +384,5 @@ signals:
 
     void focusFinderCancelledSignal();
 };
+
+#endif /*SOURCE_FOCUS_FINDER_GUI_INCLUDE_MAIN_WINDOW_H_*/

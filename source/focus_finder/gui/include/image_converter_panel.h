@@ -56,7 +56,7 @@ public:
     */
     ImageConverterPanelT(QWidget *parent, FocusFinderLogicT &ffl);
 
-    ~ImageConverterPanelT();
+    ~ImageConverterPanelT() override;
 
 
 signals:

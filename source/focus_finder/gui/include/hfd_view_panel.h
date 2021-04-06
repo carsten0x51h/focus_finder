@@ -50,13 +50,13 @@ public:
     *  @brief
     *    Constructor
     */
-    HfdViewPanelT(QWidget *parent);
+    explicit HfdViewPanelT(QWidget *parent);
 
     /**
     *  @brief
     *    Destructor
     */
-    virtual ~HfdViewPanelT();
+    ~HfdViewPanelT() override;
 
     void reset();
 

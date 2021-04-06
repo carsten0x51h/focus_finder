@@ -58,7 +58,7 @@ public:
     *  @brief
     *    Destructor
     */
-    virtual ~FocusCntlPanelT();
+    ~FocusCntlPanelT() override;
 
 signals:
 
@@ -97,7 +97,7 @@ private:
 
     void updateProfile();
 
-    std::shared_ptr<FocusInterfaceT> getFocus() const;
+    [[nodiscard]] std::shared_ptr<FocusInterfaceT> getFocus() const;
 
     void startAnimation();
 

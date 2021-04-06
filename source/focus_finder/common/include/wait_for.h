@@ -34,7 +34,39 @@
 
 DEF_Exception(Timeout);
 
-static void wait_for(const std::function<bool()>& conditionToWaitFor,
-                     std::chrono::milliseconds maxWaitMillis);
+static void wait_for(const std::function<bool()> &conditionToWaitFor, std::chrono::milliseconds maxWaitMillis) {
+
+    using namespace std::chrono_literals;
+
+    std::chrono::time_point<std::chrono::system_clock> start =
+            std::chrono::system_clock::now();
+
+    bool hitTimeout;
+
+    do {
+        auto waitingSinceMillis = std::chrono::duration_cast
+                <std::chrono::milliseconds
+                >(std::chrono::system_clock::now() - start);
+
+        hitTimeout = waitingSinceMillis >= maxWaitMillis;
+
+        LOG(debug) << "wait_for - hitTimeout: " << hitTimeout
+                   << ", conditionToWaitFor: " << conditionToWaitFor() << " -> "
+                   << (!conditionToWaitFor() && !hitTimeout) << std::endl;
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(100ms));
+
+    } while (!conditionToWaitFor() && !hitTimeout);
+
+    LOG(debug) << "wait_for - hitTimeout: " << hitTimeout
+               << ", conditionToWaitFor: " << conditionToWaitFor() << std::endl;
+
+    if (hitTimeout) {
+        std::stringstream ss;
+        ss << "Hit timeout after '" << maxWaitMillis.count() << "' ms."
+           << std::endl;
+        throw TimeoutExceptionT(ss.str());
+    }
+}
 
 #endif /*SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FOCUS_FINDER_WAIT_FOR_H_*/

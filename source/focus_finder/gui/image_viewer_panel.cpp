@@ -26,13 +26,10 @@
 #include <QEvent>
 #include <QMouseEvent>
 #include <QPainter>
-#include <QKeyEvent>
 
 #include "include/image_viewer_panel.h"
 
-#include "../common/include/logging.h"
 #include "../common/include/profile_manager.h"
-#include "../common/include/focus_finder_profile.h"
 
 #include "ui_image_viewer_panel.h"
 
@@ -93,7 +90,7 @@ void ImageViewerPanelT::resizeEvent(QResizeEvent *event) {
         << "ImageViewerPanelT::resizeEvent..." << std::endl;
     mSelectableImageWidget->update();
 
-    Q_UNUSED(event);
+    Q_UNUSED(event)
 }
 
 void ImageViewerPanelT::update() {

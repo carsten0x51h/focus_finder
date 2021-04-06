@@ -242,8 +242,7 @@ void ManageDeviceEntryPanelT::createDeviceConnectButton() {
 }
 
 ManageDeviceEntryPanelT::ManageDeviceEntryPanelT(FocusFinderLogicT &ffl,
-                                                 const std::string &deviceTypeName, const std::string &deviceName) :
-        m_ui(new Ui::ManageDeviceEntryPanel), mFfl(ffl) {
+                                                 const std::string &deviceTypeName, const std::string &deviceName) : m_ui(new Ui::ManageDeviceEntryPanel), mFfl(ffl), mConnectButton(nullptr) {
     // Setup UI
     m_ui->setupUi(this);
 
