@@ -111,7 +111,7 @@ public:
 private:
     static FocusFinderLogicT *sSelf;
 
-    [[nodiscard]] size_t calcNumStarsInRegion(const ImageT &inImg) const;
+    [[nodiscard]] static size_t calcNumStarsInRegion(const ImageT &inImg) ;
 
     void initImageMappers();
 

@@ -87,7 +87,7 @@ public:
      * Throws if save fails.
      */
     static void save(const std::string &fullGlobalFocusFinderConfigPath,
-                     const GlobalFocusFinderConfigT &profile);
+                     const GlobalFocusFinderConfigT &globalConfig);
 
     std::ostream &print(std::ostream &os, size_t indent = 0) const;
 

@@ -29,10 +29,8 @@
 #include <thread>
 #include <functional>
 
-#include "exception.h"
+#include "timeout_exception.h"
 #include "logging.h"
-
-DEF_Exception(Timeout);
 
 static void wait_for(const std::function<bool()> &conditionToWaitFor, std::chrono::milliseconds maxWaitMillis) {
 

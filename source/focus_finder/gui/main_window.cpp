@@ -1118,7 +1118,7 @@ void MainWindow::updateFilterDevice(const std::shared_ptr<FilterInterfaceT>& old
 
     // Register to new device
     if (newFilterInterface) {
-        auto newFilterDevice = newFilterInterface->getParentDevice();
+        auto * newFilterDevice = newFilterInterface->getParentDevice();
 
         LOG(debug)
             << "MainWindow::updateFilterDevice... registering to new Filter..."

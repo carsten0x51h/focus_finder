@@ -22,14 +22,14 @@
  *
  ****************************************************************************/
 
-#include <thread> // TODO: Remove - only temporary
+//#include <thread> // TODO: Remove - only temporary
 #include <chrono>
 #include <utility>
 
 #include "include/focus_finder_fast_curve_lookup.h"
 #include "include/logging.h"
 #include "include/exception.h"
-#include "include/wait_for.h"
+#include "include/timeout_exception.h"
 
 #include "include/snr.h"
 #include "include/fwhm.h"
@@ -302,7 +302,8 @@ void FocusFinderFastCurveLookupT::run() {
 
 
         // TODO: Is it even required to store the return value...?
-        int closerAbsBoundaryPos = getFocusController()->boundaryScanWithFocusCurveSupport(focusCurveFunction,
+        /*int closerAbsBoundaryPos = */
+        getFocusController()->boundaryScanWithFocusCurveSupport(focusCurveFunction,
                                                                                            selfOrientationResult,
                                                                                            curveFocusMeasureType,
                                                                                            focusMeasureLimit,
@@ -328,13 +329,13 @@ void FocusFinderFastCurveLookupT::run() {
         float minDistToMove = 10000; // TODO: Roughly estimate distance to other boundary... (min distance).
 
 
-        float startAbsPos = getFocusController()->getFocus()->getCurrentPos();
+        float startAbsPos = (float) getFocusController()->getFocus()->getCurrentPos();
         float currentAbsPos;
-        float stepsMovedSoFar = 0.0F;
+        float stepsMovedSoFar;
 
         std::shared_ptr<FocusCurveT> focusCurve = nullptr;
-        float focusMeasure = 0.0F;
-        bool endRecording = false;
+        float focusMeasure;
+        bool endRecording;
 
         do {
             // Movement direction is opposite direction than direction to boundary
@@ -353,7 +354,7 @@ void FocusFinderFastCurveLookupT::run() {
 
             focusMeasure = newRecord->getFocusMeasure(curveFocusMeasureType);
 
-            currentAbsPos = getFocusController()->getFocus()->getCurrentPos();
+            currentAbsPos = (float) getFocusController()->getFocus()->getCurrentPos();
 
             try {
                 // TODO / HACK / FIXME: Does not compile
@@ -392,7 +393,7 @@ void FocusFinderFastCurveLookupT::run() {
             LOG(debug) << "FocusFinderFastCurveLookupT::run... - Finally best focus position (estimated)="
                        << estimatedBestAbsPosFinal << std::endl;
 
-            getFocusController()->moveFocusToBlocking(estimatedBestAbsPosFinal, 30000ms);
+            getFocusController()->moveFocusToBlocking((int) estimatedBestAbsPosFinal, 30000ms);
 
             auto finalRecord = getFocusController()->measureFocus();
             float currFocusMeasure = finalRecord->getFocusMeasure(curveFocusMeasureType);

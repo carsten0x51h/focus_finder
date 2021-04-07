@@ -83,7 +83,7 @@ CurveParmT &CurveParmsT::operator[](size_t idx) {
 
 std::ostream &
 CurveParmsT::print(std::ostream &os) const {
-    for (auto &cp : mCurveParms) {
+    for (const auto &cp : mCurveParms) {
         os << cp << std::endl;
     }
     return os;

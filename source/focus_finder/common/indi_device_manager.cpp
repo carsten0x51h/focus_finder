@@ -26,18 +26,10 @@
 #include <boost/range/algorithm/copy.hpp>
 
 #include "include/indi_device_manager.h"
-
 #include "include/logging.h"
 #include "include/reporting.h"
 #include "include/reporting_dataset.h"
-
-#include "include/camera_interface.h"
-#include "include/focus_interface.h"
-#include "include/filter_interface.h"
-
-#include "include/indi_camera_interface.h"
-#include "include/indi_focus_interface.h"
-//#include "include/indi_filter_interface.h"
+#include "include/indi_device.h"
 
 #include "basedevice.h"
 
@@ -55,13 +47,13 @@ IndiDeviceManagerT::IndiDeviceManagerT() {
 
     // Register to listners of IndiClient
     mNewDeviceConnection = mIndiClient.registerNewDeviceListener(
-            boost::bind(&IndiDeviceManagerT::newDevice, this, boost::placeholders::_1));
+            [this](INDI::BaseDevice *dp) { newDevice(dp); });
     mRemoveDeviceConnection = mIndiClient.registerRemoveDeviceListener(
-            boost::bind(&IndiDeviceManagerT::removeDevice, this, boost::placeholders::_1));
+            [this](INDI::BaseDevice *dp) { removeDevice(dp); });
     mNewMessageConnection = mIndiClient.registerNewMessageListener(
-            boost::bind(&IndiDeviceManagerT::newMessage, this, boost::placeholders::_1, boost::placeholders::_2));
+            [](INDI::BaseDevice *dp, int messageID) { newMessage(dp, messageID); });
     mNewPropertyConnection = mIndiClient.registerNewPropertyListener(
-            boost::bind(&IndiDeviceManagerT::newProperty, this, boost::placeholders::_1));
+            [this](INDI::Property *property) { newProperty(property); });
 
     //boost::signals2::connection registerNewDeviceListener(const NewDeviceListenersT::slot_type & inCallBack) {
 
@@ -147,7 +139,7 @@ void IndiDeviceManagerT::newMessage(INDI::BaseDevice *dp, int messageID) {
                               msgStr));
 }
 
-void IndiDeviceManagerT::newDevice(INDI::BaseDevice *) {
+void IndiDeviceManagerT::newDevice(INDI::BaseDevice * /*baseDevice*/) {
     // The driver interface is not known when this callback is called...
     // This info is required. Therefore, instead of listening to newDevice(),
     // newProperty() is used.

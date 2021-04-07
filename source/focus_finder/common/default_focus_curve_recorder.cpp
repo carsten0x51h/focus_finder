@@ -24,13 +24,12 @@
 
 #include <chrono>
 
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 #include <utility>
 
 #include "include/default_focus_curve_recorder.h"
 #include "include/logging.h"
-#include "include/exception.h"
-#include "include/wait_for.h"
+#include "include/timeout_exception.h"
 
 #include "include/focus_measure_type.h"
 #include "include/focus_curve_record.h"
@@ -221,7 +220,7 @@ void DefaultFocusCurveRecorderT::run() {
 
         // NOTE: Moved to focus_analyzer.cpp constructor
         // // Register on camera
-        // // NOTE / TODO: For some reason std::bind did not compile....
+        // // NOTE / TODO / FIXME: For some reason std::bind did not compile....
         // mCameraExposureFinishedConnection =
         //   getCameraInterface()->registerExposureCycleFinishedListener(
         // 							 std::bind(&DefaultFocusCurveRecorderT::onImageReceived,

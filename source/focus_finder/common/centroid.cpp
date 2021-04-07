@@ -253,11 +253,15 @@ void CentroidT::calcCentroidSubPixel(const ImageT &inImg,
                                    yi + 1 /*y1*/);
 
     // 3. Interpolate using sub-pixel algorithm
-    auto xsc = (float) xi, ysc = (float) yi;
+    auto xsc = (float) xi;
+    auto ysc = (float) yi;
 
     // Sub pixel interpolation
-    float c, a1, a2, a3, a4, b1, b2, b3, b4;
-    float a1n, a2n, a3n, a4n, b1n, b2n, b3n, b4n;
+    float c;
+    float a1, a2, a3, a4;
+    float b1, b2, b3, b4;
+    float a1n, a2n, a3n, a4n;
+    float b1n, b2n, b3n, b4n;
 
     THROW_IF(Centroid, img3x3.width() != 3 || img3x3.height() != 3,
              "Expected image for sub-pixel calculation being 3x3.")
@@ -379,7 +383,9 @@ void CentroidT::calcIntensityWeightedCenter(const ImageT &inImg,
     THROW_IF(Centroid, outCentroidPos == nullptr, "outCentroidPos expected to be set.")
 
     // Determine weighted centroid - See http://cdn.intechopen.com/pdfs-wm/26716.pdf
-    double Imean2 = 0, Jmean2 = 0, Ixy2 = 0;
+    double Imean2 = 0;
+    double Jmean2 = 0;
+    double Ixy2 = 0;
 
     for (int i = 0; i < inImg.width(); ++i) {
         Imean2 += calcIx2(inImg, i);

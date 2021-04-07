@@ -78,7 +78,7 @@ ImageConverterPanelT::ImageConverterPanelT(QWidget *parent,
     // Set possible selections
     QComboBox *cbx = m_ui->cbxImageConverters;
 
-    auto linearBWStretchMapperPanel = new LinearBWStretchMapperPanelT(
+    auto * linearBWStretchMapperPanel = new LinearBWStretchMapperPanelT(
             m_ui->widget, ffl, "LinearBWStretchMapperFunction", true);
 
     cbx->addItem(QString("Linear stretch"),
@@ -88,7 +88,7 @@ ImageConverterPanelT::ImageConverterPanelT(QWidget *parent,
             &LinearBWStretchMapperPanelT::valueChangedSignal, this,
             &ImageConverterPanelT::valueChangedSlot);
 
-    auto splineCurveMapperPanel = new SplineCurveMapperPanelT(m_ui->widget, ffl,
+    auto * splineCurveMapperPanel = new SplineCurveMapperPanelT(m_ui->widget, ffl,
                                                               "SplineCurveMapperFunction", false);
 
     cbx->addItem(QString("Spline curve"),
@@ -146,9 +146,7 @@ void ImageConverterPanelT::valueChangedSlot() {
 AbstractMapperPanelT *ImageConverterPanelT::getWidgetFromCbx(int idx) {
     QComboBox *cbx = m_ui->cbxImageConverters;
     QVariant var = QVariant::fromValue(cbx->itemData(idx));
-    auto widgetPtr = qvariant_cast<AbstractMapperPanelT *>(var);
-
-    return widgetPtr;
+    return  qvariant_cast<AbstractMapperPanelT *>(var);
 }
 
 void ImageConverterPanelT::currentIndexChanged(int idx) {

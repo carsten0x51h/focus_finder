@@ -93,7 +93,7 @@ void IndiDeviceT::initInterfaceMap() {
         auto currentInterfaceType = static_cast<DeviceInterfaceTypeT::TypeE>(i);
         uint16_t currentInterfaceMask = getIndiDeviceInterfaceMaskByDeviceType(currentInterfaceType);
 
-        if (indiInterfaceSupportMask & currentInterfaceMask) {
+        if ((indiInterfaceSupportMask & currentInterfaceMask) != 0) {
             mInterfaceMap.insert(std::make_pair(currentInterfaceType, createDeviceInterface(currentInterfaceType)));
         }
     }
@@ -254,7 +254,7 @@ void IndiDeviceT::disconnectInternal() {
     mIndiClient->disconnectDevice(deviceName.c_str());
 
     auto isDisconnectedLambda =
-            [=]() -> bool {
+            [this]() -> bool {
                 try {
                     return (getConnectionStateInternal() == DeviceConnectionStateT::DISCONNECTED);
                 } catch (IndiExceptionT &exc) {
@@ -380,7 +380,7 @@ std::set<DeviceInterfaceTypeT::TypeE> IndiDeviceT::getSupportedInferfaces() cons
         auto currentInterfaceType = static_cast<DeviceInterfaceTypeT::TypeE>(i);
         uint16_t currentInterfaceMask = getIndiDeviceInterfaceMaskByDeviceType(currentInterfaceType);
 
-        if (indiInterfaceSupportMask & currentInterfaceMask) {
+        if ((indiInterfaceSupportMask & currentInterfaceMask) != 0) {
             resultSet.insert(currentInterfaceType);
         }
     }

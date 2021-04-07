@@ -43,7 +43,6 @@ const GlobalFocusFinderConfigT GlobalFocusFinderConfigT::sDefaultGlobalFocusFind
 
 GlobalFocusFinderConfigT::GlobalFocusFinderConfigT() :
         mLastChanged(std::chrono::high_resolution_clock::now()),
-        mLastActiveFocusFinderProfileName(),
         mDeviceManagerType(DeviceManagerTypeT::INDI) {
     LOG(debug)
         << "GlobalFocusFinderConfigT::GlobalFocusFinderConfigT()..." << std::endl;

@@ -94,7 +94,7 @@ FocusCurveRecordSetT::load(const boost::property_tree::ptree &pt, const std::fil
     LOG(debug) << "FocusCurveRecordSetT::load..." << std::endl;
 
     // See https://stackoverflow.com/questions/8121042/how-to-iterate-over-childnodes-in-boostpropertytree-if-these-have-childs-itse
-    for (auto &focusCurveRecordNode : pt) {
+    for (const auto &focusCurveRecordNode : pt) {
 
         if (focusCurveRecordNode.first == "curve_record") {
             LOG(debug) << "focusCurveRecordNode.first:  " << focusCurveRecordNode.first << std::endl;

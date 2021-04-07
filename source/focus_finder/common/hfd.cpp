@@ -58,7 +58,7 @@ float HfdT::calc(const ImageT &inImage, float inOuterDiameter,
     // TODO: Scale up image if necessary
 
     // Sum up all pixel values in whole circle
-    float outerRadius = inOuterDiameter / 2.0f;
+    float outerRadius = inOuterDiameter / 2.0F;
     float sum = 0;
     float sumDist = 0;
 
@@ -81,7 +81,7 @@ float HfdT::calc(const ImageT &inImage, float inOuterDiameter,
     }
 
     // NOTE: Multiplying with 2 is required since actually just the HFR is calculated above
-    return (sum > 0 ? 2.0f * sumDist / sum : std::sqrt(2.0f) * outerRadius);
+    return (sum > 0 ? 2.0F * sumDist / sum : std::sqrt(2.0F) * outerRadius);
 }
 
 std::ostream &operator<<(std::ostream &os, const HfdT &hfd) {

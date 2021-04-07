@@ -22,19 +22,11 @@
  *
  ****************************************************************************/
 
-#include "include/outlier_filter.h"
+#ifndef SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FOCUS_FINDER_TIMEOUT_EXCEPTION_H_
+#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FOCUS_FINDER_TIMEOUT_EXCEPTION_H_ SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FOCUS_FINDER_TIMEOUT_EXCEPTION_H_
 
-OutlierFilterT::OutlierFilterT() : mOutlierBoundary(-1) {
-}
+#include "exception.h"
 
-void OutlierFilterT::setOutlierBoundary(float outlierBoundary) {
-    mOutlierBoundary = outlierBoundary;
-}
+DEF_Exception(Timeout);
 
-bool OutlierFilterT::isSet() const {
-    return (mOutlierBoundary >= 0);
-}
-
-std::vector<PointWithResidualT> OutlierFilterT::getOutliers() const {
-    return mOutliers;
-}
+#endif /*SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FOCUS_FINDER_TIMEOUT_EXCEPTION_H_*/

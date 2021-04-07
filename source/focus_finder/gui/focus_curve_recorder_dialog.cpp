@@ -28,6 +28,7 @@
 #include <QHBoxLayout>
 #include <QAbstractButton>
 #include <QDoubleSpinBox>
+#include <utility>
 
 #include "include/focus_curve_recorder_dialog.h"
 #include "include/focus_curve_view_panel.h"
@@ -36,18 +37,17 @@
 #include "include/focus_curve_recorder_point_details_panel.h"
 #include "include/focus_curve_recorder_summary_details_panel.h"
 
-#include "../common/include/logging.h"
 #include "../common/include/profile_manager.h"
 
-#include "../common/include/task_executor.h"
-#include "../common/include/focus_curve_recorder.h"
-#include "../common/include/focus_curve_record.h"
-#include "../common/include/focus_curve_recorder_type.h"
-#include "../common/include/focus_curve_recorder_factory.h"
-#include "../common/include/focus_curve_recorder_logic.h"
-#include "../common/include/focus_curve_record_set.h"
-#include "../common/include/focus_measure_type.h"
-#include "../common/include/fitting_curve_type.h"
+//#include "../common/include/task_executor.h"
+//#include "../common/include/focus_curve_recorder.h"
+//#include "../common/include/focus_curve_record.h"
+//#include "../common/include/focus_curve_recorder_type.h"
+//#include "../common/include/focus_curve_recorder_factory.h"
+//#include "../common/include/focus_curve_recorder_logic.h"
+//#include "../common/include/focus_curve_record_set.h"
+//#include "../common/include/focus_measure_type.h"
+//#include "../common/include/fitting_curve_type.h"
 
 #include "ui_focus_curve_recorder_dialog.h"
 
@@ -74,7 +74,7 @@ void FocusCurveRecorderDialogT::setBtnIcon(QAbstractButton *btn,
 }
 
 FocusCurveRecorderDialogT::FocusCurveRecorderDialogT(QWidget *parent,
-                                                     std::shared_ptr<FocusCurveRecorderLogicT> focusCurveRecorderLogic)
+                                                     const std::shared_ptr<FocusCurveRecorderLogicT>& focusCurveRecorderLogic)
         : QDialog(parent),
           m_ui(new Ui::FocusCurveRecorderDialog),
           mFocusCurveRecorderLogic(focusCurveRecorderLogic) {
@@ -167,7 +167,7 @@ FocusCurveRecorderDialogT::FocusCurveRecorderDialogT(QWidget *parent,
 void FocusCurveRecorderDialogT::onSpinFocusMeasureLimitValueChanged(double value) {
     LOG(debug) << "FocusCurveRecorderDialogT::onSpinFocusMeasureLimitValueChanged... value=" << value << std::endl;
 
-    mActiveProfileTmp.setFocusMeasureLimit(value);
+    mActiveProfileTmp.setFocusMeasureLimit((float) value);
 }
 
 void FocusCurveRecorderDialogT::onSpinNumFocusCurvesToRecordValueChanged(int value) {
@@ -213,9 +213,10 @@ void FocusCurveRecorderDialogT::selectDetailView(FocusCurveRecorderDetailViewE d
 void FocusCurveRecorderDialogT::onPushButtonPressed() {
     static int idx = 0;
 
-    idx = (++idx) % 4;
+    ++idx;
+    idx = idx % 4;
 
-    FocusCurveRecorderDetailViewE detailView = static_cast<FocusCurveRecorderDetailViewE>(idx);
+    auto detailView = static_cast<FocusCurveRecorderDetailViewE>(idx);
     selectDetailView(detailView);
 }
 
@@ -255,7 +256,7 @@ void FocusCurveRecorderDialogT::reset() {
     m_ui->cbxFocusCurveType->clear();
 
     for (size_t idx = 0; idx < FocusCurveTypeT::_Count; ++idx) {
-        FocusCurveTypeT::TypeE focusCurveType = static_cast<FocusCurveTypeT::TypeE>(idx);
+        auto focusCurveType = static_cast<FocusCurveTypeT::TypeE>(idx);
 
         QVariant data;
         data.setValue(focusCurveType);
@@ -387,7 +388,7 @@ void FocusCurveRecorderDialogT::onFocusCurveRecordPressed(bool isChecked) {
 
         focusCurveRecorder->registerFocusCurveRecorderNewRecordListener(
                 [&](std::shared_ptr<FocusCurveRecordT> record) {
-                    emit focusCurveRecorderNewRecordSignal(record);
+                    emit focusCurveRecorderNewRecordSignal(std::move(record));
                 });
 
         // Register listener to get notified when the focus curve record set was updated (new data point for curve recorded)
@@ -395,21 +396,21 @@ void FocusCurveRecorderDialogT::onFocusCurveRecordPressed(bool isChecked) {
 
         focusCurveRecorder->registerFocusCurveRecorderRecordSetUpdateListener(
                 [&](std::shared_ptr<FocusCurveRecordSetT> recordSet) {
-                    emit focusCurveRecorderRecordSetUpdateSignal(recordSet);
+                    emit focusCurveRecorderRecordSetUpdateSignal(std::move(recordSet));
                 });
 
 
         // Register progress listener
         focusCurveRecorder->registerFocusCurveRecorderProgressUpdateListener(
                 [&](float progress, const std::string &msg, std::shared_ptr<FocusCurveRecordT> record) {
-                    emit focusCurveRecorderProgressUpdateSignal(progress, QString::fromStdString(msg), record);
+                    emit focusCurveRecorderProgressUpdateSignal(progress, QString::fromStdString(msg), std::move(record));
                 });
 
 
         // FocusCurveRecorder new focus curve record set finished
         focusCurveRecorder->registerFocusCurveRecorderRecordSetFinishedListener(
                 [&](std::shared_ptr<FocusCurveRecordSetT> focusCurveRecordSet) {
-                    emit focusCurveRecorderRecordSetFinishedSignal(focusCurveRecordSet);
+                    emit focusCurveRecorderRecordSetFinishedSignal(std::move(focusCurveRecordSet));
                 });
 
         // FocusCurveRecorder finished
@@ -417,7 +418,7 @@ void FocusCurveRecorderDialogT::onFocusCurveRecordPressed(bool isChecked) {
 
         focusCurveRecorder->registerFocusCurveRecorderFinishedListener(
                 [&](std::shared_ptr<const FocusCurveRecordSetContainerT> focusCurveRecordSetContainer) {
-                    emit focusCurveRecorderFinishedSignal(focusCurveRecordSetContainer);
+                    emit focusCurveRecorderFinishedSignal(std::move(focusCurveRecordSetContainer));
                 });
 
         // FocusCurveRecorder cancel
@@ -495,7 +496,7 @@ void FocusCurveRecorderDialogT::onFocusCurveRecordPressed(bool isChecked) {
 // 	}
 // }
 void FocusCurveRecorderDialogT::onFocusCurveRecorderRecordSetFinished(
-        std::shared_ptr<FocusCurveRecordSetT> focusCurveRecordSet) {
+        const std::shared_ptr<FocusCurveRecordSetT>& focusCurveRecordSet) {
     LOG(debug)
         << "FocusCurveRecorderDialogT::onFocusCurveRecorderRecordSetFinished..." << std::endl;
 
@@ -567,7 +568,7 @@ void FocusCurveRecorderDialogT::onFocusCurveRecorderRecordSetFinished(
 }
 
 void FocusCurveRecorderDialogT::onFocusCurveRecorderFinished(
-        std::shared_ptr<const FocusCurveRecordSetContainerT> focusCurveRecordSetContainer) {
+        const std::shared_ptr<const FocusCurveRecordSetContainerT>& /*focusCurveRecordSetContainer*/) {
     LOG(debug)
         << "FocusCurveRecorderDialogT::onFocusCurveRecorderFinished..." << std::endl;
 
@@ -592,7 +593,7 @@ void FocusCurveRecorderDialogT::onFocusCurveRecorderFinished(
     getApplyButton()->setEnabled(true);
 }
 
-void FocusCurveRecorderDialogT::onFocusCurveRecorderNewRecord(std::shared_ptr<FocusCurveRecordT> focusCurveRecord) {
+void FocusCurveRecorderDialogT::onFocusCurveRecorderNewRecord(const std::shared_ptr<FocusCurveRecordT>& focusCurveRecord) {
     LOG(debug)
         << "FocusCurveRecorderDialogT::onFocusCurveRecorderNewRecord..." << std::endl;
 
@@ -602,7 +603,7 @@ void FocusCurveRecorderDialogT::onFocusCurveRecorderNewRecord(std::shared_ptr<Fo
 }
 
 void FocusCurveRecorderDialogT::onFocusCurveRecorderRecordSetUpdate(
-        std::shared_ptr<FocusCurveRecordSetT> focusCurveRecordSet) {
+        const std::shared_ptr<FocusCurveRecordSetT>& /*focusCurveRecordSet*/) {
     LOG(debug)
         << "FocusCurveRecorderDialogT::onFocusCurveRecorderRecordSetUpdate..." << std::endl;
 
@@ -619,7 +620,7 @@ void FocusCurveRecorderDialogT::onFocusCurveRecorderProgressUpdate(float progres
     // TODO: Somewhere else...
     //mFocusCurveViewPanel->setFocusCurve(focusCurveRecord);
 
-    mFocusCurveRecorderProgressDetailsPanel->setCurrentIterationProgress(progress);
+    mFocusCurveRecorderProgressDetailsPanel->setCurrentIterationProgress((int) progress);
     mFocusCurveRecorderProgressDetailsPanel->setCurrentIterationProgressText(msg);
     mFocusCurveRecorderProgressDetailsPanel->setCurrentFocusCurveRecord(focusCurveRecord);
 }

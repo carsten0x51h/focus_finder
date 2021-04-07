@@ -68,7 +68,7 @@ public:
      *  @brief
      *    Constructor
      */
-    FocusCurveRecorderDialogT(QWidget *parent, std::shared_ptr<FocusCurveRecorderLogicT> focusCurveRecorderLogic);
+    FocusCurveRecorderDialogT(QWidget *parent, const std::shared_ptr<FocusCurveRecorderLogicT>& focusCurveRecorderLogic);
 
     /**
      *  @brief
@@ -139,7 +139,7 @@ private:
 
     //void initFocusMeasureCombobox();
 
-    void setBtnIcon(QAbstractButton *btn, const std::string &filename);
+    static void setBtnIcon(QAbstractButton *btn, const std::string &filename);
 
     [[nodiscard]] bool deviceCheck() const;
 
@@ -152,26 +152,26 @@ private:
 
     void onFocusCurveRecorderStarted();
 
-    void onFocusCurveRecorderNewRecord(std::shared_ptr<FocusCurveRecordT> focusCurveRecord);
+    void onFocusCurveRecorderNewRecord(const std::shared_ptr<FocusCurveRecordT>& focusCurveRecord);
 
-    void onFocusCurveRecorderRecordSetUpdate(std::shared_ptr<FocusCurveRecordSetT> focusCurveRecordSet);
+    void onFocusCurveRecorderRecordSetUpdate(const std::shared_ptr<FocusCurveRecordSetT>& focusCurveRecordSet);
 
     void onFocusCurveRecorderProgressUpdate(float progress, const QString &msg,
                                             std::shared_ptr<FocusCurveRecordT> focusCurveRecord);
 
     void onFocusCurveRecorderCancelled();
 
-    void onFocusCurveRecorderRecordSetFinished(std::shared_ptr<FocusCurveRecordSetT> focusCurveRecordSet);
+    void onFocusCurveRecorderRecordSetFinished(const std::shared_ptr<FocusCurveRecordSetT>& focusCurveRecordSet);
 
     void
-    onFocusCurveRecorderFinished(std::shared_ptr<const FocusCurveRecordSetContainerT> focusCurveRecordSetContainer);
+    onFocusCurveRecorderFinished(const std::shared_ptr<const FocusCurveRecordSetContainerT>& focusCurveRecordSetContainer);
 
     void onFocusCurveRecordPressed(bool isChecked);
 
 
     FocusFinderProfileT mActiveProfileTmp;
 
-    AnimMenuButtonT *mFocusCurveRecordButton;
+    AnimMenuButtonT *mFocusCurveRecordButton{};
 
     // TODO: Is it ok that all those instances are local to this GUI window?
     std::shared_ptr<TaskExecutorT<FocusCurveRecorderT> > mRecorderExec;

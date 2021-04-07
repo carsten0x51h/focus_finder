@@ -44,7 +44,7 @@ double CurveFunctionGaussianT::f(float x) const {
     return MathFunctionsT::gaussian(x, b, p, c, w);
 }
 
-float CurveFunctionGaussianT::f_inv(float) const {
+float CurveFunctionGaussianT::f_inv(float /*y*/) const {
     // TODO: IMPLEMENT
     throw CurveFunctionExceptionT("CurveFunctionGaussianT::f_inv() not implemented.");
 }

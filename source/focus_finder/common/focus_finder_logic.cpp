@@ -25,6 +25,7 @@
 #include <memory>
 #include <optional>
 #include <algorithm>
+#include <utility>
 
 #include "include/focus_finder_logic.h"
 
@@ -60,7 +61,7 @@ void FocusFinderLogicT::init() {
 
 void FocusFinderLogicT::close() {
     delete sSelf;
-    sSelf = 0;
+    sSelf = nullptr;
 }
 
 FocusFinderLogicT *FocusFinderLogicT::get() {
@@ -105,14 +106,12 @@ FocusFinderLogicT::FocusFinderLogicT() :
     // DEBUG END
 
 
-
-
-
     updateProfile();
 
     // Register at profile manager to get notified if selected profile / device changes...
     mFoFiConfigManager->getProfileManager()->registerActiveProfileChangedListener(
-            std::bind(&FocusFinderLogicT::updateProfile, this));
+            boost::bind(&FocusFinderLogicT::updateProfile, this)
+    );
 
 
     initImageMappers();
@@ -130,8 +129,7 @@ FocusFinderLogicT::FocusFinderLogicT() :
     mFocusCurveRecorderLogic = std::make_shared<FocusCurveRecorderLogicT>(*this);
 }
 
-FocusFinderLogicT::~FocusFinderLogicT() {
-}
+FocusFinderLogicT::~FocusFinderLogicT() = default;
 
 std::shared_ptr<CameraInterfaceT> FocusFinderLogicT::getCurrentCamera() {
     auto activeProfile = mFoFiConfigManager->getProfileManager()->getActiveProfile();
@@ -199,7 +197,7 @@ void FocusFinderLogicT::updateProfile() {
         mExposureCycleFinishedConnection = newCameraDevice->registerExposureCycleFinishedListener(
                 [&](RectT<unsigned int> roiRect, std::shared_ptr<const ImageT> resultImage, bool /*lastExposure*/) {
                     // TODO: "mLastFrame" needs mutex guard!!!-> or atomic?
-                    mLastFrame.setImage(resultImage);  // null if no image
+                    mLastFrame.setImage(std::move(resultImage));  // null if no image
                     mLastFrame.setRoi(roiRect);        // "empty" - i.e. 0,0,0,0 if not set
                 }
         );
@@ -249,10 +247,11 @@ RectT<unsigned int> FocusFinderLogicT::getSelectedRoi() const {
     return mSelectedRoi;
 }
 
-size_t FocusFinderLogicT::calcNumStarsInRegion(const ImageT &inImg) const {
+size_t FocusFinderLogicT::calcNumStarsInRegion(const ImageT &inImg) {
 
     auto thAlgo = ThresholdingAlgorithmFactoryT::getInstance(ThresholdingAlgorithmTypeT::MAX_ENTROPY);
-    float th = thAlgo->calc(inImg, 16 /*bit depth - TODO: Do not hardcode - but where to query??*/);
+    const static size_t BIT_DEPTH = 16; // TODO: Do not hardcode - but where to query??
+    float th = thAlgo->calc(inImg, BIT_DEPTH /*bit depth */);
     int thUp = std::ceil(th);
 
     LOG(debug) << "FocusFinderLogicT::calcNumStarsInRegion - threshold: " << th << ", thUp: " << thUp << std::endl;
@@ -358,7 +357,7 @@ std::optional<PointT<float> > FocusFinderLogicT::findFocusStar(
             - frameBounds.y() - 1 /*y1*/);
 
     // Calculate the SNR to check if there COULD be a star around.
-    float snr = SnrT::calculate(searchWindowImg);
+    auto snr = (float) SnrT::calculate(searchWindowImg);
     LOG(debug)
         << "SNR: " << snr << std::endl;
 
@@ -457,7 +456,7 @@ std::shared_ptr<MapperFunctionT> FocusFinderLogicT::getMapperFunctionByName(
 
     auto it =
             std::find_if(mMapperFunctions.begin(), mMapperFunctions.end(),
-                         [=](const std::shared_ptr<MapperFunctionT> mapper) {
+                         [=](const std::shared_ptr<MapperFunctionT>& mapper) {
                              return mapper->getName() == mapperFunctionName;
                          });
 

@@ -69,7 +69,7 @@ protected:
 
     void removeDevice(INDI::BaseDevice *dp);
 
-    void newMessage(INDI::BaseDevice *dp, int messageID);
+    static void newMessage(INDI::BaseDevice *dp, int messageID);
 
     void notifyDeviceAdded(std::shared_ptr<DeviceT> device) { mDeviceAddedListeners(device); };
 

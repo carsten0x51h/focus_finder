@@ -120,6 +120,7 @@ set(sources
         ../common/curve_parms.cpp
         ../common/include/outlier_filter.h
         ../common/outlier_filter.cpp
+        ../common/include/timeout_exception.h
         ../common/include/curve_fit_exception.h
         ../common/include/curve_fit_algorithm.h
         ../common/include/gsl_multi_fit_parms.h

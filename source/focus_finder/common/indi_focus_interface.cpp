@@ -71,9 +71,9 @@ void IndiFocusInterfaceT::newNumber(INumberVectorProperty *nvp) {
                                                           "FOCUS_ABSOLUTE_POSITION");
 
             if (nvp->s == IPS_BUSY) {
-                notifyFocusPositionChanged(absPosition->value);
+                notifyFocusPositionChanged((int) absPosition->value);
             } else if (nvp->s == IPS_OK || nvp->s == IPS_IDLE) {
-                notifyTargetPositionReached(absPosition->value);
+                notifyTargetPositionReached((int) absPosition->value);
             }
         }
 
@@ -146,8 +146,8 @@ bool IndiFocusInterfaceT::isAbsPosSupported() const {
         INumberVectorProperty *absPosVecProp = IndiHelperT::getNumberVec(
                 mIndiDevice->getIndiBaseDevice(), "ABS_FOCUS_POSITION");
 
-        INumber *absPos = IndiHelperT::getNumber(absPosVecProp,
-                                                 "FOCUS_ABSOLUTE_POSITION");
+        // Just try to get the property...
+        IndiHelperT::getNumber(absPosVecProp,"FOCUS_ABSOLUTE_POSITION");
 
         return true;
     } catch (IndiExceptionT &exc) {
@@ -164,7 +164,7 @@ int IndiFocusInterfaceT::getCurrentPosInternal() const {
     INumber *absPos = IndiHelperT::getNumber(absPosVecProp,
                                              "FOCUS_ABSOLUTE_POSITION");
 
-    return absPos->value;
+    return (int) absPos->value;
 }
 
 int IndiFocusInterfaceT::getCurrentPos() const {
@@ -253,7 +253,7 @@ void IndiFocusInterfaceT::setTargetPos(unsigned int ticks,
     // TODO / IDEA: Always use relative position since this is the minimum property each focuser should have.
     try {
 
-        int ticksClipped = clipTicks(ticks, direction);
+        int ticksClipped = clipTicks((int) ticks, direction);
 
         if (ticksClipped <= 0) {
             LOG(warning) << "Boundary reached. Not moving." << std::endl;
@@ -321,7 +321,7 @@ int IndiFocusInterfaceT::getMinAbsPosInternal() const {
     INumber *absPos = IndiHelperT::getNumber(absPosVecProp,
                                              "FOCUS_ABSOLUTE_POSITION");
 
-    return absPos->min;
+    return (int) absPos->min;
 }
 
 int IndiFocusInterfaceT::getMinAbsPos() const {
@@ -343,7 +343,7 @@ int IndiFocusInterfaceT::getMaxAbsPosInternal() const {
     INumber *absPos = IndiHelperT::getNumber(absPosVecProp,
                                              "FOCUS_ABSOLUTE_POSITION");
 
-    return absPos->max;
+    return (int) absPos->max;
 }
 
 int IndiFocusInterfaceT::getMaxAbsPos() const {
