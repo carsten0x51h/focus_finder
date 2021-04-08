@@ -100,7 +100,7 @@ public:
 
 protected slots:
 
-    void on_about();
+    [[maybe_unused]] void on_about();
 
     void onRoiClearedSlot();
 

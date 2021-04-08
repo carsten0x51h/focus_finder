@@ -26,6 +26,7 @@
 
 #include <QWidget>
 #include <QMovie>
+#include <utility>
 
 #include "include/focus_curve_recorder_summary_details_panel.h"
 
@@ -38,7 +39,7 @@ FocusCurveRecorderSummaryDetailsPanelT::FocusCurveRecorderSummaryDetailsPanelT(Q
                                                                                std::shared_ptr<FocusCurveRecorderLogicT> focusCurveRecorderLogic)
         : QWidget(parent),
           m_ui(new Ui::FocusCurveRecorderSummaryDetailsPanel),
-          mFocusCurveRecorderLogic(focusCurveRecorderLogic) {
+          mFocusCurveRecorderLogic(std::move(focusCurveRecorderLogic)) {
     // Setup UI
     m_ui->setupUi(this);
 
@@ -62,8 +63,7 @@ FocusCurveRecorderSummaryDetailsPanelT::FocusCurveRecorderSummaryDetailsPanelT(Q
     reset();
 }
 
-FocusCurveRecorderSummaryDetailsPanelT::~FocusCurveRecorderSummaryDetailsPanelT() {
-}
+FocusCurveRecorderSummaryDetailsPanelT::~FocusCurveRecorderSummaryDetailsPanelT() = default;
 
 void FocusCurveRecorderSummaryDetailsPanelT::reset() {
 }

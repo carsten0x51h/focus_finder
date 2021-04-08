@@ -29,7 +29,7 @@ std::ostream &FocusCurveRecordSetContainerT::print(std::ostream &os, size_t inde
 
     os << prefix << "--- FocusCurveRecordSetContainer (#" << this->size() << " record sets) ---" << std::endl;
 
-    for (FocusCurveRecordSetContainerT::const_iterator it = this->begin(); it != this->end(); ++it) {
+    for (auto it = this->begin(); it != this->end(); ++it) {
         const FocusCurveRecordSetT &fcrs = **it;
         fcrs.print(os, indent + 4);
     }

@@ -26,6 +26,7 @@
 
 #include <memory>
 #include <cmath>
+#include <utility>
 
 #include "include/focus_curve_view_panel.h"
 #include "include/focus_curve_view_widget.h"
@@ -37,8 +38,8 @@ FocusCurveViewPanelT::FocusCurveViewPanelT(QWidget *parent,
                                            std::shared_ptr<FocusCurveRecorderLogicT> focusCurveRecorderLogic) : QWidget(
         parent),
                                                                                                                 m_ui(new Ui::FocusCurveViewPanel),
-                                                                                                                mFocusCurveRecorderLogic(
-                                                                                                                        focusCurveRecorderLogic) {
+                                                                                                                mFocusCurveRecorderLogic(std::move(
+                                                                                                                        focusCurveRecorderLogic)) {
     // Setup UI
     m_ui->setupUi(this);
 
@@ -67,7 +68,7 @@ void FocusCurveViewPanelT::update() {
 }
 
 void FocusCurveViewPanelT::drawCurveHack(std::shared_ptr<FocusCurveT> focusCurve) {
-    mFocusCurveWidget->drawCurveHack(focusCurve);
+    mFocusCurveWidget->drawCurveHack(std::move(focusCurve));
 }
 
 

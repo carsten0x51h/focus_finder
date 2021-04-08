@@ -76,11 +76,11 @@ FocusCurveViewWidgetT::~FocusCurveViewWidgetT() = default;
 
 
 void FocusCurveViewWidgetT::drawFocusCurveRecordSet(QPainter *p, const std::vector<PointFT> &dataPoints,
-                                                    const FocusFinderProfileT &focusFinderProfile, const QColor& color) {
+                                                    const FocusFinderProfileT & /*focusFinderProfile*/, const QColor& color) {
 
     // Min / max focus positions
-    int deltaFocusPos = maxFocusPos - minFocusPos;
-    float deltaFocusMeasure = maxFocusMeasure - minFocusMeasure;
+    //int deltaFocusPos = maxFocusPos - minFocusPos;
+    //float deltaFocusMeasure = maxFocusMeasure - minFocusMeasure;
 
     for (auto it = dataPoints.begin(); it != dataPoints.end(); ++it) {
 
@@ -94,7 +94,7 @@ void FocusCurveViewWidgetT::drawFocusCurveRecordSet(QPainter *p, const std::vect
         // LOG(debug) << "FocusCurveViewWidgetT::drawFocusCurveRecordSet... focusPos=" << focusPos << ", focusMeasure=" << focusMeasure << ", width=" << width() << ", draw point (x, y)=" << center.x() << ", " << center.y() << ")." << std::endl;
 
         p->setPen(QPen(QBrush(color), 1, Qt::SolidLine));
-        p->setBrush(QBrush(QColor(255, 255, 255, 0)));
+        p->setBrush(QBrush(Qt::transparent));
         p->drawEllipse(center, 5 /*radius*/, 5 /*radius*/);
     }
 }
@@ -121,7 +121,7 @@ void FocusCurveViewWidgetT::drawFocusCurveRecordSets(QPainter *p) {
 
         //LOG(debug) << "FocusCurveViewWidgetT::drawFocusCurveRecordSets... drawing curveFitSummary.matchedDataPoints..." << std::endl;
 
-        drawFocusCurveRecordSet(p, curveFitSummary.matchedDataPoints, focusFinderProfile, QColor(0, 255, 0, 255));
+        drawFocusCurveRecordSet(p, curveFitSummary.matchedDataPoints, focusFinderProfile, Qt::green);
 
 
 
@@ -133,7 +133,7 @@ void FocusCurveViewWidgetT::drawFocusCurveRecordSets(QPainter *p) {
         boost::range::copy(curveFitSummary.outliers | boost::adaptors::transformed(extractOutlierPointsFunction),
                            std::back_inserter(outlierPoints));
 
-        drawFocusCurveRecordSet(p, outlierPoints, focusFinderProfile, QColor(255, 255, 0, 255));
+        drawFocusCurveRecordSet(p, outlierPoints, focusFinderProfile, Qt::yellow);
 
 
     } else if (focusCurveRecorder != nullptr) {
@@ -158,7 +158,7 @@ void FocusCurveViewWidgetT::drawFocusCurveRecordSets(QPainter *p) {
                                std::back_inserter(dataPoints));
 
             // TODO: Draw each in a different color...?!
-            drawFocusCurveRecordSet(p, dataPoints, focusFinderProfile, QColor(0, 255, 0, 255));
+            drawFocusCurveRecordSet(p, dataPoints, focusFinderProfile, Qt::green);
         }
     } else {
         LOG(debug) << "FocusCurveViewWidgetT::drawFocusCurveRecordSets... nothing to draw... no focus curve recorder."
@@ -194,8 +194,8 @@ void FocusCurveViewWidgetT::paintEvent(QPaintEvent *event) {
 
 
     // Draw focus curve
-    p.setPen(QPen(QBrush(QColor(255, 0, 0, 255)), 1, Qt::SolidLine));
-    p.setBrush(QBrush(QColor(255, 255, 255, 0)));
+    p.setPen(QPen(QBrush(Qt::red), 1, Qt::SolidLine));
+    p.setBrush(QBrush(Qt::transparent));
 
     if (mFocusCurveHack != nullptr) {
         // TODO: Later use the boundaries of the curve instead of min/max focus pos!
@@ -261,8 +261,8 @@ void FocusCurveViewWidgetT::paintEvent(QPaintEvent *event) {
 //	}
 
     // Draw cross
-    p.setPen(QPen(QBrush(QColor(255, 255, 0, 255)), 2, Qt::SolidLine));
-    p.setBrush(QBrush(QColor(255, 255, 255, 0)));
+    p.setPen(QPen(QBrush(Qt::yellow), 2, Qt::SolidLine));
+    p.setBrush(QBrush(Qt::transparent));
     p.drawLine(QPointF(mLastMousePos.x(), 0), QPointF(mLastMousePos.x(), height()));
     p.drawLine(QPointF(0, mLastMousePos.y()), QPointF(width(), mLastMousePos.y()));
 

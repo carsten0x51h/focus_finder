@@ -38,6 +38,8 @@ endif ()
 # 
 
 set(sources
+        ../common/include/fofi_project_info.h
+        ../common/fofi_project_info.cpp
         ../common/include/focus_controller.h
         ../common/focus_controller.cpp
         ../common/include/self_orientation_result.h
@@ -281,7 +283,7 @@ set(sources
         include/indi_device_manager_dialog.h
         indi_device_manager_dialog.cpp
         indi_device_manager_dialog.ui
-        )
+        ../common/fofi_project_info.cpp)
 
 
 # 

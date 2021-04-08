@@ -22,6 +22,8 @@
  *
  ****************************************************************************/
 
+// TODO: Add a new button "Reset to defaults" button...
+
 #include "include/indi_device_manager_dialog.h"
 
 #include <utility>

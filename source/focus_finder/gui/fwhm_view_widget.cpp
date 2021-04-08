@@ -52,7 +52,7 @@ FwhmViewWidgetT::~FwhmViewWidgetT() = default;
 void FwhmViewWidgetT::drawCross(QPainter &p, const QPointF &center, const QColor &crossColor, int penWidth,
                                 int halfCrossLength) {
     p.setPen(QPen(QBrush(crossColor), penWidth, Qt::SolidLine));
-    p.setBrush(QBrush(QColor(255, 255, 255, 0)));
+    p.setBrush(QBrush(Qt::transparent));
     p.drawLine(QPointF(center.x(), center.y() - halfCrossLength), QPointF(center.x(), center.y() + halfCrossLength));
     p.drawLine(QPointF(center.x() - halfCrossLength, center.y()), QPointF(center.x() + halfCrossLength, center.y()));
 }
@@ -60,7 +60,7 @@ void FwhmViewWidgetT::drawCross(QPainter &p, const QPointF &center, const QColor
 void
 FwhmViewWidgetT::drawCircle(QPainter &p, const QPointF &center, const QColor &circleColor, int penWidth, int radius) {
     p.setPen(QPen(QBrush(circleColor), penWidth, Qt::SolidLine));
-    p.setBrush(QBrush(QColor(255, 255, 255, 0)));
+    p.setBrush(QBrush(Qt::transparent));
     p.drawEllipse(center, radius, radius);
 }
 
@@ -114,23 +114,23 @@ void FwhmViewWidgetT::paintEvent(QPaintEvent *event) {
                    << fitValues.size() << std::endl;
 
         for (const auto & imgValue : imgValues) {
-            drawCross(p, toScreenCoords(imgValue), QColor(255, 0, 0, 255), penWidth, halfCrossLength);
+            drawCross(p, toScreenCoords(imgValue), Qt::red, penWidth, halfCrossLength);
         }
 
         for (const auto & fitValue : fitValues) {
-            drawCross(p, toScreenCoords(fitValue), QColor(0, 255, 0, 255), penWidth, halfCrossLength);
+            drawCross(p, toScreenCoords(fitValue), Qt::red, penWidth, halfCrossLength);
         }
 
         //Draw outliers
         for (const auto & outlierValue : outlierValues) {
-            drawCross(p, toScreenCoords(outlierValue.point), QColor(255, 255, 0, 255), penWidth,
+            drawCross(p, toScreenCoords(outlierValue.point), Qt::yellow, penWidth,
                       halfCrossLength);
 
             // IDEA: Draw circle radius depending on residual size
             //float residualRadius = xValueToDispScaleFactor * outlierValues.at(idx).residual;
             //drawCircle(p, toScreenCoords(outlierValues.at(idx).point), QColor(255, 255, 0, 255), penWidth, residualRadius);
 
-            drawCircle(p, toScreenCoords(outlierValue.point), QColor(255, 255, 0, 255), penWidth, 10.0F);
+            drawCircle(p, toScreenCoords(outlierValue.point), Qt::yellow, penWidth, 10.0F);
         }
 
 
@@ -145,8 +145,8 @@ void FwhmViewWidgetT::paintEvent(QPaintEvent *event) {
             //polygon << QPointF(i, height() - yValueToDispScaleFactor * mFwhm.calcGaussianValue(i / xValueToDispScaleFactor));
         }
 
-        p.setPen(QPen(QBrush(QColor(0, 255, 0, 255)), penWidth, Qt::SolidLine));
-        p.setBrush(QBrush(QColor(255, 255, 255, 0)));
+        p.setPen(QPen(QBrush(Qt::green), penWidth, Qt::SolidLine));
+        p.setBrush(QBrush(Qt::transparent));
         p.drawPolyline(polygon);
     }
 

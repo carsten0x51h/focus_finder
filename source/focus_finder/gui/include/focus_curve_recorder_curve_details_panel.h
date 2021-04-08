@@ -63,7 +63,7 @@ public:
 
     void reset();
 
-    void setCurveDetails(std::shared_ptr<const FocusCurveT> focusCurve);
+    void setCurveDetails(const std::shared_ptr<const FocusCurveT>& focusCurve);
 
 protected slots:
 

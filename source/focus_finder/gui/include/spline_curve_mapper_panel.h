@@ -63,9 +63,8 @@ public:
     [[nodiscard]] std::shared_ptr<MapperFunctionT> getMapperFunction() const override;
 
 
-signals:
-
-    void valueChangedSignal() override;
+//signals:
+//    void valueChangedSignal();
 
 protected slots:
     //void onRoiClearedSlot();

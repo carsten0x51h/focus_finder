@@ -26,6 +26,7 @@
 
 #include <QWidget>
 #include <QHBoxLayout>
+#include <utility>
 
 #include "include/focus_curve_recorder_curve_details_panel.h"
 
@@ -38,7 +39,7 @@ FocusCurveRecorderCurveDetailsPanelT::FocusCurveRecorderCurveDetailsPanelT(QWidg
                                                                            std::shared_ptr<FocusCurveRecorderLogicT> focusCurveRecorderLogic)
         : QWidget(parent),
           m_ui(new Ui::FocusCurveRecorderCurveDetailsPanel),
-          mFocusCurveRecorderLogic(focusCurveRecorderLogic) {
+          mFocusCurveRecorderLogic(std::move(focusCurveRecorderLogic)) {
     // Setup UI
     m_ui->setupUi(this);
 
@@ -51,9 +52,11 @@ FocusCurveRecorderCurveDetailsPanelT::FocusCurveRecorderCurveDetailsPanelT(QWidg
 //    m_ui->layFocusCurveViewWidget->addWidget(mFocusCurveWidget, 0/*row*/, 0/*col*/, 1/*rowspan*/, 1/*colspan*/);
 
     // Add the focus curve viewer panel
+    static const unsigned int FULL_STRETCH_FACTOR = 100;
+
     QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    sizePolicy.setHorizontalStretch(100);
-    sizePolicy.setVerticalStretch(100);
+    sizePolicy.setHorizontalStretch(FULL_STRETCH_FACTOR);
+    sizePolicy.setVerticalStretch(FULL_STRETCH_FACTOR);
 
     // mFocusCurveViewPanel = new FocusCurveViewPanelT(m_ui->widget, mFocusCurveRecorderLogic);
     // mFocusCurveViewPanel->setSizePolicy(sizePolicy);
@@ -62,13 +65,12 @@ FocusCurveRecorderCurveDetailsPanelT::FocusCurveRecorderCurveDetailsPanelT(QWidg
     reset();
 }
 
-FocusCurveRecorderCurveDetailsPanelT::~FocusCurveRecorderCurveDetailsPanelT() {
-}
+FocusCurveRecorderCurveDetailsPanelT::~FocusCurveRecorderCurveDetailsPanelT() = default;
 
 void FocusCurveRecorderCurveDetailsPanelT::reset() {
 }
 
-void FocusCurveRecorderCurveDetailsPanelT::setCurveDetails(std::shared_ptr<const FocusCurveT> focusCurve) {
+void FocusCurveRecorderCurveDetailsPanelT::setCurveDetails(const std::shared_ptr<const FocusCurveT>& focusCurve) {
     std::stringstream ss;
 
     std::time_t t = focusCurve->getDateTime();
@@ -118,12 +120,12 @@ void FocusCurveRecorderCurveDetailsPanelT::setCurveDetails(std::shared_ptr<const
         const CurveParmT &parm = curveParms.get(idx);
 
         // TODO: Memory leak?
-        QTableWidgetItem *nameItem = new QTableWidgetItem(QString::fromStdString(parm.getName()));
+        auto *nameItem = new QTableWidgetItem(QString::fromStdString(parm.getName()));
         nameItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
         m_ui->tblCurveParams->setItem(idx, 0, nameItem);
 
         // TODO: Memory leak?
-        QTableWidgetItem *valueItem = new QTableWidgetItem(tr("%1").arg(parm.getValue()));
+        auto *valueItem = new QTableWidgetItem(tr("%1").arg(parm.getValue()));
         valueItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
         m_ui->tblCurveParams->setItem(idx, 1, valueItem);
     }

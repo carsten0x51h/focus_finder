@@ -1649,7 +1649,6 @@ MainWindow::MainWindow() :
     // Setup UI
     m_ui->setupUi(this);
 
-
     mManageDeviceProfilesDialog = new ManageDeviceProfilesDialogT(mFfl);
 
     // Register at profile manager to get notified if selected profile / device changes...
@@ -1716,7 +1715,7 @@ void MainWindow::createAboutDialog() {
     mAboutDialog->setModal(true);
 }
 
-void MainWindow::on_about() {
+[[maybe_unused]] void MainWindow::on_about() {
 //    QString about = QString() +
 //        "Version:   " + LIBINDICLIENTPP_VERSION + "\n";
 //

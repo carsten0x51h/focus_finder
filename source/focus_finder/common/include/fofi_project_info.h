@@ -22,39 +22,25 @@
  *
  ****************************************************************************/
 
-#include <QApplication>
-#include <QString>
-#include <QFile>
+#ifndef SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FOFI_FOFI_VERSION_H_
+#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FOFI_FOFI_VERSION_H_ SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FOFI_FOFI_VERSION_H_
 
-#include "../common/include/fofi_project_info.h"
-#include "../common/include/focus_finder_logic.h"
+#include <string>
 
-#include "include/main_window.h"
+class FoFiProjectInfoT {
+public:
+    static std::string getProjectName();
+    static std::string getProjectDescription();
+    static std::string getOrganization();
+    static std::string getWebsite();
+    static std::string getMailAddress();
 
+    static int getVersionMajor();
+    static int getVersionMinor();
+    static int getVersionPatch();
+    static std::string getVersionRevision();
+    static std::string getVersionString();
+    static std::string getNamedVersion();
+};
 
-int main(int argc, char *argv[]) {
-    FocusFinderLogicT::init();
-
-    QApplication application(argc, argv);
-
-
-    // See https://stackoverflow.com/questions/4448236/how-could-qt-apply-style-from-an-external-qt-stylesheet-file
-    QFile styleSheetFile(":/res/style.qss");
-    styleSheetFile.open(QFile::ReadOnly);
-    QString styleSheet = QLatin1String(styleSheetFile.readAll());
-
-    application.setStyleSheet(styleSheet);
-
-    LOG(info) << "FoFi Revision: " << FoFiProjectInfoT::getVersionRevision() << std::endl;
-
-    // We may pass the Logic here... however, since it is currently static,
-    // it can be accessed from everywhere in the app without passing it everywhere...
-    MainWindow mainWindow;
-    mainWindow.show();
-
-    int rc = QApplication::exec();
-
-    FocusFinderLogicT::close();
-
-    return rc;
-}
+#endif /*SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FOFI_FOFI_VERSION_H_*/
