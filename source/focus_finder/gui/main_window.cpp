@@ -1642,9 +1642,10 @@ void MainWindow::onUpdateProfileSlot(std::optional<FocusFinderProfileT> oldProfi
 }
 
 MainWindow::MainWindow() :
-        m_ui(new Ui::MainWindow), mFocusDevice(nullptr), mFilterDevice(
-        nullptr),
-        mFfl(*FocusFinderLogicT::get())    // TODO: Remove mFfl... directly use static function...
+        m_ui(new Ui::MainWindow),
+        mFfl(*FocusFinderLogicT::get()),    // TODO: Remove mFfl... directly use static function...
+        mFocusDevice(nullptr),
+        mFilterDevice(nullptr)
 {
     // Setup UI
     m_ui->setupUi(this);

@@ -82,7 +82,7 @@ ReportingViewerPanelT::~ReportingViewerPanelT() {
 }
 
 // See https://stackoverflow.com/questions/19102625/qtableview-scroll-to-new-added-row
-void ReportingViewerPanelT::onModelRowsInsertedSlot(const QModelIndex &parent, int start, int end) {
+void ReportingViewerPanelT::onModelRowsInsertedSlot(const QModelIndex &/*parent*/, int start, int /*end*/) {
     m_ui->tableView->scrollTo(mDataModel->index(start, 0));
 }
 

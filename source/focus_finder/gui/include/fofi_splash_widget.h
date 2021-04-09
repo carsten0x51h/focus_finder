@@ -22,45 +22,28 @@
  *
  ****************************************************************************/
 
-#ifndef SOURCE_FOCUS_FINDER_GUI_INCLUDE_ABOUT_DIALOG_H_
-#define SOURCE_FOCUS_FINDER_GUI_INCLUDE_ABOUT_DIALOG_H_ SOURCE_FOCUS_FINDER_GUI_INCLUDE_ABOUT_DIALOG_H_
+#ifndef SOURCE_FOCUS_FINDER_GUI_INCLUDE_FOFI_SPLASH_WIDGET_H_
+#define SOURCE_FOCUS_FINDER_GUI_INCLUDE_FOFI_SPLASH_WIDGET_H_ SOURCE_FOCUS_FINDER_GUI_INCLUDE_FOFI_SPLASH_WIDGET_H_
+
+// std includes
 
 // Qt includes
-#include <QDialog>
+#include <QWidget>
+#include <QPixmap>
+#include <QLabel>
 
-class FoFiSplashWidgetT;
-
-namespace Ui {
-    class AboutDialog;
-}
-
-/**
- *  @brief
- */
-class AboutDialogT : public QDialog {
+class FoFiSplashWidgetT : public QLabel {
 Q_OBJECT
 
-public:
-
-    explicit AboutDialogT(QWidget *parent);
-
-    /**
-     *  @brief
-     *    Destructor
-     */
-    ~AboutDialogT() override;
-
-//    void paintEvent(QPaintEvent *event) override;
-
-signals:
-
-protected slots:
-
-protected:
-    const QScopedPointer<Ui::AboutDialog> m_ui;
-
 private:
-    FoFiSplashWidgetT *mFoFiSplashWidget;
+    static std::string createFoFiVersionString();
+    QPixmap * mSpashScreenPixmap;
+
+public:
+    explicit FoFiSplashWidgetT(QWidget *parent);
+    ~FoFiSplashWidgetT() override;
+
+    void paintEvent(QPaintEvent *event) override;
 };
 
-#endif /*SOURCE_FOCUS_FINDER_GUI_INCLUDE_ABOUT_DIALOG_H_*/
+#endif /*SOURCE_FOCUS_FINDER_GUI_INCLUDE_FOFI_SPLASH_WIDGET_H_*/

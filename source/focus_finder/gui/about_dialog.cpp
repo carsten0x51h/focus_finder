@@ -22,11 +22,17 @@
  *
  ****************************************************************************/
 
+#include <QPainter>
+
+#include "../common/include/fofi_project_info.h"
+
+#include "include/fofi_splash_widget.h"
 #include "include/about_dialog.h"
 
-#include "../common/include/logging.h"
-
 #include "ui_about_dialog.h"
+
+//void AboutDialogT::paintEvent(QPaintEvent * /*event*/) {
+//}
 
 AboutDialogT::AboutDialogT(QWidget *parent) : QDialog(parent),
                                               m_ui(new Ui::AboutDialog) {
@@ -34,6 +40,18 @@ AboutDialogT::AboutDialogT(QWidget *parent) : QDialog(parent),
     m_ui->setupUi(this);
 
     setFixedSize(size());
+
+
+    QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    sizePolicy.setHorizontalStretch(100);
+    sizePolicy.setVerticalStretch(100);
+
+    mFoFiSplashWidget = new FoFiSplashWidgetT(m_ui->widget);
+    mFoFiSplashWidget->setSizePolicy(sizePolicy);
+    m_ui->layFoFiSplashWidget->addWidget(mFoFiSplashWidget, 0/*row*/, 0/*col*/, 1/*rowspan*/, 1/*colspan*/);
+
+    repaint();
 }
 
+// TODO: Should mFoFiSplashWidget be deleted?
 AboutDialogT::~AboutDialogT() = default;

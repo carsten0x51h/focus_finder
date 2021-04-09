@@ -283,7 +283,7 @@ set(sources
         include/indi_device_manager_dialog.h
         indi_device_manager_dialog.cpp
         indi_device_manager_dialog.ui
-        ../common/fofi_project_info.cpp)
+        ../common/fofi_project_info.cpp fofi_splash_widget.cpp include/fofi_splash_widget.h)
 
 
 # 

@@ -26,7 +26,6 @@
 #include <QString>
 #include <QFile>
 
-#include "../common/include/fofi_project_info.h"
 #include "../common/include/focus_finder_logic.h"
 
 #include "include/main_window.h"
@@ -44,8 +43,6 @@ int main(int argc, char *argv[]) {
     QString styleSheet = QLatin1String(styleSheetFile.readAll());
 
     application.setStyleSheet(styleSheet);
-
-    LOG(info) << "FoFi Revision: " << FoFiProjectInfoT::getVersionRevision() << std::endl;
 
     // We may pass the Logic here... however, since it is currently static,
     // it can be accessed from everywhere in the app without passing it everywhere...

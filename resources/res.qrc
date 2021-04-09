@@ -6,9 +6,9 @@
     <file>connect_focuser_64x64.png</file>
     <file>filter_wheel_64x64.png</file>
     <file>connect_camera_64x64.png</file>
-    <file>fofi_splash_screen.png</file>
     <file>telescope_focusing.gif</file>
     <file>mIconExpand.svg</file>
+    <file>fofi_splash_screen.png</file>
     <file>mIconCollapse.svg</file>
     <file>record_focus_curve_64x64.png</file>
     <file>attention_25x25.png</file>

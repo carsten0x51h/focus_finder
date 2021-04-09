@@ -46,7 +46,7 @@ string(SUBSTRING "${GIT_SHA1}" 0 12 GIT_REV)
 
 # Meta information about the project
 set(META_PROJECT_NAME        "fofi")
-set(META_PROJECT_DESCRIPTION "FoFi - A focus finder for telescopes")
+set(META_PROJECT_DESCRIPTION "A free & automatic telescope focus finder")
 set(META_AUTHOR_ORGANIZATION "")
 set(META_AUTHOR_DOMAIN       "https://github.com/carsten0x51h/")
 set(META_AUTHOR_MAINTAINER   "c.schmitt51h@gmail.com")
