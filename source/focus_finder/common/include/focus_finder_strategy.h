@@ -34,14 +34,17 @@
  */
 struct FocusFinderStrategyT {
     enum TypeE {
-        FAST_CURVE_LOOKUP,
+        AVERAGED_FOCUS_CURVE,
+        SINGLE_PASS,
         _Count
     };
 
     static const char *asStr(const TypeE &inType) {
         switch (inType) {
-            case FAST_CURVE_LOOKUP:
-                return "FAST_CURVE_LOOKUP";
+            case AVERAGED_FOCUS_CURVE:
+                return "AVERAGED_FOCUS_CURVE";
+            case SINGLE_PASS:
+                return "SINGLE_PASS";
             default:
                 return "<?>";
         }
@@ -49,6 +52,5 @@ struct FocusFinderStrategyT {
 
     MAC_AS_TYPE(Type, E, _Count);
 };
-
 
 #endif /*SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FOCUS_FINDER_STRATEGY_H_*/

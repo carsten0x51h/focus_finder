@@ -41,7 +41,7 @@
 #include "include/focus_curve_record.h"
 #include "include/focus_curve_record_builder.h"
 #include "include/curve_fit_algorithm.h"
-#include "include/curve_half.h"
+#include "include/curve_sector.h"
 #include "include/point.h"
 #include "include/self_orientation_result.h"
 #include "include/boundary_location.h"
@@ -735,12 +735,12 @@ SelfOrientationResultT FocusControllerT::performSelfOrientation(float focusMeasu
 
     if (focusMeasure2 > focusMeasure1) {
         // We are on the "left" half of the curve
-        selfOrientationResult.curveHalf = CurveHalfT::LEFT_HALF;
+        selfOrientationResult.curveHalf = CurveSectorT::LEFT;
         selfOrientationResult.focusDirectionToLimit = (aboveFocusMeasureLimit ? FocusDirectionT::OUTWARD
                                                                               : FocusDirectionT::INWARD);
     } else if (focusMeasure2 < focusMeasure1) {
         // We are on the "right" half of the curve
-        selfOrientationResult.curveHalf = CurveHalfT::RIGHT_HALF;
+        selfOrientationResult.curveHalf = CurveSectorT::RIGHT;
         selfOrientationResult.focusDirectionToLimit = (aboveFocusMeasureLimit ? FocusDirectionT::INWARD
                                                                               : FocusDirectionT::OUTWARD);
     } else {

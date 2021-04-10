@@ -35,7 +35,7 @@
 #include "include/focus_curve_record.h"
 #include "include/focus_curve_record_set.h"
 #include "include/curve_fit_algorithm.h"
-#include "include/curve_half.h"
+#include "include/curve_sector.h"
 #include "include/focus_direction.h"
 
 DefaultFocusCurveRecorderT::DefaultFocusCurveRecorderT(std::shared_ptr<FocusControllerT> focusController)
@@ -121,7 +121,7 @@ int DefaultFocusCurveRecorderT::getStepSize() const {
 }
 
 
-CurveHalfT::TypeE DefaultFocusCurveRecorderT::locateStartingPosition() {
+CurveSectorT::TypeE DefaultFocusCurveRecorderT::locateStartingPosition() {
     LOG(debug)
         << "DefaultFocusCurveRecorderT::locateStartingPosition..." << std::endl;
 
@@ -135,7 +135,7 @@ CurveHalfT::TypeE DefaultFocusCurveRecorderT::locateStartingPosition() {
 
 
 std::shared_ptr<FocusCurveRecordSetT>
-DefaultFocusCurveRecorderT::recordFocusCurveRecordSet(CurveHalfT::TypeE curveHalf) {
+DefaultFocusCurveRecorderT::recordFocusCurveRecordSet(CurveSectorT::TypeE curveHalf) {
     using namespace std::chrono_literals;
 
     LOG(debug)
@@ -148,10 +148,10 @@ DefaultFocusCurveRecorderT::recordFocusCurveRecordSet(CurveHalfT::TypeE curveHal
     mFocusCurveRecordSets->push_back(focusCurveRecordSet);
 
 
-    FocusDirectionT::TypeE recordingDirection = (curveHalf == CurveHalfT::LEFT_HALF ? FocusDirectionT::OUTWARD
-                                                                                    : FocusDirectionT::INWARD);
+    FocusDirectionT::TypeE recordingDirection = (curveHalf == CurveSectorT::LEFT ? FocusDirectionT::OUTWARD
+                                                                                 : FocusDirectionT::INWARD);
 
-    LOG(debug) << "We are on the " << CurveHalfT::asStr(curveHalf) << "... -> recording direction="
+    LOG(debug) << "We are on the " << CurveSectorT::asStr(curveHalf) << "... -> recording direction="
                << FocusDirectionT::asStr(recordingDirection) << std::endl;
 
     auto curveRecord = getFocusController()->measureFocus();
@@ -233,7 +233,7 @@ void DefaultFocusCurveRecorderT::run() {
         getFocusController()->devicesAvailabilityCheck();
 
 
-        CurveHalfT::TypeE curveHalf = locateStartingPosition();
+        CurveSectorT::TypeE curveHalf = locateStartingPosition();
 
 // while() {
         // TODO: Need loop to record multiple focus curve record sets...

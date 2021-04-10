@@ -27,17 +27,17 @@
 
 #include "enum_helper.h"
 
-struct CurveHalfT {
+struct CurveSectorT {
     enum TypeE {
-        LEFT_HALF, RIGHT_HALF, _Count
+        LEFT, RIGHT, _Count
     };
 
     static const char *asStr(const TypeE &inType) {
         switch (inType) {
-            case LEFT_HALF:
-                return "LEFT_HALF";
-            case RIGHT_HALF:
-                return "RIGHT_HALF";
+            case LEFT:
+                return "LEFT";
+            case RIGHT:
+                return "RIGHT";
             default:
                 return "<?>";
         }

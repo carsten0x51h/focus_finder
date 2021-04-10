@@ -30,7 +30,7 @@
 #include <sstream>
 
 // TODO: As template...???
-// TODO: Imporve error handling...
+// TODO: Improve error handling...
 void CImgFitsIOHelperT::readFits(ImageT *outImg,
                                  const std::string &inFilename, long *outBitPix,
                                  std::stringstream *ss) {

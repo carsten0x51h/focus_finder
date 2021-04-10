@@ -29,13 +29,13 @@
 #include <ostream>
 
 #include "focus_direction.h"
-#include "curve_half.h"
+#include "curve_sector.h"
 
 class FocusCurveRecordT;
 
 struct SelfOrientationResultT {
     FocusDirectionT::TypeE focusDirectionToLimit;
-    CurveHalfT::TypeE curveHalf;
+    CurveSectorT::TypeE curveHalf;
     std::shared_ptr<FocusCurveRecordT> record1;
     std::shared_ptr<FocusCurveRecordT> record2;
 

@@ -26,7 +26,7 @@
 #include <chrono>
 #include <utility>
 
-#include "include/focus_finder_fast_curve_lookup.h"
+#include "include/averaged_focus_curve_focusing_strategy.h"
 #include "include/logging.h"
 #include "include/exception.h"
 #include "include/timeout_exception.h"
@@ -41,39 +41,39 @@
 class FocusControllerT;
 
 // TODO: Find a better name for this class.... we don't really lookup something...
-FocusFinderFastCurveLookupT::FocusFinderFastCurveLookupT(std::shared_ptr<FocusControllerT> focusController)
+AveragedFocsCurveFocusingStrategyT::AveragedFocsCurveFocusingStrategyT(std::shared_ptr<FocusControllerT> focusController)
         : FocusFinderT(std::move(focusController)),
           mCancelled(false),
           mIsRunning(false) {
     LOG(debug)
-        << "FocusFinderFastCurveLookupT::FocusFinderFastCurveLookupT..." << std::endl;
+        << "AveragedFocsCurveFocusingStrategyT::AveragedFocsCurveFocusingStrategyT..." << std::endl;
 }
 
-std::string FocusFinderFastCurveLookupT::getName() const {
-    return "FocusFinderFastCurveLookupT";
+std::string AveragedFocsCurveFocusingStrategyT::getName() const {
+    return "AveragedFocsCurveFocusingStrategyT";
 }
 
-void FocusFinderFastCurveLookupT::reset() {
+void AveragedFocsCurveFocusingStrategyT::reset() {
     // TODO
     // TODO: What happens if called while running? -> Exception?
     LOG(debug)
-        << "FocusFinderFastCurveLookupT::reset..." << std::endl;
+        << "AveragedFocsCurveFocusingStrategyT::reset..." << std::endl;
 }
 
-void FocusFinderFastCurveLookupT::checkCancelled() const {
+void AveragedFocsCurveFocusingStrategyT::checkCancelled() const {
     if (mCancelled.load()) {
         throw FocusControllerCancelledExceptionT("Focus finder cancelled.");
     }
 }
 
-bool FocusFinderFastCurveLookupT::isRunning() const {
+bool AveragedFocsCurveFocusingStrategyT::isRunning() const {
     return mIsRunning.load();
 }
 
 
 
 
-// float FocusFinderFastCurveLookupT::estimateRelPos(std::shared_ptr<CurveFunctionT> focusCurveFunction, float focusMeasure, CurveHalfT::TypeE curveHalf) {
+// float AveragedFocsCurveFocusingStrategyT::estimateRelPos(std::shared_ptr<CurveFunctionT> focusCurveFunction, float focusMeasure, CurveSectorT::TypeE curveHalf) {
 
 //   std::vector<float> estimatedFocusPositions = FocusCurveT::calcFocusPositionByFocusMeasure(focusCurveFunction, focusMeasure);
 
@@ -105,8 +105,8 @@ bool FocusFinderFastCurveLookupT::isRunning() const {
  * move(rest)  // Move rest of the distance
  * measure()   // Final measurement
  */
-void FocusFinderFastCurveLookupT::run() {
-    LOG(debug) << "FocusFinderFastCurveLookupT::run..." << std::endl;
+void AveragedFocsCurveFocusingStrategyT::run() {
+    LOG(debug) << "AveragedFocsCurveFocusingStrategyT::run..." << std::endl;
 
     mIsRunning = true;
 
@@ -130,7 +130,7 @@ void FocusFinderFastCurveLookupT::run() {
     std::shared_ptr<FocusCurveRecordSetT> records = std::make_shared<FocusCurveRecordSetT>(curveFocusMeasureType,
                                                                                            focusMeasureLimit);
 
-    LOG(debug) << "FocusFinderFastCurveLookupT::run... Using parameters: " << std::endl
+    LOG(debug) << "SinglePassFocusingStrategyT::run... Using parameters: " << std::endl
                << "  > curveFittingType=" << FittingCurveTypeT::asStr(curveFittingType) << std::endl
                << "  > foFiStepSize=" << foFiStepSize << std::endl
                << "  > curveFocusMeasureType=" << FocusMeasureTypeT::asStr(curveFocusMeasureType)
@@ -157,23 +157,23 @@ void FocusFinderFastCurveLookupT::run() {
         // Read the current focus controller
         mInitialAbsPosition = getFocusController()->getFocus()->getCurrentPos();
 
-        LOG(debug) << "FocusFinderFastCurveLookupT::run... current focus position: " << mInitialAbsPosition
+        LOG(debug) << "SinglePassFocusingStrategyT::run... current focus position: " << mInitialAbsPosition
                    << std::endl;
 
 
         // Self orientation
         LOG(debug)
-            << "FocusFinderFastCurveLookupT::run - Self orientation..." << std::endl;
+            << "SinglePassFocusingStrategyT::run - Self orientation..." << std::endl;
 
         SelfOrientationResultT selfOrientationResult = getFocusController()->performSelfOrientation(focusMeasureLimit);
 
         LOG(debug)
-            << "FocusFinderFastCurveLookupT::run - Self orientation result:"
+            << "SinglePassFocusingStrategyT::run - Self orientation result:"
             << selfOrientationResult
             << std::endl;
 
 
-        CurveHalfT::TypeE curveHalf = selfOrientationResult.curveHalf; // TODO: Better name "CurveSectorT"?
+        CurveSectorT::TypeE curveHalf = selfOrientationResult.curveHalf; // TODO: Better name "CurveSectorT"?
 
         records->push_back(selfOrientationResult.record1);
         records->push_back(selfOrientationResult.record2);
@@ -191,13 +191,13 @@ void FocusFinderFastCurveLookupT::run() {
 
 
         // DEBUG START
-        LOG(debug) << "FocusFinderFastCurveLookupT::Measured values by self orientation" << std::endl
-                   << "FocusFinderFastCurveLookupT::------------------------------------" << std::endl;
+        LOG(debug) << "SinglePassFocusingStrategyT::Measured values by self orientation" << std::endl
+                   << "SinglePassFocusingStrategyT::------------------------------------" << std::endl;
 
         for (const auto& record : *records) {
             float focusMeasure = record->getFocusMeasure(curveFocusMeasureType);
 
-            LOG(debug) << "FocusFinderFastCurveLookupT::Focus measure=" << focusMeasure << " ("
+            LOG(debug) << "SinglePassFocusingStrategyT::Focus measure=" << focusMeasure << " ("
                        << FocusMeasureTypeT::asStr(curveFocusMeasureType) << ")"
                        << ", abs focus pos=" << record->getCurrentAbsoluteFocusPos()
                        << std::endl;
@@ -260,7 +260,7 @@ void FocusFinderFastCurveLookupT::run() {
         // float dxRel1;
         // float dxRel2;
 
-        // if (curveHalf == CurveHalfT::LEFT_HALF) {
+        // if (curveHalf == CurveSectorT::LEFT) {
         //   // x2 > x1 -> distToLimit2 < distToLimit1, deltaReallyMoved > 0 since moving always INWARD
         //   dxRel1 = distToLimit1 - deltaReallyMoved;
         //   dxRel2 = distToLimit2;
@@ -342,8 +342,8 @@ void FocusFinderFastCurveLookupT::run() {
             //-> NO! Not always!!!
             //FocusDirectionT::TypeE dirToOtherBoundary = FocusDirectionT::invert(selfOrientationResult.focusDirectionToLimit);
             // TODO: Is this ok now??
-            FocusDirectionT::TypeE dirToOtherBoundary = (curveHalf == CurveHalfT::LEFT_HALF ? FocusDirectionT::OUTWARD
-                                                                                            : FocusDirectionT::INWARD);
+            FocusDirectionT::TypeE dirToOtherBoundary = (curveHalf == CurveSectorT::LEFT ? FocusDirectionT::OUTWARD
+                                                                                         : FocusDirectionT::INWARD);
 
             getFocusController()->moveFocusByBlocking(dirToOtherBoundary, foFiStepSize, 30000ms);
 
@@ -356,6 +356,9 @@ void FocusFinderFastCurveLookupT::run() {
 
             currentAbsPos = (float) getFocusController()->getFocus()->getCurrentPos();
 
+
+            throw BaseExceptionT("NOT IMPLEMENTED");
+
             try {
                 // TODO / HACK / FIXME: Does not compile
                 //focusCurve = std::make_shared<FocusCurveT>(records, FittingCurveTypeT::HYPERBOLIC_POS_ONLY);
@@ -366,11 +369,11 @@ void FocusFinderFastCurveLookupT::run() {
                 float estimatedBestAbsPos = focusCurve->getCurveParms().get("C_IDX").getValue();
 
                 LOG(debug)
-                    << "FocusFinderFastCurveLookupT::run...curve matching successful... currently best focus pos: "
+                    << "SinglePassFocusingStrategyT::run...curve matching successful... currently best focus pos: "
                     << estimatedBestAbsPos << std::endl;
 
             } catch (CurveFitExceptionT &exc) {
-                LOG(debug) << "FocusFinderFastCurveLookupT::run...curve matching failed... " << exc.what()
+                LOG(debug) << "SinglePassFocusingStrategyT::run...curve matching failed... " << exc.what()
                            << ". Retrying..." << std::endl;
             }
 
@@ -380,7 +383,7 @@ void FocusFinderFastCurveLookupT::run() {
 
             endRecording = (movedMinimumDistance && focusLimitReached);
 
-            LOG(debug) << "FocusFinderFastCurveLookupT::run..."
+            LOG(debug) << "SinglePassFocusingStrategyT::run..."
                        << "Checking loop end condition: focusLimitReached=" << focusLimitReached
                        << ", movedMinimumDistance=" << movedMinimumDistance
                        << ", -> endRecording=" << endRecording << std::endl;
@@ -390,7 +393,7 @@ void FocusFinderFastCurveLookupT::run() {
 
         if (focusCurve != nullptr) {
             float estimatedBestAbsPosFinal = focusCurve->getCurveParms().get("C_IDX").getValue();
-            LOG(debug) << "FocusFinderFastCurveLookupT::run... - Finally best focus position (estimated)="
+            LOG(debug) << "SinglePassFocusingStrategyT::run... - Finally best focus position (estimated)="
                        << estimatedBestAbsPosFinal << std::endl;
 
             getFocusController()->moveFocusToBlocking((int) estimatedBestAbsPosFinal, 30000ms);
@@ -398,11 +401,11 @@ void FocusFinderFastCurveLookupT::run() {
             auto finalRecord = getFocusController()->measureFocus();
             float currFocusMeasure = finalRecord->getFocusMeasure(curveFocusMeasureType);
 
-            LOG(debug) << "FocusFinderFastCurveLookupT::run... - FINAL, currFocusMeasure=" << currFocusMeasure
+            LOG(debug) << "SinglePassFocusingStrategyT::run... - FINAL, currFocusMeasure=" << currFocusMeasure
                        << std::endl;
 
         } else {
-            LOG(error) << "FocusFinderFastCurveLookupT::run... - Best focus position not determined..." << std::endl;
+            LOG(error) << "SinglePassFocusingStrategyT::run... - Best focus position not determined..." << std::endl;
             // TODO: ERROR / throw? / notify failed....?
         }
 
@@ -453,23 +456,23 @@ void FocusFinderFastCurveLookupT::run() {
     mIsRunning = false;
 }
 
-void FocusFinderFastCurveLookupT::rollbackFocus() {
+void AveragedFocsCurveFocusingStrategyT::rollbackFocus() {
     using namespace std::chrono_literals;
 
     LOG(debug)
-        << "FocusFinderFastCurveLookupT::rollbackFocus..." << std::endl;
+        << "AveragedFocsCurveFocusingStrategyT::rollbackFocus..." << std::endl;
 
     getFocusController()->moveFocusToBlocking(mInitialAbsPosition, 30000ms);
 }
 
-void FocusFinderFastCurveLookupT::focusFinderCleanup() {
+void AveragedFocsCurveFocusingStrategyT::focusFinderCleanup() {
     LOG(debug)
-        << "FocusFinderFastCurveLookupT::focusFinderCleanup..." << std::endl;
+        << "AveragedFocsCurveFocusingStrategyT::focusFinderCleanup..." << std::endl;
 
     rollbackFocus();
 }
 
-void FocusFinderFastCurveLookupT::cancel() {
+void AveragedFocsCurveFocusingStrategyT::cancel() {
     mCancelled = true;
     getFocusController()->cancel();
 }

@@ -22,8 +22,8 @@
  *
  ****************************************************************************/
 
-#ifndef SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FOCUS_FINDER_FAST_CURVE_LOOKUP_H_
-#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FOCUS_FINDER_FAST_CURVE_LOOKUP_H_ SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FOCUS_FINDER_FAST_CURVE_LOOKUP_H_
+#ifndef SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FOCUS_FINDER_AVERAGED_FOCUS_CURVE_FOCUSING_STRATEGY_H_
+#define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FOCUS_FINDER_AVERAGED_FOCUS_CURVE_FOCUSING_STRATEGY_H_ SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FOCUS_FINDER_AVERAGED_FOCUS_CURVE_FOCUSING_STRATEGY_H_
 
 #include <vector>
 #include <chrono>
@@ -54,14 +54,14 @@ public:
     }
 };
 
-class FocusFinderFastCurveLookupT : public FocusFinderT {
+class AveragedFocsCurveFocusingStrategyT : public FocusFinderT {
 private:
     // Prevent copy
-    FocusFinderFastCurveLookupT(const FocusFinderFastCurveLookupT &);
+    AveragedFocsCurveFocusingStrategyT(const AveragedFocsCurveFocusingStrategyT &);
 
-    FocusFinderFastCurveLookupT &operator=(const FocusFinderFastCurveLookupT &);
+    AveragedFocsCurveFocusingStrategyT &operator=(const AveragedFocsCurveFocusingStrategyT &);
 
-    //float estimateRelPos(std::shared_ptr<CurveFunctionT> focusCurveFunction, float focusMeasure, CurveHalfT::TypeE curveHalf);
+    //float estimateRelPos(std::shared_ptr<CurveFunctionT> focusCurveFunction, float focusMeasure, CurveSectorT::TypeE curveHalf);
 
     void rollbackFocus();
 
@@ -75,10 +75,10 @@ private:
 
     std::atomic<bool> mCancelled;
     std::atomic<bool> mIsRunning;
-    int mInitialAbsPosition;
+    int mInitialAbsPosition{};
 
 public:
-    explicit FocusFinderFastCurveLookupT(std::shared_ptr<FocusControllerT> focusController);
+    explicit AveragedFocsCurveFocusingStrategyT(std::shared_ptr<FocusControllerT> focusController);
 
     // Implement focus finder interface
     [[nodiscard]] std::string getName() const override;
@@ -92,4 +92,4 @@ public:
     void reset() override;
 };
 
-#endif /* SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FOCUS_FINDER_FAST_CURVE_LOOKUP_H_ */
+#endif /* SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FOCUS_FINDER_AVERAGED_FOCUS_CURVE_FOCUSING_STRATEGY_H_ */

@@ -179,9 +179,11 @@ void MainWindow::onStartFocusFinderPressed() {
 
         // HACK / TODO: For now we create always a new instance...
         // TODO: Do not create here?! -> Factory?
-
+        // TODO: Do not hardcode AVERAGED_FOCUS_CURVE.... get from profile...
+        //auto focusFinder = FocusFinderFactoryT::getInstance(
+        //        FocusFinderStrategyT::AVERAGED_FOCUS_CURVE, focusController);
         auto focusFinder = FocusFinderFactoryT::getInstance(
-                FocusFinderStrategyT::FAST_CURVE_LOOKUP, focusController);
+                FocusFinderStrategyT::SINGLE_PASS, focusController);
 
         // Register focusFinder UI listeners
         // TODO: Is unregister actually required? We create a new instalce always...

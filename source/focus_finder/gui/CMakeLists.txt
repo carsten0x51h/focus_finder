@@ -50,7 +50,7 @@ set(sources
         ../common/focus_finder_calibration.cpp
         ../common/include/floating_point_equality.h
         ../common/include/quantile.h
-        ../common/include/curve_half.h
+        ../common/include/curve_sector.h
         ../common/include/boundary_location.h
         ../common/include/focus_direction.h
         ../common/include/thresholding_algorithm.h
@@ -189,8 +189,8 @@ set(sources
         ../common/include/focus_finder_profile.h
         ../common/focus_finder_profile.cpp
         ../common/include/focus_finder.h
-        ../common/include/focus_finder_fast_curve_lookup.h
-        ../common/focus_finder_fast_curve_lookup.cpp
+        ../common/include/averaged_focus_curve_focusing_strategy.h
+        ../common/average_focus_curve_focusing_strategy.cpp
         ../common/include/task_executor.h
         ../common/include/focus_finder_strategy.h
         ../common/include/focus_finder_factory.h
@@ -283,7 +283,7 @@ set(sources
         include/indi_device_manager_dialog.h
         indi_device_manager_dialog.cpp
         indi_device_manager_dialog.ui
-        ../common/fofi_project_info.cpp fofi_splash_widget.cpp include/fofi_splash_widget.h)
+        ../common/fofi_project_info.cpp fofi_splash_widget.cpp include/fofi_splash_widget.h ../common/single_pass_focusing_strategy.cpp)
 
 
 # 

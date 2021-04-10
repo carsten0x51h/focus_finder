@@ -25,7 +25,8 @@
 #include <memory>
 
 #include "include/focus_finder_factory.h"
-#include "include/focus_finder_fast_curve_lookup.h"
+#include "include/averaged_focus_curve_focusing_strategy.h"
+#include "include/single_pass_focusing_strategy.h"
 
 class FocusControllerT;
 
@@ -33,9 +34,10 @@ std::shared_ptr<FocusFinderT> FocusFinderFactoryT::getInstance(
         const FocusFinderStrategyT::TypeE &strategy, const std::shared_ptr<FocusControllerT>& focusAnalyzer) {
 
     switch (strategy) {
-        case FocusFinderStrategyT::FAST_CURVE_LOOKUP:
-            return std::make_shared<FocusFinderFastCurveLookupT>(focusAnalyzer);
-
+        case FocusFinderStrategyT::AVERAGED_FOCUS_CURVE:
+            return std::make_shared<SinglePassFocusingStrategyT>(focusAnalyzer);
+        case FocusFinderStrategyT::SINGLE_PASS:
+            return std::make_shared<SinglePassFocusingStrategyT>(focusAnalyzer);
         default:
             return nullptr;
     }
