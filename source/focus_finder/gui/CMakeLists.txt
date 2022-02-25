@@ -4,6 +4,7 @@
 # 
 
 find_package(Qt5 COMPONENTS Core Widgets REQUIRED)
+find_package(INDI COMPONENTS client REQUIRED)
 
 # Enable automoc
 set(CMAKE_AUTOMOC ON)
@@ -153,6 +154,8 @@ set(sources
         ../common/hfd.cpp
         ../common/include/fwhm.h
         ../common/fwhm.cpp
+        ../common/include/star_details.h
+        ../common/star_details.cpp
         ../common/include/cimg_fits_io.h
         ../common/cimg_fits_io.cpp
         ../common/include/draw_helper.h
@@ -283,7 +286,7 @@ set(sources
         include/indi_device_manager_dialog.h
         indi_device_manager_dialog.cpp
         indi_device_manager_dialog.ui
-        ../common/fofi_project_info.cpp fofi_splash_widget.cpp include/fofi_splash_widget.h ../common/single_pass_focusing_strategy.cpp)
+        ../common/fofi_project_info.cpp fofi_splash_widget.cpp include/fofi_splash_widget.h ../common/single_pass_focusing_strategy.cpp include/star_details_panel.h star_details_panel.cpp ../common/star_details.cpp)
 
 
 # 
@@ -349,7 +352,7 @@ target_link_libraries(${target}
         ${CCFITS_LIBRARY}
         ${GSL_LIBRARY}
         ${GSL_CBLAS_LIBRARY}
-        ${INDI_CLIENT_LIBRARIES}
+        ${INDI_LIBRARIES}
         ${NOVA_LIBRARIES}
         ${ZLIB_LIBRARIES}
         ${DEFAULT_LINKER_OPTIONS}

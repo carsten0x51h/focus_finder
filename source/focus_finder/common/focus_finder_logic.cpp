@@ -362,7 +362,6 @@ std::optional<PointT<float> > FocusFinderLogicT::findFocusStar(
         << "SNR: " << snr << std::endl;
 
     if (snr < activeProfile->getStarDetectionSnrBoundary()) {
-        // The 1 is just a rough guess at the moment...
         LOG(warning)
             << "FocusFinderLogicT::findFocusStar... no valid star detected."
             << std::endl;

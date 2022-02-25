@@ -56,6 +56,10 @@ public:
 
     ~FocusFinderProfileT();
 
+    [[nodiscard]] size_t getVersion() const;
+
+    void setVersion(size_t version);
+
     [[nodiscard]] const std::string &getName() const;
 
     void setName(const std::string &name);
@@ -205,6 +209,7 @@ private:
     /**
      * Profile meta data
      */
+    size_t mVersion;
     std::string mName;
     TimestampT mLastChanged;
     std::string mDescription;

@@ -76,8 +76,8 @@ option(OPTION_ENABLE_CLANG_TIDY "Enable clang-tidy."                            
 # clang-tidy settings (enabled by default)
 #
 if(OPTION_ENABLE_CLANG_TIDY)
-  set(CMAKE_C_CLANG_TIDY "clang-tidy;-checks=-*,readability-*")
-  set(CMAKE_CXX_CLANG_TIDY "clang-tidy;-checks=-*,readability-*")
+  set(CMAKE_C_CLANG_TIDY "clang-tidy;-checks=-*,readability-*,-readability-magic-numbers")
+  set(CMAKE_CXX_CLANG_TIDY "clang-tidy;-checks=-*,readability-*,-readability-magic-numbers")
 endif()
 
 
@@ -110,7 +110,7 @@ include(cmake/CompileOptions.cmake)
 #
 # Look for INDI
 #
-include(cmake/FindINDI.cmake)
+find_package(INDI REQUIRED)
 
 find_package(Nova REQUIRED)
 include_directories(${NOVA_INCLUDE_DIR})

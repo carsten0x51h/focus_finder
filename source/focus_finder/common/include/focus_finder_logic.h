@@ -26,6 +26,7 @@
 #define SOURCE_FOCUS_FINDER_COMMON_FOCUS_FINDER_LOGIC_H_ SOURCE_FOCUS_FINDER_COMMON_FOCUS_FINDER_LOGIC_H_
 
 #include <memory>
+#include <optional>
 
 #include <boost/signals2.hpp>
 

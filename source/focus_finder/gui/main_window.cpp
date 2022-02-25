@@ -377,6 +377,8 @@ void MainWindow::createFwhmViewPanels() {
 }
 
 
+
+
 void MainWindow::onImageConverterValueChanged() {
     LOG(debug)
         << "MainWindow::onImageConverterValueChanged..." << std::endl;
@@ -1255,6 +1257,9 @@ void MainWindow::onFocusFinderProgressUpdate(float progress,
         mHfdViewPanel->setHfd(record->getHfd());
         mFwhmHorzViewPanel->setFwhm(record->getFwhmHorz());
         mFwhmVertViewPanel->setFwhm(record->getFwhmVert());
+
+       // TODO:  mStarDetailsPanel->setStarDetails();
+
     }
 
 

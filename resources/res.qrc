@@ -1,5 +1,6 @@
 <RCC>
   <qresource prefix="res">
+    <file>fwhm_big.ico</file>
     <file>indi_server_connected_64x64.png</file>
     <file>indi_server_disconnected_64x64.png</file>
     <file>indi_logo_72x72.png</file>

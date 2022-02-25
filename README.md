@@ -17,7 +17,11 @@ Please visit my blog https://www.lost-infinity.com for further details. The firs
 build & install
 ---------------
 
-1. Go to the build directory (should be empty):
+0. Required packages
+ * qtbase5-dev
+ * 
+
+2. Go to the build directory (should be empty):
 
 cd focus_finder/build
 

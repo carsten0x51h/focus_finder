@@ -48,6 +48,7 @@ const FocusFinderProfileT FocusFinderProfileT::sDefaultProfile;
 
 
 FocusFinderProfileT::FocusFinderProfileT() :
+        mVersion(0),
         mName(DEFAULT),
         mLastChanged(std::chrono::high_resolution_clock::now()),
 
@@ -87,6 +88,14 @@ FocusFinderProfileT::~FocusFinderProfileT() {
 /**
  * Profile basics
  */
+size_t FocusFinderProfileT::getVersion() const {
+    return mVersion;
+}
+
+void FocusFinderProfileT::setVersion(size_t version) {
+    mVersion = version;
+}
+
 const std::string &FocusFinderProfileT::getName() const {
     return mName;
 }
@@ -323,6 +332,7 @@ FocusFinderProfileT::load(const std::string &fullProfilePath, const std::filesys
         /**
          * Profile basics
          */
+        profile.setVersion(pt.get("profile.<xmlattr>.version", defaults().getVersion()));
         profile.setName(pt.get("profile.<xmlattr>.name", defaults().getName()));
         profile.setLastChanged(pt.get("profile.<xmlattr>.last_changed", defaults().getLastChanged()));
         profile.setDescription(pt.get("profile.<xmlattr>.description", defaults().getDescription()));
@@ -450,6 +460,7 @@ void FocusFinderProfileT::save(const std::string &fullProfilePath, const std::fi
         /**
          * Profile basics
          */
+        pt.put<size_t>("profile.<xmlattr>.version", profile.getVersion());
         pt.put<std::string>("profile.<xmlattr>.name", profile.getName());
         pt.put<TimestampT>("profile.<xmlattr>.last_changed", profile.getLastChanged());
         pt.put<std::string>("profile.<xmlattr>.description", profile.getDescription());
@@ -560,6 +571,7 @@ std::ostream &FocusFinderProfileT::print(std::ostream &os, size_t indent) const 
      * Basic profile settings
      */
     os << prefix << "---Profile basics---" << std::endl
+       << prefix << "Version: " << mVersion << std::endl
        << prefix << "Name: " << mName << std::endl
        << prefix << "Last changed: " << mLastChanged << std::endl // TODO: Format?
        << prefix << "Description: " << mDescription << std::endl;

@@ -261,6 +261,7 @@ private:
     HfdViewPanelT *mHfdViewPanel;
     FwhmViewPanelT *mFwhmHorzViewPanel;
     FwhmViewPanelT *mFwhmVertViewPanel;
+    // TODO: StarDetailsPanelT *mStarDetailsPanel;
 
     AboutDialogT *mAboutDialog;
 
