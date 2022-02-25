@@ -18,7 +18,6 @@ include(ExternalProject)
 
 # Set compiler standard
 # See https://stackoverflow.com/questions/40452287/let-cmake-with-clang-use-c11-c14
-#set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
@@ -68,7 +67,6 @@ option(OPTION_SELF_CONTAINED    "Create a self-contained install with all depend
 option(OPTION_BUILD_TESTS       "Build tests."                                           ON)
 option(OPTION_BUILD_DOC         "Build documentation."                                   OFF)
 option(OPTION_BUILD_EXAMPLES    "Build examples."                                        OFF)
-
 option(OPTION_ENABLE_CLANG_TIDY "Enable clang-tidy."                                     ON)
 
 
@@ -76,8 +74,8 @@ option(OPTION_ENABLE_CLANG_TIDY "Enable clang-tidy."                            
 # clang-tidy settings (enabled by default)
 #
 if(OPTION_ENABLE_CLANG_TIDY)
-  set(CMAKE_C_CLANG_TIDY "clang-tidy;-checks=-*,readability-*,-readability-magic-numbers")
-  set(CMAKE_CXX_CLANG_TIDY "clang-tidy;-checks=-*,readability-*,-readability-magic-numbers")
+  set(CMAKE_C_CLANG_TIDY "clang-tidy;-checks=-*,readability-*,-readability-magic-numbers,-readability-function-cognitive-complexity")
+  set(CMAKE_CXX_CLANG_TIDY "clang-tidy;-checks=-*,readability-*,-readability-magic-numbers,-readability-function-cognitive-complexity")
 endif()
 
 

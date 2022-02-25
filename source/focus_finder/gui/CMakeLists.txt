@@ -1,8 +1,7 @@
 
 # 
 # External dependencies
-# 
-
+#
 find_package(Qt5 COMPONENTS Core Widgets REQUIRED)
 find_package(INDI COMPONENTS client REQUIRED)
 
@@ -36,8 +35,7 @@ endif ()
 
 # 
 # Sources
-# 
-
+#
 set(sources
         ../common/include/fofi_project_info.h
         ../common/fofi_project_info.cpp
@@ -293,8 +291,6 @@ set(sources
 # Create executable
 # 
 
-#qt5_add_resources(res.qrc)
-
 # Build executable
 add_executable(${target}
         MACOSX_BUNDLE
@@ -302,15 +298,10 @@ add_executable(${target}
         ../../../resources/res.qrc
         )
 
-# Create namespaced alias
-# TODO: Required???
-#add_executable(${META_PROJECT_NAME}::${target} ALIAS ${target})
-
 
 # 
 # Project options
-# 
-
+#
 set_target_properties(${target}
         PROPERTIES
         ${DEFAULT_PROJECT_OPTIONS}
@@ -320,8 +311,7 @@ set_target_properties(${target}
 
 # 
 # Include directories
-# 
-
+#
 target_include_directories(${target}
         PRIVATE
         ${INDI_INCLUDE_DIR}
@@ -337,7 +327,6 @@ target_include_directories(${target}
 #
 
 # Add the fllowing to the section below to add further libs
-#    ${META_PROJECT_NAME}::libindiclientpp
 target_link_libraries(${target}
         PRIVATE
         ${DEFAULT_LIBRARIES}
@@ -362,8 +351,7 @@ target_link_libraries(${target}
 
 #
 # Compile definitions
-# 
-
+#
 target_compile_definitions(${target}
         PRIVATE
         ${DEFAULT_COMPILE_DEFINITIONS}
@@ -372,22 +360,11 @@ target_compile_definitions(${target}
 
 # 
 # Compile options
-# 
-
+#
 target_compile_options(${target}
         PRIVATE
         ${DEFAULT_COMPILE_OPTIONS}
         )
-
-
-# 
-# Linker options
-#
-# target_link_libraries(${target}
-#     PRIVATE
-#     ${DEFAULT_LINKER_OPTIONS}
-# )
-
 
 # 
 # Deployment
@@ -401,4 +378,3 @@ install(TARGETS ${target}
 
 # IMPORTANT: Otherwise C++11 is used...
 set_property(TARGET ${target} PROPERTY CXX_STANDARD 20)
-

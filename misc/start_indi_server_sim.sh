@@ -1,2 +1,8 @@
 #!/bin/bash
-indiserver -v /home/devnull/workspace/indi/indi/build/indi_simulator_wheel /home/devnull/workspace/indi/indi/build/indi_simulator_telescope /home/devnull/workspace/indi/indi/build/indi_simulator_ccd /home/devnull/workspace/indi/indi/build/indi_simulator_focus
+
+INDI_BIN_DIR=/usr/bin
+
+indiserver -v ${INDI_BIN_DIR}/indi_simulator_wheel \
+              ${INDI_BIN_DIR}/indi_simulator_telescope \
+              ${INDI_BIN_DIR}/indi_simulator_ccd \
+              ${INDI_BIN_DIR}/indi_simulator_focus
