@@ -17,9 +17,11 @@ Please visit my blog https://www.lost-infinity.com for further details. The firs
 build & install
 ---------------
 
-0. Required packages
+0. Dependencies
  * qtbase5-dev
- * 
+ * CImg
+ * libindi-dev
+ * TODO...
 
 2. Go to the build directory (should be empty):
 
