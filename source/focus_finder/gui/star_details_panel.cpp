@@ -27,6 +27,9 @@
 #include <memory>
 #include <cmath>
 
+#include "../common/include/event_bus.h"
+#include "../common/include/events/new_frame_event.h"
+
 #include "include/star_details_panel.h"
 
 #include "ui_star_details_panel.h"
@@ -36,6 +39,9 @@ StarDetailsPanelT::StarDetailsPanelT(QWidget *parent) : QWidget(parent),
                                                         m_ui(new Ui::StarDetailsPanel) {
     // Setup UI
     m_ui->setupUi(this);
+
+    boost::function<void(NewFrameEventT)> g = boost::bind(& StarDetailsPanelT::setStarDetailsFromEvent, this, boost::placeholders::_1);
+    EventBusT::getInstance()->subscribe(g);
 
     reset();
 }
@@ -47,8 +53,37 @@ void StarDetailsPanelT::reset() {
 
 }
 
+void StarDetailsPanelT::setStarDetailsFromEvent(const NewFrameEventT & newFrameEvent) {
+    StarDetailsT starDetails;
+
+    // TODO / HACK: Next step is to subscribe to a dedicated NewStarDetailsEvent...
+    const std::shared_ptr<const ImageT>& resultImage = newFrameEvent.getResultImage();
+
+    if (resultImage) {
+        starDetails.setMin(resultImage->min());
+        starDetails.setMax(resultImage->max());
+    }
+
+    this->setStarDetails(starDetails);
+}
+
+std::string StarDetailsPanelT::floatToString(float f) {
+    std::string text;
+
+    std::ostringstream oss;
+    oss.precision(4);
+    oss << f;
+    text = oss.str();
+
+    return text;
+}
+
 void StarDetailsPanelT::setStarDetails(const StarDetailsT &starDetails) {
     LOG(debug) << "StarDetailsPanelT::setStarDetails..." << std::endl;
+
+    m_ui->lblMin->setText(QString::fromStdString(floatToString(starDetails.getMin())));
+    m_ui->lblMax->setText(QString::fromStdString(floatToString(starDetails.getMax())));
+
 
 //    // Set Fwhm text
 //    std::string text = "-";

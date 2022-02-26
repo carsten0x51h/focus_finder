@@ -29,9 +29,11 @@
 
 // Qt includes
 #include <QWidget>
+#include <string>
 
 #include "../../common/include/focus_finder_logic.h"
 #include "../../common/include/star_details.h"
+#include "../../common/include/events/new_frame_event.h"
 
 namespace Ui {
     class StarDetailsPanel;
@@ -68,6 +70,8 @@ protected:
     const QScopedPointer<Ui::StarDetailsPanel> m_ui;
 
 private:
+    static std::string floatToString(float f);
+    void setStarDetailsFromEvent(const NewFrameEventT & newFrameEvent);
 };
 
 #endif /*SOURCE_FOCUS_FINDER_GUI_INCLUDE_STAR_DETAILS_PANEL_H_*/

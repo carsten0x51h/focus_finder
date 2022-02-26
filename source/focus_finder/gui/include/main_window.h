@@ -64,6 +64,8 @@ class HfdViewPanelT;
 
 class FwhmViewPanelT;
 
+class StarDetailsPanelT;
+
 class ManageDeviceProfilesDialogT;
 
 class AboutDialogT;
@@ -183,6 +185,8 @@ private:
 
     void createFwhmViewPanels();
 
+    void createStarDetailsPanel();
+
     void createFocusFinderMainMenuBar();
 
     void createStatusBar();
@@ -261,7 +265,7 @@ private:
     HfdViewPanelT *mHfdViewPanel;
     FwhmViewPanelT *mFwhmHorzViewPanel;
     FwhmViewPanelT *mFwhmVertViewPanel;
-    // TODO: StarDetailsPanelT *mStarDetailsPanel;
+    StarDetailsPanelT *mStarDetailsPanel;
 
     AboutDialogT *mAboutDialog;
 

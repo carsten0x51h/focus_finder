@@ -24,5 +24,53 @@
 
 #include "include/star_details.h"
 
-StarDetailsT::StarDetailsT() {
+StarDetailsT::StarDetailsT() : mMin(0.0F), mMax(0.0F), mHfd(0.0F), mFwhmHorz(0.0F), mFwhmVert(0.0F), mFwhmAvg(0.0F) {
+}
+
+float StarDetailsT::getMin() const {
+    return mMin;
+}
+
+void StarDetailsT::setMin(float min) {
+    StarDetailsT::mMin = min;
+}
+
+float StarDetailsT::getMax() const {
+    return mMax;
+}
+
+void StarDetailsT::setMax(float max) {
+    StarDetailsT::mMax = max;
+}
+
+float StarDetailsT::getHfd() const {
+    return mHfd;
+}
+
+void StarDetailsT::setHfd(float hfd) {
+    StarDetailsT::mHfd = hfd;
+}
+
+float StarDetailsT::getFwhmHorz() const {
+    return mFwhmHorz;
+}
+
+void StarDetailsT::setFwhmHorz(float fwhmHorz) {
+    StarDetailsT::mFwhmHorz = fwhmHorz;
+}
+
+float StarDetailsT::getFwhmVert() const {
+    return mFwhmVert;
+}
+
+void StarDetailsT::setFwhmVert(float fwhmVert) {
+    StarDetailsT::mFwhmVert = fwhmVert;
+}
+
+float StarDetailsT::getFwhmAvg() const {
+    return mFwhmAvg;
+}
+
+void StarDetailsT::setFwhmAvg(float fwhmAvg) {
+    StarDetailsT::mFwhmAvg = fwhmAvg;
 }

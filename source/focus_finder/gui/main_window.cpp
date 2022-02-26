@@ -47,6 +47,7 @@
 #include "include/filter_cntl_panel.h"
 #include "include/hfd_view_panel.h"
 #include "include/fwhm_view_panel.h"
+#include "include/star_details_panel.h"
 #include "include/reporting_viewer_panel.h"
 #include "include/image_converter_panel.h"
 
@@ -376,6 +377,20 @@ void MainWindow::createFwhmViewPanels() {
     }
 }
 
+void MainWindow::createStarDetailsPanel() {
+    auto *dock = new QDockWidget(tr("Star details"), this);
+    dock->setAllowedAreas(Qt::RightDockWidgetArea);
+
+    mStarDetailsPanel = new StarDetailsPanelT(dock);
+
+    // See https://www.qtcentre.org/threads/64634-Add-QWidget-to-QDockWidget
+    dock->setWidget(mStarDetailsPanel);
+
+    dock->setMinimumSize(mStarDetailsPanel->minimumSize());
+
+    addDockWidget(Qt::RightDockWidgetArea, dock);
+    m_ui->viewMenu->addAction(dock->toggleViewAction());
+}
 
 
 
@@ -1673,6 +1688,7 @@ MainWindow::MainWindow() :
     // // TODO: They take too much space this way - find better way...
     // //createHfdViewPanel();
     // //createFwhmViewPanels();
+    createStarDetailsPanel();
 
     createFocusFinderMainMenuBar();
     createStatusBar();

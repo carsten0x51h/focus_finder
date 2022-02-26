@@ -29,7 +29,37 @@ class StarDetailsT {
 public:
     StarDetailsT();
 
+    [[nodiscard]] float getMin() const;
+
+    void setMin(float mMin);
+
+    [[nodiscard]] float getMax() const;
+
+    void setMax(float mMax);
+
+    [[nodiscard]] float getHfd() const;
+
+    void setHfd(float mHfd);
+
+    [[nodiscard]] float getFwhmHorz() const;
+
+    void setFwhmHorz(float mFwhmHorz);
+
+    [[nodiscard]] float getFwhmVert() const;
+
+    void setFwhmVert(float mFwhmVert);
+
+    [[nodiscard]] float getFwhmAvg() const;
+
+    void setFwhmAvg(float mFwhmAvg);
+
 private:
+    float mMin{};
+    float mMax{};
+    float mHfd{};
+    float mFwhmHorz{};
+    float mFwhmVert{};
+    float mFwhmAvg{};
 };
 
 #endif /* FOFI_STAR_DETAILS_H */

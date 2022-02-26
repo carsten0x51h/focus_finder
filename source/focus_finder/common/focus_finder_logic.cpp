@@ -50,6 +50,9 @@
 #include "include/task_executor.h"
 #include "include/focus_curve_recorder_logic.h"
 
+#include "include/event_bus.h"
+#include "include/events/new_frame_event.h"
+
 FocusFinderLogicT *FocusFinderLogicT::sSelf = nullptr;
 
 void FocusFinderLogicT::init() {
@@ -195,7 +198,13 @@ void FocusFinderLogicT::updateProfile() {
     // Register to new device
     if (newCameraDevice) {
         mExposureCycleFinishedConnection = newCameraDevice->registerExposureCycleFinishedListener(
-                [&](RectT<unsigned int> roiRect, std::shared_ptr<const ImageT> resultImage, bool /*lastExposure*/) {
+                [&](RectT<unsigned int> roiRect, std::shared_ptr<const ImageT> resultImage, bool lastExposure) {
+
+                    NewFrameEventT newFrameEvent(roiRect, resultImage, lastExposure);
+
+                    EventBusT::getInstance()->publish<void(NewFrameEventT)>(newFrameEvent);
+
+
                     // TODO: "mLastFrame" needs mutex guard!!!-> or atomic?
                     mLastFrame.setImage(std::move(resultImage));  // null if no image
                     mLastFrame.setRoi(roiRect);        // "empty" - i.e. 0,0,0,0 if not set

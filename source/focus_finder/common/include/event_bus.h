@@ -39,10 +39,10 @@ public:
 
     template<typename T>
     boost::signals2::signal<T>* createSignal() {
-        typedef boost::signals2::signal<T> SignalT;
+        typedef boost::signals2::signal<T> signal_t;
 
         if (mSignals.find(typeid(T).name()) == mSignals.end()) {
-            auto * signal = new SignalT();
+            auto * signal = new signal_t();
             mSignals[typeid(T).name()] = signal;
             return (signal);
         }
@@ -59,13 +59,13 @@ public:
      */
     template<typename T>
     boost::signals2::connection subscribe(const boost::function<T>& callback) {
-        typedef boost::signals2::signal<T> SignalT;
-        SignalT* signal = nullptr;
+        typedef boost::signals2::signal<T> signal_t;
+        signal_t* signal = nullptr;
 
         if (mSignals.find(typeid(T).name()) == mSignals.end()) {
             signal = createSignal<T>();
         } else {
-            signal = dynamic_cast<SignalT*>(mSignals[typeid(T).name()]);
+            signal = dynamic_cast<signal_t*>(mSignals[typeid(T).name()]);
         }
 
         boost::signals2::connection ret = signal->connect(callback);
@@ -92,10 +92,10 @@ public:
      * @param args
      */
     template<typename T, typename ... Args>
-    void post(Args ... args) {
-        typedef boost::signals2::signal<T> SignalT;
+    void publish(Args ... args) {
+        typedef boost::signals2::signal<T> signal_t;
         if (mSignals.find(typeid(T).name()) != mSignals.end()) {
-            SignalT* signal = dynamic_cast<SignalT*>(mSignals[typeid(T).name()]);
+            signal_t* signal = dynamic_cast<signal_t*>(mSignals[typeid(T).name()]);
             signal->operator()(std::forward<Args>(args)...);
         }
     }
