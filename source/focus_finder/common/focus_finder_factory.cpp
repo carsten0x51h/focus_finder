@@ -35,7 +35,7 @@ std::shared_ptr<FocusFinderT> FocusFinderFactoryT::getInstance(
 
     switch (strategy) {
         case FocusFinderStrategyT::AVERAGED_FOCUS_CURVE:
-            return std::make_shared<SinglePassFocusingStrategyT>(focusAnalyzer);
+            return std::make_shared<AveragedFocsCurveFocusingStrategyT>(focusAnalyzer);
         case FocusFinderStrategyT::SINGLE_PASS:
             return std::make_shared<SinglePassFocusingStrategyT>(focusAnalyzer);
         default:
