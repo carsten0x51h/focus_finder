@@ -111,7 +111,7 @@ const FocusFinderProfileT &FocusControllerT::getFocusFinderProfile() const {
 }
 
 
-// TODO: Do not just return the one float but all data HfdT, vertical ahnd horizontal FwhmT etc. in a data structure...
+// TODO: Do not just return the one float but all data HfdT, vertical and horizontal FwhmT etc. in a data structure...
 std::shared_ptr<FocusCurveRecordT> FocusControllerT::measureFocus() {
     using namespace std::chrono_literals;
 
@@ -130,7 +130,7 @@ std::shared_ptr<FocusCurveRecordT> FocusControllerT::measureFocus() {
     SizeT<unsigned int> windowSize =
             getFocusFinderProfile().getStarWindowSize();
 
-    // NOTE: In case factor is evenm we need to add +1 to make the result odd.
+    // NOTE: In case factor is even we need to add +1 to make the result odd.
     int oddMaker = (factor % 2 == 0 ? +1 : 0);
 
     SizeT<unsigned int> outerWindowSize(
@@ -326,7 +326,7 @@ std::shared_ptr<FocusCurveRecordT> FocusControllerT::measureFocus() {
 
 
 
-                // TODO: Remove again... actually the Hfd and Fwhm should not be calculated in the focus_controller! (and not be part of the record...?!!)
+                // TODO: Remove again... actually the Hfd and FwhmT should not be calculated in the focus_controller! (and not be part of the record...?!!)
                 HfdT hfd(averageCurrentImage);
                 size_t centerIdxHorz = std::floor(averageCurrentImage.height() / 2);
                 FwhmT fwhmHorz(ImageSlicerT::slice<SliceDirectionT::HORZ>(averageCurrentImage, centerIdxHorz));

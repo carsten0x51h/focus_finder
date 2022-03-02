@@ -56,10 +56,10 @@ public:
 private:
     float mMin{};
     float mMax{};
-    float mHfd{};
-    float mFwhmHorz{};
-    float mFwhmVert{};
-    float mFwhmAvg{};
+    float mHfd{}; // TODO: Should be std::shared_ptr<HfdT> ?
+    float mFwhmHorz{}; // TODO: Should ne std::shared_ptr<FwhmT> ?
+    float mFwhmVert{}; // TODO: Should ne std::shared_ptr<FwhmT> ?
+    float mFwhmAvg{}; // TODO: Should be removed
 };
 
 #endif /* FOFI_STAR_DETAILS_H */

@@ -340,6 +340,7 @@ void MainWindow::createHfdViewPanel() {
     dock->setWidget(mHfdViewPanel);
 
     dock->setMinimumSize(mHfdViewPanel->minimumSize());
+    dock->setVisible(false);
 
     addDockWidget(Qt::RightDockWidgetArea, dock);
     m_ui->viewMenu->addAction(dock->toggleViewAction());
@@ -356,6 +357,7 @@ void MainWindow::createFwhmViewPanels() {
         dock->setWidget(mFwhmHorzViewPanel);
 
         dock->setMinimumSize(mFwhmHorzViewPanel->minimumSize());
+        dock->setVisible(false);
 
         addDockWidget(Qt::RightDockWidgetArea, dock);
         m_ui->viewMenu->addAction(dock->toggleViewAction());
@@ -371,6 +373,7 @@ void MainWindow::createFwhmViewPanels() {
         dock->setWidget(mFwhmVertViewPanel);
 
         dock->setMinimumSize(mFwhmVertViewPanel->minimumSize());
+        dock->setVisible(false);
 
         addDockWidget(Qt::RightDockWidgetArea, dock);
         m_ui->viewMenu->addAction(dock->toggleViewAction());
@@ -1387,6 +1390,15 @@ void MainWindow::onPoiSelectedSlot(const QPoint &qtPoi) {
 
     PointT<float> poi(qtPoi.x(), qtPoi.y());
 
+    // TODO: Move findFocusStar() out to "StarFinder" / "StarDetector"...
+    //       In:  Image, POI
+    //       Out: StarInfoT / StarDetailsT / StarFinderResultT....
+    //              -center pos (optional)
+    //              -HFD
+    //              -FWHM horz + vert
+    //              -SNR
+    //              -min
+    //              -max
     auto focusStarPosOpt = mFfl.findFocusStar(poi);
 
     if (focusStarPosOpt) {
@@ -1686,8 +1698,8 @@ MainWindow::MainWindow() :
     createFilterCntlPanel();
 
     // // TODO: They take too much space this way - find better way...
-    // //createHfdViewPanel();
-    // //createFwhmViewPanels();
+    createHfdViewPanel();
+    createFwhmViewPanels();
     createStarDetailsPanel();
 
     createFocusFinderMainMenuBar();

@@ -80,7 +80,7 @@ private:
 
     void setButtonConnectionState(IndiServerConnectionStateT::TypeE btnConnState);
 
-    static bool isServerInfoValid(const std::string &hostname, const std::string &portStr);
+    static bool isServerInfoValid(const std::string &hostname, int portNo);
 
     QHBoxLayout *getIndiControlButtons();
 
@@ -96,7 +96,7 @@ private:
 
     void onHostnameChanged(const QString &hostname);
 
-    void onPortChanged(const QString &portStr);
+    void onPortChanged(int portNo);
 
 
     boost::signals2::connection mServerConnectionStateChangedConnection;

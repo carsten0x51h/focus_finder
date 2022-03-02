@@ -34,10 +34,10 @@
 #include "ui_indi_device_manager_dialog.h"
 
 
-bool IndiDeviceManagerDialogT::isServerInfoValid(const std::string &hostname, const std::string &portStr) {
+bool IndiDeviceManagerDialogT::isServerInfoValid(const std::string &hostname, int portNo) {
 
     bool isHostnameValid = !hostname.empty(); // TODO: May be refined...
-    bool isPortValid = !portStr.empty();
+    bool isPortValid = (portNo > 0);
 
     return (isHostnameValid && isPortValid);
 }
@@ -53,24 +53,23 @@ void IndiDeviceManagerDialogT::onHostnameChanged(const QString &hostname) {
     LOG(debug) << "IndiDeviceManagerDialogT::onHostnameChanged()...new hostname=" << hostname.toStdString()
                << std::endl;
 
-    QString portStr = m_ui->editSpinPort->text();
+    int portNo = m_ui->editSpinPort->value();
 
     mConnectIndiServerButton->setEnabled(isServerInfoValid(
             hostname.toStdString(),
-            portStr.toStdString()
+            portNo
                                          )
     );
 }
 
-void IndiDeviceManagerDialogT::onPortChanged(const QString &portStr) {
-    LOG(debug) << "IndiDeviceManagerDialogT::onPortChanged()...new value=" << portStr.toStdString() << std::endl;
+void IndiDeviceManagerDialogT::onPortChanged(int portNo) {
+    LOG(debug) << "IndiDeviceManagerDialogT::onPortChanged()...new value=" << portNo << std::endl;
 
     QString hostname = m_ui->editHostname->text();
 
     mConnectIndiServerButton->setEnabled(isServerInfoValid(
             hostname.toStdString(),
-            portStr.toStdString()
-                                         )
+            portNo             )
     );
 }
 
@@ -279,7 +278,7 @@ IndiDeviceManagerDialogT::IndiDeviceManagerDialogT(QWidget *parent,
             &IndiDeviceManagerDialogT::onHostnameChanged);
 
     // Connect port edit spin box
-    connect(m_ui->editSpinPort, &QSpinBox::textChanged, this,
+    connect(m_ui->editSpinPort, QOverload<int>::of(&QSpinBox::valueChanged), this,
             &IndiDeviceManagerDialogT::onPortChanged);
 
     // Connect dialog close buttoin

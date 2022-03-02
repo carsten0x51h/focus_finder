@@ -204,6 +204,19 @@ void FocusFinderLogicT::updateProfile() {
 
                     EventBusT::getInstance()->publish<void(NewFrameEventT)>(newFrameEvent);
 
+                    // TODO: Implement... need position if selected star (if any)
+                    // NOTE: This may move to a sep. class / controller based on data in NewFrameEventT...
+//                    size_t centerIdxHorz = std::floor(img.height() / 2);
+//                    FwhmT fwhmHorz(ImageSlicerT::slice<SliceDirectionT::HORZ>(img, centerIdxHorz));
+//
+//                    // NOTE / TODO: This only works if width() is odd
+//                    size_t centerIdxVert = std::floor(img.width() / 2);
+//                    FwhmT fwhmVert(ImageSlicerT::slice<SliceDirectionT::VERT>(img, centerIdxVert));
+
+
+
+
+
 
                     // TODO: "mLastFrame" needs mutex guard!!!-> or atomic?
                     mLastFrame.setImage(std::move(resultImage));  // null if no image
@@ -340,7 +353,7 @@ std::optional<PointT<float> > FocusFinderLogicT::findFocusStar(
 
     // Star finder expects window coordinates in the coordinate system of the given image (ROI).
     // In case a ROI is set, "img" only is the sub-image - i.e. left-upper corner of the image
-    // coordinate starts with (0,0). Therefore "searchWindowRect" needs o be transformed to those
+    // coordinate starts with (0,0). Therefore "searchWindowRect" needs to be transformed to those
     // "ROI" coordinates.
     //
     //
