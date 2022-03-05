@@ -44,7 +44,8 @@ void DeviceT::setAvailable(bool isAvailable) {
 }
 
 bool DeviceT::isInterfaceSupported(DeviceInterfaceTypeT::TypeE interfaceType) const {
-    return getSupportedInferfaces().contains(interfaceType);
+  // NOTE: C++20 also provides "contains()" ....
+  return (getSupportedInferfaces().count(interfaceType) > 0);
 }
 
 std::shared_ptr<CameraInterfaceT> DeviceT::getCameraInterface() {

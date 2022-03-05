@@ -22,6 +22,7 @@
  *
  ****************************************************************************/
 
+#include <mutex>
 #include <boost/range/adaptors.hpp>
 #include <boost/range/algorithm/copy.hpp>
 

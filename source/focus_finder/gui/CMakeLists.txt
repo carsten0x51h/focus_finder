@@ -51,6 +51,7 @@ set(sources
         ../common/include/focus_finder_calibration.h
         ../common/focus_finder_calibration.cpp
         ../common/include/floating_point_equality.h
+        ../common/include/lerp.h
         ../common/include/quantile.h
         ../common/include/curve_sector.h
         ../common/include/boundary_location.h
@@ -380,4 +381,5 @@ install(TARGETS ${target}
         )
 
 # IMPORTANT: Otherwise C++11 is used...
-set_property(TARGET ${target} PROPERTY CXX_STANDARD 20)
+#set_property(TARGET ${target} PROPERTY CXX_STANDARD 20)
+set_property(TARGET ${target} PROPERTY CXX_STANDARD 17)

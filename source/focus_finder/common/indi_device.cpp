@@ -143,8 +143,9 @@ IndiDeviceT::getIndiDeviceInterfaceMaskByDeviceType(DeviceInterfaceTypeT::TypeE 
             return INDI::BaseDevice::AO_INTERFACE;
         case DeviceInterfaceTypeT::AUXILIARY:
             return INDI::BaseDevice::AUX_INTERFACE;
-        case DeviceInterfaceTypeT::CORRELATOR:
-            return INDI::BaseDevice::CORRELATOR_INTERFACE;
+		// NOTE: Not supported in INDI 1.8.1
+		// case DeviceInterfaceTypeT::CORRELATOR:
+        //     return INDI::BaseDevice::CORRELATOR_INTERFACE;
         case DeviceInterfaceTypeT::DETECTOR:
             return INDI::BaseDevice::DETECTOR_INTERFACE;
         case DeviceInterfaceTypeT::DOME:

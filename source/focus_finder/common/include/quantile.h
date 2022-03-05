@@ -28,7 +28,9 @@
 #include <algorithm>    // std::copy, std::sort, std::max, std::min
 #include <vector>
 #include <cinttypes>    // int64_t
-#include <cmath>        // std::floor, std::ceil, std::lerp
+#include <cmath>        // std::floor, std::ceil
+
+#include "lerp.h"       // lerp
 
 class QuantileT {
 
@@ -45,7 +47,7 @@ public:
         std::copy(inData.begin(), inData.end(), std::back_inserter(data));
         std::sort(data.begin(), data.end());
 
-        T poi = std::lerp(-0.5f, data.size() - 0.5f, prob);
+        T poi = lerp(-0.5f, data.size() - 0.5f, prob);
 
         size_t left = std::max(int64_t(std::floor(poi)), int64_t(0));
         size_t right = std::min(int64_t(std::ceil(poi)), int64_t(data.size() - 1));
@@ -54,8 +56,7 @@ public:
         T datRight = data.at(right);
 
         // Linear interpolation between two values
-        // https://en.cppreference.com/w/cpp/numeric/lerp
-        return std::lerp(datLeft, datRight, poi - left);
+        return lerp(datLeft, datRight, poi - left);
     }
 };
 

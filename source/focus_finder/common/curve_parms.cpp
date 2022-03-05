@@ -22,6 +22,8 @@
  *
  ****************************************************************************/
 
+#include <algorithm>
+
 #include "include/curve_parms.h"
 #include "include/curve_parm.h"
 

@@ -32,7 +32,7 @@ std::shared_ptr<DeviceManagerT> DeviceManagerFactoryT::getInstance(
 
     switch (type) {
         case DeviceManagerTypeT::INDI:
-            return std::make_shared<IndiDeviceManagerT>();
+		  return std::static_pointer_cast<DeviceManagerT>(std::make_shared<IndiDeviceManagerT>());
 
         default:
             return nullptr;

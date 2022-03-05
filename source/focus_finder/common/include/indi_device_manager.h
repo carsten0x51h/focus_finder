@@ -27,6 +27,7 @@
 
 #include <map>
 #include <memory>
+#include <mutex>
 
 #include "device.h"
 #include "device_manager.h"
