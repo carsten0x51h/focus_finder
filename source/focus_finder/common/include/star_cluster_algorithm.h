@@ -38,8 +38,9 @@ typedef std::list<PixelPosT> PixelClusterT;
 /**
  * Usage:
  *
- * CImg<float> binImg;
- * std::list<PixelClusterT> recognizedPixelClusters = StarClusterAlgorithmT::cluster(binImg);
+ * CImg<float> binaryImg;
+ * StarClusterAlgorithmT starClusterAlgorithm(2);
+ * std::list<PixelClusterT> clusters = starClusterAlgorithm.cluster(binaryImg);
  */
 class StarClusterAlgorithmT {
 private:

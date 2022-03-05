@@ -288,7 +288,7 @@ set(sources
         include/indi_device_manager_dialog.h
         indi_device_manager_dialog.cpp
         indi_device_manager_dialog.ui
-        ../common/fofi_project_info.cpp fofi_splash_widget.cpp include/fofi_splash_widget.h ../common/single_pass_focusing_strategy.cpp include/star_details_panel.h star_details_panel.cpp ../common/star_details.cpp ../common/include/singleton.h ../common/include/event_bus.h ../common/include/events/new_frame_event.h)
+        ../common/fofi_project_info.cpp fofi_splash_widget.cpp include/fofi_splash_widget.h ../common/single_pass_focusing_strategy.cpp include/star_details_panel.h star_details_panel.cpp ../common/star_details.cpp ../common/include/singleton.h ../common/include/event_bus.h ../common/include/events/new_frame_event.h ../common/include/single_star_detector_algorithm.h ../common/single_star_detector_algorithm.cpp)
 
 
 # 

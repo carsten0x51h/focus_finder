@@ -120,7 +120,6 @@ public:
         //            -> Implement for RectT and not for RectF... or tmpl specialization!
         //            -> Easiest: Only permit odd value!
         if (isEven(inWidth) || isEven(inHeight)) {
-            // TODO: throw!
             throw RectExceptionT("Window width and height expected to be odd values.");
         }
 

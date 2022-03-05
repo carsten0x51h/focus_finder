@@ -52,7 +52,7 @@ public:
     FocusInterfaceT(const FocusInterfaceT &) = delete;
     FocusInterfaceT &operator=(const FocusInterfaceT &) = delete;
 
-    [[nodiscard]] DeviceInterfaceTypeT::TypeE getType() const { return DeviceInterfaceTypeT::FOCUS; }
+    [[nodiscard]] DeviceInterfaceTypeT::TypeE getType() const override { return DeviceInterfaceTypeT::FOCUS; }
 
     /**
 	 * Temperature

@@ -34,12 +34,15 @@
 
 #include "ui_star_details_panel.h"
 
-
+// TODO: Maybe rename to StarDetailsViewPanelT?
 StarDetailsPanelT::StarDetailsPanelT(QWidget *parent) : QWidget(parent),
                                                         m_ui(new Ui::StarDetailsPanel) {
     // Setup UI
     m_ui->setupUi(this);
 
+    // TODO: Maybe move this out of here? In FWHM ViewPanel this won't work since there are two instances... one for HORZ and one for VERT..
+    // --> Maybe one "parent" panel for FWHM to combine vert + horz + avg? No one wants to control both separately! -> Then, using the event bus
+    // in the In the view panel would also work for the FWHM panel.
     boost::function<void(NewFrameEventT)> g = boost::bind(& StarDetailsPanelT::setStarDetailsFromEvent, this, boost::placeholders::_1);
     EventBusT::getInstance()->subscribe(g);
 
