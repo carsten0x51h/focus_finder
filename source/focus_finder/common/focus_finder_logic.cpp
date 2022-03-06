@@ -318,6 +318,9 @@ std::optional<PointT<float> > FocusFinderLogicT::findFocusStar(
         mLastFocusStarPos.emplace(PointT<float>(result.getStarCenterPos().x() + (float) frameBounds.x(),
                                                 result.getStarCenterPos().y() + (float) frameBounds.y()));
     }
+    else {
+        mLastFocusStarPos.reset();
+    }
 
     return mLastFocusStarPos;
 }
