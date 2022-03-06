@@ -2,7 +2,8 @@
  *
  *  FoFi - A free, automatic telescope focus finder.
  *
- *  Copyright(C) 2019 Carsten Schmitt <c [at] lost-infinity.com>
+ *  Copyright(C) 201
+ *  9 Carsten Schmitt <c [at] lost-infinity.com>
  *
  *  More info on https://www.lost-infinity.com
  *

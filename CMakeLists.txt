@@ -18,9 +18,11 @@ include(ExternalProject)
 
 # Set compiler standard
 # See https://stackoverflow.com/questions/40452287/let-cmake-with-clang-use-c11-c14
-set(CMAKE_CXX_STANDARD 20)
+#set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# tell CMake to use CTest extension
+enable_testing()
 
 # This module is only available with CMake >=3.1, so check whether it could be found
 include(WriteCompilerDetectionHeader OPTIONAL RESULT_VARIABLE WriterCompilerDetectionHeaderFound)
@@ -64,7 +66,6 @@ set(META_NAME_VERSION        "${META_PROJECT_NAME} v${META_VERSION} (${META_VERS
 # Project options
 option(BUILD_SHARED_LIBS        "Build shared instead of static libraries."              ON)
 option(OPTION_SELF_CONTAINED    "Create a self-contained install with all dependencies." OFF)
-option(OPTION_BUILD_TESTS       "Build tests."                                           ON)
 option(OPTION_BUILD_DOC         "Build documentation."                                   OFF)
 option(OPTION_BUILD_EXAMPLES    "Build examples."                                        OFF)
 option(OPTION_ENABLE_CLANG_TIDY "Enable clang-tidy."                                     ON)

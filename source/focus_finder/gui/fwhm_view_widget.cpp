@@ -91,7 +91,7 @@ void FwhmViewWidgetT::paintEvent(QPaintEvent *event) {
 
         auto maxIt = std::max_element(values.begin(), values.end());
 
-        const float max = 1.1f * *maxIt; // Add 10% border
+        const float max = 1.1F * *maxIt; // Add 10% border
         const float xValueToDispScaleFactor = (float) width() / (float) imgValues.size();
         const float yValueToDispScaleFactor = (float) height() / max;
 

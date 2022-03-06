@@ -926,7 +926,7 @@ void MainWindow::updateCameraDevice(const std::shared_ptr<CameraInterfaceT>& old
     bool hasOldCameraInterface = (oldCameraInterface != nullptr);
 
     if (hasOldCameraInterface) {
-        auto oldCameraDevice = oldCameraInterface->getParentDevice();
+        auto * oldCameraDevice = oldCameraInterface->getParentDevice();
 
         LOG(debug)
             << "MainWindow::updateCameraDevice... unregistering from old camera..."
@@ -955,7 +955,7 @@ void MainWindow::updateCameraDevice(const std::shared_ptr<CameraInterfaceT>& old
 
     // Register to new device
     if (newCameraInterface) {
-        auto newCameraDevice = newCameraInterface->getParentDevice();
+        auto * newCameraDevice = newCameraInterface->getParentDevice();
 
         LOG(debug)
             << "MainWindow::updateCameraDevice... registering to new camera..."
@@ -1077,7 +1077,7 @@ void MainWindow::updateFocusDevice(const std::shared_ptr<FocusInterfaceT>& oldFo
     bool hasOldFocusInterface = (oldFocusInterface != nullptr);
 
     if (hasOldFocusInterface) {
-        auto oldFocusDevice = oldFocusInterface->getParentDevice();
+        auto * oldFocusDevice = oldFocusInterface->getParentDevice();
 
         LOG(debug)
             << "MainWindow::updateFocusDevice... unregistering from old Focus..."
@@ -1094,7 +1094,7 @@ void MainWindow::updateFocusDevice(const std::shared_ptr<FocusInterfaceT>& oldFo
 
     // Register to new device
     if (newFocusInterface) {
-        auto newFocusDevice = newFocusInterface->getParentDevice();
+        auto * newFocusDevice = newFocusInterface->getParentDevice();
 
         LOG(debug)
             << "MainWindow::updateFocusDevice... registering to new Focus..."
@@ -1123,7 +1123,7 @@ void MainWindow::updateFilterDevice(const std::shared_ptr<FilterInterfaceT>& old
     bool hasOldFilterInterface = (oldFilterInterface != nullptr);
 
     if (hasOldFilterInterface) {
-        auto oldFilterDevice = oldFilterInterface->getParentDevice();
+        auto * oldFilterDevice = oldFilterInterface->getParentDevice();
 
         LOG(debug)
             << "MainWindow::updateFilterDevice... unregistering from old Filter..."
