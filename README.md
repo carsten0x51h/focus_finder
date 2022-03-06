@@ -22,12 +22,15 @@ build & install
  * CCFits
  * boost >= ?
  * zlib
- * qtbase5
+ * qtbase5-dev
  * libindi >= 1.8.1-1
  * libnova >= 0.15.0-14
  * libgsl
 
-NOTE: In order to compile, te respective dev packages are required.
+NOTE: In order to compile, the respective dev packages are required.
+
+TODO: Show min versions for distros 
+e.g. qt5 >= 5.12.8 (Ubuntu 20.04 focal)
 
 
 1. Go to the build directory (should be empty):

@@ -100,7 +100,7 @@ public:
     */
     ~MainWindow() override;
 
-protected slots:
+slots:
 
     [[maybe_unused]] void on_about();
 
