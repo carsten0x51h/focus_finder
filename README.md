@@ -1,3 +1,5 @@
+![cmake workflow](https://github.com/carsten0x51h/focus_finder/actions/workflows/cmake.yml/badge.svg)
+
 focus_finder
 ============
 
