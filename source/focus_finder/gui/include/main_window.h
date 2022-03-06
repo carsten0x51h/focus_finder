@@ -100,9 +100,9 @@ public:
     */
     ~MainWindow() override;
 
-slots:
+protected slots:
 
-    [[maybe_unused]] void on_about();
+    void on_about();
 
     void onRoiClearedSlot();
 
