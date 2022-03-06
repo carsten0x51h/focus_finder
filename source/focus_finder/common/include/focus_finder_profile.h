@@ -123,7 +123,7 @@ public:
 
     void setNumFramesPerFocusPos(size_t numFramesPerFocusPos);
 
-    [[nodiscard]] size_t getStarDetectionSnrBoundary() const;
+    [[nodiscard]] float getStarDetectionSnrBoundary() const;
 
     void setStarDetectionSnrBoundary(float starDetectionSnrBoundary);
 

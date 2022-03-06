@@ -25,7 +25,7 @@
 #include "include/hfd.h"
 #include "include/image.h"
 
-const float HfdT::outerHfdDiameter = 27.0f; // TODO: Calc?! - depends on pixel size and focal length (and seeing...) WAS 21!!!
+const float HfdT::outerHfdDiameter = 27.0F; // TODO: Calc?! - depends on pixel size and focal length (and seeing...) WAS 21!!! TODO: At least make this configurable - set from the outside!
 
 float HfdT::calc(const ImageT &inImage, float inOuterDiameter,
                  ImageT *outCenteredImg, bool inSubMean) {

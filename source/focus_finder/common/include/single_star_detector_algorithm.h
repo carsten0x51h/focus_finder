@@ -44,9 +44,7 @@ public:
     /**
      * Result of algorithm modeled as inner class.
      * The properties mStarCenterPos and mSnr are only populated
-     * under certain conditions. If not populated, mSnr and mSnrLimit
-     * are set to 0.0F, mNumStarsDetected is set to -1
-     * and mStarCenterPos is nullopt.
+     * under certain conditions.
      */
     class ResultT {
     public:
@@ -65,13 +63,15 @@ public:
         };
 
     public:
-        ResultT(StatusT::TypeE status, float snr = 0.0F, float snrLimit = 0.0F, int numStarsDetected = -1, const PointT<float> & starCenterPos.... add set functions.... solves this problem...);
+        ResultT();
 
         /**
          * Returns the status of the single star detector
          * @return
          */
         [[nodiscard]] StatusT::TypeE getStatus() const;
+
+        void setStatus(StatusT::TypeE status);
 
 
         // TODO: Maybe add a getDetailedDescription() method? E.g. how many stars were detected? What went wrong?...
@@ -83,27 +83,38 @@ public:
          */
         [[nodiscard]] float getSnr() const;
 
+        void setSnr(float snr);
+
         /**
          * @return Returns the SNR limit which was applied during the analysis.
          */
         [[nodiscard]] float getSnrLimit() const;
 
+        void setSnrLimit(float snrLimit);
+
         /**
          * @return Returns the amount of detected stars.
          */
-        [[nodiscard]] int getNumStarsDetected() const;
+        [[nodiscard]] unsigned int getNumStarsDetected() const;
+
+        void setNumStarsDetected(unsigned int numStarsDetected);
 
         /**
          * @return Returns star center position in image coordinates.
          */
-        std::optional<PointT<float> > getStarCenterPos() const;
+        [[nodiscard]] PointT<float> getStarCenterPos() const;
+
+        void setStarCenterPos(const PointT<float> & starCenterPos);
+
+        std::ostream &print(std::ostream &os, size_t indent = 0) const;
+        friend std::ostream &operator<<(std::ostream &os, const ResultT &result);
 
     private:
         StatusT::TypeE mStatus;
         float mSnr;
         float mSnrLimit;
-        int mNumStarsDetected;
-        std::optional<PointT<float> > mStarCenterPos;
+        unsigned int mNumStarsDetected;
+        PointT<float> mStarCenterPos;
     };
 
 
@@ -121,6 +132,10 @@ public:
      * @return ResultT structure
      */
     ResultT detect(std::shared_ptr<const ImageT> inImage, const PointT<float> & inPoi) const;
+
+
+private:
+    static unsigned int calcNumStarsInRegion(const ImageT &inImg) ;
 
 };
 

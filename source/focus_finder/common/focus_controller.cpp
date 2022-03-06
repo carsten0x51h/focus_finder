@@ -183,7 +183,7 @@ std::shared_ptr<FocusCurveRecordT> FocusControllerT::measureFocus() {
                 runExposureBlocking(inMs);
 
                 // Calc center of subframe
-                PointT<unsigned int> centerOuterSubframe(
+                PointT<int> centerOuterSubframe(
                         std::ceil(mCurrentImage->width() / 2),
                         std::ceil(mCurrentImage->height() / 2));
 
@@ -192,9 +192,9 @@ std::shared_ptr<FocusCurveRecordT> FocusControllerT::measureFocus() {
                     << centerOuterSubframe << std::endl;
 
                 // In outer subframe (mCurrentImage) coordinates
-                auto innerRoi = RectT<unsigned int>::fromCenterPoint(
+                auto innerRoi = RectT<int>::fromCenterPoint(
                         centerOuterSubframe,
-                        getFocusFinderProfile().getStarWindowSize());
+                        getFocusFinderProfile().getStarWindowSize().to<int>());
 
                 LOG(debug)
                     << "FocusControllerT::run - calculated inner ROI=" << innerRoi
@@ -203,8 +203,8 @@ std::shared_ptr<FocusCurveRecordT> FocusControllerT::measureFocus() {
                 // get_crop() from mCurrentImage using innerRoi
                 ImageT innerSubFrameImg = mCurrentImage->get_crop(innerRoi.x() /*x0*/,
                                                                   innerRoi.y() /*y0*/,
-                                                                  (int) (innerRoi.x() + innerRoi.width()) - 1/*x1*/,
-                                                                  (int) (innerRoi.y() + innerRoi.height()) - 1/*y1*/
+                                                                  (innerRoi.x() + innerRoi.width()) - 1/*x1*/,
+                                                                  (innerRoi.y() + innerRoi.height()) - 1/*y1*/
                 );
 
                 LOG(debug)
@@ -438,7 +438,7 @@ std::shared_ptr<FocusCurveRecordT> FocusControllerT::measureFocus() {
 
 
 void FocusControllerT::waitForFocus(std::chrono::milliseconds timeout, bool ignoreCancel) const {
-    auto isFocusPositionReachedOrCancelledLambda = [=, this]() -> bool {
+    auto isFocusPositionReachedOrCancelledLambda = [=]() -> bool {
         LOG(debug) << "current pos=" << getFocus()->getCurrentPos()
                    << ", target pos=" << getFocus()->getTargetPos()
                    << ", isMoving? " << getFocus()->isMoving()

@@ -18,15 +18,19 @@ build & install
 ---------------
 
 0. Dependencies
- * cimg-dev
+ * cimg
+ * CCFits
  * boost >= ?
  * zlib
- * qtbase5-dev
- * libindi-dev >= 1.8.1-1
- * libnova-dev >= 0.15.0-14
- * More?
+ * qtbase5
+ * libindi >= 1.8.1-1
+ * libnova >= 0.15.0-14
+ * libgsl
 
-2. Go to the build directory (should be empty):
+NOTE: In order to compile, te respective dev packages are required.
+
+
+1. Go to the build directory (should be empty):
 
 cd focus_finder/build
 

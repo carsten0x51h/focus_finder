@@ -28,6 +28,10 @@
 
 #include "include/single_star_detector_algorithm.h"
 
+#include "include/thresholding_algorithm_factory.h"
+#include "include/thresholding_algorithm.h"
+#include "include/star_cluster_algorithm.h"
+
 /**
  * Result class
  */
@@ -50,36 +54,107 @@ const char * SingleStarDetectorAlgorithmT::ResultT::StatusT::asStr(const TypeE &
     }
 }
 
-SingleStarDetectorAlgorithmT::ResultT::ResultT(StatusT::TypeE status, float snr, float snrLimit, int numStarsDetected, const PointT<float> & starCenterPos) : mStatus(status), mSnr(snr), mSnrLimit(snrLimit), mNumStarsDetected(numStarsDetected), mStarCenterPos(starCenterPos) {
+SingleStarDetectorAlgorithmT::ResultT::ResultT() : mStatus(StatusT::_Count), mSnr(0.0F), mSnrLimit(0.0F), mNumStarsDetected(-1), mStarCenterPos(PointT<float>(-1.0F, -1.0F)) {
 }
 
 SingleStarDetectorAlgorithmT::ResultT::StatusT::TypeE SingleStarDetectorAlgorithmT::ResultT::getStatus() const {
-    return mStatus;
+    return ResultT::mStatus;
 }
 
-std::optional<PointT<float> > SingleStarDetectorAlgorithmT::ResultT::getStarCenterPos() const {
-    return mStarCenterPos;
+void SingleStarDetectorAlgorithmT::ResultT::setStatus(SingleStarDetectorAlgorithmT::ResultT::StatusT::TypeE status) {
+    ResultT::mStatus = status;
+}
+
+PointT<float> SingleStarDetectorAlgorithmT::ResultT::getStarCenterPos() const {
+    return ResultT::mStarCenterPos;
+}
+
+void SingleStarDetectorAlgorithmT::ResultT::setStarCenterPos(const PointT<float> &starCenterPos) {
+    ResultT::mStarCenterPos = starCenterPos;
 }
 
 float SingleStarDetectorAlgorithmT::ResultT::getSnr() const {
-    return mSnr;
+    return ResultT::mSnr;
+}
+
+void SingleStarDetectorAlgorithmT::ResultT::setSnr(float snr) {
+    ResultT::mSnr = snr;
 }
 
 float SingleStarDetectorAlgorithmT::ResultT::getSnrLimit() const {
-    return mSnrLimit;
+    return ResultT::mSnrLimit;
 }
 
-int SingleStarDetectorAlgorithmT::ResultT::getNumStarsDetected() const {
-    return mNumStarsDetected;
+void SingleStarDetectorAlgorithmT::ResultT::setSnrLimit(float snrLimit) {
+    ResultT::mSnrLimit = snrLimit;
 }
+
+unsigned int SingleStarDetectorAlgorithmT::ResultT::getNumStarsDetected() const {
+    return ResultT::mNumStarsDetected;
+}
+
+void SingleStarDetectorAlgorithmT::ResultT::setNumStarsDetected(unsigned int numStarsDetected) {
+    ResultT::mNumStarsDetected = numStarsDetected;
+}
+
+// TODO: operator<<...
+
+
+std::ostream &
+SingleStarDetectorAlgorithmT::ResultT::print(std::ostream &os, size_t indent) const {
+    std::string prefix = std::string(indent, ' ');
+
+    os << prefix << "status: " << SingleStarDetectorAlgorithmT::ResultT::StatusT::asStr(mStatus)
+       << prefix << ", SNR: " << mSnr
+       << prefix << ", SNR limit: " << mSnrLimit
+       << prefix << ", Star center pos: " << mStarCenterPos
+       << prefix << ", numStarsDetected: " << mNumStarsDetected
+       << std::endl;
+
+    return os;
+}
+
+std::ostream &operator<<(std::ostream &os,
+                         const SingleStarDetectorAlgorithmT::ResultT &result) {
+    return result.print(os);
+}
+
+
+
+
+
 
 SingleStarDetectorAlgorithmT::SingleStarDetectorAlgorithmT(float snrLimit, const SizeT<unsigned int> & starWindowSize) : mSnrLimit(snrLimit), mStarWindowSize(starWindowSize) {
 }
 
+unsigned int SingleStarDetectorAlgorithmT::calcNumStarsInRegion(const ImageT &inImg) {
+
+    auto thAlgo = ThresholdingAlgorithmFactoryT::getInstance(ThresholdingAlgorithmTypeT::MAX_ENTROPY);
+    const static size_t BIT_DEPTH = 16; // TODO: Do not hardcode - but where to query??
+    float th = thAlgo->calc(inImg, BIT_DEPTH /*bit depth */);
+    int thUp = std::ceil(th);
+
+    LOG(debug) << "SingleStarDetectorAlgorithmT::calcNumStarsInRegion - threshold: " << th << ", thUp: " << thUp << std::endl;
+
+    ImageT binaryImg = inImg.get_threshold((float) thUp + 1.0F /*HACK!*/); // Threshold function somehow uses >=
+
+    StarClusterAlgorithmT starClusterAlgorithm(
+            2 /*defines the allowed number of dark pixels between two white pixels until they form a cluster*/);
+    std::list<PixelClusterT> clusters = starClusterAlgorithm.cluster(binaryImg);
+
+    LOG(debug) << "SingleStarDetectorAlgorithmT::calcNumStarsInRegion - Found " << clusters.size() << " stars..." << std::endl;
+
+    return clusters.size();
+}
+
+
 SingleStarDetectorAlgorithmT::ResultT SingleStarDetectorAlgorithmT::detect(std::shared_ptr<const ImageT> inImage, const PointT<float> & inPoi) const {
 
+    ResultT result;
+
     if (inImage == nullptr) {
-        return ResultT{ResultT::StatusT::NO_INPUT_IMAGE_SET };
+        result.setStatus(ResultT::StatusT::NO_INPUT_IMAGE_SET);
+        return result;
     }
 
     PointT<int> poi = inPoi.to<int>();
@@ -101,7 +176,8 @@ SingleStarDetectorAlgorithmT::ResultT SingleStarDetectorAlgorithmT::detect(std::
                 << "SingleStarDetectorAlgorithmT::detect... searchWindow out of image bounds."
                 << std::endl;
 
-        return ResultT{ResultT::StatusT::STAR_WINDOW_OUT_OF_BOUNDS };
+        result.setStatus(ResultT::StatusT::STAR_WINDOW_OUT_OF_BOUNDS);
+        return result;
     }
 
     // NOTE: CImg doc - boundary_conditions = Can be { 0=dirichlet | 1=neumann | 2=periodic | 3=mirror }.
@@ -125,6 +201,9 @@ SingleStarDetectorAlgorithmT::ResultT SingleStarDetectorAlgorithmT::detect(std::
     // Calculate the SNR to check if there COULD be a star around.
     auto snr = (float) SnrT::calculate(searchWindowImg);
 
+    result.setSnr(snr);
+    result.setSnrLimit(mSnrLimit);
+
     LOG(debug)
             << "SingleStarDetectorAlgorithmT::detect...SNR: " << snr << std::endl;
 
@@ -134,13 +213,16 @@ SingleStarDetectorAlgorithmT::ResultT SingleStarDetectorAlgorithmT::detect(std::
                 << snr << " too low. SNR limit is " << mSnrLimit << "."
                 << std::endl;
 
-        return ResultT{ ResultT::StatusT::NO_STAR_FOUND_SNR_TOO_LOW, snr, mSnrLimit };
+        result.setStatus(ResultT::StatusT::NO_STAR_FOUND_SNR_TOO_LOW);
+
+        return result;
     }
 
 
     // Check that there is only a single star in the selected region
-    StarCounterAlgorithmT starCounterAlgorithm(imageBitDepth, ThresholdingAlgorithmTypeT::MAX_ENTROPY);
-    int numStarsDetected = starCounterAlgorithm.count(searchWindowImg); // const ImageT &inImg
+    unsigned int numStarsDetected = calcNumStarsInRegion(searchWindowImg);
+
+    result.setNumStarsDetected(numStarsDetected);
 
     if (numStarsDetected != 1) {
         LOG(warning)
@@ -148,7 +230,9 @@ SingleStarDetectorAlgorithmT::ResultT SingleStarDetectorAlgorithmT::detect(std::
                 << " but expected exactly 1."
                 << std::endl;
 
-        return ResultT{ ResultT::StatusT::UNEXPECTED_STAR_COUNT, snr, mSnrLimit, numStarsDetected };
+        result.setStatus(ResultT::StatusT::UNEXPECTED_STAR_COUNT);
+
+        return result;
     }
 
 
@@ -167,66 +251,14 @@ SingleStarDetectorAlgorithmT::ResultT SingleStarDetectorAlgorithmT::detect(std::
     // If there is a result, transform the returned coordinates (sub frame system)
     // back to the "window" coordinates (directly replace in the same optional object.
     if (calcCenterOpt) {
-        calcCenterOpt.emplace(
-                PointT<float>(calcCenterOpt->x() + (float) searchWindowRect.x(),
-                              calcCenterOpt->y() + (float) searchWindowRect.y()));
+                PointT<float> transformedPoint(calcCenterOpt->x() + (float) searchWindowRect.x(),
+                              calcCenterOpt->y() + (float) searchWindowRect.y());
 
-        return ResultT{ ResultT::StatusT::SINGLE_STAR_DETECTED, snr, mSnrLimit, numStarsDetected, calcCenterOpt.value() };
+        result.setStatus(ResultT::StatusT::SINGLE_STAR_DETECTED);
+        result.setStarCenterPos(transformedPoint);
     }
     else {
-        // TODO: Maybe add set() methods to ResultT class... so no repetition is required all the time...
-        return ResultT{ResultT::StatusT::CENTROID_CALC_FAILED, snr, mSnrLimit, numStarsDetected, calcCenterOpt };
+        result.setStatus(ResultT::StatusT::CENTROID_CALC_FAILED);
     }
+    return result;
 }
-
-/** ---------------------------------------------------------------------------
- * Usage:
- * IN: poi in pixmap coordinates - i.e. where user clicked...
- *
- * auto activeProfile = mFoFiConfigManager->getProfileManager()->getActiveProfile();
- *
- * if (!activeProfile) {
- *   LOG(warning) << "No active profile set!" << std::endl;
- *   return std::nullopt;
- * }
- *
- * auto img = mLastFrame.getImage();
- *
- * if (img == nullptr) {
- *   LOG(warning)
- *      << "FocusFinderLogicT::findFocusStar... failed - no frame available."
- *      << std::endl;
- *   return std::nullopt;
- * }
- *
- *    // NOTE: Point "poi" passed in is in "pixmap" coordinates, i.e. in case there is
- *    //       just a subframe image available, the coordinates need to be transformed.
- *    //       In case roi is not set, roiX and roiY are just 0. That means we can make
- *    //       the same transformation always - just in case of a "full frame" it simply
- *    //       has no effect.
- *    auto frameBounds = mLastFrame.getBounds().to<int>(); // RectT<unsigned int>
- *
- *  // TODO: Coordinates are not 100% correct!!?? Needs debug / Check...
- *
- *  // Transform given POI to "sub-frame" coordinates:
- *  //
- *  // NOTE: Point "poi" passed in is in "pixmap" coordinates, i.e. in case there is
- *  //       just a subframe image available, the coordinates need to be transformed.
- *  //       In case roi is not set, roiX and roiY are just 0. That means we can make
- *  //       the same transformation always - just in case of a "full frame" it simply
- *  //       has no effect.
- *  auto frameBounds = mLastFrame.getBounds().to<int>(); // RectT<unsigned int>
- *
- *
- * SingleStarDetectorAlgorithmT singleStarDetectorAlgorithm(activeProfile->getStarDetectionSnrBoundary(), activeProfile->getStarWindowSize())
- *
- * Point<float> subFramePoi(poi.x() - frameBounds.x(), poi.y() - frameBounds.y());
- *
- * SingleStarDetectorAlgorithmT::ResultT result = singleStarDetectorAlgorithm.detect(img, subFramePoi);
- *
- * if (result.status == ResultT::StatusT::SINGLE_STAR_DETECTED) {
- *    // NOTE: In case of success, the calculated star center coordinate needs to be re-transformed to pixmap coordinates!
- *    Point<float> centerCoord(starCenter.x() + frameBounds.x(), starCenter.y() - frameBounds.y());
- *    ...
- * }
- */

@@ -204,7 +204,7 @@ void FocusFinderProfileT::setNumFramesPerFocusPos(size_t numFramesPerFocusPos) {
     mNumFramesPerFocusPos = numFramesPerFocusPos;
 }
 
-size_t FocusFinderProfileT::getStarDetectionSnrBoundary() const {
+float FocusFinderProfileT::getStarDetectionSnrBoundary() const {
     return mStarDetectionSnrBoundary;
 }
 

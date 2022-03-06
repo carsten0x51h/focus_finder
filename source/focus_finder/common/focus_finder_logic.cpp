@@ -39,9 +39,7 @@
 #include "include/logging.h"
 #include "include/snr.h"
 #include "include/centroid.h"
-#include "include/thresholding_algorithm_factory.h"
-#include "include/thresholding_algorithm.h"
-#include "include/star_cluster_algorithm.h"
+#include "include/single_star_detector_algorithm.h"
 
 #include "include/linear_bw_stretch_mapper_function.h"
 #include "include/spline_curve_mapper_function.h"
@@ -269,31 +267,14 @@ RectT<unsigned int> FocusFinderLogicT::getSelectedRoi() const {
     return mSelectedRoi;
 }
 
-size_t FocusFinderLogicT::calcNumStarsInRegion(const ImageT &inImg) {
-
-    auto thAlgo = ThresholdingAlgorithmFactoryT::getInstance(ThresholdingAlgorithmTypeT::MAX_ENTROPY);
-    const static size_t BIT_DEPTH = 16; // TODO: Do not hardcode - but where to query??
-    float th = thAlgo->calc(inImg, BIT_DEPTH /*bit depth */);
-    int thUp = std::ceil(th);
-
-    LOG(debug) << "FocusFinderLogicT::calcNumStarsInRegion - threshold: " << th << ", thUp: " << thUp << std::endl;
-
-    ImageT binaryImg = inImg.get_threshold(thUp + 1 /*HACK!*/); // Threshold function somehow uses >=
-
-    StarClusterAlgorithmT starClusterAlgorithm(
-            2 /*defines the allowed number of dark pixels between two white pixels until they form a cluster*/);
-    std::list<PixelClusterT> clusters = starClusterAlgorithm.cluster(binaryImg);
-
-    LOG(debug) << "FocusFinderLogicT::calcNumStarsInRegion - Found " << clusters.size() << " stars..." << std::endl;
-
-    return clusters.size();
+std::optional<PointT<float> > FocusFinderLogicT::getLastFocusStarPos() const {
+    return mLastFocusStarPos;
 }
 
 // TODO: PointT<float> & poi -> PointT<int> & poi ??
+// TODO / FIXME: After removing the POI amd clicking into nowhere, still the old star is selected again..
 std::optional<PointT<float> > FocusFinderLogicT::findFocusStar(
-        const PointT<float> &poiFloat) {
-
-    PointT<int> poi = poiFloat.to<int>();
+        const PointT<float> &poi) {
 
     auto activeProfile = mFoFiConfigManager->getProfileManager()->getActiveProfile();
 
@@ -302,16 +283,18 @@ std::optional<PointT<float> > FocusFinderLogicT::findFocusStar(
         return std::nullopt;
     }
 
-    // TODO: Need mutex guard for 'mLastFrame'!!!-> or atomic?
     auto img = mLastFrame.getImage();
 
     if (img == nullptr) {
         LOG(warning)
             << "FocusFinderLogicT::findFocusStar... failed - no frame available."
             << std::endl;
+
         return std::nullopt;
     }
 
+    // Transform given POI to "sub-frame" coordinates:
+    //
     // NOTE: Point "poi" passed in is in "pixmap" coordinates, i.e. in case there is
     //       just a subframe image available, the coordinates need to be transformed.
     //       In case roi is not set, roiX and roiY are just 0. That means we can make
@@ -319,115 +302,23 @@ std::optional<PointT<float> > FocusFinderLogicT::findFocusStar(
     //       has no effect.
     auto frameBounds = mLastFrame.getBounds().to<int>(); // RectT<unsigned int>
 
-    // TODO / HACK: We need a RectT type conversion - see QRect and QRectF - they have the same problem.
-//	auto frameBounds = RectT<float>(frameBoundsI.x(), frameBoundsI.y(),
-//			frameBoundsI.width(), frameBoundsI.height());
-//	auto frameBounds = RectT<int>(frameBoundsI.x(), frameBoundsI.y(),
-//			frameBoundsI.width(), frameBoundsI.height());
+    SingleStarDetectorAlgorithmT singleStarDetectorAlgorithm(activeProfile->getStarDetectionSnrBoundary(), activeProfile->getStarWindowSize());
 
-    // TODO: Coordinates are not 100% correct!!?? Needs debug / Check...
+    PointT<float> subFramePoi(poi.x() - (float) frameBounds.x(), poi.y() - (float) frameBounds.y());
 
-    // Extract "searchWindow" from seachCenter point.
-    SizeT<unsigned int> starWindowSize = activeProfile->getStarWindowSize();
+    SingleStarDetectorAlgorithmT::ResultT result = singleStarDetectorAlgorithm.detect(img, subFramePoi);
 
-//	RectT<float> searchWindowRect = RectT<float>::fromCenterPoint(poi,
-//			starWindowSize.width(), starWindowSize.height());
-    RectT<int> searchWindowRect = RectT<int>::fromCenterPoint(poi, starWindowSize.to<int>());
+    // Log the result
+    LOG(info) << "FocusFinderLogicT::findFocusStar result - "
+              << result
+              << std::endl;
 
-    LOG(debug) << "FocusFinderLogicT::findFocusStar - searchWindowRect: "
-               << " x=" << searchWindowRect.x() << ", y=" << searchWindowRect.y()
-               << ", w=" << searchWindowRect.width() << ", h=" << searchWindowRect.height()
-               << std::endl;
-
-
-    // Handle case that user clicked to close to the boundary (see OLD code).
-    bool selectionInsideBounds = frameBounds.contains(searchWindowRect);
-
-
-    if (!selectionInsideBounds) {
-        LOG(warning)
-            << "FocusFinderLogicT::findFocusStar... selection window out of bounds."
-            << std::endl;
-        return std::nullopt;
+    // NOTE: In case of success, the calculated star center coordinate needs to be re-transformed to pixmap coordinates
+    if (SingleStarDetectorAlgorithmT::ResultT::StatusT::SINGLE_STAR_DETECTED == result.getStatus()) {
+        mLastFocusStarPos.emplace(PointT<float>(result.getStarCenterPos().x() + (float) frameBounds.x(),
+                                                result.getStarCenterPos().y() + (float) frameBounds.y()));
     }
 
-    // Star finder expects window coordinates in the coordinate system of the given image (ROI).
-    // In case a ROI is set, "img" only is the sub-image - i.e. left-upper corner of the image
-    // coordinate starts with (0,0). Therefore "searchWindowRect" needs to be transformed to those
-    // "ROI" coordinates.
-    //
-    //
-    // NOTE: CImg doc - boundary_conditions = Can be { 0=dirichlet | 1=neumann | 2=periodic | 3=mirror }.
-    // 		 In mathematics, the Dirichlet (or first-type) boundary condition is a type of boundary condition,
-    // 		 named after Peter Gustav Lejeune Dirichlet (1805–1859).
-    //
-    //		 See: https://en.wikipedia.org/wiki/Dirichlet_boundary_condition
-    //
-    //
-    // 		 In mathematics, the Neumann (or second-type) boundary condition is a type of boundary condition,
-    //		 named after Carl Neumann.[1] When imposed on an ordinary or a partial differential equation, the
-    //		 condition specifies the values in which the derivative of a solution is applied within the boundary
-    //       of the domain.
-    //
-    // 		 See https://en.wikipedia.org/wiki/Neumann_boundary_condition
-    ImageT searchWindowImg = img->get_crop(
-            searchWindowRect.x() - frameBounds.x() /*x0*/,
-            searchWindowRect.y() - frameBounds.y() /*y0*/,
-            searchWindowRect.x() + searchWindowRect.height()
-            - frameBounds.x() - 1 /*x1*/,
-            searchWindowRect.y() + searchWindowRect.width()
-            - frameBounds.y() - 1 /*y1*/);
-
-    // Calculate the SNR to check if there COULD be a star around.
-    auto snr = (float) SnrT::calculate(searchWindowImg);
-    LOG(debug)
-        << "SNR: " << snr << std::endl;
-
-    if (snr < activeProfile->getStarDetectionSnrBoundary()) {
-        LOG(warning)
-            << "FocusFinderLogicT::findFocusStar... no valid star detected."
-            << std::endl;
-        return std::nullopt;
-    }
-
-
-    // Check that there is only a single star in the selected region
-    size_t numStarsInRegion = calcNumStarsInRegion(searchWindowImg);
-
-    if (numStarsInRegion != 1) {
-        LOG(warning)
-            << "FocusFinderLogicT::findFocusStar... none or multiple stars in region detected."
-            << std::endl;
-        return std::nullopt;
-    }
-
-
-    // Try to calculate the centroid of the star image
-    //
-    // TODO: In addition we may want to configure
-    //		 -Centroid type
-    //		 -subtract mean (?) - should this be configured??
-    //       -starRect = size of the star rect / "window" (from profile cfg)
-    //       -maxSearchRect = 2 or 3 * starRect - max search boundary (from profile cfg)
-    ImageT calcImage;
-    auto calcCenterOpt = CentroidT::calculate(searchWindowImg,
-                                              CentroidTypeT::IWC, true /*sub mean*/, &calcImage);
-
-    // If there is a result, transform the returned coordinates (sub frame system)
-    // back to the "window" coordinates (directly replace in the same optinal object.
-    if (calcCenterOpt) {
-        calcCenterOpt.emplace(
-                PointT<float>(calcCenterOpt->x() + searchWindowRect.x(),
-                              calcCenterOpt->y() + searchWindowRect.y()));
-    }
-
-    // TODO: Is it a good idea to set it here?
-    mLastFocusStarPos = calcCenterOpt;
-
-    return calcCenterOpt;
-}
-
-std::optional<PointT<float> > FocusFinderLogicT::getLastFocusStarPos() const {
     return mLastFocusStarPos;
 }
 

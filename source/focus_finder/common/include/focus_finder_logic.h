@@ -83,6 +83,8 @@ public:
 
     [[nodiscard]] const FrameT &getLastFrame() const;
 
+    [[nodiscard]] std::optional<PointT<float> > getLastFocusStarPos() const;
+
 
     [[nodiscard]] std::vector<std::string> getMapperFunctionNames() const;
 
@@ -92,8 +94,6 @@ public:
     [[nodiscard]] std::shared_ptr<ImageConverter16To8T> getImageConverter16To8() const;
 
     [[nodiscard]] std::shared_ptr<TaskExecutorT<FocusFinderT> > getFocusFinderExecutor() const;
-
-    [[nodiscard]] std::optional<PointT<float> > getLastFocusStarPos() const;
 
     std::shared_ptr<FocusCurveRecorderLogicT> getFocusCurveRecorderLogic();
 
@@ -111,8 +111,6 @@ public:
 
 private:
     static FocusFinderLogicT *sSelf;
-
-    [[nodiscard]] static size_t calcNumStarsInRegion(const ImageT &inImg) ;
 
     void initImageMappers();
 
@@ -134,13 +132,13 @@ private:
     // TODO: Needs mutex guard!!!-> or atomic?
     FrameT mLastFrame;
 
+    std::optional<PointT<float> > mLastFocusStarPos;
+
     std::vector<std::shared_ptr<MapperFunctionT> > mMapperFunctions;
 
     std::shared_ptr<ImageConverter16To8T> mImageConverter16To8;
 
     std::shared_ptr<TaskExecutorT<FocusFinderT> > mFocusFinderExecutor;
-
-    std::optional<PointT<float> > mLastFocusStarPos;
 
     std::shared_ptr<FocusCurveRecorderLogicT> mFocusCurveRecorderLogic;
 };

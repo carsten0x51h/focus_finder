@@ -36,6 +36,8 @@
 #include <chrono>
 #include <atomic>
 
+#include "include/indi_version_macro.h"
+
 IndiDeviceT::IndiDeviceT(INDI::BaseDevice *dp,
                          IndiClientT *indiClient) :
         mIndiBaseDevice(dp), mIndiClient(indiClient), mCancelConnectFlag(false) {
@@ -104,7 +106,6 @@ std::string IndiDeviceT::getName() const {
     return mIndiBaseDevice->getDeviceName();
 }
 
-
 /**
  * Defined in basedevice.h:
  * GENERAL_INTERFACE       = 0,         /// < Default interface for all INDI devices
@@ -143,9 +144,12 @@ IndiDeviceT::getIndiDeviceInterfaceMaskByDeviceType(DeviceInterfaceTypeT::TypeE 
             return INDI::BaseDevice::AO_INTERFACE;
         case DeviceInterfaceTypeT::AUXILIARY:
             return INDI::BaseDevice::AUX_INTERFACE;
-		// NOTE: Not supported in INDI 1.8.1
-		// case DeviceInterfaceTypeT::CORRELATOR:
-        //     return INDI::BaseDevice::CORRELATOR_INTERFACE;
+// NOTE: CORRELATOR_INTERFACE was introduced in INDI v1.8.4
+// Therefore, check if INDI version is equal or greater.
+#if INDI_VERSION >= 10804
+        case DeviceInterfaceTypeT::CORRELATOR:
+            return INDI::BaseDevice::CORRELATOR_INTERFACE;
+#endif
         case DeviceInterfaceTypeT::DETECTOR:
             return INDI::BaseDevice::DETECTOR_INTERFACE;
         case DeviceInterfaceTypeT::DOME:
@@ -186,7 +190,7 @@ void IndiDeviceT::connectInternal() {
     mIndiClient->connectDevice(deviceName.c_str());
 
     auto isConnOrCancel =
-            [=, this]() -> bool {
+            [=]() -> bool {
                 try {
                     LOG(debug) << "mCancelConnectFlag:" << mCancelConnectFlag.load()
                                << ", getConnectionStateInternal() == DeviceConnectionStateT::CONNECTED: "

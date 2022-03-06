@@ -99,6 +99,7 @@ set(sources
         ../common/reporting_dataset.cpp
         ../common/include/reporting.h
         ../common/reporting.cpp
+        ../common/include/indi_version_macro.h
         ../common/include/indi_client.h
         ../common/indi_client.cpp
         ../common/include/indi_device.h
@@ -288,7 +289,7 @@ set(sources
         include/indi_device_manager_dialog.h
         indi_device_manager_dialog.cpp
         indi_device_manager_dialog.ui
-        ../common/fofi_project_info.cpp fofi_splash_widget.cpp include/fofi_splash_widget.h ../common/single_pass_focusing_strategy.cpp include/star_details_panel.h star_details_panel.cpp ../common/star_details.cpp ../common/include/singleton.h ../common/include/event_bus.h ../common/include/events/new_frame_event.h ../common/include/single_star_detector_algorithm.h ../common/single_star_detector_algorithm.cpp)
+        ../common/fofi_project_info.cpp fofi_splash_widget.cpp include/fofi_splash_widget.h ../common/single_pass_focusing_strategy.cpp include/star_details_panel.h star_details_panel.cpp ../common/star_details.cpp ../common/include/singleton.h ../common/include/event_bus.h ../common/include/events/new_frame_event.h ../common/include/single_star_detector_algorithm.h ../common/single_star_detector_algorithm.cpp ../common/include/indi_version_macro.h)
 
 
 # 
