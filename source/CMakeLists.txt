@@ -12,13 +12,8 @@ configure_file(version.h.in ${CMAKE_CURRENT_BINARY_DIR}/include/${META_PROJECT_N
 # Sub-projects
 # 
 
-# Libraries
 set(IDE_FOLDER "")
 add_subdirectory(focus_finder)
-
-# Tests
-set(IDE_FOLDER "Tests")
-add_subdirectory(tests)
 
 
 # 
