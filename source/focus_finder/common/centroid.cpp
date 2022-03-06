@@ -62,7 +62,7 @@ void CentroidT::calcCentroid2ndMoment(const ImageT &inImg,
 
     // TODO: The cropping below is probably nor required!!!
     const int SIZE = inImg.width();
-    const int BACK = (int) std::ceil((float) inImg.width() / 2.0f) - 1;
+    const int BACK = (int) std::ceil((float) inImg.width() / 2.0F) - 1;
 
     std::valarray<float> vals(
             SIZE * SIZE); // this array will contain all the intensities of the pixels in the SIZE*SIZE grid
