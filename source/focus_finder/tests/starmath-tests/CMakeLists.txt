@@ -28,6 +28,7 @@ target_link_libraries(${target}
         ${DEFAULT_LIBRARIES}
         ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
         ${Boost_LOG_LIBRARY}
+        ${Boost_SYSTEM_LIBRARY}
         ${CFITSIO_LIBRARY}
         ${CCFITS_LIBRARY}
         ${DEFAULT_LINKER_OPTIONS}
