@@ -164,9 +164,13 @@ IndiDeviceT::getIndiDeviceInterfaceMaskByDeviceType(DeviceInterfaceTypeT::TypeE 
             return INDI::BaseDevice::LIGHTBOX_INTERFACE;
         case DeviceInterfaceTypeT::ROTATOR:
             return INDI::BaseDevice::ROTATOR_INTERFACE;
+// NOTE: SPECTROGRAPH_INTERFACE was introduced in INDI v1.8.4
+// Therefore, check if INDI version is equal or greater.
+#if INDI_VERSION >= 10804
         case DeviceInterfaceTypeT::SPECTROGRAPH:
             return INDI::BaseDevice::SPECTROGRAPH_INTERFACE;
-        case DeviceInterfaceTypeT::WEATHER:
+#endif
+	case DeviceInterfaceTypeT::WEATHER:
             return INDI::BaseDevice::WEATHER_INTERFACE;
         default:
             std::stringstream ss;
