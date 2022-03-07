@@ -28,9 +28,9 @@
 
 // TODO: Remove, when store() function has been extracted...
 #include <boost/property_tree/ptree.hpp>
-#include <filesystem>
 #include <utility>
 
+#include "include/filesystem_wrapper.h"
 #include "include/focus_curve_record.h"
 #include "include/cimg_fits_io.h"
 #include "include/fwhm.h"
@@ -129,7 +129,7 @@ FocusCurveRecordT::print(std::ostream &os, size_t indent) const {
 
 // TODO: This function may be moved out of this class because the dependency to property_tree shoud not be in here... It does not have to be a class member at all! -> Move to a sep. "translator" or "serialization" class... Maybe this should go to a translator function like for the enum? No, because probably this is only for one entry!
 void FocusCurveRecordT::save(boost::property_tree::ptree &pt, const FocusCurveRecordT &focusCurveRecord,
-                             const std::filesystem::path &lightFramePath) {
+                             const fs::path &lightFramePath) {
     boost::property_tree::ptree curveRecordPt;
 
     curveRecordPt.put<TimestampT>("<xmlattr>.record_timestamp", focusCurveRecord.getCreationTimestamp());
@@ -145,7 +145,7 @@ void FocusCurveRecordT::save(boost::property_tree::ptree &pt, const FocusCurveRe
     // // Create directory if it does not exist
     // // TODO: Also the ProfileManager should care about the creation of all required directories... (logic below...)
     // // TODO: Pass std::error_code& ec to handle error instead of throw...
-    // std::filesystem::create_directories(lightFrameDirectoryPath);
+    // fs::create_directories(lightFrameDirectoryPath);
 
     // // Create frame filename
     long msSinceEpoch = std::chrono::duration_cast<std::chrono::milliseconds>(
@@ -155,7 +155,7 @@ void FocusCurveRecordT::save(boost::property_tree::ptree &pt, const FocusCurveRe
     ssImgFilename << msSinceEpoch << ".fits";
 
     // Finally, build image file path
-    std::filesystem::path imgFilePath = lightFramePath;
+    fs::path imgFilePath = lightFramePath;
     imgFilePath /= ssImgFilename.str();
 
     LOG(debug) << "Storing FocusCurveRecordT image to '" << imgFilePath << "'..." << std::endl;
@@ -171,14 +171,14 @@ void FocusCurveRecordT::save(boost::property_tree::ptree &pt, const FocusCurveRe
 
 
 std::shared_ptr<FocusCurveRecordT>
-FocusCurveRecordT::load(const boost::property_tree::ptree &pt, const std::filesystem::path &lightFramePath) {
+FocusCurveRecordT::load(const boost::property_tree::ptree &pt, const fs::path &lightFramePath) {
 
     auto creationTimestamp = pt.get<TimestampT>("<xmlattr>.record_timestamp");
 
     // Create directory if it does not exist
     // TODO: Also the ProfileManager should care about the creation of all required directories... (logic below...)
     // TODO: Pass std::error_code& ec to handle error instead of throw...
-    //std::filesystem::create_directories(lightFrameDirectoryPath);
+    //fs::create_directories(lightFrameDirectoryPath);
 
     // Create frame filename
     long msSinceEpoch = std::chrono::duration_cast<std::chrono::milliseconds>(
@@ -188,7 +188,7 @@ FocusCurveRecordT::load(const boost::property_tree::ptree &pt, const std::filesy
     ssImgFilename << msSinceEpoch << ".fits";
 
     // Finally, build image file path
-    std::filesystem::path imgFilePath = lightFramePath;
+    fs::path imgFilePath = lightFramePath;
     imgFilePath /= ssImgFilename.str();
 
     LOG(debug) << "Loading FocusCurveRecordT image from '" << imgFilePath << "'..." << std::endl;

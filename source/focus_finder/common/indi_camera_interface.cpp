@@ -29,8 +29,8 @@
 #include <functional>
 #include <list>
 #include <unistd.h>
-#include <filesystem>
 
+#include "include/filesystem_wrapper.h"
 #include "include/cimg_fits_io.h"
 #include "include/reporting.h"
 #include "include/indi_helper.h"
@@ -158,7 +158,7 @@ std::shared_ptr<ImageT> IndiCameraInterfaceT::convertIndiBlobToCImg(IBLOB *iblob
 
         // Removing tmp file
         std::error_code ec;
-        std::filesystem::remove(sfn, ec);
+        fs::remove(sfn, ec);
 
         if (ec) {
             LOG(warning) << "Unable to delete temporary FITS file '" << sfn

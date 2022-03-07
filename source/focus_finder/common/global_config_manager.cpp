@@ -22,8 +22,7 @@
  *
  ****************************************************************************/
 
-#include <filesystem>
-
+#include "include/filesystem_wrapper.h"
 #include "include/logging.h"
 #include "include/global_config_manager.h"
 #include "include/global_focus_finder_config.h"
@@ -33,8 +32,8 @@
 const std::string GlobalConfigManagerT::GLOBAL_CFG_FILENAME = "fofi_global.cfg";
 
 
-std::filesystem::path GlobalConfigManagerT::getGlobalConfigRootDirectory() {
-    std::filesystem::path globalConfigRootPath = HomeDirectoryFinderT::getHomeDir();
+fs::path GlobalConfigManagerT::getGlobalConfigRootDirectory() {
+    fs::path globalConfigRootPath = HomeDirectoryFinderT::getHomeDir();
 
     globalConfigRootPath /= ".fofi";
 
@@ -42,9 +41,9 @@ std::filesystem::path GlobalConfigManagerT::getGlobalConfigRootDirectory() {
 }
 
 
-std::filesystem::path GlobalConfigManagerT::composeFullGlobalConfigFilePath() {
+fs::path GlobalConfigManagerT::composeFullGlobalConfigFilePath() {
 
-    std::filesystem::path fullPath = GlobalConfigManagerT::getGlobalConfigRootDirectory();
+    fs::path fullPath = GlobalConfigManagerT::getGlobalConfigRootDirectory();
 
     fullPath /= GLOBAL_CFG_FILENAME;
 
@@ -55,7 +54,7 @@ GlobalConfigManagerT::GlobalConfigManagerT() {
     // Create ".fofi" in home directory if it does not exist.
     // TODO: Only create if it does not exist...
     // TODO: Error handling...
-    std::filesystem::create_directories(GlobalConfigManagerT::getGlobalConfigRootDirectory());
+    fs::create_directories(GlobalConfigManagerT::getGlobalConfigRootDirectory());
 
     // Try to load the config
     try {

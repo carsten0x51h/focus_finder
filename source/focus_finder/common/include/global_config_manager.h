@@ -27,8 +27,8 @@
 
 #include <string>
 #include <optional>
-#include <filesystem>
 
+#include "filesystem_wrapper.h"
 #include "exception.h"
 #include "global_focus_finder_config.h"
 
@@ -46,7 +46,7 @@ private:
     /**
      *
      */
-    static std::filesystem::path composeFullGlobalConfigFilePath();
+    static fs::path composeFullGlobalConfigFilePath();
 
     /**
      *
@@ -60,7 +60,7 @@ public:
     /**
      *
      */
-    static std::filesystem::path getGlobalConfigRootDirectory();
+    static fs::path getGlobalConfigRootDirectory();
 
     /**
      *
