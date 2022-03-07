@@ -28,7 +28,6 @@
 #include <memory>
 
 #include "../../common/include/single_star_detector_algorithm.h"
-#include "../../common/include/cimg_fits_io.h"
 #include "../../common/include/image.h"
 
 

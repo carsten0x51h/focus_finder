@@ -5,7 +5,6 @@ message(STATUS "Test ${target}")
 set(sources
         starmath_test_module.cpp
         single_star_detector_tests.cpp
-        ../../common/cimg_fits_io.cpp
         ../../common/centroid.cpp
         ../../common/snr.cpp
         ../../common/single_star_detector_algorithm.cpp
@@ -29,8 +28,6 @@ target_link_libraries(${target}
         ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
         ${Boost_LOG_LIBRARY}
         ${Boost_SYSTEM_LIBRARY}
-        ${CFITSIO_LIBRARY}
-        ${CCFITS_LIBRARY}
         ${DEFAULT_LINKER_OPTIONS}
         )
 
