@@ -350,7 +350,7 @@ target_link_libraries(${target}
         ${Boost_LOG_SETUP_LIBRARY}
         ${Boost_THREAD_LIBRARY}
         ${Boost_SYSTEM_LIBRARY}
-		"$<$<AND:$<CXX_COMPILER_ID:GNU>,$<VERSION_LESS:$<CXX_COMPILER_VERSION>,9.0>>:-lstdc++fs>"
+		"$<$<AND:$<CXX_COMPILER_ID:GNU>,$<VERSION_LESS:$<CXX_COMPILER_VERSION>,9.0>>:stdc++fs>"
         ${CFITSIO_LIBRARY}
         ${CCFITS_LIBRARY}
         ${GSL_LIBRARY}
