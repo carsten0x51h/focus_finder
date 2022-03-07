@@ -183,8 +183,8 @@ void ManageDeviceProfilesDialogT::profileToUI(std::optional<FocusFinderProfileT>
     updateMenuStatus();
 }
 
-void ManageDeviceProfilesDialogT::onActiveProfileChangedSlot(const std::optional<FocusFinderProfileT>& oldProfile,
-                                                             const std::optional<FocusFinderProfileT>& newProfile) {
+void ManageDeviceProfilesDialogT::onActiveProfileChangedSlot(const std::optional<FocusFinderProfileT>& /*oldProfile*/,
+                                                             const std::optional<FocusFinderProfileT>& /*newProfile*/) {
 
     LOG(debug) << "ManageDeviceProfilesDialogT::onActiveProfileChangedSlot..." << std::endl;
 
@@ -196,8 +196,9 @@ void ManageDeviceProfilesDialogT::onActiveProfileChangedSlot(const std::optional
 
 // A new profile has been selected -> tell the backend...
 void ManageDeviceProfilesDialogT::onProfileSelectionChangedSlot(
-        const QString &selectedProfileNameQtStr) {
+        int selectedProfileIdx) {
 
+    const QString & selectedProfileNameQtStr = m_ui->cbxSelectedProfile->itemText(selectedProfileIdx);
     std::string selectedProfileName = selectedProfileNameQtStr.toStdString();
 
     LOG(debug)
@@ -220,7 +221,7 @@ void ManageDeviceProfilesDialogT::setupProfileList() {
     refillProfileList();
 
     connect(m_ui->cbxSelectedProfile,
-            QOverload<const QString &>::of(&QComboBox::currentIndexChanged),
+            QOverload<int>::of(&QComboBox::currentIndexChanged),
             this, &ManageDeviceProfilesDialogT::onProfileSelectionChangedSlot);
 }
 

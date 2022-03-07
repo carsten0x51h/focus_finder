@@ -83,7 +83,7 @@ protected slots:
 
     void onSettingsProfileActionTriggeredSlot();
 
-    void onProfileSelectionChangedSlot(const QString &selectedProfileNameQtStr);
+    void onProfileSelectionChangedSlot(int selectedProfileIdx);
 
     void onActiveProfileChangedSlot(const std::optional<FocusFinderProfileT>& oldProfile,
                                     const std::optional<FocusFinderProfileT>& newProfile);

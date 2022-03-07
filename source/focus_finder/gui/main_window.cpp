@@ -864,7 +864,7 @@ void MainWindow::createExposureTimeSelector() {
 
     // Connect cbx selection listener...
     connect(mExposureTimeCbx,
-            QOverload<const QString &>::of(&QComboBox::currentIndexChanged),
+            QOverload<int>::of(&QComboBox::currentIndexChanged),
             this, &MainWindow::onExposureTimeSelectionChangedSlot);
 
     getFocusFinderMainMenuBar()->addWidget(mExposureTimeCbx);
