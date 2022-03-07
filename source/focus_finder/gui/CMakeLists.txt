@@ -1,4 +1,12 @@
 
+# function( set_required_build_settings_for_GCC8 )
+#     # Always link with libstdc++fs.a when using GCC 8.
+#     # Note: This command makes sure that this option comes pretty late on the cmdline.
+#     link_libraries( "$<$<AND:$<CXX_COMPILER_ID:GNU>,$<VERSION_LESS:$<CXX_COMPILER_VERSION>,9.0>>:-lstdc++fs>" )
+# endfunction()
+
+# set_required_build_settings_for_GCC8()
+
 # 
 # External dependencies
 #
@@ -342,6 +350,7 @@ target_link_libraries(${target}
         ${Boost_LOG_SETUP_LIBRARY}
         ${Boost_THREAD_LIBRARY}
         ${Boost_SYSTEM_LIBRARY}
+		"$<$<AND:$<CXX_COMPILER_ID:GNU>,$<VERSION_LESS:$<CXX_COMPILER_VERSION>,9.0>>:-lstdc++fs>"
         ${CFITSIO_LIBRARY}
         ${CCFITS_LIBRARY}
         ${GSL_LIBRARY}
