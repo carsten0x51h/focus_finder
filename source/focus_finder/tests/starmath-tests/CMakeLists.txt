@@ -3,8 +3,8 @@ set(target starmath-test)
 message(STATUS "Test ${target}")
 
 set(sources
-        starmath_tests.cpp
-        single_star_detector_test.cpp
+        starmath_test_module.cpp
+        single_star_detector_tests.cpp
         ../../common/cimg_fits_io.cpp
         ../../common/centroid.cpp
         ../../common/snr.cpp

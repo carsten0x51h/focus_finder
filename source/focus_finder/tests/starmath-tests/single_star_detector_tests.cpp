@@ -32,8 +32,8 @@
 #include "../../common/include/image.h"
 
 
-struct StarMathTestFixture {
-    StarMathTestFixture() {
+struct SingleStarDetectorTestFixture {
+    SingleStarDetectorTestFixture() {
         BOOST_TEST_MESSAGE( "Loading test image." );
 
         mTestImage = std::make_shared<ImageT>();
@@ -41,12 +41,12 @@ struct StarMathTestFixture {
         std::stringstream logStream;
         CImgFitsIOHelperT::readFits(mTestImage.get(), "test_data/test_image_1.fits", & outBitPix,  & logStream);
     }
-    ~StarMathTestFixture() {}
+    ~SingleStarDetectorTestFixture() {}
 
     std::shared_ptr<ImageT> mTestImage;
 };
 
-BOOST_FIXTURE_TEST_SUITE(starmath_tests, StarMathTestFixture);
+BOOST_FIXTURE_TEST_SUITE(starmath_tests, SingleStarDetectorTestFixture);
 
 /**
  * SingleStarDetectorTest - Success path
