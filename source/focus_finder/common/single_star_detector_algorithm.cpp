@@ -54,7 +54,7 @@ const char * SingleStarDetectorAlgorithmT::ResultT::StatusT::asStr(const TypeE &
     }
 }
 
-SingleStarDetectorAlgorithmT::ResultT::ResultT() : mStatus(StatusT::_Count), mSnr(0.0F), mSnrLimit(0.0F), mNumStarsDetected(-1), mStarCenterPos(PointT<float>(-1.0F, -1.0F)) {
+SingleStarDetectorAlgorithmT::ResultT::ResultT() : mStatus(StatusT::_Count), mSnr(0.0F), mSnrLimit(0.0F), mNumStarsDetected(0), mStarCenterPos(PointT<float>(-1.0F, -1.0F)) {
 }
 
 SingleStarDetectorAlgorithmT::ResultT::StatusT::TypeE SingleStarDetectorAlgorithmT::ResultT::getStatus() const {
@@ -152,6 +152,8 @@ SingleStarDetectorAlgorithmT::ResultT SingleStarDetectorAlgorithmT::detect(std::
 
     ResultT result;
 
+    result.setSnrLimit(mSnrLimit);
+
     if (inImage == nullptr) {
         result.setStatus(ResultT::StatusT::NO_INPUT_IMAGE_SET);
         return result;
@@ -202,7 +204,6 @@ SingleStarDetectorAlgorithmT::ResultT SingleStarDetectorAlgorithmT::detect(std::
     auto snr = (float) SnrT::calculate(searchWindowImg);
 
     result.setSnr(snr);
-    result.setSnrLimit(mSnrLimit);
 
     LOG(debug)
             << "SingleStarDetectorAlgorithmT::detect...SNR: " << snr << std::endl;
