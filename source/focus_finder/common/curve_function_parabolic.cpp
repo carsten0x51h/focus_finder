@@ -30,6 +30,7 @@
 CurveFunctionParabolicT::CurveFunctionParabolicT(const CurveParmsT &curveParms) : CurveFunctionT(curveParms) {
 
 }
+CurveFunctionParabolicT::~CurveFunctionParabolicT() = default;
 
 std::string CurveFunctionParabolicT::getName() const {
     return "CurveFunctionParabolicT";

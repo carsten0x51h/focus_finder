@@ -31,6 +31,7 @@ CurveFunctionHyperbolicPosOnlyT::CurveFunctionHyperbolicPosOnlyT(const CurveParm
         curveParms) {
 
 }
+CurveFunctionHyperbolicPosOnlyT::~CurveFunctionHyperbolicPosOnlyT() = default;
 
 std::string CurveFunctionHyperbolicPosOnlyT::getName() const {
     return "CurveFunctionHyperbolicPosOnlyT";

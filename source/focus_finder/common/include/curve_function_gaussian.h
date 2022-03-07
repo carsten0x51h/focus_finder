@@ -56,6 +56,7 @@ public:
     };
 
     explicit CurveFunctionGaussianT(const CurveParmsT &curveParms);
+    virtual ~CurveFunctionGaussianT();
 
     [[nodiscard]] std::string getName() const override;
 

@@ -31,6 +31,9 @@ CurveFunctionHyperbolicT::CurveFunctionHyperbolicT(const CurveParmsT &curveParms
 
 }
 
+CurveFunctionHyperbolicT::~CurveFunctionHyperbolicT() = default;
+
+
 std::string CurveFunctionHyperbolicT::getName() const {
     return "CurveFunctionHyperbolicT";
 }

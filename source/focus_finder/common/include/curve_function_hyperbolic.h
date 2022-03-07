@@ -56,6 +56,7 @@ public:
     };
 
     explicit CurveFunctionHyperbolicT(const CurveParmsT &curveParms);
+    virtual ~CurveFunctionHyperbolicT();
 
     [[nodiscard]] std::string getName() const override;
 

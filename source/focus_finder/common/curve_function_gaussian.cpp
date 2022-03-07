@@ -29,6 +29,7 @@
 CurveFunctionGaussianT::CurveFunctionGaussianT(const CurveParmsT &curveParms) : CurveFunctionT(curveParms) {
 
 }
+CurveFunctionGaussianT::~CurveFunctionGaussianT() = default;
 
 std::string CurveFunctionGaussianT::getName() const {
     return "CurveFunctionGaussianT";

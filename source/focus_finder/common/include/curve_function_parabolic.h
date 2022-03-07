@@ -55,6 +55,7 @@ public:
     };
 
     explicit CurveFunctionParabolicT(const CurveParmsT &curveParms);
+    virtual ~CurveFunctionParabolicT();
 
     [[nodiscard]] std::string getName() const override;
 
