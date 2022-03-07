@@ -321,7 +321,7 @@ bool FocusFinderProfileT::hasCalibrationData() const {
 
 
 FocusFinderProfileT
-FocusFinderProfileT::load(const std::string &fullProfilePath, const std::filesystem::path &lightFramePath) {
+FocusFinderProfileT::load(const std::string &fullProfilePath, const fs::path &lightFramePath) {
 
     FocusFinderProfileT profile;
 
@@ -450,7 +450,7 @@ FocusFinderProfileT::load(const std::string &fullProfilePath, const std::filesys
 }
 
 
-void FocusFinderProfileT::save(const std::string &fullProfilePath, const std::filesystem::path &lightFramePath,
+void FocusFinderProfileT::save(const std::string &fullProfilePath, const fs::path &lightFramePath,
                                const FocusFinderProfileT &profile) {
     boost::property_tree::ptree pt;
 

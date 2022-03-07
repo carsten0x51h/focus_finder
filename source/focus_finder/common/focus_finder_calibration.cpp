@@ -136,7 +136,7 @@ std::shared_ptr<FocusCurveT> FocusFinderCalibrationT::getFocusCurve() const {
 
 void FocusFinderCalibrationT::save(boost::property_tree::ptree &pt,
                                    const std::shared_ptr<FocusFinderCalibrationT>& focusFinderCalibration,
-                                   const std::filesystem::path &lightFramePath) {
+                                   const fs::path &lightFramePath) {
     LOG(debug) << "FocusFinderCalibrationT::save..." << std::endl;
 
     boost::property_tree::ptree focusCurvesPt;
@@ -146,7 +146,7 @@ void FocusFinderCalibrationT::save(boost::property_tree::ptree &pt,
     LOG (debug) << "Removing calibration lightframes from " << lightFramePath.string() << "..." << std::endl;
 
     std::error_code errCode;
-    std::uintmax_t numObjRemoved = std::filesystem::remove_all(lightFramePath, errCode);
+    std::uintmax_t numObjRemoved = fs::remove_all(lightFramePath, errCode);
 
     if (errCode.value() == 0) {
         LOG(debug) << "Removed " << numObjRemoved << " lightframes from '" << lightFramePath.string() << "'."
@@ -158,7 +158,7 @@ void FocusFinderCalibrationT::save(boost::property_tree::ptree &pt,
     }
 
     // Re-create the light_frames directory
-    std::filesystem::create_directories(lightFramePath, errCode);
+    fs::create_directories(lightFramePath, errCode);
 
     if (errCode.value() == 0) {
         LOG(debug) << "Created directory '" << lightFramePath.string() << "'." << std::endl;
@@ -178,7 +178,7 @@ void FocusFinderCalibrationT::save(boost::property_tree::ptree &pt,
 
 std::shared_ptr<FocusFinderCalibrationT>
 FocusFinderCalibrationT::load(const boost::property_tree::ptree &pt, const CurveFitParmsT &curveFitParms,
-                              const std::filesystem::path &lightFramePath) {
+                              const fs::path &lightFramePath) {
     LOG(debug) << "FocusFinderCalibrationT::load..." << std::endl;
 
     // Read all elements of a RecordSet...

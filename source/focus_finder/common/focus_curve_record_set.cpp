@@ -64,7 +64,7 @@ std::pair<int, int> FocusCurveRecordSetT::minmaxFocusPos() const {
 
 void FocusCurveRecordSetT::save(boost::property_tree::ptree &focusCurvesPt,
                                 const std::shared_ptr<FocusCurveRecordSetT>& focusCurveRecordSet,
-                                const std::filesystem::path &lightFramePath) {
+                                const fs::path &lightFramePath) {
     LOG(debug) << "FocusCurveRecordSetT::save... Storing " << focusCurveRecordSet->size() << " records..." << std::endl;
 
     boost::property_tree::ptree recordSetPt;
@@ -82,7 +82,7 @@ void FocusCurveRecordSetT::save(boost::property_tree::ptree &focusCurvesPt,
 
 
 std::shared_ptr<FocusCurveRecordSetT>
-FocusCurveRecordSetT::load(const boost::property_tree::ptree &pt, const std::filesystem::path &lightFramePath) {
+FocusCurveRecordSetT::load(const boost::property_tree::ptree &pt, const fs::path &lightFramePath) {
 
     //get<FocusMeasureTypeT>()
     FocusMeasureTypeT::TypeE focusMeasureType = FocusMeasureTypeT::FWHM_AVERAGE; // TODO: LOAD

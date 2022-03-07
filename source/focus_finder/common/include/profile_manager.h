@@ -61,17 +61,17 @@ private:
     /**
      * Concats the directory path to the given profile.
      */
-    static std::filesystem::path composeFullProfileDirectory(const std::string &profileDirectoryName) ;
+    static fs::path composeFullProfileDirectory(const std::string &profileDirectoryName) ;
 
     /**
      * Concats root path with filename.
      */
-    static std::filesystem::path composeFullProfileFilePath(const std::string &profileDirectoryName) ;
+    static fs::path composeFullProfileFilePath(const std::string &profileDirectoryName) ;
 
     /**
      * Concats path to light frame directory of given profile.
      */
-    static std::filesystem::path composeFullLightFrameDirectory(const std::string &profileDirectoryName) ;
+    static fs::path composeFullLightFrameDirectory(const std::string &profileDirectoryName) ;
 
     /**
      * Holds the active profile (if any).
@@ -122,7 +122,7 @@ public:
      * Return the root path to the profile directory.
      * Example: ~/.fofi/profiles
      */
-    static std::filesystem::path getProfilesRootDirectory();
+    static fs::path getProfilesRootDirectory();
 
     /**
      * Return the directory name of the currently active profile.
@@ -137,7 +137,7 @@ public:
      *
      * Example: ~/.fofi/profiles/profile_1
      */
-    std::optional<std::filesystem::path> getActiveProfileDirectory() const;
+    std::optional<fs::path> getActiveProfileDirectory() const;
 
     /**
      * Optionally returns the active profile lightframe directory where the
@@ -146,7 +146,7 @@ public:
      *
      * Example: ~/.fofi/profile_1/calibration/light_frames
      */
-    std::optional<std::filesystem::path> getActiveProfileLightFrameDirectory() const;
+    std::optional<fs::path> getActiveProfileLightFrameDirectory() const;
 
     /**
      * Remove active profile so that no profile is active any longer.

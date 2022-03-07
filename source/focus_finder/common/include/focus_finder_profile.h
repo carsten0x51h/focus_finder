@@ -189,13 +189,13 @@ public:
     /**
      * Throws if not found.
      */
-    static FocusFinderProfileT load(const std::string &fullProfilePath, const std::filesystem::path &lightFramePath);
+    static FocusFinderProfileT load(const std::string &fullProfilePath, const fs::path &lightFramePath);
 
     /**
      * Throws if save fails.
      */
     static void save(const std::string &fullProfilePath,
-                     const std::filesystem::path &lightFramePath,
+                     const fs::path &lightFramePath,
                      const FocusFinderProfileT &profile);
 
     std::ostream &print(std::ostream &os, size_t indent = 0) const;
