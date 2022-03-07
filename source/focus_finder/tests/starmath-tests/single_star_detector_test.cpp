@@ -31,7 +31,22 @@
 #include "../../common/include/cimg_fits_io.h"
 #include "../../common/include/image.h"
 
-BOOST_AUTO_TEST_SUITE(starmath_tests)
+
+struct StarMathTestFixture {
+    StarMathTestFixture() {
+        BOOST_TEST_MESSAGE( "Loading test image." );
+
+        mTestImage = std::make_shared<ImageT>();
+        long outBitPix = 0L;
+        std::stringstream logStream;
+        CImgFitsIOHelperT::readFits(mTestImage.get(), "test_data/test_image_1.fits", & outBitPix,  & logStream);
+    }
+    ~StarMathTestFixture() {}
+
+    std::shared_ptr<ImageT> mTestImage;
+};
+
+BOOST_FIXTURE_TEST_SUITE(starmath_tests, StarMathTestFixture);
 
 /**
  * SingleStarDetectorTest - Success path
@@ -46,21 +61,25 @@ BOOST_AUTO_TEST_SUITE(starmath_tests)
  */
 BOOST_AUTO_TEST_CASE(single_star_detector_test_success_path)
 {
-    std::shared_ptr<ImageT> testImage = std::make_shared<ImageT>();
-    long outBitPix = 0L;
-    std::stringstream logStream;
-    CImgFitsIOHelperT::readFits(testImage.get(), "test_data/test_image_1.fits", & outBitPix,  & logStream);
-
     const float SNR_LIMIT = 1.0F;
     SizeT<unsigned int> starWindowSize(35, 35);
     const PointT<float> poi(424.0F, 916.0F); // Position close to star - manually read with KStar image viewer
 
     SingleStarDetectorAlgorithmT singleStarDetectorAlgorithm(SNR_LIMIT, starWindowSize);
-    auto result = singleStarDetectorAlgorithm.detect(testImage, poi);
+    auto result = singleStarDetectorAlgorithm.detect(mTestImage, poi);
 
 	BOOST_CHECK_EQUAL( result.getStatus(), SingleStarDetectorAlgorithmT::ResultT::StatusT::SINGLE_STAR_DETECTED );
     BOOST_CHECK_EQUAL( result.getSnrLimit(), SNR_LIMIT );
     BOOST_CHECK_EQUAL( result.getNumStarsDetected(), 1 );
+}
+
+
+/**
+ * TODO
+ */
+BOOST_AUTO_TEST_CASE(single_star_detector_test_out_of_bounds)
+{
+    BOOST_CHECK_EQUAL( 2, 2 );
 }
 
 BOOST_AUTO_TEST_SUITE_END()
