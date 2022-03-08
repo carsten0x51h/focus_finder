@@ -67,7 +67,7 @@ BOOST_AUTO_TEST_CASE(single_star_detector_test_success_path)
     auto result = singleStarDetectorAlgorithm.detect(mTestImage, poi);
 
 	BOOST_CHECK_EQUAL( result.getStatus(), SingleStarDetectorAlgorithmT::ResultT::StatusT::SINGLE_STAR_DETECTED );
-    BOOST_CHECK_EQUAL( result.getSnrLimit(), SNR_LIMIT );
+    BOOST_CHECK_CLOSE( result.getSnrLimit(), SNR_LIMIT, 0.001F );
     BOOST_CHECK_EQUAL( result.getNumStarsDetected(), 1 );
 }
 
@@ -78,12 +78,12 @@ BOOST_AUTO_TEST_CASE(single_star_detector_test_success_path)
 BOOST_AUTO_TEST_CASE(single_star_detector_test_out_of_bounds)
 {
     const PointT<float> poi(5.0F, 100.0F); // Position close to left border
-
+	
     SingleStarDetectorAlgorithmT singleStarDetectorAlgorithm(SNR_LIMIT, mStarWindowSize);
     auto result = singleStarDetectorAlgorithm.detect(mTestImage, poi);
 
     BOOST_CHECK_EQUAL( result.getStatus(), SingleStarDetectorAlgorithmT::ResultT::StatusT::STAR_WINDOW_OUT_OF_BOUNDS );
-    BOOST_CHECK_EQUAL( result.getSnrLimit(), SNR_LIMIT );
+    BOOST_CHECK_CLOSE( result.getSnrLimit(), SNR_LIMIT, 0.001F );
     BOOST_CHECK_EQUAL( result.getNumStarsDetected(), 0 );
 }
 
@@ -98,7 +98,7 @@ BOOST_AUTO_TEST_CASE(single_star_detector_test_null_image)
     auto result = singleStarDetectorAlgorithm.detect(nullptr, poi);
 
     BOOST_CHECK_EQUAL( result.getStatus(), SingleStarDetectorAlgorithmT::ResultT::StatusT::NO_INPUT_IMAGE_SET );
-    BOOST_CHECK_EQUAL( result.getSnrLimit(), SNR_LIMIT );
+    BOOST_CHECK_CLOSE( result.getSnrLimit(), SNR_LIMIT, 0.001F );
     BOOST_CHECK_EQUAL( result.getNumStarsDetected(), 0 );
 }
 
@@ -113,7 +113,7 @@ BOOST_AUTO_TEST_CASE(single_star_detector_test_bad_snr)
     auto result = singleStarDetectorAlgorithm.detect(mTestImage, poi);
 
     BOOST_CHECK_EQUAL( result.getStatus(), SingleStarDetectorAlgorithmT::ResultT::StatusT::NO_STAR_FOUND_SNR_TOO_LOW );
-    BOOST_CHECK_EQUAL( result.getSnrLimit(), SNR_LIMIT );
+    BOOST_CHECK_CLOSE( result.getSnrLimit(), SNR_LIMIT, 0.001F );
     BOOST_CHECK_EQUAL( result.getNumStarsDetected(), 0 );
 }
 
@@ -128,7 +128,7 @@ BOOST_AUTO_TEST_CASE(single_star_detector_test_multi_star)
     auto result = singleStarDetectorAlgorithm.detect(mTestImage, poi);
 
     BOOST_CHECK_EQUAL( result.getStatus(), SingleStarDetectorAlgorithmT::ResultT::StatusT::UNEXPECTED_STAR_COUNT );
-    BOOST_CHECK_EQUAL( result.getSnrLimit(), SNR_LIMIT );
+    BOOST_CHECK_CLOSE( result.getSnrLimit(), SNR_LIMIT, 0.001F );
     BOOST_CHECK_EQUAL( result.getNumStarsDetected(), 2 );
 }
 

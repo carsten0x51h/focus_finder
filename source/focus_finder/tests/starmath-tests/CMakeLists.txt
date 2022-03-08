@@ -5,6 +5,7 @@ message(STATUS "Test ${target}")
 set(sources
         starmath_test_module.cpp
         single_star_detector_tests.cpp
+		snr_tests.cpp
         ../../common/centroid.cpp
         ../../common/snr.cpp
         ../../common/single_star_detector_algorithm.cpp
