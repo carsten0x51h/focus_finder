@@ -330,7 +330,7 @@ void AveragedFocsCurveFocusingStrategyT::run() {
 
 
         float startAbsPos = (float) getFocusController()->getFocus()->getCurrentPos();
-        float currentAbsPos;
+        float currentAbsPos = 0.0F;
         float stepsMovedSoFar;
 
         std::shared_ptr<FocusCurveT> focusCurve = nullptr;
