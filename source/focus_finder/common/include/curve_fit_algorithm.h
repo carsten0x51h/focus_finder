@@ -61,10 +61,10 @@ public:
         CurveFitSummaryT summary;
 
         size_t numInitialDataPoints = std::distance(dps.begin(), dps.end());
-        size_t numMinRequiredDataPoints = numInitialDataPoints
+        size_t numMinRequiredDataPoints = (float) numInitialDataPoints
                                           * (1.0f - curveFitParms.getMaxAcceptedOutliersPerc() / 100.0f);
 
-        bool wantOutlierRemoval = (curveFitParms.getOutlierBoundaryFactor() > 0);
+        bool wantOutlierRemoval = curveFitParms.getEnableOutlierDetection();
         const size_t numMinInitialRequiredDataPoints = 8; // TODO: ok? Probably more... 10 ?
 
         // Check input parameters
@@ -119,6 +119,7 @@ public:
                 }
 
                 // Calc residuals (lambda function) (currently hardcoded here)
+                // TODO: The residual function should be passed in as parameter.
                 auto residualFunction =
                         [&](const PointFT &p) { return std::fabs(p.y() - fc->fx(p.x(), cp)); };
 
