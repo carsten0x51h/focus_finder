@@ -30,26 +30,37 @@
 #include "../../common/include/snr.h"
 #include "../../common/include/image.h"
 
-struct SnrTestFixture {
-    SnrTestFixture() {
-        BOOST_TEST_MESSAGE( "Loading test image." );
-        mTestImage = ImageT("test_data/test_image_2.tif");
-    }
-    ~SnrTestFixture() {}
 
-    ImageT mTestImage;
-};
-
-BOOST_FIXTURE_TEST_SUITE(starmath_tests, SnrTestFixture);
+BOOST_AUTO_TEST_SUITE(snr_tests)
 
 /**
- * A completely black image should give an SNR of 0.
+ * Check SNR of empty image. A cimg_library::CImgInstanceException is expected.
  */
-BOOST_AUTO_TEST_CASE(snr_test_null_signal)
+BOOST_AUTO_TEST_CASE(snr_test_empty_image)
 {
-	double snr = SnrT::calculate(mTestImage);
-	
-    BOOST_CHECK_CLOSE( snr, 0.0F, 0.001F );
+    ImageT nullImage;
+
+    BOOST_CHECK_THROW( SnrT::calculate(nullImage), cimg_library::CImgInstanceException );
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+/**
+ * Calculate SNR of different images.
+ */
+BOOST_AUTO_TEST_CASE(snr_test_star_signals)
+{
+    std::list<std::pair<std::string, float> > imageSnrPairs {
+        std::make_pair<std::string, float>("test_data/test_image_2.tif", 0.0F), // A completely black image should give an SNR of 0.
+        std::make_pair<std::string, float>("test_data/test_image_3.tif", 1.5995403692606724F), // A weak star
+        std::make_pair<std::string, float>("test_data/test_image_4.tif", 4.1645735440908789F), // A bright star
+        std::make_pair<std::string, float>("test_data/test_image_5.tif", 4.2979500980918717F), // A saturated star
+        std::make_pair<std::string, float>("test_data/test_image_6.tif", 1.4864298210463467F), // Noise
+        std::make_pair<std::string, float>("test_data/test_image_7.tif", 0.0F) // A completely white image should give an SNR of 0.
+    };
+
+    for (auto imageSnrPair = imageSnrPairs.begin(); imageSnrPair != imageSnrPairs.end(); imageSnrPair++) {
+        ImageT img(imageSnrPair->first.c_str());
+        BOOST_CHECK_CLOSE( SnrT::calculate(img), imageSnrPair->second, 0.001F );
+    }
+}
+
+BOOST_AUTO_TEST_SUITE_END();
