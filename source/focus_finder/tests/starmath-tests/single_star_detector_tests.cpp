@@ -23,6 +23,8 @@
  ****************************************************************************/
 
 #include <boost/test/unit_test.hpp>
+
+#include <boost/test/unit_test.hpp>
 #include <boost/test/tools/floating_point_comparison.hpp>
 
 #include <memory>
@@ -39,14 +41,14 @@ struct SingleStarDetectorTestFixture {
 
         mTestImage = std::make_shared<ImageT>("test_data/test_image_1.tif");
     }
-    ~SingleStarDetectorTestFixture() {}
+    ~SingleStarDetectorTestFixture() = default;
 
     std::shared_ptr<ImageT> mTestImage;
     SizeT<unsigned int> mStarWindowSize;
     const float SNR_LIMIT = 1.0F;
 };
 
-BOOST_FIXTURE_TEST_SUITE(starmath_tests, SingleStarDetectorTestFixture);
+BOOST_FIXTURE_TEST_SUITE(single_star_detector_tests, SingleStarDetectorTestFixture);
 
 /**
  * SingleStarDetectorTest - Success path
