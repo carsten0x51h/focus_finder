@@ -33,7 +33,7 @@ class CurveFitParmsT {
 public:
     explicit CurveFitParmsT(FittingCurveTypeT::TypeE fittingCurveType = FittingCurveTypeT::_Count,
                    float maxAcceptedRelativeError = 0.1F, float maxAcceptedAbsoluteError = 0.1F,
-                   std::size_t numMaxIterations = 100, bool enableOutlierDetection = true,
+                   std::size_t numMaxIterations = 100, bool enableOutlierDetection = false,
                    float outlierBoundaryFactor = 1.5F,
                    float maxAcceptedOutliersPerc = 10.0F);
 

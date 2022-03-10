@@ -66,7 +66,7 @@ DEF_Exception(Fwhm);
 class FwhmFitParmsT {
 
 public:
-    FwhmFitParmsT(float maxAcceptedRelativeError = 0.1F, float maxAcceptedAbsoluteError = 0.1F, size_t numMaxIterations = 10000, bool enableOutlierDetection = true, float outlierBoundaryFactor = 1.5F, float acceptOutliersPerc = 20.0F) :
+    FwhmFitParmsT(float maxAcceptedRelativeError = 0.1F, float maxAcceptedAbsoluteError = 0.1F, size_t numMaxIterations = 10000, bool enableOutlierDetection = false, float outlierBoundaryFactor = 1.5F, float acceptOutliersPerc = 20.0F) :
             mMaxAcceptedRelativeError(maxAcceptedRelativeError),
             mMaxAcceptedAbsoluteError(maxAcceptedAbsoluteError),
             mNumMaxIterations(numMaxIterations),
@@ -184,6 +184,8 @@ public:
     }
 
     [[nodiscard]] float getValue(bool inThrowIfNotValid = true) const;
+
+    [[nodiscard]] CurveParmsT getCurveParms() const;
 
     [[nodiscard]] const std::vector<PointFT> &getImgValues() const;
 
