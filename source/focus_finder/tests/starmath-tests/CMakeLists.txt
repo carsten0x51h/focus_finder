@@ -6,14 +6,29 @@ set(sources
         starmath_test_module.cpp
         single_star_detector_tests.cpp
 		snr_tests.cpp
+		fwhm_tests.cpp
         ../../common/centroid.cpp
         ../../common/snr.cpp
+		../../common/fwhm.cpp
+		../../common/curve_parms.cpp
+		../../common/curve_parm.cpp
+		../../common/curve_fit_parms.cpp
+		../../common/curve_fit_summary.cpp
+		../../common/outlier_filter.cpp
+		../../common//point_with_residual.cpp
+		../../common/lm_fitting_curve.cpp
+		../../common/lm_fitting_curve_factory.cpp
+		../../common/lm_fitting_curve_gaussian.cpp
+		../../common/lm_fitting_curve_hyperbolic.cpp
+		../../common/lm_fitting_curve_hyperbolic_pos_only.cpp
+		../../common/lm_fitting_curve_parabolic.cpp
+		../../common/lm_curve_matcher.cpp
         ../../common/single_star_detector_algorithm.cpp
         ../../common/star_cluster_algorithm.cpp
         ../../common/thresholding_algorithm_factory.cpp
         ../../common/max_entropy_thresholding_algorithm.cpp
         ../../common/otsu_thresholding_algorithm.cpp
-        )
+		)
 
 # create an executable, which instantiates a runner from
 # GoogleTest, Boost.Test, QtTest or whatever framework you use
@@ -26,7 +41,9 @@ add_executable(${target}
 target_link_libraries(${target}
         PRIVATE
         ${DEFAULT_LIBRARIES}
-        ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
+		${GSL_LIBRARY}
+		${GSL_CBLAS_LIBRARY}
+		${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
         ${Boost_LOG_LIBRARY}
         ${Boost_SYSTEM_LIBRARY}
         ${DEFAULT_LINKER_OPTIONS}
