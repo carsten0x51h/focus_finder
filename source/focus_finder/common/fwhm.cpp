@@ -125,6 +125,10 @@ float FwhmT::getValue(bool inThrowIfNotValid) const {
     return (float) sigmaToFwhm(mGaussParms.get("W_IDX").getValue());
 }
 
+CurveParmsT FwhmT::getCurveParms() const {
+    return mGaussParms;
+}
+
 const std::vector<PointFT> &FwhmT::getImgValues() const {
     return mImgValues;
 }
@@ -154,8 +158,7 @@ float FwhmT::getStandardDeviation() const {
         mse += std::pow(yFit - yImg, 2.0F);
     }
 
-    mse = std::sqrt(mse / ((float) mFitValues.size() - 1.0F));
-    return mse;
+    return std::sqrt(mse / ((float) mFitValues.size() - 1.0F));
 }
 
 void FwhmT::calcIsValid() {
@@ -207,6 +210,7 @@ FwhmT::print(std::ostream &os, bool inPrintDetails) const {
              it != mOutlierValues.end(); ++it) {
             os << *it << "; ";
         }
+        os << ", std dev: " << getStandardDeviation() << std::endl;
     }
 
     return os;
