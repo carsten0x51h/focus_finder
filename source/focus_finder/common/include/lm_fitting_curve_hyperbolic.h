@@ -64,6 +64,7 @@ public:
     // };
 
 
+    virtual ~LmFittingCurveHyperbolicT() = default;
 
     [[nodiscard]] std::string getName() const override;
 

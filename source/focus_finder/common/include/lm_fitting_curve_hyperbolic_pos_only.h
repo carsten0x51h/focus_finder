@@ -67,7 +67,7 @@ public:
     // 	MAC_AS_TYPE(Type, E, _Count);
     // };
 
-
+    virtual ~LmFittingCurveHyperbolicPosOnlyT() = default;
 
     [[nodiscard]] std::string getName() const override;
 

@@ -60,10 +60,11 @@ public:
         MAC_AS_TYPE(Type, E, _Count);
     };
 
+    virtual ~LmFittingCurveParabolicT() = default;
 
-    std::string getName() const override;
+    [[nodiscard]] std::string getName() const override;
 
-    std::vector<std::string> getParmNames() const override;
+    [[nodiscard]] std::vector<std::string> getParmNames() const override;
 
     float fx(float x, const gsl_vector *curveParms) const override;
 

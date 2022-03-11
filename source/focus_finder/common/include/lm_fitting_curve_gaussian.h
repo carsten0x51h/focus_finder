@@ -62,6 +62,7 @@ public:
         MAC_AS_TYPE(Type, E, _Count);
     };
 
+    virtual ~LmFittingCurveGaussianT() = default;
 
     float fx(float x, const gsl_vector *curveParms) const override;
 
