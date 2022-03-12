@@ -63,9 +63,18 @@ public:
             const ImageT &inImage, size_t index) {
         std::vector<typename ImageT::value_type> values;
 
+        // In case an empty image is passed, return an empty vector.
+        if (inImage.is_empty()) {
+            return values;
+        }
+
         // Extract slices through centroid for profiles
         switch (D) {
             case SliceDirectionT::HORZ: {
+                if (index >= inImage.width()) {
+                    throw ImageSlicerExceptionT("Index out of bounds.");
+                }
+
                 values.resize(inImage.width());
 
                 cimg_forX(inImage, x) {
@@ -74,6 +83,10 @@ public:
                 break;
             }
             case SliceDirectionT::VERT: {
+                if (index >= inImage.height()) {
+                    throw ImageSlicerExceptionT("Index out of bounds.");
+                }
+
                 values.resize(inImage.height());
 
                 cimg_forY(inImage, y) {
