@@ -57,9 +57,7 @@ BOOST_AUTO_TEST_CASE(slicing_test)
             11667, 11554, 11694, 11630, 12303, 13797, 16955, 19371, 17333, 13835, 12139, 11776, 11751, 11373, 11769
     };
 
-    BOOST_TEST(horzSlice == expectedHorzPixelsValues,
-               boost::test_tools::tolerance(1e-3) << "all expected horizontal pixel values in slice"
-                                                  << boost::test_tools::per_element());
+    BOOST_TEST(horzSlice == expectedHorzPixelsValues, boost::test_tools::per_element());
 
     // Vertical slice check
     const size_t vertPos = 7;
@@ -70,9 +68,7 @@ BOOST_AUTO_TEST_CASE(slicing_test)
             11423, 11740, 11665, 12039, 14459, 23210, 42693, 51836, 35324, 19371, 13353, 12142, 11577, 11421, 11717
     };
 
-    BOOST_TEST(vertSlice == expectedVertPixelsValues,
-               boost::test_tools::tolerance(1e-3) << "all expected vertical pixel values in slice"
-                                                  << boost::test_tools::per_element());
+    BOOST_TEST(vertSlice == expectedVertPixelsValues, boost::test_tools::per_element());
 }
 
 /**
