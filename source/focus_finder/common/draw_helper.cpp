@@ -30,21 +30,21 @@
 void DrawHelperT::drawCross(cimg_library::CImg<unsigned char> *inoutImg,
                             float inX, float inY, const unsigned char *inColor, size_t inCrossSize,
                             float inScaleFactor, size_t inOpacity) {
-    inoutImg->draw_line(floor(inScaleFactor * (inX - inCrossSize + 1) + 0.5),
+    inoutImg->draw_line(floor(inScaleFactor * (inX - (float) inCrossSize + 1.0F) + 0.5),
                         floor(inScaleFactor * (inY + 1) + 0.5),
-                        floor(inScaleFactor * (inX + inCrossSize + 1) + 0.5),
-                        floor(inScaleFactor * (inY + 1) + 0.5), inColor, inOpacity);
+                        floor(inScaleFactor * (inX + (float) inCrossSize + 1.0F) + 0.5),
+                        floor(inScaleFactor * (inY + 1) + 0.5), inColor, (float) inOpacity);
 
     inoutImg->draw_line(floor(inScaleFactor * (inX + 1) + 0.5),
-                        floor(inScaleFactor * (inY - inCrossSize + 1) + 0.5),
+                        floor(inScaleFactor * (inY - (float) inCrossSize + 1.0F) + 0.5),
                         floor(inScaleFactor * (inX + 1) + 0.5),
-                        floor(inScaleFactor * (inY + inCrossSize + 1) + 0.5), inColor,
-                        inOpacity);
+                        floor(inScaleFactor * (inY + (float) inCrossSize + 1.0F) + 0.5), inColor,
+                        (float) inOpacity);
 }
 
 void DrawHelperT::drawCross(cimg_library::CImg<unsigned char> *inoutImg,
                             const PointT<float> &inPos, const unsigned char *inColor,
                             size_t inCrossSize, float inScaleFactor, size_t inOpacity) {
-    drawCross(inoutImg, std::get<0>(inPos), std::get<1>(inPos), inColor,
+    drawCross(inoutImg, inPos.x(), inPos.y(), inColor,
               inCrossSize, inScaleFactor, inOpacity);
 }
