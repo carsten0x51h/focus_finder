@@ -131,7 +131,7 @@ public:
      * @param poi - in image coordinates
      * @return ResultT structure
      */
-    ResultT detect(std::shared_ptr<const ImageT> inImage, const PointT<float> & inPoi) const;
+    [[nodiscard]] ResultT detect(std::shared_ptr<const ImageT> inImage, const PointT<float> & inPoi) const;
 
 
 private:
