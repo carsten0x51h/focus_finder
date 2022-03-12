@@ -23,7 +23,6 @@
  ****************************************************************************/
 
 #include <memory>
-#include <string>
 
 #include <gsl/gsl_vector.h>
 
