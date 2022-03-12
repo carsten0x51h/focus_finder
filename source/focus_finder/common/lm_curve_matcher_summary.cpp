@@ -23,18 +23,26 @@
  ****************************************************************************/
 
 #include <ostream>
+#include <gsl/gsl_errno.h> // Definition of GSL_SUCCESS, GSL_FAILURE, ...
 
 #include "include/lm_curve_matcher_summary.h"
+
+
+LmCurveMatcherSummaryT::LmCurveMatcherSummaryT() : statusCode(GSL_FAILURE), numIterationsRequired(0) {}
 
 std::ostream &operator<<(std::ostream &os,
                          const LmCurveMatcherSummaryT &lmCurveMatcherSummary) {
     static const char *prefix = "   > ";
 
     os << "** LmCurveMatcherSummary **" << std::endl;
-    os << prefix << "success: " << lmCurveMatcherSummary.success << std::endl
+    os << prefix << "success: " << lmCurveMatcherSummary.isSuccessful() << std::endl
        << prefix << "numIterationsRequired: " << lmCurveMatcherSummary.numIterationsRequired << std::endl
        << prefix << "statusCode: " << lmCurveMatcherSummary.statusCode << std::endl
        << prefix << "statusMsg: " << lmCurveMatcherSummary.statusMsg << std::endl;
 
     return os;
+}
+
+bool LmCurveMatcherSummaryT::isSuccessful() const {
+    return ( GSL_SUCCESS == statusCode );
 }
