@@ -31,8 +31,9 @@
 #include "point.h"
 #include "point_with_residual.h"
 
-class CurveFitSummaryT {
-public:
+struct CurveFitSummaryT {
+    CurveFitSummaryT();
+
     bool success;                                // < Indicates if curve parameters were found under given constraints
     size_t numIterationsRequiredTotal = 0;       // < Number of required iterations in total
     float outlierBoundary;                       // < Contains outlier boundary in case outlier detection was enabled, otherwise 0
