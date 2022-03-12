@@ -64,6 +64,7 @@ public:
 
         // TODO: FIXED_PARMS - Only return number of non-fixed parms... ask mLmFittingCurve for this... (generic IF)...
         size_t numCurveParams = mLmFittingCurve->getParmNames().size();
+
         LOG(debug) << "LmCurveMatcher::fit() - numPoints: " << numPoints << std::endl;
 
         GslMultiFitParmsT gslMultiFitParms;
