@@ -32,7 +32,6 @@
 #include "../../common/include/single_star_detector_algorithm.h"
 #include "../../common/include/image.h"
 
-
 struct SingleStarDetectorTestFixture {
     SingleStarDetectorTestFixture() {
         BOOST_TEST_MESSAGE( "Loading test image." );
@@ -80,7 +79,7 @@ BOOST_AUTO_TEST_CASE(single_star_detector_test_success_path)
 BOOST_AUTO_TEST_CASE(single_star_detector_test_out_of_bounds)
 {
     const PointT<float> poi(5.0F, 100.0F); // Position close to left border
-	
+
     SingleStarDetectorAlgorithmT singleStarDetectorAlgorithm(SNR_LIMIT, mStarWindowSize);
     auto result = singleStarDetectorAlgorithm.detect(mTestImage, poi);
 
@@ -120,13 +119,15 @@ BOOST_AUTO_TEST_CASE(single_star_detector_test_bad_snr)
 }
 
 /**
- * Multiple stars detected.
+ * Multiple stars detected. Test if two stars in the given region are
+ * detected correctly.
  */
 BOOST_AUTO_TEST_CASE(single_star_detector_test_multi_star)
 {
-    const PointT<float> poi(453.0F, 951.0F); // Location with two stars
+    const PointT<float> poi(452.0F, 943.0F); // Location with two stars
 
     SingleStarDetectorAlgorithmT singleStarDetectorAlgorithm(SNR_LIMIT, mStarWindowSize);
+
     auto result = singleStarDetectorAlgorithm.detect(mTestImage, poi);
 
     BOOST_CHECK_EQUAL( result.getStatus(), SingleStarDetectorAlgorithmT::ResultT::StatusT::UNEXPECTED_STAR_COUNT );
