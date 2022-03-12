@@ -31,7 +31,6 @@
 #include "include/image.h"
 #include "include/logging.h"
 #include "include/point.h"
-#include "include/tuple_printer.h"
 
 void CentroidT::calcCentroid2ndMoment(const ImageT &inImg,
                                       PointT<float> *outCentroidPos) {
@@ -89,11 +88,11 @@ void CentroidT::calcCentroid2ndMoment(const ImageT &inImg,
     cimg_forXY(subInImg, x, y) {
             const long off = subInImg.offset(x, y);
             vals[off] = subInImg(x, y); // save pixel intensity
-            distX[off] = (double) x - (double) xPosMax; // x distance of pixel from top left
-            distY[off] = (double) y - (double) yPosMax; // y distance of pixel from top left
-            dist[off] = sqrt(
-                    pow((double) distX[off], 2.0) +
-                    pow((double) distY[off], 2.0)); // distance of pixel from top-left, uses x and y to find hypotenuse
+            distX[off] = (float) ((double) x - (double) xPosMax); // x distance of pixel from top left
+            distY[off] = (float) ((double) y - (double) yPosMax); // y distance of pixel from top left
+            dist[off] = (float) std::sqrt(
+                    std::pow((double) distX[off], 2.0) +
+                    std::pow((double) distY[off], 2.0)); // distance of pixel from top-left, uses x and y to find hypotenuse
         }
 
     // 3. Find valueLow and valueHigh in grid
@@ -224,7 +223,7 @@ void CentroidT::calcCentroid2ndMoment(const ImageT &inImg,
         if (vals[i] <= threshold) {
             vals[i] = 0; // Pix intensity <= thres, set to 0
         } else {
-            vals[i] = vals[i] - threshold; // Pix intensity > thres, calc subtraction
+            vals[i] = (float) (vals[i] - threshold); // Pix intensity > thres, calc subtraction
         }
         sum += vals[i]; // Sum of intensities
         xSum += vals[i] * (double) distX[i]; // Sum of intensities * distance X
@@ -236,8 +235,8 @@ void CentroidT::calcCentroid2ndMoment(const ImageT &inImg,
         throw CentroidExceptionT("Unable to determine centroid.");
     }
 
-    std::get<0>(*outCentroidPos) = xPosMax + xSum / sum;
-    std::get<1>(*outCentroidPos) = yPosMax + ySum / sum;
+    outCentroidPos->setX((float) (xPosMax + xSum / sum));
+    outCentroidPos->setY((float) (yPosMax + ySum / sum));
 }
 
 void CentroidT::calcCentroidSubPixel(const ImageT &inImg,
@@ -246,8 +245,8 @@ void CentroidT::calcCentroidSubPixel(const ImageT &inImg,
     THROW_IF(Centroid, outSubPixelCenter == nullptr, "outSubPixelCenter expected to be set.")
 
     // 2. Round to nearest integer and then iteratively improve.
-    int xi = floor(std::get<0>(inCenter) + 0.5);
-    int yi = floor(std::get<1>(inCenter) + 0.5);
+    int xi = floor(inCenter.x() + 0.5);
+    int yi = floor(inCenter.y() + 0.5);
 
     ImageT img3x3 = inImg.get_crop(xi - 1 /*x0*/, yi - 1 /*y0*/, xi + 1 /*x1*/,
                                    yi + 1 /*y1*/);
@@ -287,7 +286,7 @@ void CentroidT::calcCentroidSubPixel(const ImageT &inImg,
         float newC = std::max({sp1, sp2, sp3, sp4});
 
         // Calc position of new center
-        float ad = pow(2.0, -((float) i + 1));
+        float ad = std::pow(2.0F, -((float) i + 1));
 
         if (newC == sp1) {
             xsc = xsc - ad; // to the left
@@ -357,8 +356,8 @@ void CentroidT::calcCentroidSubPixel(const ImageT &inImg,
         b4 = b4n;
     }
 
-    std::get<0>(*outSubPixelCenter) = xsc;
-    std::get<1>(*outSubPixelCenter) = xsc;
+    outSubPixelCenter->setX(xsc);
+    outSubPixelCenter->setY(ysc);
 }
 
 double CentroidT::calcIx2(const ImageT &img, int x) {
@@ -398,11 +397,11 @@ void CentroidT::calcIntensityWeightedCenter(const ImageT &inImg,
         Jmean2 += calcJy2(inImg, i);
     }
 
-    std::get<0>(*outCentroidPos) = Imean2 / Ixy2;
-    std::get<1>(*outCentroidPos) = Jmean2 / Ixy2;
+    outCentroidPos->setX((float) (Imean2 / Ixy2));
+    outCentroidPos->setY((float) (Jmean2 / Ixy2));
 
     LOG(info) << "CentroidT::calcIntensityWeightedCenter - Calculated centroid relative pos=("
-              << std::get<0>(*outCentroidPos) << ", " << std::get<1>(*outCentroidPos) << ")..."
+              << outCentroidPos->x() << ", " << outCentroidPos->y() << ")..."
               << std::endl;
 }
 
@@ -437,7 +436,7 @@ std::optional<PointT<float> > CentroidT::calculate(const ImageT &inImg,
     if (inSubMean) {
         double mean = aiImg.mean();
         cimg_forXY(aiImg, x, y) {
-                aiImg(x, y) = (aiImg(x, y) < mean ? 0 : aiImg(x, y) - mean);
+                aiImg(x, y) = (float) (aiImg(x, y) < mean ? 0 : aiImg(x, y) - mean);
             }
     }
 
@@ -448,7 +447,7 @@ std::optional<PointT<float> > CentroidT::calculate(const ImageT &inImg,
             calcIntensityWeightedCenter(aiImg, &relCenter); // center is relative
 
             // This method does not allow an evaluation if a real "star" was detected.
-            // Therefore it always returns true.
+            // Therefore, it always returns true.
             centroidFound = true;
             break;
         }
@@ -459,7 +458,7 @@ std::optional<PointT<float> > CentroidT::calculate(const ImageT &inImg,
                                  20 /*numIterations*/);
 
             // This method does not allow an evaluation if a real "star" was detected.
-            // Therefore it always returns true.
+            // Therefore, it always returns true.
             centroidFound = true;
             break;
         }
@@ -491,8 +490,8 @@ std::optional<PointT<float> > CentroidT::calculate(const ImageT &inImg,
     // Debug output only...
     if (centroidFound) {
         LOG(info)
-            << "CentroidT::calculate() - centroid found - x: " << std::get<0>(relCenter) << ",y: "
-            << std::get<1>(relCenter)
+            << "CentroidT::calculate() - centroid found - x: " << relCenter.x() << ",y: "
+            << relCenter.y()
             << std::endl;
     } else {
         LOG(info)
@@ -527,4 +526,3 @@ const ImageT &CentroidT::getResultImage() const {
 std::optional<PointT<float> > CentroidT::getCenter() const {
     return mCenterOpt;
 }
-

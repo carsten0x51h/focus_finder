@@ -47,7 +47,7 @@ cimg_library::CImg<unsigned char> CentroidViewT::genView(
         const float mm = centroidResultImage.max() - min;
 
         cimg_forXY(centroidResultImage, x, y) {
-                int value = 255.0 * (centroidResultImage(x, y) - min) / mm;
+                int value = (int) (255.0F * (centroidResultImage(x, y) - min) / mm);
                 rgbImg(x, y, 0 /*red*/) = value;
                 rgbImg(x, y, 1 /*green*/) = value;
                 rgbImg(x, y, 2 /*blue*/) = value;
@@ -57,13 +57,13 @@ cimg_library::CImg<unsigned char> CentroidViewT::genView(
         const unsigned char red[3] = {255, 0, 0};
 
         // Scale image
-        rgbImg.resize(scaleFactor * rgbImg.width(),
-                      scaleFactor * rgbImg.height(), -100 /*size_z*/, -100 /*size_c*/,
+        rgbImg.resize((int) (scaleFactor * (float) rgbImg.width()),
+                      (int) (scaleFactor * (float) rgbImg.height()), -100 /*size_z*/, -100 /*size_c*/,
                       1 /*interpolation_type*/);
 
         DrawHelperT::drawCross(&rgbImg,
-                               floor(scaleFactor * std::get<0>(center) + 0.5),
-                               floor(scaleFactor * std::get<1>(center) + 0.5), red,
+                               std::floor(scaleFactor * center.x() + 0.5),
+                               std::floor(scaleFactor * center.y() + 0.5), red,
                                3 /*cross-size*/, 1.0 /*scale factor*/, 1 /*opacity*/);
     }
     return rgbImg; // Make a copy...
