@@ -28,13 +28,14 @@
 #include <ostream>
 #include <string>
 
-class LmCurveMatcherSummaryT {
-public:
+struct LmCurveMatcherSummaryT {
+    LmCurveMatcherSummaryT();
+
     int statusCode;
     std::string statusMsg;
-    bool success;                    // < Indicates if curve parameters were found under given constraints
     size_t numIterationsRequired;    // < Number of required iterations
 
+    bool isSuccessful() const;
     friend std::ostream &operator<<(std::ostream &os, const LmCurveMatcherSummaryT &summary);
 };
 
