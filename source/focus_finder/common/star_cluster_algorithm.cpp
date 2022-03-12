@@ -36,7 +36,6 @@ void StarClusterAlgorithmT::initOffsetPattern(int n) {
 
     for (int i = -n; i <= n; ++i) {
         for (int j = -n; j <= n; ++j) {
-            // Only add if not 0,0
             mOffsets.emplace_back(i, j);
 
             LOG(debug) << "Adding offset (" << i << ", " << j << ")." << std::endl;
