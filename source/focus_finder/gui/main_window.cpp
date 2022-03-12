@@ -1405,8 +1405,8 @@ void MainWindow::onPoiSelectedSlot(const QPoint &qtPoi) {
         PointT<float> center = *focusStarPosOpt;
 
         LOG(info)
-            << "Star detected - center pos=(" << std::get<0>(center) << ", "
-            << std::get<1>(center) << ")." << std::endl;
+            << "Star detected - center pos=(" << center.x() << ", "
+            << center.y() << ")." << std::endl;
 
         // Valid POI selected - that means
         // 1. Tell "image viewer" about the POI
