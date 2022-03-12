@@ -42,7 +42,6 @@ void AnimMenuButtonT::stopAnimation() {
 }
 
 void AnimMenuButtonT::toggleIfDefault(QAction *a) {
-    std::cerr << "a: " << a << ", defaultAction(): " << defaultAction() << std::endl;
 
     if (a == defaultAction()) {
         toggle();
