@@ -99,8 +99,7 @@ BOOST_AUTO_TEST_CASE(star_cluster_algorithm_single_segment_test_image)
             PixelPosT(18, 11), PixelPosT(18, 12), PixelPosT(18, 13), PixelPosT(18, 14), PixelPosT(19, 15)
     };
 
-    BOOST_TEST(*pixelCluster1 == expectedPixels, boost::test_tools::tolerance(1e-3) << "all pixels contained in segment"
-                                                                                    << boost::test_tools::per_element());
+    BOOST_TEST(*pixelCluster1 == expectedPixels, boost::test_tools::per_element());
 }
 
 
