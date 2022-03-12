@@ -4,18 +4,22 @@ message(STATUS "Test ${target}")
 
 set(sources
         starmath_test_module.cpp
-        single_star_detector_tests.cpp
+		point_tests.cpp
 		snr_tests.cpp
-		fwhm_tests.cpp
+		star_cluster_algorithm_tests.cpp
+        single_star_detector_tests.cpp
+        curve_fitting_tests.cpp
+		image_slicer_tests.cpp
+		../../common/point.cpp
         ../../common/centroid.cpp
         ../../common/snr.cpp
-		../../common/fwhm.cpp
 		../../common/curve_parms.cpp
 		../../common/curve_parm.cpp
 		../../common/curve_fit_parms.cpp
 		../../common/curve_fit_summary.cpp
 		../../common/outlier_filter.cpp
 		../../common//point_with_residual.cpp
+		../../common/lm_curve_matcher_summary.cpp
 		../../common/lm_fitting_curve.cpp
 		../../common/lm_fitting_curve_factory.cpp
 		../../common/lm_fitting_curve_gaussian.cpp
@@ -28,7 +32,7 @@ set(sources
         ../../common/thresholding_algorithm_factory.cpp
         ../../common/max_entropy_thresholding_algorithm.cpp
         ../../common/otsu_thresholding_algorithm.cpp
-		)
+		star_cluster_algorithm_tests.cpp image_slicer_tests.cpp point_tests.cpp)
 
 # create an executable, which instantiates a runner from
 # GoogleTest, Boost.Test, QtTest or whatever framework you use
