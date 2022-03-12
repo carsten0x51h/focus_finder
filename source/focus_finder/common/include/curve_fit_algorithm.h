@@ -61,11 +61,11 @@ public:
         CurveFitSummaryT summary;
 
         size_t numInitialDataPoints = std::distance(dps.begin(), dps.end());
-        size_t numMinRequiredDataPoints = (float) numInitialDataPoints
-                                          * (1.0f - curveFitParms.getMaxAcceptedOutliersPerc() / 100.0f);
+        size_t numMinRequiredDataPoints = numInitialDataPoints
+                                          * (size_t) std::floor(1.0f - curveFitParms.getMaxAcceptedOutliersPerc() / 100.0f);
 
         bool wantOutlierRemoval = curveFitParms.getEnableOutlierDetection();
-        const size_t numMinInitialRequiredDataPoints = 8; // TODO: ok? Probably more... 10 ?
+        const size_t numMinInitialRequiredDataPoints = 8; // TODO: ok? Probably more... 10 ? --> Depends on the problem --> add as parameter...
 
         // Check input parameters
         THROW_IF(CurveFit,
@@ -112,6 +112,7 @@ public:
                 // Process fit summary
                 summary.numIterationsRequiredTotal +=
                         lmCurveMatcherSummary.numIterationsRequired;
+                summary.success = lmCurveMatcherSummary.isSuccessful();
 
                 // Only continue if outlier detections is enabled
                 if (!wantOutlierRemoval) {
@@ -178,10 +179,8 @@ public:
         // Finally, and only in case of success take a copy of the matched data points (the ones
         // which correspond to the curve parms returned). In case the matching fails, this container
         // is empty.
-        // TODO: Should we call summary.matchedDataPoints.clear() first?
         boost::range::copy(dataPointsToFit, std::back_inserter(summary.matchedDataPoints));
 
-        // TODO: Should we call summary.curveDataPoints.clear() first?;
         boost::range::copy(dataPointsToFit | boost::adaptors::transformed(
                 [&](const auto &p) { return PointFT(p.x(), fc->fx(p.x(), cp)); }),
                            std::back_inserter(summary.curveDataPoints));
