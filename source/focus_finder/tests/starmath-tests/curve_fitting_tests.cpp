@@ -71,8 +71,8 @@ BOOST_AUTO_TEST_CASE(gaussian_curve_fit_test)
     BOOST_TEST(curveFitSummary.success == true);
     BOOST_TEST(curveFitSummary.matchedDataPoints.size() == 35);
     BOOST_TEST(curveFitSummary.numIterationsRequiredTotal == 4);
-    BOOST_TEST(curveFitSummary.curveDataPoints == expectedCurveValues, boost::test_tools::tolerance( 1e-3 ) << "comparison failed" << boost::test_tools::per_element());
-    BOOST_TEST(curveFitSummary.matchedDataPoints == dataPoints, boost::test_tools::tolerance( 1e-3 ) << "comparison failed" << boost::test_tools::per_element());
+    BOOST_TEST(curveFitSummary.curveDataPoints == expectedCurveValues, boost::test_tools::per_element());
+    BOOST_TEST(curveFitSummary.matchedDataPoints == dataPoints, boost::test_tools::per_element());
     BOOST_TEST(curveFitSummary.outliers.size() == 0);
     BOOST_TEST(curveFitSummary.outlierBoundary == 0.0F, boost::test_tools::tolerance( 1e-3 ));
 }
