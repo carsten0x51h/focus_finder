@@ -33,30 +33,6 @@
 #include "enum_helper.h"
 
 /**
- * NOTE: Old code which was used for old DirectionT (now SliceDirectionT)
- *       to be passed from cmdline (which now is probably not required any
- *       more).
- */
-//#include <boost/algorithm/string/case_conv.hpp>
-// DirectionT validator for boost cmd line parser
-//void validate(boost::any & v, const vector<string> & values,
-//		DirectionT::TypeE * target_type, int) {
-//	using namespace boost::program_options;
-//
-//	validators::check_first_occurrence(v);
-//	string s = validators::get_single_string(values);
-//	boost::to_upper(s);
-//	DirectionT::TypeE type = DirectionT::asType(s.c_str());
-//
-//	if (type != DirectionT::_Count) {
-//		v = any(type);
-//	} else {
-//		throw validation_error(validation_error::invalid_option_value);
-//	}
-//}
-
-
-/**
  * Helper class - horizontal and vertical.
  */
 struct SliceDirectionT {
