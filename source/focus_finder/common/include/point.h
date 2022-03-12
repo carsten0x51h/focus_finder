@@ -28,28 +28,85 @@
 #include <tuple>
 
 #include "tuple_printer.h"
+#include <limits>
+#include <cmath>
+
+template<typename T> class PointT;  // pre-declare the template class itself
+template<typename T> std::ostream& operator<< (std::ostream& os, const PointT <T>& p);
 
 /**
  * PointT structure (X x Y).
  */
 template<class T>
-class PointT : public std::tuple<T, T> {
+class PointT {
 public:
-    PointT() : std::tuple<T, T>() {}
+    PointT() :mX(0), mY(0) {}
 
-    PointT(const T &x, const T &y) : std::tuple<T, T>(x, y) {}
+    PointT(const T &x, const T &y) : mX(x), mY(y) {}
 
-    const T &x() const { return std::get<0>(*this); }
+    [[nodiscard]] const T &x() const { return mX; }
 
-    void setX(const T &x) { std::get<0>(*this) = x; }
+    void setX(const T &x) { mX = x; }
 
-    const T &y() const { return std::get<1>(*this); }
+    [[nodiscard]] const T &y() const { return mY; }
 
-    void setY(const T &y) { std::get<1>(*this) = y; }
+    void setY(const T &y) { mY = y; }
 
     template<class U>
     PointT<U> to() const { return PointT<U>(x(), y()); }
+
+private:
+    T mX;
+    T mY;
 };
+
+
+template<class T>
+std::ostream& operator<<(std::ostream& os, const PointT<T>& p)
+{
+    os << "(" << p.x() << "," << p.y() << ")";
+    return os;
+}
+
+template<class T>
+bool operator==(const PointT<T>& p1, const PointT<T>& p2)
+{
+    return (p1.x() == p2.x() && p1.y() == p2.y());
+}
+
+template<class T>
+bool operator!=(const PointT<T>& p1, const PointT<T>& p2)
+{
+    // Use implementation of operator== and negate it.
+    return !(p1 == p2);
+}
+
+template<>
+bool operator==<float>(const PointT<float>& p1, const PointT<float>& p2);
+
+template<>
+bool operator==<double>(const PointT<double>& p1, const PointT<double>& p2);
+
+
+/**
+ * Definition: One point is "bigger" than another when the distance to (0,0) is bigger.
+ * NOTE: This might have a performance impact and may have to be changed...
+ *
+ * @tparam T
+ * @param p1
+ * @param p2
+ * @return
+ *
+ * NOTE: It is not checked if the pow() overshoots the limit of the respective data type.
+ */
+template<class T>
+bool operator<(const PointT<T>& p1, const PointT<T>& p2)
+{
+ // An idiomatic way to implement strict weak ordering for a structure is to use lexicographical comparison provided by std::tie.
+ // See https://en.cppreference.com/w/cpp/language/operators
+ return (std::tie(p1.x(), p1.y()) < std::tie(p2.x(), p2.y()));
+}
+
 
 using PointFT = PointT<float>;
 
