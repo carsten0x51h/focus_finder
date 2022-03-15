@@ -6,12 +6,15 @@ set(sources
         starmath_test_module.cpp
 		point_tests.cpp
 		snr_tests.cpp
+		centroid_tests.cpp
+		hfd_tests.cpp
 		star_cluster_algorithm_tests.cpp
         single_star_detector_tests.cpp
         curve_fitting_tests.cpp
 		image_slicer_tests.cpp
 		../../common/point.cpp
         ../../common/centroid.cpp
+		../../common/hfd.cpp
         ../../common/snr.cpp
 		../../common/curve_parms.cpp
 		../../common/curve_parm.cpp
@@ -32,7 +35,7 @@ set(sources
         ../../common/thresholding_algorithm_factory.cpp
         ../../common/max_entropy_thresholding_algorithm.cpp
         ../../common/otsu_thresholding_algorithm.cpp
-		star_cluster_algorithm_tests.cpp image_slicer_tests.cpp point_tests.cpp)
+		star_cluster_algorithm_tests.cpp image_slicer_tests.cpp point_tests.cpp hfd_tests.cpp centroid_tests.cpp)
 
 # create an executable, which instantiates a runner from
 # GoogleTest, Boost.Test, QtTest or whatever framework you use
