@@ -27,8 +27,12 @@
 
 const float HfdT::outerHfdDiameter = 27.0F; // TODO: Calc?! - depends on pixel size and focal length (and seeing...) WAS 21!!! TODO: At least make this configurable - set from the outside!
 
-float HfdT::calc(const ImageT &inImage, float inOuterDiameter,
-                 ImageT *outCenteredImg, bool inSubMean) {
+float HfdT::calculate(const ImageT &inImage, float inOuterDiameter,
+                      ImageT *outCenteredImg, bool inSubMean) {
+
+    if (inImage.is_empty()) {
+        throw HfdExceptionT("Empty image supplied.");
+    }
 
     // TODO: Is this ok here???
     // Noise reduction
