@@ -176,4 +176,18 @@ BOOST_AUTO_TEST_CASE(star_cluster_algorithm_cluster_radius_test)
 }
 
 
+/**
+ * Black image - no cluster segments expected.
+ */
+BOOST_AUTO_TEST_CASE(star_cluster_algorithm_no_cluster_test)
+{
+    ImageT binaryImg("test_data/test_image_2.tif"); // black image
+
+    StarClusterAlgorithmT starClusterAlgorithm(
+            2 /*defines the allowed number of dark pixels between two white pixels until they form a cluster*/);
+
+    // Expect that no cluster was found
+    BOOST_TEST(starClusterAlgorithm.cluster(binaryImg).size() == 0);
+}
+
 BOOST_AUTO_TEST_SUITE_END();
