@@ -65,7 +65,7 @@ public:
 
     std::chrono::duration<float> getExposureTime() const;
 
-    // TODO: Do not store those as members but only calc if required ... based on correctedStarImage...?
+    // TODO: Do not store those as members but only calculate if required ... based on correctedStarImage...?
     // -> Even store "focus measure" in curve record??
     float getSnr() const;
 
