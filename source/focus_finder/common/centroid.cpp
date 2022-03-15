@@ -221,9 +221,9 @@ void CentroidT::calcCentroid2ndMoment(const ImageT &inImg,
     // Threshold data and calculate the sums
     for (size_t i = 0; i < vals.size(); i++) {
         if (vals[i] <= threshold) {
-            vals[i] = 0; // Pix intensity <= thres, set to 0
+            vals[i] = 0; // Pix intensity <= threshold, set to 0
         } else {
-            vals[i] = (float) (vals[i] - threshold); // Pix intensity > thres, calc subtraction
+            vals[i] = (float) (vals[i] - threshold); // Pix intensity > threshold, calculate subtraction
         }
         sum += vals[i]; // Sum of intensities
         xSum += vals[i] * (double) distX[i]; // Sum of intensities * distance X
@@ -413,7 +413,7 @@ std::optional<PointT<float> > CentroidT::calculate(const ImageT &inImg,
     bool centroidFound;
 
     if (inImg.width() <= 0 || inImg.height() <= 0) {
-        return std::nullopt;
+        throw CentroidExceptionT("No image supplied.");
     }
 
     // Noise reduction
