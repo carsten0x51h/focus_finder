@@ -71,7 +71,7 @@ public:
         // Extract slices through centroid for profiles
         switch (D) {
             case SliceDirectionT::HORZ: {
-                if (index >= inImage.width()) {
+	      if (index >= (size_t) inImage.width()) {
                     throw ImageSlicerExceptionT("Index out of bounds.");
                 }
 
@@ -83,7 +83,7 @@ public:
                 break;
             }
             case SliceDirectionT::VERT: {
-                if (index >= inImage.height()) {
+                if (index >= (size_t) inImage.height()) {
                     throw ImageSlicerExceptionT("Index out of bounds.");
                 }
 
