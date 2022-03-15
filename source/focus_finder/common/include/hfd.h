@@ -78,13 +78,13 @@ public:
 
     inline void set(const ImageT &inImage, float inOuterDiameter =
     outerHfdDiameter, bool inSubMean = true) {
-        mHfdValue = HfdT::calc(inImage, inOuterDiameter, &mImg, inSubMean);
+        mHfdValue = HfdT::calculate(inImage, inOuterDiameter, &mImg, inSubMean);
         mOuterDiameter = inOuterDiameter;
     }
 
-    static float calc(const ImageT &inImage, float inOuterDiameter =
+    static float calculate(const ImageT &inImage, float inOuterDiameter =
     outerHfdDiameter, ImageT *outCenteredImg = nullptr,
-                      bool inSubMean = true);
+                           bool inSubMean = true);
 
     [[nodiscard]] inline bool valid() const {
         return (mHfdValue > 0 && mImg.width() > 0 && mImg.height() > 0);
