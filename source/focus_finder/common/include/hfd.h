@@ -75,7 +75,7 @@ public:
     explicit HfdT(const ImageT &inImage,
          float inOuterDiameter = outerHfdDiameter, float inScaleFactor = scaleFactor, bool inSubBgLevel =
     true) {
-        this->set(inImage, inOuterDiameter, scaleFactor, inSubBgLevel);
+        this->set(inImage, inOuterDiameter, inScaleFactor, inSubBgLevel);
     }
 
     inline void set(const ImageT &inImage, float inOuterDiameter =
