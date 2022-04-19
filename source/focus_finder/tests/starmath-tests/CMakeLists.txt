@@ -35,7 +35,7 @@ set(sources
         ../../common/thresholding_algorithm_factory.cpp
         ../../common/max_entropy_thresholding_algorithm.cpp
         ../../common/otsu_thresholding_algorithm.cpp
-		star_cluster_algorithm_tests.cpp image_slicer_tests.cpp point_tests.cpp hfd_tests.cpp centroid_tests.cpp)
+		star_cluster_algorithm_tests.cpp image_slicer_tests.cpp point_tests.cpp hfd_tests.cpp centroid_tests.cpp image_tests.cpp)
 
 # create an executable, which instantiates a runner from
 # GoogleTest, Boost.Test, QtTest or whatever framework you use
@@ -54,7 +54,9 @@ target_link_libraries(${target}
         ${Boost_LOG_LIBRARY}
         ${Boost_SYSTEM_LIBRARY}
         ${DEFAULT_LINKER_OPTIONS}
-        )
+		${TIFF_LIBRARIES}
+		png
+		)
 
 # now register the executable with CTest
 add_test(NAME ${target} COMMAND ${target} WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
