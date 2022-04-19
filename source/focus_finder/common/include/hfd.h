@@ -35,7 +35,6 @@
  *       system and also on the seeing conditions. The HFD value calculated depends on this
  *       outer diameter value.
  *
- * TODO: Implement scale up.
  * TODO: Add LOG msgs to HfdT.
  */
 
@@ -51,6 +50,9 @@ DEF_Exception(Hfd);
 
 class HfdT {
 private:
+    static float
+    calcPixelDistanceToCenter(float inX, float inY, float inCenterX, float inCenterY);
+
     ImageT mImg;
     float mHfdValue{};
     float mOuterDiameter{};
@@ -61,30 +63,30 @@ public:
 //       cross is shifted to the top-left in most of the cases.
 // NOTE: 27 gives better results with simulator! - Anyhow, 21 could be much better with real telescope.... TEST...
     static const float outerHfdDiameter; // TODO: Calc?! - depends on pixel size and focal length (and seeing...) WAS 21!!!
-
-    static bool
-    insideCircle(float inX /*pos of x*/, float inY /*pos of y*/, float inCenterX, float inCenterY, float inRadius);
-
+    static const float scaleFactor;
 
     HfdT() :
             mHfdValue(0), mOuterDiameter(outerHfdDiameter) {
     }
 
+    // TODO / IDEA: Extend HFT class so that instead of "inSubBgLevel" a lambda threshold function can be passed in optionally.
+    //              If none is specified, either a default is used or none at all (TBD)...
+
     explicit HfdT(const ImageT &inImage,
-         float inOuterDiameter = outerHfdDiameter, bool inSubMean =
+         float inOuterDiameter = outerHfdDiameter, float inScaleFactor = scaleFactor, bool inSubBgLevel =
     true) {
-        this->set(inImage, inOuterDiameter, inSubMean);
+        this->set(inImage, inOuterDiameter, scaleFactor, inSubBgLevel);
     }
 
     inline void set(const ImageT &inImage, float inOuterDiameter =
-    outerHfdDiameter, bool inSubMean = true) {
-        mHfdValue = HfdT::calculate(inImage, inOuterDiameter, &mImg, inSubMean);
+    outerHfdDiameter, float inScaleFactor = scaleFactor, bool inSubBgLevel = true) {
+        mHfdValue = HfdT::calculate(inImage, inOuterDiameter, inScaleFactor, &mImg, inSubBgLevel);
         mOuterDiameter = inOuterDiameter;
     }
 
     static float calculate(const ImageT &inImage, float inOuterDiameter =
-    outerHfdDiameter, ImageT *outCenteredImg = nullptr,
-                           bool inSubMean = true);
+    outerHfdDiameter, float inScaleFactor = scaleFactor, ImageT *outCenteredImg = nullptr,
+                           bool inSubBgLevel = true);
 
     [[nodiscard]] inline bool valid() const {
         return (mHfdValue > 0 && mImg.width() > 0 && mImg.height() > 0);
@@ -123,4 +125,4 @@ public:
     friend std::ostream &operator<<(std::ostream &os, const HfdT &hfd);
 };
 
-#endif // _HFD_H_
+#endif // SOURCE_FOCUS_FINDER_COMMON_INCLUDE_HFD_H_
