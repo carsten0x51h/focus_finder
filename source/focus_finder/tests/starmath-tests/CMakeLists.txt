@@ -46,7 +46,7 @@ add_executable(${target}
 
 # depending on the framework, you need to link to it
 target_link_libraries(${target}
-        PRIVATE
+		PRIVATE
         ${DEFAULT_LIBRARIES}
 		${GSL_LIBRARY}
 		${GSL_CBLAS_LIBRARY}
@@ -55,7 +55,6 @@ target_link_libraries(${target}
         ${Boost_SYSTEM_LIBRARY}
         ${DEFAULT_LINKER_OPTIONS}
 		${TIFF_LIBRARIES}
-		png
 		)
 
 # now register the executable with CTest
