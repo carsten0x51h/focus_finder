@@ -79,7 +79,7 @@ BOOST_AUTO_TEST_CASE(hfd_dark_image_test)
  */
 BOOST_AUTO_TEST_CASE(hfd_test_image1_test)
 {
-    ImageT whiteImage("test_data/test_image_14.tiff"); // All pixels have the value 65534 - 120x120
+    ImageT whiteImage("test_data/test_image_14.tif"); // All pixels have the value 65534 - 120x120
 
     const float outerDiameter = 99;
     const float expectedHfd = (2.0F / 3.0F) * outerDiameter;
