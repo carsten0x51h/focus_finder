@@ -31,9 +31,6 @@
 #include "../../common/include/hfd.h"
 #include "../../common/include/image.h"
 
-// TODO: Remove?
-#define cimg_use_tiff
-//#define cimg_use_png
 
 BOOST_AUTO_TEST_SUITE(hfd_tests)
 
@@ -79,12 +76,12 @@ BOOST_AUTO_TEST_CASE(hfd_dark_image_test)
  */
 BOOST_AUTO_TEST_CASE(hfd_test_image1_test)
 {
-    ImageT whiteImage("test_data/test_image_14.tif"); // All pixels have the value 65534 - 120x120
+    ImageT whiteImage("test_data/test_image_14.tif"); // All pixels have the value 65535 - 120x120
 
     const float outerDiameter = 99;
     const float expectedHfd = (2.0F / 3.0F) * outerDiameter;
 
-    BOOST_CHECK_CLOSE(HfdT::calculate(whiteImage, outerDiameter, 10.0F /* scale factor */, nullptr, false), expectedHfd, 0.001F);
+    BOOST_CHECK_CLOSE(HfdT::calculate(whiteImage, outerDiameter, 10.0F /* scale factor */, nullptr, false), expectedHfd, 0.01F);
 }
 
 
