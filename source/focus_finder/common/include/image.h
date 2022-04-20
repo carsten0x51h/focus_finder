@@ -25,10 +25,12 @@
 #ifndef SOURCE_FOCUS_FINDER_COMMON_INCLUDE_IMAGE_H_
 #define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_IMAGE_H_ SOURCE_FOCUS_FINDER_COMMON_INCLUDE_IMAGE_H_
 
-// We do not want X11 dependency
+/**
+ * We do not want an X11 dependency by default.
+ */
 #define cimg_display 0
 
-/*
+/**
  * NOTE: In order to use TIFF, enable the following define. This also requires adding
  *       ${TIFF_LIBRARIES} to the CMakeLists.txt file.
  * See https://stackoverflow.com/questions/3021050/write-tiff-float-images-using-cimg
@@ -40,25 +42,15 @@
  *
  * See https://github.com/dtschump/CImg/issues/72
  */
-//#define cimg_use_tiff
+#define cimg_use_tiff
 
 
+/**
+ * Enable CImg debug output
+ */
+#define cimg_verbosity 3
 
 #include <CImg.h>
-
-// If X11 is used, the following things need to be undefined because of a conflict with definitions in QT5.
-// https://stackoverflow.com/questions/22476110/c-compiling-error-including-x11-x-h-x11-xlib-h
-//#undef Bool
-//#undef CursorShape
-//#undef Expose
-//#undef KeyPress
-//#undef KeyRelease
-//#undef FocusIn
-//#undef FocusOut
-//#undef FontChange
-//#undef None
-//#undef Status
-//#undef Unsorted
 
 /**
  *
@@ -67,7 +59,7 @@
 //Image8T
 //Image16T
 //ImageFT
-// TODO: Introduce bit depth? -> probelmatic for float type...
+// TODO: Introduce bit depth? -> problematic for float type...
 using ImageT = cimg_library::CImg<float>;
 
 
