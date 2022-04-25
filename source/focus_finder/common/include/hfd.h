@@ -44,18 +44,20 @@
 DEF_Exception(Hfd);
 
 class HfdT {
+public:
+    typedef std::function<double(const ImageT&, unsigned int)> BackgroundThresholdFunctionT;
+
 private:
     ImageT mImg;
     double mHfdValue{};
     unsigned int mOuterDiameter{};
+    static const BackgroundThresholdFunctionT defaultBgThresholdFunction;
 
 public:
-    typedef std::function<double(const ImageT&, unsigned int)> BackgroundThresholdFunctionT;
-
-// NOTE: There is a bug in centerPosToFrame() which does not calculate the frame correct! Putting a 31 here hence leads to an exception...
-//       Fixing this bug leads to another problem where the center of the star does not seem to be calculated correctly any longer - the
-//       cross is shifted to the top-left in most of the cases.
-// NOTE: 27 gives better results with simulator! - Anyhow, 21 could be much better with real telescope.... TEST...
+    // NOTE: There is a bug in centerPosToFrame() which does not calculate the frame correct! Putting a 31 here hence leads to an exception...
+    //       Fixing this bug leads to another problem where the center of the star does not seem to be calculated correctly any longer - the
+    //       cross is shifted to the top-left in most of the cases.
+    // NOTE: 27 gives better results with simulator! - Anyhow, 21 could be much better with real telescope.... TEST...
     static const unsigned int outerHfdDiameter; // TODO: Calc?! - depends on pixel size and focal length (and seeing...) WAS 21!!!
     static const double scaleFactor;
 
@@ -68,35 +70,35 @@ public:
 
     explicit HfdT(const ImageT &inImage,
          unsigned int inOuterDiameter = outerHfdDiameter, double inScaleFactor = scaleFactor,
-         BackgroundThresholdFunctionT inBgThresholdFunction = nullptr) {
+         BackgroundThresholdFunctionT inBgThresholdFunction = defaultBgThresholdFunction) {
         this->set(inImage, inOuterDiameter, inScaleFactor, inBgThresholdFunction);
     }
 
     explicit HfdT(const ImageT &inImage, const PointT<unsigned int> & starCenterPx,
                   unsigned int inOuterDiameter = outerHfdDiameter, double inScaleFactor = scaleFactor,
-                  BackgroundThresholdFunctionT inBgThresholdFunction = nullptr) {
+                  BackgroundThresholdFunctionT inBgThresholdFunction = defaultBgThresholdFunction) {
         this->set(inImage, starCenterPx, inOuterDiameter, inScaleFactor, inBgThresholdFunction);
     }
 
     inline void set(const ImageT &inImage, unsigned int inOuterDiameter =
-    outerHfdDiameter, double inScaleFactor = scaleFactor, BackgroundThresholdFunctionT inBgThresholdFunction = nullptr) {
+    outerHfdDiameter, double inScaleFactor = scaleFactor, BackgroundThresholdFunctionT inBgThresholdFunction = defaultBgThresholdFunction) {
         mHfdValue = HfdT::calculate(inImage, inOuterDiameter, inScaleFactor, &mImg, inBgThresholdFunction);
         mOuterDiameter = inOuterDiameter;
     }
 
     inline void set(const ImageT &inImage, const PointT<unsigned int> & starCenterPx, unsigned int inOuterDiameter =
-    outerHfdDiameter, double inScaleFactor = scaleFactor, BackgroundThresholdFunctionT inBgThresholdFunction = nullptr) {
+    outerHfdDiameter, double inScaleFactor = scaleFactor, BackgroundThresholdFunctionT inBgThresholdFunction = defaultBgThresholdFunction) {
         mHfdValue = HfdT::calculate(inImage, starCenterPx, inOuterDiameter, inScaleFactor, &mImg, inBgThresholdFunction);
         mOuterDiameter = inOuterDiameter;
     }
 
     static double calculate(const ImageT &inImage, unsigned int inOuterDiameter =
     outerHfdDiameter, double inScaleFactor = scaleFactor, ImageT *outCenteredImg = nullptr,
-                            BackgroundThresholdFunctionT inBgThresholdFunction = nullptr);
+                            BackgroundThresholdFunctionT inBgThresholdFunction = defaultBgThresholdFunction);
 
     static double calculate(const ImageT &inImage, const PointT<unsigned int> & starCenterPx, unsigned int inOuterDiameter =
     outerHfdDiameter, double inScaleFactor = scaleFactor, ImageT *outCenteredImg = nullptr,
-                            BackgroundThresholdFunctionT inBgThresholdFunction = nullptr);
+                            BackgroundThresholdFunctionT inBgThresholdFunction = defaultBgThresholdFunction);
 
     [[nodiscard]] inline bool valid() const {
         return (mHfdValue > 0 && mImg.width() > 0 && mImg.height() > 0);
