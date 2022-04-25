@@ -23,18 +23,13 @@
  ****************************************************************************/
 
 /**
- *
  * Get all pixels inside a radius: http://stackoverflow.com/questions/14487322/get-all-pixel-array-inside-circle
  * Algorithm:                      http://en.wikipedia.org/wiki/Midpoint_circle_algorithm
  * HDF calculation:                http://www005.upp.so-net.ne.jp/k_miyash/occ02/halffluxdiameter/halffluxdiameter_en.html
  *                                 http://www.cyanogen.com/help/maximdl/Half-Flux.htm
  *
- * NOTE: Currently the accuracy is limited by the insideCircle function (-> sub-pixel accuracy).
- * NOTE: The HFD is estimated in case there is no flux (HFD ~ sqrt(2) * inOuterDiameter / 2).
- * NOTE: The outer diameter is usually a value which depends on the properties of the optical
- *       system and also on the seeing conditions. The HFD value calculated depends on this
- *       outer diameter value.
- *
+ * TODO: Add link to documentation and "Properties of HFD" blog entry.
+ * TODO: Change default of inBgThresholdFunction to a good default thresholder.
  * TODO: Add LOG msgs to HfdT.
  */
 
@@ -50,20 +45,19 @@ DEF_Exception(Hfd);
 
 class HfdT {
 private:
-    static float
-    calcPixelDistanceToCenter(float inX, float inY, float inCenterX, float inCenterY);
-
     ImageT mImg;
-    float mHfdValue{};
-    float mOuterDiameter{};
+    double mHfdValue{};
+    unsigned int mOuterDiameter{};
 
 public:
+    typedef std::function<double(const ImageT&, unsigned int)> BackgroundThresholdFunctionT;
+
 // NOTE: There is a bug in centerPosToFrame() which does not calculate the frame correct! Putting a 31 here hence leads to an exception...
 //       Fixing this bug leads to another problem where the center of the star does not seem to be calculated correctly any longer - the
 //       cross is shifted to the top-left in most of the cases.
 // NOTE: 27 gives better results with simulator! - Anyhow, 21 could be much better with real telescope.... TEST...
-    static const float outerHfdDiameter; // TODO: Calc?! - depends on pixel size and focal length (and seeing...) WAS 21!!!
-    static const float scaleFactor;
+    static const unsigned int outerHfdDiameter; // TODO: Calc?! - depends on pixel size and focal length (and seeing...) WAS 21!!!
+    static const double scaleFactor;
 
     HfdT() :
             mHfdValue(0), mOuterDiameter(outerHfdDiameter) {
@@ -73,20 +67,36 @@ public:
     //              If none is specified, either a default is used or none at all (TBD)...
 
     explicit HfdT(const ImageT &inImage,
-         float inOuterDiameter = outerHfdDiameter, float inScaleFactor = scaleFactor, bool inSubBgLevel =
-    true) {
-        this->set(inImage, inOuterDiameter, inScaleFactor, inSubBgLevel);
+         unsigned int inOuterDiameter = outerHfdDiameter, double inScaleFactor = scaleFactor,
+         BackgroundThresholdFunctionT inBgThresholdFunction = nullptr) {
+        this->set(inImage, inOuterDiameter, inScaleFactor, inBgThresholdFunction);
     }
 
-    inline void set(const ImageT &inImage, float inOuterDiameter =
-    outerHfdDiameter, float inScaleFactor = scaleFactor, bool inSubBgLevel = true) {
-        mHfdValue = HfdT::calculate(inImage, inOuterDiameter, inScaleFactor, &mImg, inSubBgLevel);
+    explicit HfdT(const ImageT &inImage, const PointT<unsigned int> & starCenterPx,
+                  unsigned int inOuterDiameter = outerHfdDiameter, double inScaleFactor = scaleFactor,
+                  BackgroundThresholdFunctionT inBgThresholdFunction = nullptr) {
+        this->set(inImage, starCenterPx, inOuterDiameter, inScaleFactor, inBgThresholdFunction);
+    }
+
+    inline void set(const ImageT &inImage, unsigned int inOuterDiameter =
+    outerHfdDiameter, double inScaleFactor = scaleFactor, BackgroundThresholdFunctionT inBgThresholdFunction = nullptr) {
+        mHfdValue = HfdT::calculate(inImage, inOuterDiameter, inScaleFactor, &mImg, inBgThresholdFunction);
         mOuterDiameter = inOuterDiameter;
     }
 
-    static float calculate(const ImageT &inImage, float inOuterDiameter =
-    outerHfdDiameter, float inScaleFactor = scaleFactor, ImageT *outCenteredImg = nullptr,
-                           bool inSubBgLevel = true);
+    inline void set(const ImageT &inImage, const PointT<unsigned int> & starCenterPx, unsigned int inOuterDiameter =
+    outerHfdDiameter, double inScaleFactor = scaleFactor, BackgroundThresholdFunctionT inBgThresholdFunction = nullptr) {
+        mHfdValue = HfdT::calculate(inImage, starCenterPx, inOuterDiameter, inScaleFactor, &mImg, inBgThresholdFunction);
+        mOuterDiameter = inOuterDiameter;
+    }
+
+    static double calculate(const ImageT &inImage, unsigned int inOuterDiameter =
+    outerHfdDiameter, double inScaleFactor = scaleFactor, ImageT *outCenteredImg = nullptr,
+                            BackgroundThresholdFunctionT inBgThresholdFunction = nullptr);
+
+    static double calculate(const ImageT &inImage, const PointT<unsigned int> & starCenterPx, unsigned int inOuterDiameter =
+    outerHfdDiameter, double inScaleFactor = scaleFactor, ImageT *outCenteredImg = nullptr,
+                            BackgroundThresholdFunctionT inBgThresholdFunction = nullptr);
 
     [[nodiscard]] inline bool valid() const {
         return (mHfdValue > 0 && mImg.width() > 0 && mImg.height() > 0);
@@ -97,7 +107,7 @@ public:
         mImg.assign(); // In-place version of the default constructor CImg(). It simply resets the instance to an empty image.
     }
 
-    [[nodiscard]] inline float getValue() const {
+    [[nodiscard]] inline double getValue() const {
         return mHfdValue;
     }
 
@@ -105,18 +115,18 @@ public:
         return mImg;
     }
 
-    [[nodiscard]] inline float getOuterDiameter() const {
+    [[nodiscard]] inline unsigned int getOuterDiameter() const {
         return mOuterDiameter;
     }
 
 
     // NOTE: mOuterDiameter / (2.0 * sqrt(2))
     // TODO: Why 2*sqrt(2)?
-    static float getMaxHfdLimit(float inOuterHfdDiameter) {
-        return 0.353553390593f * inOuterHfdDiameter;
+    static double getMaxHfdLimit(unsigned int inOuterHfdDiameter) {
+        return 0.353553390593 * inOuterHfdDiameter;
     }
 
-    [[nodiscard]] inline float getMaxHfdLimit() const {
+    [[nodiscard]] inline double getMaxHfdLimit() const {
         return HfdT::getMaxHfdLimit(mOuterDiameter);
     }
 
