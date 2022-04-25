@@ -37,6 +37,8 @@ DEF_Exception(Rect);
 
 /**
  * RectT structure (X x Y x W x H).
+ *
+ * TODO / IDEA: Make w & h as unsigned for fixed point types and x & y as signed.
  */
 template<class T>
 class RectT : public std::tuple<T, T, T, T> {
