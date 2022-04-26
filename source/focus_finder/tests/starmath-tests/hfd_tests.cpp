@@ -183,8 +183,12 @@ BOOST_AUTO_TEST_CASE(hfd_test_ideal_gaussian_sigmaX_test)
                            << (int) sigma << "_" << normFactorStr << "_odd_"
                            << imageDimension << "x" << imageDimension << ".tiff";
 
+                ImageT img(filenameSs.str().c_str());
+
+                std::cerr << "img: " << filenameSs.str() <<  ", dim - w=" << img.width() << ", h=" << img.height() << ", max value=" << img.max() << std::endl;
+
                 BOOST_CHECK_CLOSE(HfdT::calculate(
-                        ImageT(filenameSs.str().c_str()),
+                        img,
                         (double) imageDimension,
                         1.0F /* scale factor */,
                         nullptr,
@@ -353,7 +357,6 @@ BOOST_AUTO_TEST_CASE(hfd_real_newton_focus_star_no_background_subtraction_test)
 
 
 // TODO: Add real star images (see recorded images in different focus) also containing noise...
-
 
 
 // TODO: Further tests...

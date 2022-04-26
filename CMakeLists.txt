@@ -307,7 +307,6 @@ MARK_AS_ADVANCED(
     CMAKE_EXE_LINKER_FLAGS_PERF
     CMAKE_SHARED_LINKER_FLAGS_PERF )
 
-
 # Debug
 set(CMAKE_C_FLAGS_DEBUG
   "${CFLAGS_COMMON} -O0 -g -fsanitize=address -fno-omit-frame-pointer"
