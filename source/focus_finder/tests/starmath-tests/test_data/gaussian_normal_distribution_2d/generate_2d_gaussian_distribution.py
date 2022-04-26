@@ -26,7 +26,7 @@ for dim in imageDimensions:
             if factor == "norm":
                 factor = 1 / (2.0*math.pi*sigma*sigma);
                 normStr = "_normalized";
-                kern = gkern(dim, sigma, factor).astype('float')
+                kern = gkern(dim, sigma, factor).astype(np.float32) #.astype('float')
             else:
                 normStr = "_factor_" + str(factor);
                 kern = gkern(dim, sigma, factor).astype('uint16')
