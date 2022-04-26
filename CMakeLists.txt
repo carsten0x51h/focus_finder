@@ -320,7 +320,6 @@ set(CMAKE_CXX_FLAGS_DEBUG
   FORCE
   )
 
-
   
 IF(NOT CMAKE_BUILD_TYPE)
   SET(CMAKE_BUILD_TYPE Release
@@ -329,7 +328,3 @@ IF(NOT CMAKE_BUILD_TYPE)
 ENDIF(NOT CMAKE_BUILD_TYPE)
    
 message("* Current build type is : ${CMAKE_BUILD_TYPE}")
-
-
-
-

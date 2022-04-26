@@ -59,3 +59,8 @@ target_link_libraries(${target}
 
 # now register the executable with CTest
 add_test(NAME ${target} COMMAND ${target} WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+
+# Following sets the environment variable for the shell in which the test
+# progoram 'hello' is run, but not the shell in which ctest is run
+SET_TESTS_PROPERTIES(${target}
+		PROPERTIES ENVIRONMENT "CTEST_OUTPUT_ON_FAILURE=1")
