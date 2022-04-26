@@ -185,8 +185,6 @@ BOOST_AUTO_TEST_CASE(hfd_test_ideal_gaussian_sigmaX_test)
 
                 ImageT img(filenameSs.str().c_str());
 
-                std::cerr << "img: " << filenameSs.str() <<  ", dim - w=" << img.width() << ", h=" << img.height() << ", max value=" << img.max() << std::endl;
-
                 BOOST_CHECK_CLOSE(HfdT::calculate(
                         img,
                         (double) imageDimension,
