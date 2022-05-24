@@ -68,10 +68,10 @@ BOOST_AUTO_TEST_CASE(hfd_dark_image_test)
  * Same as hfd_test_all_pixel_values_equal_1_test, expectation is
  * that pixel value does not make a difference in calculated HFD value.
  *
- * TODO: Explain why the result is counter-intuitive i.e. why the resulting HFD
- *       is not the diameter of the inner circle which exactly cuts the area of
- *       the outer circle into half... Instead of the expected factor of 1/sqrt(2)
- *       the factor is 2/3. This can be easily explained...
+ * A detailed explanation why the expected HFD equals (2.0F / 3.0F) * outerDiameter
+ * can be found here:
+ *
+ * https://www.lost-infinity.com/the-half-flux-diameter-hfd-of-a-plain-image/
  */
 BOOST_AUTO_TEST_CASE(hfd_test_all_pixel_values_equal_1_test)
 {
@@ -109,6 +109,11 @@ BOOST_AUTO_TEST_CASE(hfd_test_all_pixel_values_equal_1_test)
 /**
  * An artificial image where all the pixels have the same value > 0 is used to
  * check if the calculated HFD fits the expected theoretical value.
+ *
+ * A detailed explanation why the expected HFD equals (2.0F / 3.0F) * outerDiameter
+ * can be found here:
+ *
+ * https://www.lost-infinity.com/the-half-flux-diameter-hfd-of-a-plain-image/
  */
 BOOST_AUTO_TEST_CASE(hfd_test_all_pixel_values_equal_65535_test)
 {
@@ -144,10 +149,12 @@ BOOST_AUTO_TEST_CASE(hfd_test_all_pixel_values_equal_65535_test)
 
 
 /**
- * TODO: Comment the formula...
+ * A detailed explanation of the formula can be found here:
+ *
+ * https://www.lost-infinity.com/the-half-flux-diameter-hfd-for-a-perfectly-normal-distributed-star/
  *
  * @param sigma
- * @return
+ * @return The expected HFD
  */
 static double calcExpectedHfd(double sigma) {
     // NOTE: Using C++20, those constants can be replaced by <numbers> include.
@@ -355,8 +362,6 @@ BOOST_AUTO_TEST_CASE(hfd_real_newton_focus_star_no_background_subtraction_test)
 
 
 // TODO: Add real star images (see recorded images in different focus) also containing noise...
-
-
 // TODO: Further tests...
 
 BOOST_AUTO_TEST_SUITE_END();

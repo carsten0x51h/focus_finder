@@ -22,4 +22,17 @@
  *
  ****************************************************************************/
 
-// TODO: Load 16 bit TIFF, PNG, FITS and check that really a 16 bit image was loaded...
+#include <boost/test/unit_test.hpp>
+
+#include "../../common/include/image.h"
+
+// TODO: Load float TIFF image and check if certain pixels have the correct value (0.1324, ....)
+// TODO: Load a float TIFF image and check if certain pixels have the correct value... (65535...)
+// TODO: Load FITS image and check that really a 16 bit image was loaded...
+
+BOOST_AUTO_TEST_CASE(tiff_float_image_test)
+{
+        ImageT tiffFloatImage("test_data/test_image_2.tif");
+        // TODO: Test loaded pixel value...
+        //BOOST_CHECK_EQUAL(std::isnan(HfdT::calculate(darkImage, outerDiameter)), true);
+}
