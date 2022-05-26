@@ -44,6 +44,22 @@ BOOST_AUTO_TEST_CASE(centroid_test_empty_image)
     BOOST_CHECK_THROW(CentroidT::calculate(nullImage), CentroidExceptionT);
 }
 
+
+/**
+ * Test centroid calculation for a perfectly normal distributed star
+ * with odd pixel count.
+ */
+    BOOST_AUTO_TEST_CASE(centroid_test_perfect_normal_distribution_image)
+    {
+        ImageT normalDistOddPixelCountImage("test_data/gaussian_normal_distribution_2d/gaussian_2d_sigma1_factor_65535_odd_101x101.tiff");
+
+        auto centroid = CentroidT::calculate(normalDistOddPixelCountImage);
+        BOOST_CHECK_CLOSE( centroid->x(), 50.0F, 0.001F );
+        BOOST_CHECK_CLOSE( centroid->y(), 50.0F, 0.001F );
+    }
+
 // TODO: Further tests...
+// TODO: Extend centroid calc function to also allow specification of a "region of interest"
+//        or a point around which the centroid should be determined?
 
 BOOST_AUTO_TEST_SUITE_END();
