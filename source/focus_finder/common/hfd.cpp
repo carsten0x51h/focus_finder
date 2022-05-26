@@ -48,7 +48,7 @@ const HfdT::BackgroundThresholdFunctionT HfdT::defaultBgThresholdFunction = [](c
  * @return
  */
 double HfdT::calculate(const ImageT &inImage, unsigned int inOuterDiameterPx,
-                       double inScaleFactor, ImageT *outCenteredImg, BackgroundThresholdFunctionT inBgThresholdFunction) {
+                       double inScaleFactor, ImageT *outCenteredImg, const BackgroundThresholdFunctionT& inBgThresholdFunction) {
 
     PointT<unsigned int> starCenterPx((inImage.width() % 2 != 0 ? (inImage.width() - 1) : inImage.width())  / 2,
                                       (inImage.height() % 2 != 0 ? (inImage.height() - 1) : inImage.height())  / 2);
@@ -58,30 +58,11 @@ double HfdT::calculate(const ImageT &inImage, unsigned int inOuterDiameterPx,
 
 // TODO: As template.... float | double...?
 double HfdT::calculate(const ImageT &inImage, const PointT<unsigned int> & starCenterPx, unsigned int inOuterDiameterPx,
-                      double inScaleFactor, ImageT *outCenteredImg, BackgroundThresholdFunctionT inBgThresholdFunction) {
+                      double inScaleFactor, ImageT *outCenteredImg, const BackgroundThresholdFunctionT& inBgThresholdFunction) {
 
     if (inImage.is_empty()) {
         throw HfdExceptionT("Empty image supplied.");
     }
-
-
-    // TODO: Should the noise reduction step be in this class?
-    //
-    // Noise reduction
-    // AD noise reduction --> In: Loaded image, Out: Noise reduced image
-    // http://cimg.sourceforge.net/reference/structcimg__library_1_1CImg.html
-//    ImageT aiImg = inImage.get_blur_anisotropic(130.0F, /*amplitude*/
-//                                                0.7F, /*sharpness*/
-//                                                0.3F, /*anisotropy*/
-//                                                0.6F, /*alpha*/
-//                                                1.1F, /*sigma*/
-//                                                0.8F, /*dl*/
-//                                                30, /*da*/
-//                                                2, /*gauss_prec*/
-//                                                0, /*interpolation_type*/
-//                                                false /*fast_approx*/
-//    );
-
 
     // Crop the part from the supplied image which is needed to calculate the HFD value.
     // A boundary check is performed.
@@ -117,8 +98,6 @@ double HfdT::calculate(const ImageT &inImage, const PointT<unsigned int> & starC
     }
 
     /**
-     * TODO: Supply this as a parameter to the HFD class?
-     *
      * interpolation_type - see https://cimg.eu/reference/structcimg__library_1_1CImg.html
      *
      * -1 = no interpolation: raw memory resizing.
