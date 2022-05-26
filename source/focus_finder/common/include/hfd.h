@@ -23,18 +23,21 @@
  ****************************************************************************/
 
 /**
- * Get all pixels inside a radius: http://stackoverflow.com/questions/14487322/get-all-pixel-array-inside-circle
- * Algorithm:                      http://en.wikipedia.org/wiki/Midpoint_circle_algorithm
- * HDF calculation:                http://www005.upp.so-net.ne.jp/k_miyash/occ02/halffluxdiameter/halffluxdiameter_en.html
- *                                 http://www.cyanogen.com/help/maximdl/Half-Flux.htm
+ * HDF calculation
+ * https://www.lost-infinity.com/night-sky-image-processing-part-6-measuring-the-half-flux-diameter-hfd-of-a-star-a-simple-c-implementation/
+ * https://www.lost-infinity.com/the-half-flux-diameter-hfd-for-a-perfectly-normal-distributed-star/
+ * https://www.lost-infinity.com/the-half-flux-diameter-hfd-of-a-plain-image/
+ * http://www005.upp.so-net.ne.jp/k_miyash/occ02/halffluxdiameter/halffluxdiameter_en.html
+ * http://www.cyanogen.com/help/maximdl/Half-Flux.htm
  *
- * TODO: Add link to documentation and "Properties of HFD" blog entry.
- * TODO: Change default of inBgThresholdFunction to a good default thresholder.
- * TODO: Add LOG msgs to HfdT.
+ * Get all pixels inside a radius
+ * http://stackoverflow.com/questions/14487322/get-all-pixel-array-inside-circle
  */
 
 #ifndef SOURCE_FOCUS_FINDER_COMMON_INCLUDE_HFD_H_
 #define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_HFD_H_ SOURCE_FOCUS_FINDER_COMMON_INCLUDE_HFD_H_
+
+#include <utility>
 
 #include "image.h"
 #include "point.h"
@@ -54,51 +57,44 @@ private:
     static const BackgroundThresholdFunctionT defaultBgThresholdFunction;
 
 public:
-    // NOTE: There is a bug in centerPosToFrame() which does not calculate the frame correct! Putting a 31 here hence leads to an exception...
-    //       Fixing this bug leads to another problem where the center of the star does not seem to be calculated correctly any longer - the
-    //       cross is shifted to the top-left in most of the cases.
-    // NOTE: 27 gives better results with simulator! - Anyhow, 21 could be much better with real telescope.... TEST...
-    static const unsigned int outerHfdDiameter; // TODO: Calc?! - depends on pixel size and focal length (and seeing...) WAS 21!!!
+    static const unsigned int outerHfdDiameter;
     static const double scaleFactor;
 
     HfdT() :
             mHfdValue(0), mOuterDiameter(outerHfdDiameter) {
     }
 
-    // TODO / IDEA: Extend HFT class so that instead of "inSubBgLevel" a lambda threshold function can be passed in optionally.
-    //              If none is specified, either a default is used or none at all (TBD)...
-
     explicit HfdT(const ImageT &inImage,
          unsigned int inOuterDiameter = outerHfdDiameter, double inScaleFactor = scaleFactor,
-         BackgroundThresholdFunctionT inBgThresholdFunction = defaultBgThresholdFunction) {
+         const BackgroundThresholdFunctionT& inBgThresholdFunction = defaultBgThresholdFunction) {
         this->set(inImage, inOuterDiameter, inScaleFactor, inBgThresholdFunction);
     }
 
     explicit HfdT(const ImageT &inImage, const PointT<unsigned int> & starCenterPx,
                   unsigned int inOuterDiameter = outerHfdDiameter, double inScaleFactor = scaleFactor,
-                  BackgroundThresholdFunctionT inBgThresholdFunction = defaultBgThresholdFunction) {
+                  const BackgroundThresholdFunctionT& inBgThresholdFunction = defaultBgThresholdFunction) {
         this->set(inImage, starCenterPx, inOuterDiameter, inScaleFactor, inBgThresholdFunction);
     }
 
     inline void set(const ImageT &inImage, unsigned int inOuterDiameter =
-    outerHfdDiameter, double inScaleFactor = scaleFactor, BackgroundThresholdFunctionT inBgThresholdFunction = defaultBgThresholdFunction) {
+    outerHfdDiameter, double inScaleFactor = scaleFactor, const BackgroundThresholdFunctionT& inBgThresholdFunction = defaultBgThresholdFunction) {
         mHfdValue = HfdT::calculate(inImage, inOuterDiameter, inScaleFactor, &mImg, inBgThresholdFunction);
         mOuterDiameter = inOuterDiameter;
     }
 
     inline void set(const ImageT &inImage, const PointT<unsigned int> & starCenterPx, unsigned int inOuterDiameter =
-    outerHfdDiameter, double inScaleFactor = scaleFactor, BackgroundThresholdFunctionT inBgThresholdFunction = defaultBgThresholdFunction) {
+    outerHfdDiameter, double inScaleFactor = scaleFactor, const BackgroundThresholdFunctionT& inBgThresholdFunction = defaultBgThresholdFunction) {
         mHfdValue = HfdT::calculate(inImage, starCenterPx, inOuterDiameter, inScaleFactor, &mImg, inBgThresholdFunction);
         mOuterDiameter = inOuterDiameter;
     }
 
     static double calculate(const ImageT &inImage, unsigned int inOuterDiameter =
     outerHfdDiameter, double inScaleFactor = scaleFactor, ImageT *outCenteredImg = nullptr,
-                            BackgroundThresholdFunctionT inBgThresholdFunction = defaultBgThresholdFunction);
+                            const BackgroundThresholdFunctionT& inBgThresholdFunction = defaultBgThresholdFunction);
 
     static double calculate(const ImageT &inImage, const PointT<unsigned int> & starCenterPx, unsigned int inOuterDiameter =
     outerHfdDiameter, double inScaleFactor = scaleFactor, ImageT *outCenteredImg = nullptr,
-                            BackgroundThresholdFunctionT inBgThresholdFunction = defaultBgThresholdFunction);
+                            const BackgroundThresholdFunctionT& inBgThresholdFunction = defaultBgThresholdFunction);
 
     [[nodiscard]] inline bool valid() const {
         return (mHfdValue > 0 && mImg.width() > 0 && mImg.height() > 0);
