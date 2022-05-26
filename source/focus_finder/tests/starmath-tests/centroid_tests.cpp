@@ -47,16 +47,31 @@ BOOST_AUTO_TEST_CASE(centroid_test_empty_image)
 
 /**
  * Test centroid calculation for a perfectly normal distributed star
- * with odd pixel count.
+ * with odd pixel count. The centroid is right in the middle of the image.
  */
-    BOOST_AUTO_TEST_CASE(centroid_test_perfect_normal_distribution_image)
-    {
-        ImageT normalDistOddPixelCountImage("test_data/gaussian_normal_distribution_2d/gaussian_2d_sigma1_factor_65535_odd_101x101.tiff");
+BOOST_AUTO_TEST_CASE(centroid_test_perfect_normal_distribution_centered_image)
+{
+    ImageT normalDistOddPixelCountImage("test_data/gaussian_normal_distribution_2d/gaussian_2d_sigma1_factor_65535_odd_101x101.tiff");
 
-        auto centroid = CentroidT::calculate(normalDistOddPixelCountImage);
-        BOOST_CHECK_CLOSE( centroid->x(), 50.0F, 0.001F );
-        BOOST_CHECK_CLOSE( centroid->y(), 50.0F, 0.001F );
-    }
+    auto centroid = CentroidT::calculate(normalDistOddPixelCountImage);
+    BOOST_CHECK_CLOSE( centroid->x(), 50.0F, 0.001F );
+    BOOST_CHECK_CLOSE( centroid->y(), 50.0F, 0.001F );
+}
+
+
+/**
+ * Test centroid calculation for a perfectly normal distributed star
+ * with odd pixel count. The centroid is at position (x=22,y=14).
+ */
+BOOST_AUTO_TEST_CASE(centroid_test_perfect_normal_distribution_shifted_image)
+{
+    ImageT normalDistOddPixelCountImage("test_data/test_image_21.tif");
+
+    auto centroid = CentroidT::calculate(normalDistOddPixelCountImage);
+    BOOST_CHECK_CLOSE( centroid->x(), 22.0F, 0.1F );
+    BOOST_CHECK_CLOSE( centroid->y(), 14.0F, 0.1F );
+}
+
 
 // TODO: Further tests...
 // TODO: Extend centroid calc function to also allow specification of a "region of interest"
