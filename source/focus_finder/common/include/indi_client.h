@@ -32,6 +32,7 @@
 #include "indi_server_connection_state.h"
 
 #include <boost/signals2.hpp>
+#include <thread>
 
 // TODO: Maybe better inherit protected...
 class IndiClientT : public INDI::BaseClient {
