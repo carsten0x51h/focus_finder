@@ -27,10 +27,9 @@
 
 #include <memory>
 
+#include "thresholding_algorithm.h"
 #include "thresholding_algorithm_type.h"
 #include "enum_helper.h"
-
-class ThresholdingAlgorithmT;
 
 class ThresholdingAlgorithmFactoryT {
 public:
