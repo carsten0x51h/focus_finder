@@ -31,21 +31,6 @@
 
 class CurveFitParmsT {
 public:
-    /**
-     * FIXME: maxAcceptedRelativeError & maxAcceptedAbsoluteError are actually wrong. This was assumed because
-     *        on the one hand the documentation states:
-     *        This function tests for the convergence of the sequence by comparing the last step dx with the
-     *        absolute error epsabs and relative error epsrel to the current position x. The test returns
-     *        GSL_SUCCESS if the following condition is achieved, |dx_i| < epsabs + epsrel |x_i|
-     *        for each component of x and returns GSL_CONTINUE otherwise.
-     *        On the other hand it states for a given epsrel=1e-4 and epsabs=1e-4:
-     *        The iteration terminates when the change in x is smaller than 0.0001, as both an absolute and
-     *        relative change.
-     */
-
-
-    //               The meaning is: The iteration terminates when the change in x is smaller than the given value,
-    //               as both an absolute and relative change.
     explicit CurveFitParmsT(FittingCurveTypeT::TypeE fittingCurveType = FittingCurveTypeT::_Count,
                    float maxAcceptedRelativeError = 0.1F, float maxAcceptedAbsoluteError = 0.1F,
                    std::size_t numMaxIterations = 100, bool enableOutlierDetection = false,
