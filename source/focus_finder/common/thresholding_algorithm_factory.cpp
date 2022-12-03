@@ -27,6 +27,7 @@
 #include "include/thresholding_algorithm_factory.h"
 #include "include/otsu_thresholding_algorithm.h"
 #include "include/max_entropy_thresholding_algorithm.h"
+#include "include/mean_thresholding_algorithm.h"
 
 std::shared_ptr<ThresholdingAlgorithmT> ThresholdingAlgorithmFactoryT::getInstance(
         const ThresholdingAlgorithmTypeT::TypeE &type) {
@@ -37,6 +38,9 @@ std::shared_ptr<ThresholdingAlgorithmT> ThresholdingAlgorithmFactoryT::getInstan
 
         case ThresholdingAlgorithmTypeT::MAX_ENTROPY:
             return std::make_shared<MaxEntropyThresholdingAlgorithmT>();
+
+        case ThresholdingAlgorithmTypeT::MEAN:
+            return std::make_shared<MeanThresholdingAlgorithmT>();
 
         default:
             return nullptr;

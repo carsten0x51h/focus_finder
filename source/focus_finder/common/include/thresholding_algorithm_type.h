@@ -31,6 +31,7 @@ struct ThresholdingAlgorithmTypeT {
     enum TypeE {
         OTSU,
         MAX_ENTROPY,
+        MEAN,
         _Count
     };
 
@@ -40,6 +41,8 @@ struct ThresholdingAlgorithmTypeT {
                 return "OTSU";
             case MAX_ENTROPY:
                 return "MAX_ENTROPY";
+            case MEAN:
+                return "MEAN";
             default:
                 return "<?>";
         }
