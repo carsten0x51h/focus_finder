@@ -31,7 +31,6 @@
 #include <functional>
 
 #include <gsl/gsl_vector.h>
-#include <gsl/gsl_vector.h>
 #include <gsl/gsl_multifit_nlin.h>
 
 #include "logging.h"
@@ -47,6 +46,14 @@
 #include "curve_fit_parms.h"
 #include "curve_fit_summary.h"
 #include "curve_parms.h"
+
+
+
+
+// TESTING
+#include <gsl/gsl_rng.h>
+#include <gsl/gsl_randist.h>
+#include <gsl/gsl_blas.h>
 
 
 class LmCurveMatcherT {
@@ -100,21 +107,65 @@ public:
         int status;
         size_t iter = 0;
 
-        // Iterate to to find a result
+        // Iterate to find a result.
         // Status will be 0 in case of success, otherwise value != 0 (GSL error code).
+        bool continueFitting = true;
+
         do {
             iter++;
             status = gsl_multifit_fdfsolver_iterate(solver); // returns 0 in case of success
 
             if (status) {
+                // Exit loop in case of error
                 break;
             }
 
             // See http://www.csse.uwa.edu.au/programming/gsl-1.0/gsl-ref_35.html
-            status = gsl_multifit_test_delta(solver->dx, solver->x, curveFitParms.getMaxAcceptedAbsoluteError(),
-                                             curveFitParms.getMaxAcceptedRelativError());
+            status = gsl_multifit_test_delta(solver->dx, solver->x, 1e-8 /*curveFitParms.getMaxAcceptedAbsoluteError()*/,
+                                             1e-5 /*curveFitParms.getMaxAcceptedRelativError()*/);
 
-        } while (GSL_CONTINUE == status && iter < curveFitParms.getNumMaxIterations());
+            //TODO: Debug - even if status was 0 here, the loop was repeated .... check the condition below...
+
+            continueFitting = (GSL_CONTINUE == status && iter < curveFitParms.getNumMaxIterations());
+            std::cerr << "continueFitting: " << continueFitting << std::endl;
+        } while (continueFitting);
+
+
+
+
+        // TESTING START
+        // See https://www.csse.uwa.edu.au/programming/gsl-1.0/gsl-ref_35.html
+        // See https://github.com/samtools/bcftools/blob/develop/peakfit.c
+        // See https://github.com/BrianGladman/gsl/blob/master/multifit/convergence.c
+        // See https://root.cern/doc/v608/GSLMultiFit_8h_source.html
+//        int info;
+//        int test1 = gsl_multifit_fdfsolver_test(solver, 1e-8,1e-8, 0.0, &info);
+//        std::cerr << "test1: " << test1 << std::endl;
+//        std::cerr << "info: " << info << std::endl;
+
+//        gsl_matrix * fJac = gsl_matrix_alloc( numPoints, numCurveParams );
+//        gsl_matrix * fCov = gsl_matrix_alloc( numCurveParams, numCurveParams );
+//        static double kEpsrel = 0.0001;
+//        gsl_multifit_fdfsolver_jac (solver, fJac);
+//        int ret = gsl_multifit_covar(fJac, kEpsrel, fCov);
+//        std::cerr << "ret: " << ret << std::endl;
+//
+//        gsl_matrix_fprintf (stdout, fCov, "%g");
+//
+//#define FIT(i) gsl_vector_get(solver->x, i)
+//#define ERR(i) sqrt(gsl_matrix_get(fCov,i,i))
+//
+//        printf("B = %.5f +/- %.5f\n", FIT(0), ERR(0));
+//        printf("P = %.5f +/- %.5f\n", FIT(1), ERR(1));
+//        printf("C = %.5f +/- %.5f\n", FIT(2), ERR(2));
+//        printf("W = %.5f +/- %.5f\n", FIT(3), ERR(3));
+//        printf ("status = %s\n", gsl_strerror (status));
+
+        // TESTING END
+
+
+
+
 
         // Store the result into the summary
         lmCurveMatcherSummary.numIterationsRequired = iter;
