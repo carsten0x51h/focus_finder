@@ -25,14 +25,18 @@
 #include <boost/test/unit_test.hpp>
 #include <boost/test/tools/floating_point_comparison.hpp>
 
-#include <memory>
 #include <optional>
 
 #include "../../common/include/centroid_algorithm_factory.h"
+#include "../../common/include/thresholding_algorithm_factory.h"
 #include "../../common/include/image.h"
 #include "../../common/include/point.h"
 
-
+/**
+ * TODO: Rename image files - Encode dimensions - e.g. 120x120 and type
+ *       of image (e.g. plain/all_values_1/gaussian). Adapt names in HFD
+ *       tests as well. Why? test_image_15.tif does not say anything.
+ */
 BOOST_AUTO_TEST_SUITE(centroid_tests)
 
 
@@ -71,10 +75,6 @@ BOOST_AUTO_TEST_SUITE(centroid_tests)
  *
  * For the 5x5 image (image index starting with 0,0), this is
  * exactly in the center.
- *
- * TODO: Rename image files - Encode dimensions - e.g. 120x120 and type
- *       of image (e.g. plain/all_values_1/gaussian). Adapt names in HFD
- *       tests as well. Why? test_image_15.tif does not say anything.
  */
 BOOST_AUTO_TEST_CASE(intensity_weighted_centroid_no_bg_threshold_all_pixel_values_equal_1_test)
 {
@@ -86,6 +86,73 @@ BOOST_AUTO_TEST_CASE(intensity_weighted_centroid_no_bg_threshold_all_pixel_value
 
     BOOST_CHECK(centroidOpt.has_value());
     BOOST_CHECK_EQUAL(centroidOpt.value(), PointT<float>(2.0F,2.0F));
+}
+
+/**
+ * Calculate centroid of an image with one syntetic, perfect star using the intensity weighted
+ * centroiding method.
+ *
+ * The expected centroid index position is (x,y)=(22,14).
+ */
+BOOST_AUTO_TEST_CASE(intensity_weighted_centroid_no_bg_threshold_perfect_star_test)
+{
+    ImageT perfectStarImage("test_data/test_image_21.tif"); // Ideal star with centroid at (x,y)=(22, 14)
+
+    auto centroidAlgorithm = CentroidAlgorithmFactoryT::getInstance(CentroidAlgorithmTypeT::IWC);
+
+    std::optional<PointT<float>> centroidOpt = centroidAlgorithm->calc(perfectStarImage);
+
+    BOOST_CHECK(centroidOpt.has_value());
+    BOOST_CHECK_EQUAL(centroidOpt.value(), PointT<float>(22.0F,14.0F));
+}
+
+
+/**
+ * Calculate centroid of a noisy image with a real star using the intensity weighted
+ * centroiding method without using a background threshold function.
+ *
+ * Visually, the centroid is close to (x,y)=(15, 14).
+ * Calculation using IWC gives (x,y) = (13.1486, 13.6157).
+ */
+BOOST_AUTO_TEST_CASE(intensity_weighted_centroid_no_bg_threshold_real_noisy_star_test)
+{
+    ImageT perfectStarImage("test_data/test_image_23.tif");
+
+    auto centroidAlgorithm = CentroidAlgorithmFactoryT::getInstance(CentroidAlgorithmTypeT::IWC);
+
+    std::optional<PointT<float>> centroidOpt = centroidAlgorithm->calc(perfectStarImage);
+
+    BOOST_CHECK(centroidOpt.has_value());
+    BOOST_CHECK_CLOSE(centroidOpt.value().x(), 13.1486F, 0.001F);
+    BOOST_CHECK_CLOSE(centroidOpt.value().y(), 13.6157F, 0.001F);
+}
+
+
+/**
+ * Calculate centroid of a noisy image with a real star using the intensity weighted
+ * centroiding method and the Max-Entropy background threshold function.
+ *
+ * Visually, the centroid is close to (x,y)=(15, 14).
+ * Calculation using IWC gives (x,y) = (14.8288746, 13.9050961).
+ */
+BOOST_AUTO_TEST_CASE(intensity_weighted_centroid_max_entropy_threshold_real_noisy_star_test)
+{
+    ImageT perfectStarImage("test_data/test_image_23.tif");
+
+    auto maxEntropyThresholdAlgorithm = ThresholdingAlgorithmFactoryT::getInstance(ThresholdingAlgorithmTypeT::MAX_ENTROPY);
+    auto centroidAlgorithm = CentroidAlgorithmFactoryT::getInstance(CentroidAlgorithmTypeT::IWC);
+
+
+    auto thresholdFunction = [=](const ImageT& inImg) -> double {
+        // TODO: Need to find a solution for the bit-depth... -> make part of ImageT?
+        return maxEntropyThresholdAlgorithm->calc(inImg, 16);
+    };
+
+    std::optional<PointT<float>> centroidOpt = centroidAlgorithm->calc(perfectStarImage, thresholdFunction);
+
+    BOOST_CHECK(centroidOpt.has_value());
+    BOOST_CHECK_CLOSE(centroidOpt.value().x(), 14.8288746, 0.001F);
+    BOOST_CHECK_CLOSE(centroidOpt.value().y(), 13.9050961, 0.001F);
 }
 
 
