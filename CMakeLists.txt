@@ -68,7 +68,7 @@ option(BUILD_SHARED_LIBS        "Build shared instead of static libraries."     
 option(OPTION_SELF_CONTAINED    "Create a self-contained install with all dependencies." OFF)
 option(OPTION_BUILD_DOC         "Build documentation."                                   OFF)
 option(OPTION_BUILD_EXAMPLES    "Build examples."                                        OFF)
-option(OPTION_ENABLE_CLANG_TIDY "Enable clang-tidy."                                     ON)
+option(OPTION_ENABLE_CLANG_TIDY "Enable clang-tidy."                                     OFF)
 
 
 #
