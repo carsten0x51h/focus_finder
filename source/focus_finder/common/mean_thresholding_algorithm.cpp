@@ -29,7 +29,7 @@ std::string MeanThresholdingAlgorithmT::getName() const { return "MeanThresholdi
 
 float MeanThresholdingAlgorithmT::calc(const ImageT &inImg, long bitDepth) const {
 
-    LOG(debug) << "MeanThresholdingAlgorithmT::calc..." << std::endl;
+    LOG(trace) << "MeanThresholdingAlgorithmT::calc..." << std::endl;
 
     return (float) inImg.mean();
 }
