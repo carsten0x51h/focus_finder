@@ -155,6 +155,12 @@ BOOST_AUTO_TEST_CASE(intensity_weighted_centroid_max_entropy_threshold_real_nois
     BOOST_CHECK_CLOSE(centroidOpt.value().y(), 13.9050961, 0.001F);
 }
 
+// TODO!!!
+//TODO: Implement the other centroid algorithms... COG, WCOG, ?? SUB-PIXEL and MOMENT2?!
+// TODO: Add further tests?
+// TODO!!!
+
+
 
 // TODO: Centroid calc depends on the actual algorithm. So the test cases below have to be refactored!
 //       -> The old CentroidT class is about to be removed.
