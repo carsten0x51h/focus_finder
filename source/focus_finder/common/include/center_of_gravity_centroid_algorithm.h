@@ -22,25 +22,32 @@
  *
  ****************************************************************************/
 
-#include <memory>
+#ifndef FOFI_CENTER_OF_GRAVITY_CENTROID_ALGORITHM_H
+#define FOFI_CENTER_OF_GRAVITY_CENTROID_ALGORITHM_H
 
-#include "include/centroid_algorithm_factory.h"
-#include "include/intensity_weighted_centroid_algorithm.h"
-#include "include/center_of_gravity_centroid_algorithm.h"
+#include <optional>
 
-std::shared_ptr<CentroidAlgorithmT> CentroidAlgorithmFactoryT::getInstance(
-        const CentroidAlgorithmTypeT::TypeE &type) {
+#include "centroid_algorithm.h"
+#include "image.h"
 
-    switch (type) {
-        case CentroidAlgorithmTypeT::IWC:
-            return std::make_shared<IntensityWeightedCentroidAlgorithmT>();
+class CenterOfGravityCentroidAlgorithmT : public CentroidAlgorithmT {
+public:
+    [[nodiscard]] std::string getName() const override;
 
-        case CentroidAlgorithmTypeT::COG:
-            return std::make_shared<CenterOfGravityCentroidAlgorithmT>();
+    /**
+     * The "Center Of Gravity Centroiding" is described on page 169 of
+     * "Topics in Adaptive Optics" - "Advanced Methods for Improving the Efficiency
+     * of a Shack Hartmann Wavefront Sensor"
+     * See http://cdn.intechopen.com/pdfs-wm/26716.pdf
+     *
+     * @param inImg
+     * @param inBgThresholdFunction
+     * @return Calculated centroid. NOTE: The position is in image coordinates.
 
-        default: {
-            // TODO: Better throw an exception?!
-            return nullptr;
-        }
-    }
-}
+     */
+    [[nodiscard]] std::optional<PointT<float>> calc(const ImageT &inImg, const BackgroundThresholdFunctionT& inBgThresholdFunction) const override;
+
+    static PointT<float> calcCenterOfGravity(const ImageT &inImg);
+};
+
+#endif //FOFI_CENTER_OF_GRAVITY_CENTROID_ALGORITHM_H

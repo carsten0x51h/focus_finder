@@ -36,6 +36,14 @@
  * TODO: Rename image files - Encode dimensions - e.g. 120x120 and type
  *       of image (e.g. plain/all_values_1/gaussian). Adapt names in HFD
  *       tests as well. Why? test_image_15.tif does not say anything.
+ *
+ * TODO / IDEA: Pass threshold function? Or better expect image where background was already removed??
+ *              This way threshold functionality does not mix up with actual centroid calculation and
+ *              also unit tests will have one dimension less. Furthermore, the parent class
+ *              CentroidAlgorithmT does ot need to hold common functionality. In other words, it is the
+ *              developers responsibility, to apply the required operations (like threshold calculation
+ *              and subtraction as well as potential noise reduction steps). Both operations are optional
+ *              and highly depend on the actual image.
  */
 BOOST_AUTO_TEST_SUITE(centroid_tests)
 
@@ -89,7 +97,7 @@ BOOST_AUTO_TEST_CASE(intensity_weighted_centroid_no_bg_threshold_all_pixel_value
 }
 
 /**
- * Calculate centroid of an image with one syntetic, perfect star using the intensity weighted
+ * Calculate centroid of an image with one synthetic, perfect star using the intensity weighted
  * centroiding method.
  *
  * The expected centroid index position is (x,y)=(22,14).
@@ -154,6 +162,38 @@ BOOST_AUTO_TEST_CASE(intensity_weighted_centroid_max_entropy_threshold_real_nois
     BOOST_CHECK_CLOSE(centroidOpt.value().x(), 14.8288746, 0.001F);
     BOOST_CHECK_CLOSE(centroidOpt.value().y(), 13.9050961, 0.001F);
 }
+
+
+/**
+ * Calculate centroid of a 5x5 pixel image with all pixel values equal to 1
+ * using the center of gravity method.
+ *
+ * The expected centroid in image coordinates (starts with (0, 0)) is
+ * (xs, ys) = (2,2). A similar calculation of the expected value is shown in
+ * one of the unit tests for the "Intensity Weighted Algorithm" above.
+ *
+ * TODO / IDEA: Better write one unit test for COG which will then be executed for
+ *              different images with different expectations?
+ *              -> Then, where does documentation - especially for describing the
+ *              expected values - go?
+ */
+BOOST_AUTO_TEST_CASE(center_of_gravity_centroid_no_bg_threshold_all_pixel_values_equal_1_test)
+{
+    ImageT plainImage("test_data/test_image_22.tif"); // All pixels have the value 1 - 5x5
+
+    auto centroidAlgorithm = CentroidAlgorithmFactoryT::getInstance(CentroidAlgorithmTypeT::COG);
+
+    std::optional<PointT<float>> centroidOpt = centroidAlgorithm->calc(plainImage);
+
+    BOOST_CHECK(centroidOpt.has_value());
+    BOOST_CHECK_EQUAL(centroidOpt.value(), PointT<float>(2.0F,2.0F));
+}
+
+// TODO: Separate Threshold from Centroid!
+// TODO: Implement a few more COG tests.
+// TODO: Remove old Centroid from code
+
+
 
 // TODO!!!
 //TODO: Implement the other centroid algorithms... COG, WCOG, ?? SUB-PIXEL and MOMENT2?!
