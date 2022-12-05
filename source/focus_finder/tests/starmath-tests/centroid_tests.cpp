@@ -117,14 +117,24 @@ BOOST_AUTO_TEST_CASE(intensity_weighted_centroid_perfect_star_test)
  */
 BOOST_AUTO_TEST_CASE(center_of_gravity_centroid_all_pixel_values_equal_1_test)
 {
-    ImageT plainImage("test_data/test_image_22.tif"); // All pixels have the value 1 - 5x5
+    std::array<std::pair<std::string, PointT<float> >, 4> centroidData = {
+            std::make_pair("test_data/centroiding/test_image_all_pixels_value_1_5x5.tif", PointT<float>(2.0F,2.0F)),
+            std::make_pair("test_data/centroiding/test_image_one_pixel_bottom_right_5x5.tif", PointT<float>(3.0F,3.0F)),
+            std::make_pair("test_data/centroiding/test_image_one_pixel_top_left_10x10.tif", PointT<float>(1.0F,1.0F)),
+            std::make_pair("test_data/centroiding/test_image_two_opposite_pixels_5x5.tif", PointT<float>(2.0F,2.0F))
+    };
 
     auto centroidAlgorithm = CentroidAlgorithmFactoryT::getInstance(CentroidAlgorithmTypeT::COG);
 
-    std::optional<PointT<float>> centroidOpt = centroidAlgorithm->calc(plainImage);
+    for (auto const & centroidTestRecord : centroidData) {
+        std::string imageFilename = centroidTestRecord.first;
+        ImageT testImage(imageFilename.c_str());
+        PointT<float> expectedCentroidPoint = centroidTestRecord.second;
+        std::optional<PointT<float>> centroidOpt = centroidAlgorithm->calc(testImage);
 
-    BOOST_CHECK(centroidOpt.has_value());
-    BOOST_CHECK_EQUAL(centroidOpt.value(), PointT<float>(2.0F,2.0F));
+        BOOST_CHECK(centroidOpt.has_value());
+        BOOST_CHECK_EQUAL(centroidOpt.value(), expectedCentroidPoint);
+    }
 }
 
 // TODO: Implement a few more COG tests.
