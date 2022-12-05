@@ -36,6 +36,52 @@
  */
 BOOST_AUTO_TEST_SUITE(centroid_tests)
 
+
+/**
+ * Check Centroid of empty image. Expectation is that valid()
+ * returns false and the optional return value has no value.
+ */
+BOOST_AUTO_TEST_CASE(centroid_test_empty_image)
+{
+    ImageT nullImage;
+    auto centroidAlgorithmCog = CentroidAlgorithmFactoryT::getInstance(CentroidAlgorithmTypeT::COG);
+    auto centroidAlgorithmIwc = CentroidAlgorithmFactoryT::getInstance(CentroidAlgorithmTypeT::IWC);
+
+    BOOST_CHECK_THROW(centroidAlgorithmCog->calc(nullImage), CentroidExceptionT);
+    BOOST_CHECK_THROW(centroidAlgorithmIwc->calc(nullImage), CentroidExceptionT);
+}
+
+
+/**
+ * Calculate centroids using the center of gravity (COG) method.
+ * This array contains pairs of filename and expected centroid.
+ * The expected values were cross-checked manually.
+ */
+BOOST_AUTO_TEST_CASE(center_of_gravity_centroid_test)
+{
+    std::array<std::pair<std::string, PointT<float> >, 5> centroidData = {
+            std::make_pair("test_data/centroiding/test_image_all_pixels_value_1_5x5.tif", PointT<float>(2.0F,2.0F)),
+            std::make_pair("test_data/centroiding/test_image_one_pixel_bottom_right_5x5.tif", PointT<float>(3.0F,3.0F)),
+            std::make_pair("test_data/centroiding/test_image_one_pixel_top_left_10x10.tif", PointT<float>(1.0F,1.0F)),
+            std::make_pair("test_data/centroiding/test_image_two_opposite_pixels_5x5.tif", PointT<float>(2.0F,2.0F)),
+            std::make_pair("test_data/centroiding/test_image_noise_on_the_left_and_one_center_pixel_5x5.tif", PointT<float>(1.88378F,2.0F))
+    };
+
+    auto centroidAlgorithm = CentroidAlgorithmFactoryT::getInstance(CentroidAlgorithmTypeT::COG);
+
+    for (auto const & centroidTestRecord : centroidData) {
+        std::string imageFilename = centroidTestRecord.first;
+        ImageT testImage(imageFilename.c_str());
+        PointT<float> expectedCentroidPoint = centroidTestRecord.second;
+        std::optional<PointT<float>> centroidOpt = centroidAlgorithm->calc(testImage);
+
+        BOOST_CHECK(centroidOpt.has_value());
+        BOOST_CHECK_CLOSE(centroidOpt.value().x(), expectedCentroidPoint.x(), 0.001F);
+        BOOST_CHECK_CLOSE(centroidOpt.value().y(), expectedCentroidPoint.y(), 0.001F);
+    }
+}
+
+
 /**
  * Calculate centroids using the intensity weighted center (IWC)
  * method. This array contains pairs of filename and expected centroid.
@@ -77,12 +123,13 @@ BOOST_AUTO_TEST_SUITE(centroid_tests)
  */
 BOOST_AUTO_TEST_CASE(intensity_weighted_centroid_test)
 {
-    std::array<std::pair<std::string, PointT<float> >, 5> centroidData = {
+    std::array<std::pair<std::string, PointT<float> >, 6> centroidData = {
             std::make_pair("test_data/centroiding/test_image_all_pixels_value_1_5x5.tif", PointT<float>(2.0F,2.0F)),
             std::make_pair("test_data/centroiding/test_image_one_pixel_bottom_right_5x5.tif", PointT<float>(3.0F,3.0F)),
             std::make_pair("test_data/centroiding/test_image_one_pixel_top_left_10x10.tif", PointT<float>(1.0F,1.0F)),
             std::make_pair("test_data/centroiding/test_image_two_opposite_pixels_5x5.tif", PointT<float>(2.0F,2.0F)),
-            std::make_pair("test_data/centroiding/test_image_ideal_star_73x65.tif", PointT<float>(22.0F,14.0F))
+            std::make_pair("test_data/centroiding/test_image_ideal_star_73x65.tif", PointT<float>(22.0F,14.0F)),
+            std::make_pair("test_data/centroiding/test_image_noise_on_the_left_and_one_center_pixel_5x5.tif", PointT<float>(1.99803F,2.0F))
     };
 
     auto centroidAlgorithm = CentroidAlgorithmFactoryT::getInstance(CentroidAlgorithmTypeT::IWC);
@@ -94,92 +141,13 @@ BOOST_AUTO_TEST_CASE(intensity_weighted_centroid_test)
         std::optional<PointT<float>> centroidOpt = centroidAlgorithm->calc(testImage);
 
         BOOST_CHECK(centroidOpt.has_value());
-        BOOST_CHECK_EQUAL(centroidOpt.value(), expectedCentroidPoint);
+        BOOST_CHECK_CLOSE(centroidOpt.value().x(), expectedCentroidPoint.x(), 0.001F);
+        BOOST_CHECK_CLOSE(centroidOpt.value().y(), expectedCentroidPoint.y(), 0.001F);
     }
 }
 
-/**
- * Calculate centroids using the center of gravity (COG) method.
- * This array contains pairs of filename and expected centroid.
- * The expected values were cross-checked manually.
- */
-BOOST_AUTO_TEST_CASE(center_of_gravity_centroid_test)
-{
-    std::array<std::pair<std::string, PointT<float> >, 4> centroidData = {
-        std::make_pair("test_data/centroiding/test_image_all_pixels_value_1_5x5.tif", PointT<float>(2.0F,2.0F)),
-        std::make_pair("test_data/centroiding/test_image_one_pixel_bottom_right_5x5.tif", PointT<float>(3.0F,3.0F)),
-        std::make_pair("test_data/centroiding/test_image_one_pixel_top_left_10x10.tif", PointT<float>(1.0F,1.0F)),
-        std::make_pair("test_data/centroiding/test_image_two_opposite_pixels_5x5.tif", PointT<float>(2.0F,2.0F))
-    };
-
-    auto centroidAlgorithm = CentroidAlgorithmFactoryT::getInstance(CentroidAlgorithmTypeT::COG);
-
-    for (auto const & centroidTestRecord : centroidData) {
-        std::string imageFilename = centroidTestRecord.first;
-        ImageT testImage(imageFilename.c_str());
-        PointT<float> expectedCentroidPoint = centroidTestRecord.second;
-        std::optional<PointT<float>> centroidOpt = centroidAlgorithm->calc(testImage);
-
-        BOOST_CHECK(centroidOpt.has_value());
-        BOOST_CHECK_EQUAL(centroidOpt.value(), expectedCentroidPoint);
-    }
-}
-
-// TODO: Need one test image which gives different results for IWC and COG!
-// TODO: Remove old Centroid from code
-
-
-
-// TODO!!!
-//TODO: Implement the other centroid algorithms... WCOG, ?? SUB-PIXEL and MOMENT2?!
+// TODO: Implement the other centroid algorithms... WCOG, ?? SUB-PIXEL and MOMENT2?!
 // TODO: Add further tests?
-// TODO!!!
-
-
-
-// TODO: Centroid calc depends on the actual algorithm. So the test cases below have to be refactored!
-//       -> The old CentroidT class is about to be removed.
-///**
-///**
-// * Check Centroid of empty image. Expectation is that valid()
-// * returns false and the optional return value has no value.
-// */
-//    BOOST_AUTO_TEST_CASE(centroid_test_empty_image)
-//    {
-//        ImageT nullImage;
-//
-//        BOOST_CHECK_THROW(CentroidT::calculate(nullImage), CentroidExceptionT);
-//    }
-
-// * Test centroid calculation for a perfectly normal distributed star
-// * with odd pixel count. The centroid is right in the middle of the image.
-// */
-//BOOST_AUTO_TEST_CASE(centroid_test_perfect_normal_distribution_centered_image)
-//{
-//    ImageT normalDistOddPixelCountImage("test_data/gaussian_normal_distribution_2d/gaussian_2d_sigma1_factor_65535_odd_101x101.tiff");
-//
-//    auto centroid = CentroidT::calculate(normalDistOddPixelCountImage);
-//    BOOST_CHECK_CLOSE( centroid->x(), 50.0F, 0.001F );
-//    BOOST_CHECK_CLOSE( centroid->y(), 50.0F, 0.001F );
-//}
-//
-//
-///**
-// * Test centroid calculation for a perfectly normal distributed star
-// * with odd pixel count. The centroid is at position (x=22,y=14).
-// */
-//BOOST_AUTO_TEST_CASE(centroid_test_perfect_normal_distribution_shifted_image)
-//{
-//    ImageT normalDistOddPixelCountImage("test_data/test_image_21.tif");
-//
-//    auto centroid = CentroidT::calculate(normalDistOddPixelCountImage);
-//    BOOST_CHECK_CLOSE( centroid->x(), 22.0F, 0.1F );
-//    BOOST_CHECK_CLOSE( centroid->y(), 14.0F, 0.1F );
-//}
-
-
-// TODO: Further tests...
-// TODO: Extend centroid calc function to also allow specification of a "region of interest"
-//        or a point around which the centroid should be determined?
+// TODO: Remove old Centroid from code
 
 BOOST_AUTO_TEST_SUITE_END();
