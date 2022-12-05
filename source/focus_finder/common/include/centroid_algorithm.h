@@ -43,6 +43,13 @@ public:
     [[nodiscard]] virtual std::string getName() const = 0;
 
     [[nodiscard]] virtual std::optional<PointT<float>> calc(const ImageT &inImg, const BackgroundThresholdFunctionT& inBgThresholdFunction = nullptr) const = 0;
+
+
+    static bool isBackgroundThresholdFunctionSet(const BackgroundThresholdFunctionT &inBgThresholdFunction) ;
+
+    static ImageT
+    applyBackgroundThresholdFunction(const ImageT &inImg,
+                                     const BackgroundThresholdFunctionT &inBgThresholdFunction) ;
 };
 
 #endif /*SOURCE_FOCUS_FINDER_COMMON_INCLUDE_CENTROID_ALGORITHM_H_*/

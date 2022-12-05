@@ -22,32 +22,29 @@
  *
  ****************************************************************************/
 
-#ifndef FOFI_INTENSITY_WEIGHTED_CENTROID_ALGORITHM_H
-#define FOFI_INTENSITY_WEIGHTED_CENTROID_ALGORITHM_H
+#include "include/centroid_algorithm.h"
 
-#include <optional>
+ImageT CentroidAlgorithmT::applyBackgroundThresholdFunction(const ImageT &inImg, const BackgroundThresholdFunctionT &inBgThresholdFunction) {
 
-#include "centroid_algorithm.h"
-#include "image.h"
+    if (isBackgroundThresholdFunctionSet(inBgThresholdFunction)) {
+        double backgroundThreshold = inBgThresholdFunction(inImg);
 
-class IntensityWeightedCentroidAlgorithmT : public CentroidAlgorithmT {
-public:
-    [[nodiscard]] std::string getName() const override;
+        // Create an emtpy image with xy-dimensions of inImg.
+        // See https://cimg.eu/reference/structcimg__library_1_1CImg.html
+        ImageT starImage(inImg, "xy");
 
-    /**
-     * The "Intensity Weighted Centroiding" is described on page 170 of
-     * "Topics in Adaptive Optics" - "Advanced Methods for Improving the Efficiency
-     * of a Shack Hartmann Wavefront Sensor"
-     * See http://cdn.intechopen.com/pdfs-wm/26716.pdf
-     *
-     * @param inImg
-     * @param inBgThresholdFunction
-     * @return Calculated centroid. NOTE: The position is in image coordinates.
+        // NOTE: If resulting pixel value is negative, 0 is applied.
+        cimg_forXY(inImg, x, y) {
+                starImage(x, y) = (float) (inImg(x, y) < backgroundThreshold ? 0 : inImg(x, y) - backgroundThreshold);
+            }
 
-     */
-    [[nodiscard]] std::optional<PointT<float>> calc(const ImageT &inImg, const BackgroundThresholdFunctionT& inBgThresholdFunction) const override;
+        return starImage;
+    }
+    else {
+        // Return a copy
+        return inImg;
+    }
+}
 
-    static PointT<float> calcIntensityWeightedCenter(const ImageT &inImg);
-};
-
-#endif //FOFI_INTENSITY_WEIGHTED_CENTROID_ALGORITHM_H
+bool CentroidAlgorithmT::isBackgroundThresholdFunctionSet(
+        const BackgroundThresholdFunctionT &inBgThresholdFunction) { return inBgThresholdFunction != nullptr; }

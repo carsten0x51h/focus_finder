@@ -48,31 +48,6 @@ std::optional<PointT<float>> IntensityWeightedCentroidAlgorithmT::calc(const Ima
     };
 }
 
-ImageT IntensityWeightedCentroidAlgorithmT::applyBackgroundThresholdFunction(const ImageT &inImg, const BackgroundThresholdFunctionT &inBgThresholdFunction) {
-
-    if (isBackgroundThresholdFunctionSet(inBgThresholdFunction)) {
-        double backgroundThreshold = inBgThresholdFunction(inImg);
-
-        // Create an emtpy image with xy-dimensions of inImg.
-        // See https://cimg.eu/reference/structcimg__library_1_1CImg.html
-        ImageT starImage(inImg, "xy");
-
-        // NOTE: If resulting pixel value is negative, 0 is applied.
-        cimg_forXY(inImg, x, y) {
-            starImage(x, y) = (float) (inImg(x, y) < backgroundThreshold ? 0 : inImg(x, y) - backgroundThreshold);
-        }
-
-        return starImage;
-    }
-    else {
-        // Return a copy
-        return inImg;
-    }
-}
-
-bool IntensityWeightedCentroidAlgorithmT::isBackgroundThresholdFunctionSet(
-        const CentroidAlgorithmT::BackgroundThresholdFunctionT &inBgThresholdFunction) { return inBgThresholdFunction != nullptr; }
-
 PointT<float> IntensityWeightedCentroidAlgorithmT::calcIntensityWeightedCenter(const ImageT &inImg) {
 
     PointT<float> centroid;
@@ -86,9 +61,8 @@ PointT<float> IntensityWeightedCentroidAlgorithmT::calcIntensityWeightedCenter(c
     // However, for the calculation 1..M is expected.
     // Therefore, +1 is needed. Otherwise, the first I2x
     // and I2y are not counted.
-    // TODO: Question is, if this is sufficient, or if from the result 1 must be subtracted again!
     cimg_forXY(inImg, x, y) {
-        I2 = pow(inImg(x, y), 2.0);
+        I2 = std::pow(inImg(x, y), 2.0);
         I2x += I2 * (x + 1);
         I2y += I2 * (y + 1);
         Ixy2 += I2;
