@@ -28,26 +28,13 @@
 #include <optional>
 
 #include "../../common/include/centroid_algorithm_factory.h"
-#include "../../common/include/thresholding_algorithm_factory.h"
-#include "../../common/include/image.h"
-#include "../../common/include/point.h"
-#include "../../common/include/logging.h"
 
 /**
  * TODO: Rename image files - Encode dimensions - e.g. 120x120 and type
  *       of image (e.g. plain/all_values_1/gaussian). Adapt names in HFD
  *       tests as well. Why? test_image_15.tif does not say anything.
- *
- * TODO / IDEA: Pass threshold function? Or better expect image where background was already removed??
- *              This way threshold functionality does not mix up with actual centroid calculation and
- *              also unit tests will have one dimension less. Furthermore, the parent class
- *              CentroidAlgorithmT does ot need to hold common functionality. In other words, it is the
- *              developers responsibility, to apply the required operations (like threshold calculation
- *              and subtraction as well as potential noise reduction steps). Both operations are optional
- *              and highly depend on the actual image.
  */
 BOOST_AUTO_TEST_SUITE(centroid_tests)
-
 
 
 /**
@@ -85,7 +72,7 @@ BOOST_AUTO_TEST_SUITE(centroid_tests)
  * For the 5x5 image (image index starting with 0,0), this is
  * exactly in the center.
  */
-BOOST_AUTO_TEST_CASE(intensity_weighted_centroid_no_bg_threshold_all_pixel_values_equal_1_test)
+BOOST_AUTO_TEST_CASE(intensity_weighted_centroid_all_pixel_values_equal_1_test)
 {
     ImageT plainImage("test_data/test_image_22.tif"); // All pixels have the value 1 - 5x5
 
@@ -103,7 +90,7 @@ BOOST_AUTO_TEST_CASE(intensity_weighted_centroid_no_bg_threshold_all_pixel_value
  *
  * The expected centroid index position is (x,y)=(22,14).
  */
-BOOST_AUTO_TEST_CASE(intensity_weighted_centroid_no_bg_threshold_perfect_star_test)
+BOOST_AUTO_TEST_CASE(intensity_weighted_centroid_perfect_star_test)
 {
     ImageT perfectStarImage("test_data/test_image_21.tif"); // Ideal star with centroid at (x,y)=(22, 14)
 
@@ -114,65 +101,6 @@ BOOST_AUTO_TEST_CASE(intensity_weighted_centroid_no_bg_threshold_perfect_star_te
     BOOST_CHECK(centroidOpt.has_value());
     BOOST_CHECK_EQUAL(centroidOpt.value(), PointT<float>(22.0F,14.0F));
 }
-
-
-/**
- * Calculate centroid of a noisy image with a real star using the intensity weighted
- * centroiding method without using a background threshold function.
- *
- * Visually, the centroid is close to (x,y)=(15, 14).
- * Calculation using IWC gives (x,y) = (13.1486, 13.6157).
- */
-BOOST_AUTO_TEST_CASE(intensity_weighted_centroid_no_bg_threshold_real_noisy_star_test)
-{
-    ImageT perfectStarImage("test_data/test_image_23.tif");
-
-    auto centroidAlgorithm = CentroidAlgorithmFactoryT::getInstance(CentroidAlgorithmTypeT::IWC);
-
-    std::optional<PointT<float>> centroidOpt = centroidAlgorithm->calc(perfectStarImage);
-
-    BOOST_CHECK(centroidOpt.has_value());
-    BOOST_CHECK_CLOSE(centroidOpt.value().x(), 13.1486F, 0.001F);
-    BOOST_CHECK_CLOSE(centroidOpt.value().y(), 13.6157F, 0.001F);
-}
-
-
-/**
- * TODO: This is a "real world" test which includes a threshold calculation.
- *       Thresholding code should not being used in the centroid_tests.
- *       Instead, a separate "real world"m "mixed" or "pipeline" test should
- *       be added. For testing the centroid functions, artificial test images
- *       without noise should be used!
- *
- * Calculate centroid of a noisy image with a real star using the intensity weighted
- * centroiding method and the Max-Entropy background threshold function.
- *
- * Visually, the centroid is close to (x,y)=(15, 14).
- * Calculation using IWC gives (x,y) = (14.8288746, 13.9050961).
- */
-BOOST_AUTO_TEST_CASE(intensity_weighted_centroid_max_entropy_threshold_real_noisy_star_test)
-{
-    ImageT realNoisyStarImage("test_data/test_image_23.tif");
-
-    auto centroidAlgorithm = CentroidAlgorithmFactoryT::getInstance(CentroidAlgorithmTypeT::IWC);
-
-    auto maxEntropyThresholdAlgorithm = ThresholdingAlgorithmFactoryT::getInstance(ThresholdingAlgorithmTypeT::MAX_ENTROPY);
-    float threshold = maxEntropyThresholdAlgorithm->calc(realNoisyStarImage, 16);
-
-    ImageT imgMinusThreshold(realNoisyStarImage, "xy");
-
-    cimg_forXY(realNoisyStarImage, x, y) {
-            float currIntensityValue = realNoisyStarImage(x, y);
-            imgMinusThreshold(x,y) = (currIntensityValue > threshold ? currIntensityValue - threshold : 0);
-    }
-
-    std::optional<PointT<float>> centroidOpt = centroidAlgorithm->calc(imgMinusThreshold);
-
-    BOOST_CHECK(centroidOpt.has_value());
-    BOOST_CHECK_CLOSE(centroidOpt.value().x(), 14.8288746, 0.001F);
-    BOOST_CHECK_CLOSE(centroidOpt.value().y(), 13.9050961, 0.001F);
-}
-
 
 /**
  * Calculate centroid of a 5x5 pixel image with all pixel values equal to 1
@@ -187,7 +115,7 @@ BOOST_AUTO_TEST_CASE(intensity_weighted_centroid_max_entropy_threshold_real_nois
  *              -> Then, where does documentation - especially for describing the
  *              expected values - go?
  */
-BOOST_AUTO_TEST_CASE(center_of_gravity_centroid_no_bg_threshold_all_pixel_values_equal_1_test)
+BOOST_AUTO_TEST_CASE(center_of_gravity_centroid_all_pixel_values_equal_1_test)
 {
     ImageT plainImage("test_data/test_image_22.tif"); // All pixels have the value 1 - 5x5
 
@@ -205,7 +133,7 @@ BOOST_AUTO_TEST_CASE(center_of_gravity_centroid_no_bg_threshold_all_pixel_values
 
 
 // TODO!!!
-//TODO: Implement the other centroid algorithms... COG, WCOG, ?? SUB-PIXEL and MOMENT2?!
+//TODO: Implement the other centroid algorithms... WCOG, ?? SUB-PIXEL and MOMENT2?!
 // TODO: Add further tests?
 // TODO!!!
 
