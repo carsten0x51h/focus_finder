@@ -31,6 +31,7 @@
 #include "../../common/include/thresholding_algorithm_factory.h"
 #include "../../common/include/image.h"
 #include "../../common/include/point.h"
+#include "../../common/include/logging.h"
 
 /**
  * TODO: Rename image files - Encode dimensions - e.g. 120x120 and type
@@ -137,6 +138,12 @@ BOOST_AUTO_TEST_CASE(intensity_weighted_centroid_no_bg_threshold_real_noisy_star
 
 
 /**
+ * TODO: This is a "real world" test which includes a threshold calculation.
+ *       Thresholding code should not being used in the centroid_tests.
+ *       Instead, a separate "real world"m "mixed" or "pipeline" test should
+ *       be added. For testing the centroid functions, artificial test images
+ *       without noise should be used!
+ *
  * Calculate centroid of a noisy image with a real star using the intensity weighted
  * centroiding method and the Max-Entropy background threshold function.
  *
@@ -145,18 +152,21 @@ BOOST_AUTO_TEST_CASE(intensity_weighted_centroid_no_bg_threshold_real_noisy_star
  */
 BOOST_AUTO_TEST_CASE(intensity_weighted_centroid_max_entropy_threshold_real_noisy_star_test)
 {
-    ImageT perfectStarImage("test_data/test_image_23.tif");
+    ImageT realNoisyStarImage("test_data/test_image_23.tif");
 
-    auto maxEntropyThresholdAlgorithm = ThresholdingAlgorithmFactoryT::getInstance(ThresholdingAlgorithmTypeT::MAX_ENTROPY);
     auto centroidAlgorithm = CentroidAlgorithmFactoryT::getInstance(CentroidAlgorithmTypeT::IWC);
 
+    auto maxEntropyThresholdAlgorithm = ThresholdingAlgorithmFactoryT::getInstance(ThresholdingAlgorithmTypeT::MAX_ENTROPY);
+    float threshold = maxEntropyThresholdAlgorithm->calc(realNoisyStarImage, 16);
 
-    auto thresholdFunction = [=](const ImageT& inImg) -> double {
-        // TODO: Need to find a solution for the bit-depth... -> make part of ImageT?
-        return maxEntropyThresholdAlgorithm->calc(inImg, 16);
-    };
+    ImageT imgMinusThreshold(realNoisyStarImage, "xy");
 
-    std::optional<PointT<float>> centroidOpt = centroidAlgorithm->calc(perfectStarImage, thresholdFunction);
+    cimg_forXY(realNoisyStarImage, x, y) {
+            float currIntensityValue = realNoisyStarImage(x, y);
+            imgMinusThreshold(x,y) = (currIntensityValue > threshold ? currIntensityValue - threshold : 0);
+    }
+
+    std::optional<PointT<float>> centroidOpt = centroidAlgorithm->calc(imgMinusThreshold);
 
     BOOST_CHECK(centroidOpt.has_value());
     BOOST_CHECK_CLOSE(centroidOpt.value().x(), 14.8288746, 0.001F);
@@ -189,7 +199,6 @@ BOOST_AUTO_TEST_CASE(center_of_gravity_centroid_no_bg_threshold_all_pixel_values
     BOOST_CHECK_EQUAL(centroidOpt.value(), PointT<float>(2.0F,2.0F));
 }
 
-// TODO: Separate Threshold from Centroid!
 // TODO: Implement a few more COG tests.
 // TODO: Remove old Centroid from code
 

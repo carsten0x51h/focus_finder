@@ -199,7 +199,6 @@ set(sources
         ../common/include/centroid.h
         ../common/centroid.cpp
         ../common/include/centroid_algorithm.h
-        ../common/centroid_algorithm.cpp
         ../common/include/centroid_view.h
         ../common/centroid_view.cpp
         ../common/include/focus_finder_logic.h

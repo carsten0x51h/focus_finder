@@ -30,7 +30,7 @@
 
 std::string IntensityWeightedCentroidAlgorithmT::getName() const { return "IntensityWeightedCentroidAlgorithmT"; }
 
-std::optional<PointT<float>> IntensityWeightedCentroidAlgorithmT::calc(const ImageT &inImg, const BackgroundThresholdFunctionT& inBgThresholdFunction) const {
+std::optional<PointT<float>> IntensityWeightedCentroidAlgorithmT::calc(const ImageT &inImg) const {
 
     LOG(debug) << "IntensityWeightedCentroidAlgorithmT::calc..." << std::endl;
 
@@ -41,11 +41,7 @@ std::optional<PointT<float>> IntensityWeightedCentroidAlgorithmT::calc(const Ima
     // Apply background threshold function, if specified
     // In case the background threshold function is not set, this could be implemented
     // more efficient, but this is not likely and this way it is more readable.
-    return std::optional<PointT<float> >{
-        calcIntensityWeightedCenter(
-                applyBackgroundThresholdFunction(inImg, inBgThresholdFunction)
-        )
-    };
+    return std::optional<PointT<float> >{ calcIntensityWeightedCenter(inImg) };
 }
 
 PointT<float> IntensityWeightedCentroidAlgorithmT::calcIntensityWeightedCenter(const ImageT &inImg) {

@@ -41,11 +41,10 @@ public:
      * See http://cdn.intechopen.com/pdfs-wm/26716.pdf
      *
      * @param inImg
-     * @param inBgThresholdFunction
      * @return Calculated centroid. NOTE: The position is in image coordinates.
 
      */
-    [[nodiscard]] std::optional<PointT<float>> calc(const ImageT &inImg, const BackgroundThresholdFunctionT& inBgThresholdFunction) const override;
+    [[nodiscard]] std::optional<PointT<float>> calc(const ImageT &inImg) const override;
 
     static PointT<float> calcCenterOfGravity(const ImageT &inImg);
 };

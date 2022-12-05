@@ -14,7 +14,6 @@ set(sources
 		image_slicer_tests.cpp
 		../../common/point.cpp
         ../../common/centroid.cpp
-		../../common/centroid_algorithm.cpp
 		../../common/centroid_algorithm_factory.cpp
 		../../common/intensity_weighted_centroid_algorithm.cpp
 		../../common/center_of_gravity_centroid_algorithm.cpp

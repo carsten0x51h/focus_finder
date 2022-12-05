@@ -32,6 +32,12 @@
 #include "include/logging.h"
 #include "include/point.h"
 
+/**
+ * NOTE: Based on https://aladin.u-strasbg.fr/java/nph-aladin.pl?frame=plugDetail&name=Centroid.java
+ *
+ * @param inImg
+ * @param outCentroidPos
+ */
 void CentroidT::calcCentroid2ndMoment(const ImageT &inImg,
                                       PointT<float> *outCentroidPos) {
     THROW_IF(Centroid, outCentroidPos == nullptr, "outCentroidPos expected to be set.")
@@ -72,6 +78,10 @@ void CentroidT::calcCentroid2ndMoment(const ImageT &inImg,
     // X and Y are now central brightest pixel in SIZExSIZE grid
     // TODO: Check!! SIZE should be configured?!! SIZE should be odd!?!
 
+    // NOTE: The calculation below "only" is done based on a sub-image
+    //       which is centered around the pixel with the max intensity.
+    //       If there are multiple pixels with max intensities, the fist
+    //       is selected (?).
     int startX = xPosMax - BACK, startY = yPosMax - BACK;
     const ImageT &subInImg = inImg.get_crop(startX, startY,
                                             startX + SIZE - 1, startY + SIZE - 1);
@@ -219,12 +229,22 @@ void CentroidT::calcCentroid2ndMoment(const ImageT &inImg,
     double ySum = 0; // Sum of the product of the intensity of a pixel times it's y-distance from the center of the grid
 
     // Threshold data and calculate the sums
+    // TODO: Instead of the code below, we should apply the threshold as ThresholdAlgorithm
+    //       (like the in the IntensityWeightedCentroidAlgorithmT).
     for (size_t i = 0; i < vals.size(); i++) {
         if (vals[i] <= threshold) {
             vals[i] = 0; // Pix intensity <= threshold, set to 0
         } else {
             vals[i] = (float) (vals[i] - threshold); // Pix intensity > threshold, calculate subtraction
         }
+
+        // NOTE: This looks like the calculation of COG_
+        //     xs = sum_ij(I_ij * x_ij) / sum_ij(I_ij)
+        //     ys = sum_ij(I_ij * y_ij) / sum_ij(I_ij)
+        //
+        // Instead, the COG should be used...
+        //
+        // TODO: Looks like the code above is actually a threshold calculator!
         sum += vals[i]; // Sum of intensities
         xSum += vals[i] * (double) distX[i]; // Sum of intensities * distance X
         ySum += vals[i] * (double) distY[i]; // Sum of intensities * distance Y
@@ -235,6 +255,9 @@ void CentroidT::calcCentroid2ndMoment(const ImageT &inImg,
         throw CentroidExceptionT("Unable to determine centroid.");
     }
 
+    // TODO: Is this adding xPosMax / yPosMax correct?? Shouldn't it be the
+    //       "top, right corner" of the sub-image (see calculation with
+    //       BACK above).
     outCentroidPos->setX((float) (xPosMax + xSum / sum));
     outCentroidPos->setY((float) (yPosMax + ySum / sum));
 }

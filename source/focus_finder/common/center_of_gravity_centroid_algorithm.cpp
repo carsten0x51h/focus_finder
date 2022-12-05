@@ -30,7 +30,7 @@
 
 std::string CenterOfGravityCentroidAlgorithmT::getName() const { return "CenterOfGravityCentroidAlgorithmT"; }
 
-std::optional<PointT<float>> CenterOfGravityCentroidAlgorithmT::calc(const ImageT &inImg, const BackgroundThresholdFunctionT& inBgThresholdFunction) const {
+std::optional<PointT<float>> CenterOfGravityCentroidAlgorithmT::calc(const ImageT &inImg) const {
 
     LOG(debug) << "CenterOfGravityCentroidAlgorithmT::calc..." << std::endl;
 
@@ -41,11 +41,7 @@ std::optional<PointT<float>> CenterOfGravityCentroidAlgorithmT::calc(const Image
     // Apply background threshold function, if specified
     // In case the background threshold function is not set, this could be implemented
     // more efficient, but this is not likely and this way it is more readable.
-    return std::optional<PointT<float> >{
-            calcCenterOfGravity(
-                    applyBackgroundThresholdFunction(inImg, inBgThresholdFunction)
-            )
-    };
+    return std::optional<PointT<float> >{ calcCenterOfGravity(inImg) };
 }
 
 PointT<float> CenterOfGravityCentroidAlgorithmT::calcCenterOfGravity(const ImageT &inImg) {
@@ -61,8 +57,8 @@ PointT<float> CenterOfGravityCentroidAlgorithmT::calcCenterOfGravity(const Image
     // Therefore, +1 is needed. Otherwise, the first I2x
     // and I2y are not counted.
     cimg_forXY(inImg, x, y) {
-        Ix += inImg(x, y) * (x + 1);
-        Iy += inImg(x, y) * (y + 1);
+        Ix += inImg(x, y) * (x + 1.0F);
+        Iy += inImg(x, y) * (y + 1.0F);
         sumOfAllIntensityValues += inImg(x, y);
     }
 
