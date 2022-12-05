@@ -35,9 +35,17 @@ public:
     [[nodiscard]] std::string getName() const override;
 
     /**
+     * Intensity Weighted Centroiding (IWC) is similar to WCoG with a
+     * difference that the weighting function, Wij is the intensity
+     * distribution of the spot pattern, Iij .
+     *
+     * In comparison to the CoG method, this algorithm performs a better job
+     * under low light level conditions and low background and readout noise.
+     *
      * The "Intensity Weighted Centroiding" is described on page 170 of
      * "Topics in Adaptive Optics" - "Advanced Methods for Improving the Efficiency
      * of a Shack Hartmann Wavefront Sensor"
+     *
      * See http://cdn.intechopen.com/pdfs-wm/26716.pdf
      *
      * @param inImg

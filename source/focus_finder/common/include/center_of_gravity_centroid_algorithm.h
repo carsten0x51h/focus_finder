@@ -35,6 +35,10 @@ public:
     [[nodiscard]] std::string getName() const override;
 
     /**
+     * This is the simplest of all the centroiding techniques and is best
+     * suited to situations where the light intensity levels are sufficiently
+     * high and the signal to noise ratio (SNR) is good enough.
+
      * The "Center Of Gravity Centroiding" is described on page 169 of
      * "Topics in Adaptive Optics" - "Advanced Methods for Improving the Efficiency
      * of a Shack Hartmann Wavefront Sensor"
