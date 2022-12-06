@@ -32,7 +32,11 @@ float OtsuThresholdingAlgorithmT::calc(const ImageT &inImg, long bitDepth) const
 
     LOG(debug) << "OtsuThresholdingAlgorithmT::calc..." << std::endl;
 
-    size_t numBuckets = std::pow(2.0F, bitDepth);
+    if (inImg.width() <= 0 || inImg.height() <= 0) {
+        throw ThresholdingExceptionT("No image supplied.");
+    }
+
+    auto numBuckets = (size_t) std::pow(2.0F, bitDepth);
     std::vector<float> hist(numBuckets, 0.0F);
 
     float numPixels = (float) inImg.width() * (float) inImg.height();
@@ -45,15 +49,15 @@ float OtsuThresholdingAlgorithmT::calc(const ImageT &inImg, long bitDepth) const
     LOG(debug) << "OtsuThresholdingAlgorithmT::calc - numBuckets: " << numBuckets << ", numPixels: " << numPixels
                << std::endl;
 
-    // Calculate histogram - for some reason inImg.get_histogram() behaves different than expected.
+    // Calculate histogram - for some reason inImg.get_histogram() behaves unexpectedly.
     cimg_forXY(inImg, x, y) {
-            int value = inImg(x, y);
+            int value = (int) inImg(x, y);
             ++hist[value];
         }
 
     float sum = 0;
     for (size_t pos = 0; pos < numBuckets; ++pos) {
-        sum += pos * hist[pos];
+        sum += (float) pos * hist[pos];
     }
 
 
@@ -66,7 +70,7 @@ float OtsuThresholdingAlgorithmT::calc(const ImageT &inImg, long bitDepth) const
 
         if (isAlmostEqual(wF, 0.0F)) { break; }
 
-        sumB += i * hist[i];
+        sumB += (float) i * hist[i];
 
         float mF = (sum - sumB) / wF;
         float mB = sumB / wB;
@@ -74,9 +78,9 @@ float OtsuThresholdingAlgorithmT::calc(const ImageT &inImg, long bitDepth) const
         float bw = wB * wF * std::pow(diff, 2.0F);
 
         if (bw >= max) {
-            threshold1 = i;
+            threshold1 = (float) i;
             if (bw > max) {
-                threshold2 = i;
+                threshold2 = (float) i;
             }
             max = bw;
         }

@@ -35,20 +35,23 @@ std::string MaxEntropyThresholdingAlgorithmT::getName() const { return "MaxEntro
 // TODO: bitDepth is not required..?! -> remove it...
 // TODO: Supply number of bins at parameter / template parameter?
 // TODO: Supply image type also as template parameter?
-float MaxEntropyThresholdingAlgorithmT::calc(const ImageT &img, long bitDepth) const {
+float MaxEntropyThresholdingAlgorithmT::calc(const ImageT &inImg, long bitDepth) const {
 
     LOG(debug) << "MaxEntropyThresholdingAlgorithmT::calc..." << std::endl;
+
+    if (inImg.width() <= 0 || inImg.height() <= 0) {
+        throw ThresholdingExceptionT("No image supplied.");
+    }
 
     size_t numBins = NUM_BINS;
     std::vector<float> hist(numBins, 0);
 
-    // TODO: Use min_max()...
     float max;
-    float min = img.min_max(max);
+    float min = inImg.min_max(max);
 
     LOG(debug) << "MaxEntropyThresholdingAlgorithmT::calc... bitDepth=" << bitDepth
                << ", numBins=" << numBins << ", min=" << min << ", max=" << max
-               << ", img-dim (w x h)=" << img.width() << " x " << img.height() << std::endl;
+               << ", img-dim (w x h)=" << inImg.width() << " x " << inImg.height() << std::endl;
 
     /**
      * IMPORTANT / IDEA: "Shrink" /map the float image pixel values to 256 possible brightness levels (i.e. 256 histogram bins).
@@ -57,13 +60,13 @@ float MaxEntropyThresholdingAlgorithmT::calc(const ImageT &img, long bitDepth) c
      * histogram. In order to get the threshold for the initial float image, this transformation needs to be reverted
      * later (see comment below).
      */
-    cimg_forXY(img, x, y) {
-            int idx = (int) ((float) (numBins - 1) * (img(x, y) - min) / (max - min));
+    cimg_forXY(inImg, x, y) {
+            int idx = (int) ((float) (numBins - 1) * (inImg(x, y) - min) / (max - min));
             ++hist[idx];
         }
 
     // Normalize histogram (sum of all is 1)
-    float sum = (float) img.width() * (float) img.height();
+    float sum = (float) inImg.width() * (float) inImg.height();
 
     std::vector<float> normHist(hist);
     for (auto it = normHist.begin(); it != normHist.end(); ++it) {
@@ -79,7 +82,7 @@ float MaxEntropyThresholdingAlgorithmT::calc(const ImageT &img, long bitDepth) c
         accumHistSum += normHist[idx];
 
         accumulatedHistBlack[idx] = accumHistSum;
-        accumulatedHistWhite[idx] = 1.0F - accumHistSum; // TODO: not exactly 0 where it should be 0...
+        accumulatedHistWhite[idx] = 1.0F - accumHistSum;
     }
 
     // Find first index of element not 0 in black distribution

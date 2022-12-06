@@ -28,6 +28,9 @@
 #include <string>
 
 #include "image.h"
+#include "exception.h"
+
+DEF_Exception(Thresholding);
 
 class ThresholdingAlgorithmT {
 public:

@@ -31,5 +31,9 @@ float MeanThresholdingAlgorithmT::calc(const ImageT &inImg, long bitDepth) const
 
     LOG(trace) << "MeanThresholdingAlgorithmT::calc..." << std::endl;
 
+    if (inImg.width() <= 0 || inImg.height() <= 0) {
+        throw ThresholdingExceptionT("No image supplied.");
+    }
+
     return (float) inImg.mean();
 }
