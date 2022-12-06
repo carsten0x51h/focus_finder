@@ -29,7 +29,6 @@
 #include <cmath>
 
 #include "../../common/include/hfd.h"
-#include "../../common/include/image.h"
 
 BOOST_AUTO_TEST_SUITE(hfd_tests)
 
