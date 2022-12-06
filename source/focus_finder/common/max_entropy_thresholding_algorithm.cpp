@@ -141,7 +141,7 @@ float MaxEntropyThresholdingAlgorithmT::calc(const ImageT &inImg, long bitDepth)
 
         if (max_ent < tot_ent) {
             max_ent = tot_ent;
-            threshold = idx;
+            threshold = (float) idx;
         }
     }
 
@@ -149,7 +149,7 @@ float MaxEntropyThresholdingAlgorithmT::calc(const ImageT &inImg, long bitDepth)
      * IMPORTANT: The histogram was "shrinked" to 256 values, i.e. float pixel value range was mapped to 256 brightness values.
      * This "shrinking" step needs to be reverted so that the calculated threshold matches the original float image.
      */
-    float th2 = min + (threshold / numBins) * (max - min);
+    float th2 = min + (threshold / (float) numBins) * (max - min);
 
     LOG(debug) << "MaxEntropyThresholdingAlgorithmT::calc...threshold: " << threshold << ", th2: " << th2 << std::endl;
 

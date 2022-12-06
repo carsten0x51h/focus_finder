@@ -57,8 +57,8 @@ PointT<float> CenterOfGravityCentroidAlgorithmT::calcCenterOfGravity(const Image
     // Therefore, +1 is needed. Otherwise, the first I2x
     // and I2y are not counted.
     cimg_forXY(inImg, x, y) {
-        Ix += inImg(x, y) * (x + 1.0F);
-        Iy += inImg(x, y) * (y + 1.0F);
+        Ix += inImg(x, y) * ((float) x + 1.0F);
+        Iy += inImg(x, y) * ((float) y + 1.0F);
         sumOfAllIntensityValues += inImg(x, y);
     }
 
