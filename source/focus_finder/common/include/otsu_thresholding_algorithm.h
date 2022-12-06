@@ -34,10 +34,22 @@
  * histogram of our pixel intensities of our image is bi-modal, which simply means that
  * the histogram is two peaks.
  *
+ * Otsu's thresholding method involves iterating through all the possible threshold
+ * values and calculating a measure of spread for the pixel levels each side of the
+ * threshold, i.e. the pixels that either fall in foreground or background. The aim
+ * is to find the threshold value where the sum of foreground and background spreads
+ * is at its minimum.
+ *
  * It’s also important to note that Otsu’s method is an example of global thresholding
  * — implying that a single thresholding value is computed for the entire image.
  *
+ * This threshold is determined by minimizing intra-class intensity variance, or
+ * equivalently, by maximizing inter-class variance. The algorithm exhaustively
+ * searches for the threshold that minimizes the intra-class variance, defined
+ * as a weighted sum of variances of the two classes
+ *
  * See https://rndayala.wordpress.com/2019/11/13/image-processing-thresholding/
+ * See http://www.labbookpages.co.uk/software/imgProc/otsuThreshold.html
  */
 class OtsuThresholdingAlgorithmT : public ThresholdingAlgorithmT {
 public:
