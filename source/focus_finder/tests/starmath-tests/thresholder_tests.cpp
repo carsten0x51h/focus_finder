@@ -58,12 +58,24 @@ BOOST_AUTO_TEST_CASE(mean_thresholding_plain_image_test)
 
 /**
  *
+ * TODO: Deal with depth...
  */
-BOOST_AUTO_TEST_CASE(otsu_thresholding_plain_image_test)
+BOOST_AUTO_TEST_CASE(otsu_thresholding_test)
 {
+    ImageT allPixeslValue1Image("test_data/thresholding/test_image_thresholding_all_pixels_value_1_120x120.tif");
+    ImageT allPixelsValue65535Image("test_data/thresholding/test_image_thresholding_all_pixels_value_65535_100x100.tif");
     ImageT twoPeakHistogramImage("test_data/thresholding/test_image_histogram_two_peaks_281x204.tif");
 
-    // TODO: Deal with depth...
+    BOOST_CHECK_CLOSE(
+            ThresholdingAlgorithmFactoryT::getInstance(ThresholdingAlgorithmTypeT::OTSU)->calc(allPixeslValue1Image, 16),
+            0.0F    /*expected threshold*/,
+            0.001F  /*fault tolerance*/
+    );
+    BOOST_CHECK_CLOSE(
+            ThresholdingAlgorithmFactoryT::getInstance(ThresholdingAlgorithmTypeT::OTSU)->calc(allPixelsValue65535Image, 16),
+            0.0F    /*expected threshold*/,
+            0.001F  /*fault tolerance*/
+    );
     BOOST_CHECK_CLOSE(
             ThresholdingAlgorithmFactoryT::getInstance(ThresholdingAlgorithmTypeT::OTSU)->calc(twoPeakHistogramImage, 16),
             170.0F    /*expected threshold*/,
