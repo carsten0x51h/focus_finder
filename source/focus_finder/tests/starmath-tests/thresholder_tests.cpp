@@ -56,4 +56,19 @@ BOOST_AUTO_TEST_CASE(mean_thresholding_plain_image_test)
     );
 }
 
+/**
+ *
+ */
+BOOST_AUTO_TEST_CASE(otsu_thresholding_plain_image_test)
+{
+    ImageT twoPeakHistogramImage("test_data/thresholding/test_image_histogram_two_peaks_281x204.tif");
+
+    // TODO: Deal with depth...
+    BOOST_CHECK_CLOSE(
+            ThresholdingAlgorithmFactoryT::getInstance(ThresholdingAlgorithmTypeT::OTSU)->calc(twoPeakHistogramImage, 16),
+            170.0F    /*expected threshold*/,
+            0.001F  /*fault tolerance*/
+    );
+}
+
 BOOST_AUTO_TEST_SUITE_END();

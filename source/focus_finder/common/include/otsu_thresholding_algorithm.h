@@ -28,6 +28,17 @@
 #include "thresholding_algorithm.h"
 #include "image.h"
 
+/**
+ * Otsu’s method assumes that our image contains two classes of pixels: the background and
+ * the foreground. Furthermore, Otsu’s method makes the assumption that the grayscale
+ * histogram of our pixel intensities of our image is bi-modal, which simply means that
+ * the histogram is two peaks.
+ *
+ * It’s also important to note that Otsu’s method is an example of global thresholding
+ * — implying that a single thresholding value is computed for the entire image.
+ *
+ * See https://rndayala.wordpress.com/2019/11/13/image-processing-thresholding/
+ */
 class OtsuThresholdingAlgorithmT : public ThresholdingAlgorithmT {
 public:
     [[nodiscard]] std::string getName() const override;
