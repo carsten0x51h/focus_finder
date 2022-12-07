@@ -39,8 +39,11 @@ std::shared_ptr<CentroidAlgorithmT> CentroidAlgorithmFactoryT::getInstance(
             return std::make_shared<CenterOfGravityCentroidAlgorithmT>();
 
         default: {
-            // TODO: Better throw an exception?!
-            return nullptr;
+            std::stringstream ss;
+            ss << "Unknown centroid algorithm type "
+               << CentroidAlgorithmTypeT::asStr(type) << std::endl;
+
+            throw CentroidExceptionT(ss.str());
         }
     }
 }

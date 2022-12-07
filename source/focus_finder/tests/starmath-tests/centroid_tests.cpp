@@ -23,11 +23,17 @@
  ****************************************************************************/
 
 #include <boost/test/unit_test.hpp>
+#include <boost/test/data/test_case.hpp>
+#include <boost/test/data/monomorphic.hpp>
 #include <boost/test/tools/floating_point_comparison.hpp>
 
 #include <optional>
 
+#include <string>
+
 #include "../../common/include/centroid_algorithm_factory.h"
+
+namespace bdata = boost::unit_test::data;
 
 /**
  * TODO: Rename image files - Encode dimensions - e.g. 120x120 and type
@@ -51,34 +57,29 @@ BOOST_AUTO_TEST_CASE(centroid_test_empty_image)
     BOOST_CHECK_THROW(centroidAlgorithmIwc->calc(nullImage), CentroidExceptionT);
 }
 
-
 /**
  * Calculate centroids using the center of gravity (COG) method.
  * This array contains pairs of filename and expected centroid.
  * The expected values were cross-checked manually.
  */
-BOOST_AUTO_TEST_CASE(center_of_gravity_centroid_test)
+BOOST_DATA_TEST_CASE(center_of_gravity_centroid_test, bdata::make(
+        std::vector< std::tuple<std::string, PointT<float> > > {
+                { "test_data/centroiding/test_image_all_pixels_value_1_5x5.tif", PointT<float>(2.0F,2.0F) },
+                { "test_data/centroiding/test_image_one_pixel_bottom_right_5x5.tif", PointT<float>(3.0F,3.0F) },
+                { "test_data/centroiding/test_image_one_pixel_top_left_10x10.tif", PointT<float>(1.0F,1.0F) },
+                { "test_data/centroiding/test_image_two_opposite_pixels_5x5.tif", PointT<float>(2.0F,2.0F) },
+                { "test_data/centroiding/test_image_noise_on_the_left_and_one_center_pixel_5x5.tif", PointT<float>(1.88378F,2.0F) }
+            }),
+            imageFilename, expectedCentroidPoint)
 {
-    std::array<std::pair<std::string, PointT<float> >, 5> centroidData = {
-            std::make_pair("test_data/centroiding/test_image_all_pixels_value_1_5x5.tif", PointT<float>(2.0F,2.0F)),
-            std::make_pair("test_data/centroiding/test_image_one_pixel_bottom_right_5x5.tif", PointT<float>(3.0F,3.0F)),
-            std::make_pair("test_data/centroiding/test_image_one_pixel_top_left_10x10.tif", PointT<float>(1.0F,1.0F)),
-            std::make_pair("test_data/centroiding/test_image_two_opposite_pixels_5x5.tif", PointT<float>(2.0F,2.0F)),
-            std::make_pair("test_data/centroiding/test_image_noise_on_the_left_and_one_center_pixel_5x5.tif", PointT<float>(1.88378F,2.0F))
-    };
-
     auto centroidAlgorithm = CentroidAlgorithmFactoryT::getInstance(CentroidAlgorithmTypeT::COG);
 
-    for (auto const & centroidTestRecord : centroidData) {
-        std::string imageFilename = centroidTestRecord.first;
-        ImageT testImage(imageFilename.c_str());
-        PointT<float> expectedCentroidPoint = centroidTestRecord.second;
-        std::optional<PointT<float>> centroidOpt = centroidAlgorithm->calc(testImage);
+    ImageT testImage(imageFilename.c_str());
+    std::optional<PointT<float>> centroidOpt = centroidAlgorithm->calc(testImage);
 
-        BOOST_CHECK(centroidOpt.has_value());
-        BOOST_CHECK_CLOSE(centroidOpt.value().x(), expectedCentroidPoint.x(), 0.001F);
-        BOOST_CHECK_CLOSE(centroidOpt.value().y(), expectedCentroidPoint.y(), 0.001F);
-    }
+    BOOST_CHECK(centroidOpt.has_value());
+    BOOST_CHECK_CLOSE(centroidOpt.value().x(), expectedCentroidPoint.x(), 0.001F);
+    BOOST_CHECK_CLOSE(centroidOpt.value().y(), expectedCentroidPoint.y(), 0.001F);
 }
 
 

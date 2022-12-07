@@ -42,6 +42,7 @@ BOOST_AUTO_TEST_CASE(hfd_test_empty_image)
     BOOST_CHECK_THROW(HfdT::calculate(nullImage), HfdExceptionT);
 }
 
+// TODO: Move test images to new hfd folder!... and rename them!
 
 /**
  * Check HFD of completely dark image
