@@ -23,12 +23,15 @@
  ****************************************************************************/
 
 #include <boost/test/unit_test.hpp>
+#include <boost/test/data/test_case.hpp>
 #include <boost/test/tools/floating_point_comparison.hpp>
 
 #include <memory>
 #include <cmath>
 
 #include "../../common/include/hfd.h"
+
+namespace bdata = boost::unit_test::data;
 
 BOOST_AUTO_TEST_SUITE(hfd_tests)
 
@@ -73,36 +76,26 @@ BOOST_AUTO_TEST_CASE(hfd_dark_image_test)
  *
  * https://www.lost-infinity.com/the-half-flux-diameter-hfd-of-a-plain-image/
  */
-BOOST_AUTO_TEST_CASE(hfd_test_all_pixel_values_equal_1_test)
+BOOST_DATA_TEST_CASE(hfd_test_all_pixel_values_equal_1_test, bdata::make(
+        std::vector< std::tuple<float, float> > {
+                { 1.0F, 0.1F },
+                { 10.0F, 0.01F },
+                { 100.0F, 0.0001F }
+        }),
+        scaleFactor, acceptedError)
 {
-    ImageT plainImage("test_data/test_image_15.tif"); // All pixels have the value 1 - 120x120
+    ImageT plainImage("test_data/hfd/test_image_all_pixels_1_120x120.tif");
 
     const float outerDiameter = 99;
     const float expectedHfd = (2.0F / 3.0F) * outerDiameter;
 
     BOOST_CHECK_CLOSE(HfdT::calculate(plainImage,
                                       outerDiameter,
-                                      1.0F /* scale factor */,
+                                      scaleFactor,
                                       nullptr,
                                       nullptr /*no background threshold subtraction*/),
                       expectedHfd,
-                      0.1F);
-
-    BOOST_CHECK_CLOSE(HfdT::calculate(plainImage,
-                                      outerDiameter,
-                                      10.0F /* scale factor */,
-                                      nullptr,
-                                      nullptr /*no background threshold subtraction*/),
-                      expectedHfd,
-                      0.01F);
-
-    BOOST_CHECK_CLOSE(HfdT::calculate(plainImage,
-                                      outerDiameter,
-                                      100.0F /* scale factor */,
-                                      nullptr,
-                                      nullptr /*no background threshold subtraction*/),
-                      expectedHfd,
-                      0.0001F);
+                      acceptedError);
 }
 
 
