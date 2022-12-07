@@ -76,68 +76,32 @@ BOOST_AUTO_TEST_CASE(hfd_dark_image_test)
  *
  * https://www.lost-infinity.com/the-half-flux-diameter-hfd-of-a-plain-image/
  */
-BOOST_DATA_TEST_CASE(hfd_test_all_pixel_values_equal_1_test, bdata::make(
-        std::vector< std::tuple<float, float> > {
-                { 1.0F, 0.1F },
-                { 10.0F, 0.01F },
-                { 100.0F, 0.0001F }
-        }),
-        scaleFactor, acceptedError)
+BOOST_DATA_TEST_CASE(hfd_test_all_pixel_values_equal_1_test,
+                     bdata::make(
+                        std::vector< std::string > {
+                            "test_data/hfd/test_image_all_pixels_1_120x120.tif",
+                            "test_data/hfd/test_image_all_pixels_65535_120x120.tif"
+                     }) *
+                     bdata::make(
+                        std::vector< std::tuple<float, float> > {
+                            { 1.0F, 0.1F },
+                            { 10.0F, 0.01F },
+                            { 100.0F, 0.0001F }
+                     }),
+                     imageFilename, scaleFactor, acceptedError)
 {
-    ImageT plainImage("test_data/hfd/test_image_all_pixels_1_120x120.tif");
+    ImageT image(imageFilename.c_str());
 
     const float outerDiameter = 99;
     const float expectedHfd = (2.0F / 3.0F) * outerDiameter;
 
-    BOOST_CHECK_CLOSE(HfdT::calculate(plainImage,
+    BOOST_CHECK_CLOSE(HfdT::calculate(image,
                                       outerDiameter,
                                       scaleFactor,
                                       nullptr,
                                       nullptr /*no background threshold subtraction*/),
                       expectedHfd,
                       acceptedError);
-}
-
-
-/**
- * An artificial image where all the pixels have the same value > 0 is used to
- * check if the calculated HFD fits the expected theoretical value.
- *
- * A detailed explanation why the expected HFD equals (2.0F / 3.0F) * outerDiameter
- * can be found here:
- *
- * https://www.lost-infinity.com/the-half-flux-diameter-hfd-of-a-plain-image/
- */
-BOOST_AUTO_TEST_CASE(hfd_test_all_pixel_values_equal_65535_test)
-{
-    ImageT whiteImage("test_data/test_image_14.tif"); // All pixels have the value 65535 - 120x120
-
-    const float outerDiameter = 99;
-    const float expectedHfd = (2.0F / 3.0F) * outerDiameter;
-
-    BOOST_CHECK_CLOSE(HfdT::calculate(whiteImage,
-                                      outerDiameter,
-                                      1.0F /* scale factor */,
-                                      nullptr,
-                                      nullptr /*no background threshold subtraction*/),
-                      expectedHfd,
-                      0.1F);
-
-    BOOST_CHECK_CLOSE(HfdT::calculate(whiteImage,
-                                      outerDiameter,
-                                      10.0F /* scale factor */,
-                                      nullptr,
-                                      nullptr /*no background threshold subtraction*/),
-                      expectedHfd,
-                      0.01F);
-
-    BOOST_CHECK_CLOSE(HfdT::calculate(whiteImage,
-                                      outerDiameter,
-                                      100.0F /* scale factor */,
-                                      nullptr,
-                                      nullptr /*no background threshold subtraction*/),
-                      expectedHfd,
-                      0.0001F);
 }
 
 
