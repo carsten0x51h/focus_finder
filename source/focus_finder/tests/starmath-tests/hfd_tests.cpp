@@ -165,60 +165,33 @@ BOOST_DATA_TEST_CASE(hfd_test_ideal_gaussian_sigmaX_test,
 /**
  * Specify invalid "star center" and/or outer diameters.
  */
-BOOST_AUTO_TEST_CASE(hfd_out_of_bounds_test) {
-        ImageT image120x120("test_data/test_image_14.tif"); // 120x120
+BOOST_DATA_TEST_CASE(hfd_out_of_bounds_test,
+                     (bdata::make(
+                             std::vector< PointT<unsigned int> > {
+                                     PointT<unsigned int>(120,120), // star center position completely out of range of the image dimensions, lower right corner
+                                     PointT<unsigned int>(130,50),  // x coordinate out of bounds
+                                     PointT<unsigned int>(0,0),     // star center position inside image dimensions but "outer diameter" outside image boundaries, top left corner
+                                     PointT<unsigned int>(119,119), // lower right corner
+                                     PointT<unsigned int>(60,60)
+                             }) ^
+                     bdata::make(
+                             std::vector< int > {
+                                     3, 3, 3, 3,
+                                     151            // star center is valid but outer radius completely exceeds image bounds
+                             })) *
+                     bdata::make(
+                             std::vector< float > {
+                                     1.0F, 10.0F
+                             }),
+                     starCenter, outerDiameter, scaleFactor)
+{
+        ImageT image120x120("test_data/hfd/test_image_all_pixels_65535_120x120.tif"); // 120x120
 
-        // star center position completely out of range of the image dimensions
-        // -> Expect exception
-        // lower right corner
         BOOST_CHECK_THROW(HfdT::calculate(
                 image120x120  /* pixel index 0..119 */,
-                PointT<unsigned int>(120,120),
-                3,
-                1.0F /* scale factor */,
-                nullptr,
-                nullptr /*no background threshold subtraction*/),
-                HfdExceptionT);
-
-        // x coordinate out of bounds
-        BOOST_CHECK_THROW(HfdT::calculate(
-                image120x120  /* pixel index 0..119 */,
-                PointT<unsigned int>(130,50),
-                3,
-                1.0F /* scale factor */,
-                nullptr,
-                nullptr /*no background threshold subtraction*/),
-                HfdExceptionT);
-
-
-        // star center position inside image dimensions but "outer diameter" outside image boundaries.
-        // -> Expect exception
-        // top left corner
-        BOOST_CHECK_THROW(HfdT::calculate(
-                image120x120 /* pixel index 0..119 */,
-                PointT<unsigned int>(0,0),
-                3,
-                1.0F /* scale factor */,
-                nullptr,
-                nullptr /*no background threshold subtraction*/),
-                HfdExceptionT);
-
-        // lower right corner
-        BOOST_CHECK_THROW(HfdT::calculate(
-                image120x120 /* pixel index 0..119 */,
-                PointT<unsigned int>(119,119),
-                3,
-                1.0F /* scale factor */,
-                nullptr,
-                nullptr /*no background threshold subtraction*/),
-                HfdExceptionT);
-
-        // star center is valid but outer radius completely exceeds image bounds
-        BOOST_CHECK_THROW(HfdT::calculate(
-                image120x120 /* pixel index 0..119 */,
-                PointT<unsigned int>(60,60),
-                151,
-                1.0F /* scale factor */,
+                starCenter,
+                outerDiameter,
+                scaleFactor,
                 nullptr,
                 nullptr /*no background threshold subtraction*/),
                 HfdExceptionT);
@@ -228,43 +201,27 @@ BOOST_AUTO_TEST_CASE(hfd_out_of_bounds_test) {
 /**
  * Specify invalid "star center" and/or outer diameters.
  */
-BOOST_AUTO_TEST_CASE(hfd_out_star_center_and_outer_diameter_corner_cases_test) {
-        ImageT image120x120("test_data/test_image_14.tif"); // 120x120
+BOOST_DATA_TEST_CASE(hfd_out_star_center_and_outer_diameter_corner_cases_test,
+                     bdata::make(
+                             std::vector< PointT<unsigned int> > {
+                                     PointT<unsigned int>(1,1),     // Star center position and outer diameter at the border but still valid - top left corner
+                                     PointT<unsigned int>(1,50),    // left border
+                                     PointT<unsigned int>(118,50),  // right border
+                                     PointT<unsigned int>(118,118)  // bottom right corner
+                             }) *
+                     bdata::make(
+                             std::vector< float > {
+                                     1.0F, 10.0F
+                             }),
+                     starCenter, scaleFactor)
+{
+        ImageT image120x120("test_data/hfd/test_image_all_pixels_65535_120x120.tif"); // 120x120
 
-        // Star center position and outer diameter at the border but still valid.
-        // top left corner
         BOOST_CHECK_NO_THROW(HfdT::calculate(
                 image120x120 /* pixel index 0..119 */,
-                PointT<unsigned int>(1,1),
+                starCenter,
                 3,
-                1.0F /* scale factor */,
-                nullptr,
-                nullptr /*no background threshold subtraction*/));
-
-        // left border
-        BOOST_CHECK_NO_THROW(HfdT::calculate(
-                image120x120 /* pixel index 0..119 */,
-                PointT<unsigned int>(1,50),
-                3,
-                1.0F /* scale factor */,
-                nullptr,
-                nullptr /*no background threshold subtraction*/));
-
-        // right border
-        BOOST_CHECK_NO_THROW(HfdT::calculate(
-                image120x120 /* pixel index 0..119 */,
-                PointT<unsigned int>(118,50),
-                3,
-                1.0F /* scale factor */,
-                nullptr,
-                nullptr /*no background threshold subtraction*/));
-
-        // bottom right corner
-        BOOST_CHECK_NO_THROW(HfdT::calculate(
-                image120x120 /* pixel index 0..119 */,
-                PointT<unsigned int>(118,118),
-                3,
-                1.0F /* scale factor */,
+                scaleFactor,
                 nullptr,
                 nullptr /*no background threshold subtraction*/));
 }
