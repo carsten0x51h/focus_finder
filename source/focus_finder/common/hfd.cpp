@@ -33,6 +33,9 @@ const HfdT::BackgroundThresholdFunctionT HfdT::defaultBgThresholdFunction = [](c
 };
 
 /**
+ * TODO: The thresholding function should be removed completely. This processing step should be executed
+ *       previously, if desired.
+ *
  * TODO: Maybe this function should be removed, completely... It is a bit strange to have this kind of
  *       behaviour modelled in here...
  *
