@@ -227,54 +227,6 @@ BOOST_DATA_TEST_CASE(hfd_out_star_center_and_outer_diameter_corner_cases_test,
 }
 
 
-/**
- * The HFD algorithm is executed on a set of real star images recorded with a Newtonian
- * telescope. The telescope focus is moved from "far out of focus" to "in focus". In sum
- * 11 images were recorded. The focus distance is equal between the images. The star
- * image never reaches saturation. The star center slightly moves what is ignored in this
- * test.
- */
-BOOST_AUTO_TEST_CASE(hfd_real_newton_focus_star_no_background_subtraction_test)
-{
-    std::array<std::pair<int, double>, 11> focusStarData = {
-            std::make_pair(1, 27.456088096660295), std::make_pair(2, 26.039354380832002),
-            std::make_pair(3, 24.798843695746001), std::make_pair(4, 22.743999207494756),
-            std::make_pair(5, 19.926210044511915), std::make_pair(6, 17.341647262965008),
-            std::make_pair(7, 14.616004395669748), std::make_pair(8, 12.516580080411764),
-            std::make_pair(9, 10.090836864932291), std::make_pair(10, 7.0064759328706696),
-            std::make_pair(11, 6.3337311227004358)
-    };
-
-    for (auto focusStar : focusStarData) {
-        int focusStarNumber = focusStar.first;
-        double expectedFocusStarHfd = focusStar.second;
-
-        std::stringstream filenameSs;
-        filenameSs << "test_data/newton_focus_star/newton_focus_star" << focusStarNumber << ".tiff";
-
-        // For the unit-tests a very simple background threshold function is used - the mean() function.
-        // NOTE: Instead the "Max entropy" or "Otsu" thresholding algorithm can be used.
-        auto bgThresholdFunction = [](const ImageT & img, unsigned bitDepth)-> double {
-            return img.mean();
-        };
-
-        BOOST_CHECK_CLOSE(
-            HfdT::calculate(
-                ImageT(filenameSs.str().c_str()),
-                PointT<unsigned int> (33, 47), // Star center position manually extracted from first image
-                55.0 /*outer diameter*/,
-                1.0F /* scale factor */,
-                nullptr,
-                bgThresholdFunction
-            ),
-            expectedFocusStarHfd,
-            0.01F
-        );
-    }
-
-}
-
-
 // TODO: Add real star images (see recorded images in different focus) also containing noise...
 // TODO: Further tests...
 
