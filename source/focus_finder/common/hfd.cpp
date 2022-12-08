@@ -22,8 +22,10 @@
  *
  ****************************************************************************/
 
+#include "include/rect.h"
 #include "include/hfd.h"
 #include "include/image.h"
+
 #include <cmath>
 
 const unsigned int HfdT::outerHfdDiameter = 55; // TODO: Calc?! - depends on pixel size and focal length (and seeing...) WAS 21!!! TODO: At least make this configurable - set from the outside!
