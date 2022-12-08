@@ -40,7 +40,7 @@
  */
 void CentroidT::calcCentroid2ndMoment(const ImageT &inImg,
                                       PointT<float> *outCentroidPos) {
-    THROW_IF(Centroid, outCentroidPos == nullptr, "outCentroidPos expected to be set.")
+    THROW_IF(CentroidOld, outCentroidPos == nullptr, "outCentroidPos expected to be set.")
 
     LOG(trace)
         << "starCentroid - image dimension (w h)=(" << inImg.width() << " "
@@ -214,7 +214,7 @@ void CentroidT::calcCentroid2ndMoment(const ImageT &inImg,
         }
         level--;
         if (level <= 1) {
-            throw CentroidExceptionT("Threshold could not be found!");
+            throw CentroidOldExceptionT("Threshold could not be found!");
         }
     }
     double threshold = vals[threshInt];
@@ -252,7 +252,7 @@ void CentroidT::calcCentroid2ndMoment(const ImageT &inImg,
 
     // Calculate centroid
     if (sum < std::numeric_limits<double>::epsilon()) {
-        throw CentroidExceptionT("Unable to determine centroid.");
+        throw CentroidOldExceptionT("Unable to determine centroid.");
     }
 
     // TODO: Is this adding xPosMax / yPosMax correct?? Shouldn't it be the
@@ -265,7 +265,7 @@ void CentroidT::calcCentroid2ndMoment(const ImageT &inImg,
 void CentroidT::calcCentroidSubPixel(const ImageT &inImg,
                                      PointT<float> inCenter, PointT<float> *outSubPixelCenter,
                                      size_t inNumIterations) {
-    THROW_IF(Centroid, outSubPixelCenter == nullptr, "outSubPixelCenter expected to be set.")
+    THROW_IF(CentroidOld, outSubPixelCenter == nullptr, "outSubPixelCenter expected to be set.")
 
     // 2. Round to nearest integer and then iteratively improve.
     int xi = floor(inCenter.x() + 0.5);
@@ -285,7 +285,7 @@ void CentroidT::calcCentroidSubPixel(const ImageT &inImg,
     float a1n, a2n, a3n, a4n;
     float b1n, b2n, b3n, b4n;
 
-    THROW_IF(Centroid, img3x3.width() != 3 || img3x3.height() != 3,
+    THROW_IF(CentroidOld, img3x3.width() != 3 || img3x3.height() != 3,
              "Expected image for sub-pixel calculation being 3x3.")
 
     b1 = img3x3(0, 0);
@@ -402,7 +402,7 @@ double CentroidT::calcJy2(const ImageT &img, int y) {
 // Calculate Intensity Weighted Center (IWC)
 void CentroidT::calcIntensityWeightedCenter(const ImageT &inImg,
                                             PointT<float> *outCentroidPos) {
-    THROW_IF(Centroid, outCentroidPos == nullptr, "outCentroidPos expected to be set.")
+    THROW_IF(CentroidOld, outCentroidPos == nullptr, "outCentroidPos expected to be set.")
 
     // Determine weighted centroid - See http://cdn.intechopen.com/pdfs-wm/26716.pdf
     double Imean2 = 0;
@@ -436,7 +436,7 @@ std::optional<PointT<float> > CentroidT::calculate(const ImageT &inImg,
     bool centroidFound;
 
     if (inImg.width() <= 0 || inImg.height() <= 0) {
-        throw CentroidExceptionT("No image supplied.");
+        throw CentroidOldExceptionT("No image supplied.");
     }
 
     // Noise reduction
@@ -490,7 +490,7 @@ std::optional<PointT<float> > CentroidT::calculate(const ImageT &inImg,
                 calcCentroid2ndMoment(aiImg, &relCenter);
 
                 centroidFound = true;
-            } catch (CentroidExceptionT &exc) {
+            } catch (CentroidOldExceptionT &exc) {
                 centroidFound = false;
                 LOG(warning)
                     << "Detection of centroid using MOMENT2 failed: " << exc.what()
@@ -499,7 +499,7 @@ std::optional<PointT<float> > CentroidT::calculate(const ImageT &inImg,
             break;
         }
         default: {
-            THROW_IF(Centroid, true, "Invalid CentroidTypeT.")
+            THROW_IF(CentroidOld, true, "Invalid CentroidTypeT.")
         }
     }
 

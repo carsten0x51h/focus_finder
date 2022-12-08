@@ -37,7 +37,7 @@
 #include "centroid_type.h"
 
 
-DEF_Exception(Centroid);
+DEF_Exception(CentroidOld);
 
 class CentroidT {
 private:
