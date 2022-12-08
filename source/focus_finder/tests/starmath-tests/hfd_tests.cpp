@@ -124,41 +124,41 @@ static double calcExpectedHfd(double sigma) {
 /**
  * Calculation of the HFD for an ideal gaussian shaped distribution.
  */
-BOOST_AUTO_TEST_CASE(hfd_test_ideal_gaussian_sigmaX_test)
+BOOST_DATA_TEST_CASE(hfd_test_ideal_gaussian_sigmaX_test,
+                     bdata::make(
+                             std::vector< std::tuple<float, float> > {
+                                     { 1.0F, 4.0F },
+                                     { 2.0F, 2.5F },
+                                     { 3.0F, 1.5F },
+                                     { 4.0F, 0.5F },
+                                     { 5.0F, 0.5F }
+                             }) *
+                     bdata::make(
+                             std::vector< int > {
+                                 51, 101
+                             }) *
+                     bdata::make(
+                             std::vector< std::string > {
+                                     "normalized",
+                                     "factor_32767",
+                                     "factor_65535"
+                             }),
+                     sigma, maxError, imageDimension, normFactorStr)
 {
-    std::array<std::pair<float, float>, 5> sigmasAndMaxErrors = {
-            std::make_pair(1.0F, 4.0F), std::make_pair(2.0F, 2.5F),
-            std::make_pair(3.0F, 1.5F), std::make_pair(4.0F, 0.5F),
-            std::make_pair(5.0F, 0.5F)
-    };
-    std::array<int, 2> imageDimensions = { 51, 101 };
-    std::array<std::string, 3> normFactors = { "normalized", "factor_32767", "factor_65535" };
+    std::stringstream filenameSs;
+    filenameSs << "test_data/gaussian_normal_distribution_2d/gaussian_2d_sigma"
+               << (int) sigma << "_" << normFactorStr << "_odd_"
+               << imageDimension << "x" << imageDimension << ".tiff";
 
+    ImageT img(filenameSs.str().c_str());
 
-    for (auto imageDimension : imageDimensions) {
-        for (const auto & normFactorStr : normFactors) {
-            for (auto sigmaAndMaxError : sigmasAndMaxErrors) {
-
-                float sigma = sigmaAndMaxError.first;
-                float maxError = sigmaAndMaxError.second;
-
-                std::stringstream filenameSs;
-                filenameSs << "test_data/gaussian_normal_distribution_2d/gaussian_2d_sigma"
-                           << (int) sigma << "_" << normFactorStr << "_odd_"
-                           << imageDimension << "x" << imageDimension << ".tiff";
-
-                ImageT img(filenameSs.str().c_str());
-
-                BOOST_CHECK_CLOSE(HfdT::calculate(
-                        img,
-                        (double) imageDimension,
-                        1.0F /* scale factor */,
-                        nullptr,
-                        nullptr /*no background threshold subtraction*/),
-                        calcExpectedHfd(sigma), maxError);
-            }
-        }
-    }
+    BOOST_CHECK_CLOSE(HfdT::calculate(
+            img,
+            (double) imageDimension,
+            1.0F /* scale factor */,
+            nullptr,
+            nullptr /*no background threshold subtraction*/),
+            calcExpectedHfd(sigma), maxError);
 }
 
 
