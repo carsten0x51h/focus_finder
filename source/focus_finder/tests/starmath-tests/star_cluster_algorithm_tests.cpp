@@ -37,7 +37,7 @@ BOOST_AUTO_TEST_SUITE(star_cluster_algorithm_tests)
  */
 BOOST_AUTO_TEST_CASE(star_cluster_algorithm_two_pixels_test_image)
 {
-    ImageT binaryImg("test_data/test_image_9.tif");
+    ImageT binaryImg("test_data/star_cluster/test_image_two_segments_35x35.tif");
 
     StarClusterAlgorithmT starClusterAlgorithm(
             2 /*defines the allowed number of dark pixels between two white pixels until they form a cluster*/);
@@ -66,20 +66,14 @@ BOOST_AUTO_TEST_CASE(star_cluster_algorithm_two_pixels_test_image)
  */
 BOOST_AUTO_TEST_CASE(star_cluster_algorithm_single_segment_test_image)
 {
-    ImageT binaryImg("test_data/test_image_10.tif");
+    ImageT binaryImg("test_data/star_cluster/test_image_one_segment_35x35.tif");
 
     StarClusterAlgorithmT starClusterAlgorithm(
             2 /*defines the allowed number of dark pixels between two white pixels until they form a cluster*/);
     std::list<PixelClusterT> clusters = starClusterAlgorithm.cluster(binaryImg);
 
-
     // Expect 1 pixel cluster (see image)
     BOOST_TEST(clusters.size() == 1);
-
-    const auto & pixelCluster1 = clusters.begin();
-
-    BOOST_TEST(pixelCluster1->size() == 71); // Expect 71 pixels which are set (counted in image)
-
 
     // Check that all expected pixels are in the segment
     std::list<PixelPosT> expectedPixels = {
@@ -99,7 +93,7 @@ BOOST_AUTO_TEST_CASE(star_cluster_algorithm_single_segment_test_image)
             PixelPosT(18, 11), PixelPosT(18, 12), PixelPosT(18, 13), PixelPosT(18, 14), PixelPosT(19, 15)
     };
 
-    BOOST_TEST(*pixelCluster1 == expectedPixels, boost::test_tools::per_element());
+    BOOST_TEST(*clusters.begin() == expectedPixels, boost::test_tools::per_element());
 }
 
 
@@ -108,7 +102,7 @@ BOOST_AUTO_TEST_CASE(star_cluster_algorithm_single_segment_test_image)
  */
 BOOST_AUTO_TEST_CASE(star_cluster_algorithm_three_segments_test)
 {
-    ImageT binaryImg("test_data/test_image_11.tif");
+    ImageT binaryImg("test_data/star_cluster/test_image_three_segments_35x35.tif");
 
     StarClusterAlgorithmT starClusterAlgorithm(
             2 /*defines the allowed number of dark pixels between two white pixels until they form a cluster*/);
@@ -120,39 +114,25 @@ BOOST_AUTO_TEST_CASE(star_cluster_algorithm_three_segments_test)
     // Check that all expected pixels are in respective segments.
     //
     // Segment 1
-    const auto & pixelCluster1 = clusters.begin();
-
-    BOOST_TEST(pixelCluster1->size() == 12);
-
     std::list<PixelPosT> expectedPixelsCluster1 = {
             PixelPosT(8, 8), PixelPosT(8, 9), PixelPosT(9, 8), PixelPosT(9, 9), PixelPosT(9, 10), PixelPosT(10, 8),
             PixelPosT(10, 9), PixelPosT(10, 10), PixelPosT(11, 7), PixelPosT(11, 8), PixelPosT(12, 6), PixelPosT(13, 5)
     };
-
-    BOOST_TEST(*pixelCluster1 == expectedPixelsCluster1, boost::test_tools::per_element());
+    BOOST_TEST(*clusters.begin() == expectedPixelsCluster1, boost::test_tools::per_element());
 
     // Segment 2
-    const auto & pixelCluster2 = std::next(clusters.begin());
-
-    BOOST_TEST(pixelCluster2->size() == 8);
-
     std::list<PixelPosT> expectedPixelsCluster2 = {
             PixelPosT(11, 23), PixelPosT(11, 25), PixelPosT(12, 22), PixelPosT(12, 23), PixelPosT(12, 24),
             PixelPosT(13, 22), PixelPosT(13, 23), PixelPosT(14, 24)
     };
-
-    BOOST_TEST(*pixelCluster2 == expectedPixelsCluster2, boost::test_tools::per_element());
+    BOOST_TEST(*std::next(clusters.begin()) == expectedPixelsCluster2, boost::test_tools::per_element());
 
     // Segment 3
-    const auto & pixelCluster3 = std::next(clusters.begin(), 2);
-
-    BOOST_TEST(pixelCluster3->size() == 9);
     std::list<PixelPosT> expectedPixelsCluster3 = {
             PixelPosT(22, 9), PixelPosT(22, 10), PixelPosT(23, 9), PixelPosT(23, 10), PixelPosT(23, 11),
             PixelPosT(24, 8), PixelPosT(24, 10), PixelPosT(24, 12), PixelPosT(25, 13)
     };
-
-    BOOST_TEST(*pixelCluster3 == expectedPixelsCluster3, boost::test_tools::per_element());
+    BOOST_TEST(*std::next(clusters.begin(), 2) == expectedPixelsCluster3, boost::test_tools::per_element());
 }
 
 
