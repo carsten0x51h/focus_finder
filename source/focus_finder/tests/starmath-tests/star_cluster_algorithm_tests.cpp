@@ -23,6 +23,9 @@
  ****************************************************************************/
 
 #include <boost/test/unit_test.hpp>
+#include <boost/test/data/test_case.hpp>
+
+namespace bdata = boost::unit_test::data;
 
 #include "../../common/include/image.h"
 #include "../../common/include/star_cluster_algorithm.h"
@@ -139,20 +142,19 @@ BOOST_AUTO_TEST_CASE(star_cluster_algorithm_three_segments_test)
 /**
  * Test different cluster radii.
  */
-BOOST_AUTO_TEST_CASE(star_cluster_algorithm_cluster_radius_test)
+BOOST_DATA_TEST_CASE(star_cluster_algorithm_cluster_radius_test,
+        bdata::make(
+            // number of dark pixels between two white pixels to form a cluster, expected number of cluster segments
+            std::vector< std::tuple<int, int> > {
+                    { 2, 2 },
+                    { 3, 1 }
+            }),
+        allowedNumberOfDarkPixelsBetweenWhitePixels, expectedNumberOfClusterSegments)
 {
-    ImageT binaryImg("test_data/test_image_12.tif");
+    ImageT binaryImg("test_data/star_cluster/test_image_two_close_segments_35x35.tif");
+    StarClusterAlgorithmT starClusterAlgorithm(allowedNumberOfDarkPixelsBetweenWhitePixels );
 
-    StarClusterAlgorithmT starClusterAlgorithm1(
-            2 /*defines the allowed number of dark pixels between two white pixels until they form a cluster*/);
-
-    BOOST_TEST(starClusterAlgorithm1.cluster(binaryImg).size() == 2);
-
-
-    StarClusterAlgorithmT starClusterAlgorithm2(
-            3 /*defines the allowed number of dark pixels between two white pixels until they form a cluster*/);
-
-    BOOST_TEST(starClusterAlgorithm2.cluster(binaryImg).size() == 1);
+    BOOST_TEST(starClusterAlgorithm.cluster(binaryImg).size() == expectedNumberOfClusterSegments);
 }
 
 
