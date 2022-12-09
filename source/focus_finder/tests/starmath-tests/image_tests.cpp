@@ -33,9 +33,9 @@
  */
 BOOST_AUTO_TEST_CASE(tiff_16_bit_image_test)
 {
-        const float expectedPixelValue = 65535.0F;
-        ImageT tiffFloatImage("test_data/test_image_7.tif");
-        BOOST_CHECK_CLOSE(tiffFloatImage(0,0), expectedPixelValue, 0.001F);
+    const float expectedPixelValue = 65535.0F;
+    ImageT tiffFloatImage("test_data/image/test_image_16bit_100x100.tif");
+    BOOST_CHECK_CLOSE(tiffFloatImage(0,0), expectedPixelValue, 0.001F);
 }
 
 /**
@@ -45,6 +45,6 @@ BOOST_AUTO_TEST_CASE(tiff_16_bit_image_test)
 BOOST_AUTO_TEST_CASE(tiff_32_bit_float_image_test)
 {
     const float expectedPixelValue = 0.5F;
-    ImageT tiffFloatImage("test_data/test_image_20.tif");
+    ImageT tiffFloatImage("test_data/image/test_image_32bit_120x120.tif");
     BOOST_CHECK_CLOSE(tiffFloatImage(0,0), expectedPixelValue, 0.001F);
 }
