@@ -32,7 +32,7 @@ struct ImageSlicerTestFixture {
     ImageSlicerTestFixture() {
         BOOST_TEST_MESSAGE( "Loading test image." );
 
-        mTestImage = ImageT("test_data/test_image_4.tif");
+        mTestImage = ImageT("test_data/image_slicer/test_image_real_star_15x15.tif");
     }
     ~ImageSlicerTestFixture() = default;
 
