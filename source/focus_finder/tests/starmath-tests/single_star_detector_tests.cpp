@@ -39,8 +39,7 @@ struct SingleStarDetectorTestFixture {
         BOOST_TEST_MESSAGE( "Loading test image." );
 
         mStarWindowSize = SizeT<unsigned int>(35, 35);
-        // TODO: Reorg path
-        mTestImage = std::make_shared<ImageT>("test_data/test_image_1.tif");
+        mTestImage = std::make_shared<ImageT>("test_data/single_star_detector/test_image_single_star_detector_1.tif");
     }
     ~SingleStarDetectorTestFixture() = default;
 
