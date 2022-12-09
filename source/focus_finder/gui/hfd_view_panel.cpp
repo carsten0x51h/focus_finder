@@ -27,6 +27,8 @@
 #include <memory>
 #include <cmath>
 
+#include "../common/include/logging.h"
+
 #include "include/hfd_view_panel.h"
 #include "include/hfd_view_widget.h"
 
