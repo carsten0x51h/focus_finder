@@ -39,7 +39,7 @@ struct SingleStarDetectorTestFixture {
         BOOST_TEST_MESSAGE( "Loading test image." );
 
         mStarWindowSize = SizeT<unsigned int>(35, 35);
-
+        // TODO: Reorg path
         mTestImage = std::make_shared<ImageT>("test_data/test_image_1.tif");
     }
     ~SingleStarDetectorTestFixture() = default;
@@ -52,6 +52,14 @@ struct SingleStarDetectorTestFixture {
 BOOST_FIXTURE_TEST_SUITE(single_star_detector_tests, SingleStarDetectorTestFixture);
 
 
+/**
+ * Test if the SingleStarDetector behaves as expected for different inputs.
+ *
+ * NOTE: SNR and star position (centroid result) are not tested here since those
+ *       are tested in their own unit tests. Testing them here again would introduce
+ *       a dependency - i.e. after modifying the calculation of the SNR or the CentroidT
+ *       this testcase would fail.
+ */
 BOOST_DATA_TEST_CASE(single_star_detector_test,
      bdata::make(
          std::vector< PointT<float> > {
