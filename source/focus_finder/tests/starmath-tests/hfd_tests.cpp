@@ -45,7 +45,6 @@ BOOST_AUTO_TEST_CASE(hfd_test_empty_image)
     BOOST_CHECK_THROW(HfdT::calculate(nullImage), HfdExceptionT);
 }
 
-// TODO: Move test images to new hfd folder!... and rename them!
 
 /**
  * Check HFD of completely dark image
@@ -60,7 +59,7 @@ BOOST_AUTO_TEST_CASE(hfd_test_empty_image)
  */
 BOOST_AUTO_TEST_CASE(hfd_dark_image_test)
 {
-    ImageT darkImage("test_data/test_image_2.tif");
+    ImageT darkImage("test_data/hfd/test_image_all_values_0_100x100.tif");
 
     const float outerDiameter = 21;
     BOOST_CHECK_EQUAL(std::isnan(HfdT::calculate(darkImage, outerDiameter)), true);
@@ -146,7 +145,7 @@ BOOST_DATA_TEST_CASE(hfd_test_ideal_gaussian_sigmaX_test,
                      sigma, maxError, imageDimension, normFactorStr)
 {
     std::stringstream filenameSs;
-    filenameSs << "test_data/gaussian_normal_distribution_2d/gaussian_2d_sigma"
+    filenameSs << "test_data/hfd/gaussian_normal_distribution_2d/gaussian_2d_sigma"
                << (int) sigma << "_" << normFactorStr << "_odd_"
                << imageDimension << "x" << imageDimension << ".tiff";
 
@@ -225,9 +224,5 @@ BOOST_DATA_TEST_CASE(hfd_out_star_center_and_outer_diameter_corner_cases_test,
                 nullptr,
                 nullptr /*no background threshold subtraction*/));
 }
-
-
-// TODO: Add real star images (see recorded images in different focus) also containing noise...
-// TODO: Further tests...
 
 BOOST_AUTO_TEST_SUITE_END();

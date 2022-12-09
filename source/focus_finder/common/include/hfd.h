@@ -33,12 +33,27 @@
  * Get all pixels inside a radius
  * http://stackoverflow.com/questions/14487322/get-all-pixel-array-inside-circle
  *
- * TODO: Change so that:
+ * TODO: Change further unit tests to DATA-TESTS..., rename / move image files
+ * TODO: Rename all .tif to .tiff
+ *
+ * TODO: Change HFD so that:
  *    -Only quadratic images are accepted
  *    -Always set outerRadius to given image dimensions -> no subimage() call anymore
  *    -Assume that sar centroid is in the center of the image
  *    -Remove thresholder - assume that thresholding took place before
  *        --> Separation of concerns
+ *
+ *  TODO: Can I invent a star-image processing pipeline? Fluent API?
+ *     -starImg = ProcessingPipeline(inImg ?)
+ *          .chooseMaxInRegion(region: (x1, y1), (x2, y2) or Point: (x, y) - click).
+ *          .subimage/subframe(width*height?)
+ *          .threshold(MAX_ENTROPY)
+ *          .scale(10.0F)
+ *          .centroid(IWC)
+ *          .execute(inImg?) / .build() / .process(inImg?);
+ *
+ *      FwhmT fwhm = starImg.fwhm(...)
+ *      HfdT hfd = starImg.hfd(...)
  */
 
 #ifndef SOURCE_FOCUS_FINDER_COMMON_INCLUDE_HFD_H_
