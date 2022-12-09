@@ -23,12 +23,14 @@
  ****************************************************************************/
 
 #include <boost/test/unit_test.hpp>
+#include <boost/test/data/test_case.hpp>
 #include <boost/test/tools/floating_point_comparison.hpp>
+
+namespace bdata = boost::unit_test::data;
 
 #include <memory>
 
 #include "../../common/include/snr.h"
-#include "../../common/include/image.h"
 
 
 BOOST_AUTO_TEST_SUITE(snr_tests)
@@ -46,21 +48,20 @@ BOOST_AUTO_TEST_CASE(snr_test_empty_image)
 /**
  * Calculate SNR of different images.
  */
-BOOST_AUTO_TEST_CASE(snr_test_star_signals)
+BOOST_DATA_TEST_CASE(snr_star_signals_test,
+        bdata::make(
+        std::vector< std::tuple<std::string, float> > {
+            { "test_data/snr/test_image_all_pixels_0_100x100.tif", 0.0F }, // A completely black image should give an SNR of 0.
+            { "test_data/snr/test_image_weak_star_30x31.tif", 1.5995403692606724F }, // A weak star
+            { "test_data/snr/test_image_bright_star_15x15.tif", 4.1645735440908789F }, // A bright star
+            { "test_data/snr/test_image_saturated_star_15x15.tif", 4.2979500980918717F }, // A saturated star
+            { "test_data/snr/test_image_noise_26x26.tif", 1.4864298210463467F }, // Noise
+            { "test_data/snr/test_image_all_pixels_65535_100x100.tif", 0.0F } // A completely white image should give an SNR of 0.
+        }),
+        imageFilename, snr)
 {
-    std::list<std::pair<std::string, float> > imageSnrPairs {
-        std::make_pair<std::string, float>("test_data/test_image_2.tif", 0.0F), // A completely black image should give an SNR of 0.
-        std::make_pair<std::string, float>("test_data/test_image_3.tif", 1.5995403692606724F), // A weak star
-        std::make_pair<std::string, float>("test_data/test_image_4.tif", 4.1645735440908789F), // A bright star
-        std::make_pair<std::string, float>("test_data/test_image_5.tif", 4.2979500980918717F), // A saturated star
-        std::make_pair<std::string, float>("test_data/test_image_6.tif", 1.4864298210463467F), // Noise
-        std::make_pair<std::string, float>("test_data/test_image_7.tif", 0.0F) // A completely white image should give an SNR of 0.
-    };
-
-    for (auto imageSnrPair = imageSnrPairs.begin(); imageSnrPair != imageSnrPairs.end(); imageSnrPair++) {
-        ImageT img(imageSnrPair->first.c_str());
-        BOOST_CHECK_CLOSE( SnrT::calculate(img), imageSnrPair->second, 0.001F );
-    }
+    ImageT img(imageFilename.c_str());
+    BOOST_CHECK_CLOSE( SnrT::calculate(img), snr, 0.001F );
 }
 
 BOOST_AUTO_TEST_SUITE_END();
