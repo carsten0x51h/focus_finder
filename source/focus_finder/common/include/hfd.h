@@ -60,6 +60,7 @@
 #define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_HFD_H_ SOURCE_FOCUS_FINDER_COMMON_INCLUDE_HFD_H_
 
 #include <utility>
+#include <functional>
 
 #include "image.h"
 #include "point.h"
