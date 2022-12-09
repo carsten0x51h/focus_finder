@@ -37,8 +37,6 @@
  */
 const char * SingleStarDetectorAlgorithmT::ResultT::StatusT::asStr(const TypeE &inType) {
     switch (inType) {
-        case NO_INPUT_IMAGE_SET:
-            return "NO_INPUT_IMAGE_SET";
         case STAR_WINDOW_OUT_OF_BOUNDS:
             return "STAR_WINDOW_OUT_OF_BOUNDS";
         case NO_STAR_FOUND_SNR_TOO_LOW:
@@ -155,8 +153,7 @@ SingleStarDetectorAlgorithmT::ResultT SingleStarDetectorAlgorithmT::detect(std::
     result.setSnrLimit(mSnrLimit);
 
     if (inImage == nullptr) {
-        result.setStatus(ResultT::StatusT::NO_INPUT_IMAGE_SET);
-        return result;
+        throw SingleStarDetectorExceptionT("No input image set.");
     }
 
     PointT<int> poi = inPoi.to<int>();

@@ -23,12 +23,16 @@
  ****************************************************************************/
 
 #include <boost/test/unit_test.hpp>
+#include <boost/test/data/test_case.hpp>
 #include <boost/test/tools/floating_point_comparison.hpp>
+
+namespace bdata = boost::unit_test::data;
+
 
 #include <memory>
 
 #include "../../common/include/single_star_detector_algorithm.h"
-#include "../../common/include/image.h"
+
 
 struct SingleStarDetectorTestFixture {
     SingleStarDetectorTestFixture() {
@@ -47,90 +51,39 @@ struct SingleStarDetectorTestFixture {
 
 BOOST_FIXTURE_TEST_SUITE(single_star_detector_tests, SingleStarDetectorTestFixture);
 
-/**
- * SingleStarDetectorTest - Success path
- *
- * Test if a single star is detected correctly for a POI which is
- * close to the given star.
- *
- * NOTE: SNR and star position (centroid result) are not tested here since those
- *       are tested in their own unit tests. Testing them here again would introduce
- *       a dependency - i.e. after modifying the calculation of the SNR or the CentroidT
- *       this testcase would fail.
- */
-BOOST_AUTO_TEST_CASE(single_star_detector_test_success_path)
-{
-    const PointT<float> poi(424.0F, 916.0F); // Position close to star - manually read with KStar image viewer
 
+BOOST_DATA_TEST_CASE(single_star_detector_test,
+     bdata::make(
+         std::vector< PointT<float> > {
+                 PointT<float>(424.0F, 916.0F), // Position close to star - manually read with KStar image viewer
+                 PointT<float>(5.0F, 100.0F),   // Position close to left border
+                 PointT<float>(100.0F, 100.0F), // Any valid position to satisfy compiler
+                 PointT<float>(452.0F, 943.0F)  // Location with two stars
+         }) ^
+     bdata::make(
+         std::vector< std::tuple<int /*num stars detected*/, typename SingleStarDetectorAlgorithmT::ResultT::StatusT::TypeE> > {
+                 { 1, SingleStarDetectorAlgorithmT::ResultT::StatusT::SINGLE_STAR_DETECTED },
+                 { 0, SingleStarDetectorAlgorithmT::ResultT::StatusT::STAR_WINDOW_OUT_OF_BOUNDS },
+                 { 0, SingleStarDetectorAlgorithmT::ResultT::StatusT::NO_STAR_FOUND_SNR_TOO_LOW },
+                 { 2, SingleStarDetectorAlgorithmT::ResultT::StatusT::UNEXPECTED_STAR_COUNT }
+         }),
+     poi, numStarsDetected, starDetectorResult)
+{
     SingleStarDetectorAlgorithmT singleStarDetectorAlgorithm(SNR_LIMIT, mStarWindowSize);
     auto result = singleStarDetectorAlgorithm.detect(mTestImage, poi);
 
-	BOOST_CHECK_EQUAL( result.getStatus(), SingleStarDetectorAlgorithmT::ResultT::StatusT::SINGLE_STAR_DETECTED );
     BOOST_CHECK_CLOSE( result.getSnrLimit(), SNR_LIMIT, 0.001F );
-    BOOST_CHECK_EQUAL( result.getNumStarsDetected(), 1 );
-}
-
-
-/**
- * Select an area too close to the image border.
- */
-BOOST_AUTO_TEST_CASE(single_star_detector_test_out_of_bounds)
-{
-    const PointT<float> poi(5.0F, 100.0F); // Position close to left border
-
-    SingleStarDetectorAlgorithmT singleStarDetectorAlgorithm(SNR_LIMIT, mStarWindowSize);
-    auto result = singleStarDetectorAlgorithm.detect(mTestImage, poi);
-
-    BOOST_CHECK_EQUAL( result.getStatus(), SingleStarDetectorAlgorithmT::ResultT::StatusT::STAR_WINDOW_OUT_OF_BOUNDS );
-    BOOST_CHECK_CLOSE( result.getSnrLimit(), SNR_LIMIT, 0.001F );
-    BOOST_CHECK_EQUAL( result.getNumStarsDetected(), 0 );
+    BOOST_CHECK_EQUAL( result.getNumStarsDetected(), numStarsDetected );
+    BOOST_CHECK_EQUAL( result.getStatus(), starDetectorResult );
 }
 
 /**
- * Specify a null image.
+ * Check for exception in case no image is specified.
  */
-BOOST_AUTO_TEST_CASE(single_star_detector_test_null_image)
+BOOST_AUTO_TEST_CASE(single_star_detector_test_empty_image)
 {
-    const PointT<float> poi(100.0F, 100.0F); // Any valid position to satisfy compiler
-
     SingleStarDetectorAlgorithmT singleStarDetectorAlgorithm(SNR_LIMIT, mStarWindowSize);
-    auto result = singleStarDetectorAlgorithm.detect(nullptr, poi);
-
-    BOOST_CHECK_EQUAL( result.getStatus(), SingleStarDetectorAlgorithmT::ResultT::StatusT::NO_INPUT_IMAGE_SET );
-    BOOST_CHECK_CLOSE( result.getSnrLimit(), SNR_LIMIT, 0.001F );
-    BOOST_CHECK_EQUAL( result.getNumStarsDetected(), 0 );
-}
-
-/**
- * Bad SNR.
- */
-BOOST_AUTO_TEST_CASE(single_star_detector_test_bad_snr)
-{
-    const PointT<float> poi(100.0F, 100.0F); // Any valid position without a star
-
-    SingleStarDetectorAlgorithmT singleStarDetectorAlgorithm(SNR_LIMIT, mStarWindowSize);
-    auto result = singleStarDetectorAlgorithm.detect(mTestImage, poi);
-
-    BOOST_CHECK_EQUAL( result.getStatus(), SingleStarDetectorAlgorithmT::ResultT::StatusT::NO_STAR_FOUND_SNR_TOO_LOW );
-    BOOST_CHECK_CLOSE( result.getSnrLimit(), SNR_LIMIT, 0.001F );
-    BOOST_CHECK_EQUAL( result.getNumStarsDetected(), 0 );
-}
-
-/**
- * Multiple stars detected. Test if two stars in the given region are
- * detected correctly.
- */
-BOOST_AUTO_TEST_CASE(single_star_detector_test_multi_star)
-{
-    const PointT<float> poi(452.0F, 943.0F); // Location with two stars
-
-    SingleStarDetectorAlgorithmT singleStarDetectorAlgorithm(SNR_LIMIT, mStarWindowSize);
-
-    auto result = singleStarDetectorAlgorithm.detect(mTestImage, poi);
-
-    BOOST_CHECK_EQUAL( result.getStatus(), SingleStarDetectorAlgorithmT::ResultT::StatusT::UNEXPECTED_STAR_COUNT );
-    BOOST_CHECK_CLOSE( result.getSnrLimit(), SNR_LIMIT, 0.001F );
-    BOOST_CHECK_EQUAL( result.getNumStarsDetected(), 2 );
+    BOOST_CHECK_THROW(singleStarDetectorAlgorithm.detect(nullptr, PointT<float>(100.0F, 100.0F)), SingleStarDetectorExceptionT);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

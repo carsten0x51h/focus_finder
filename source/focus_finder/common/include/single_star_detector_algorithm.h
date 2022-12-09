@@ -50,7 +50,6 @@ public:
     public:
         struct StatusT {
             enum TypeE {
-                NO_INPUT_IMAGE_SET,
                 STAR_WINDOW_OUT_OF_BOUNDS,
                 NO_STAR_FOUND_SNR_TOO_LOW,
                 CENTROID_CALC_FAILED,
