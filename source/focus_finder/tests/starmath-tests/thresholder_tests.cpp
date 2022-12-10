@@ -26,7 +26,10 @@
 
 
 #include <boost/test/unit_test.hpp>
+#include <boost/test/data/test_case.hpp>
 #include <boost/test/tools/floating_point_comparison.hpp>
+
+namespace bdata = boost::unit_test::data;
 
 #include "../../common/include/thresholding_algorithm_factory.h"
 #include "../../common/include/point.h"
@@ -34,65 +37,55 @@
 BOOST_AUTO_TEST_SUITE(thresholder_tests)
 
 /**
- * TODO: Test if exception is thrown in certain cases?
- *
- * TODO: Which unit tests to define?? Black image? White image? Other artifical image?
+ * TODO: Which unit tests to define?? Black image? White image? Other artificial image?
  *       Real star image with noise? -> compare to "Moments" thresholder of ImageJ...
  */
 
 
 /**
- *
+ * Thresholding empty image test. In case of an empty image, a
+ * ThresholdingExceptionT is expected to be thrown.
  */
 BOOST_AUTO_TEST_CASE(thresholding_empty_image_test)
 {
     ImageT nullImage;
-    BOOST_CHECK_THROW(ThresholdingAlgorithmFactoryT::getInstance(ThresholdingAlgorithmTypeT::MEAN)->calc(nullImage, 16);, ThresholdingExceptionT);
-    BOOST_CHECK_THROW(ThresholdingAlgorithmFactoryT::getInstance(ThresholdingAlgorithmTypeT::MAX_ENTROPY)->calc(nullImage, 16);, ThresholdingExceptionT);
-    BOOST_CHECK_THROW(ThresholdingAlgorithmFactoryT::getInstance(ThresholdingAlgorithmTypeT::OTSU)->calc(nullImage, 16);, ThresholdingExceptionT);
+    BOOST_CHECK_THROW(ThresholdingAlgorithmFactoryT::getInstance(ThresholdingAlgorithmTypeT::MEAN)->calc(nullImage, 16), ThresholdingExceptionT);
+    BOOST_CHECK_THROW(ThresholdingAlgorithmFactoryT::getInstance(ThresholdingAlgorithmTypeT::MAX_ENTROPY)->calc(nullImage, 16), ThresholdingExceptionT);
+    BOOST_CHECK_THROW(ThresholdingAlgorithmFactoryT::getInstance(ThresholdingAlgorithmTypeT::OTSU)->calc(nullImage, 16), ThresholdingExceptionT);
 }
+
 
 /**
  * Test the mean thresholding algorithm using a plain, image with
  * all pixel values = 1. The calculated threshold is expected to
  * be 1, since this is the mean value of all pixels.
- */
-BOOST_AUTO_TEST_CASE(mean_thresholding_plain_image_test)
-{
-    ImageT plainImage5x5("test_data/test_image_22.tif"); // 5x5 pixel, all pixel values = 1
-
-    // TODO: Deal with depth...
-    BOOST_CHECK_CLOSE(
-            ThresholdingAlgorithmFactoryT::getInstance(ThresholdingAlgorithmTypeT::MEAN)->calc(plainImage5x5, 16),
-            1.0F    /*expected threshold*/,
-            0.001F  /*fault tolerance*/
-    );
-}
-
-/**
  *
- * TODO: Deal with depth...
+ * TODO: Add further comments, extend test to other Thresholder types.
+ * TODO: Deal with image bit depth...
  */
-BOOST_AUTO_TEST_CASE(otsu_thresholding_test)
+BOOST_DATA_TEST_CASE(thresholding_image_test,
+     bdata::make(
+             std::vector <std::string> {
+                 "test_data/thresholding/test_image_all_pixels_1_5x5.tif",
+                 "test_data/thresholding/test_image_thresholding_all_pixels_value_1_120x120.tif",
+                 "test_data/thresholding/test_image_thresholding_all_pixels_value_65535_100x100.tif",
+                 "test_data/thresholding/test_image_thresholding_6x6.tif"
+             }) ^
+     bdata::make(
+             std::vector< std::tuple<ThresholdingAlgorithmTypeT::TypeE, float, float> > {
+                 { ThresholdingAlgorithmTypeT::MEAN, 1.0F, 0.001F },
+                 { ThresholdingAlgorithmTypeT::OTSU, 0.0F, 0.001F },
+                 { ThresholdingAlgorithmTypeT::OTSU, 0.0F, 0.001F },
+                 { ThresholdingAlgorithmTypeT::OTSU, 2.0F, 0.001F }
+             }),
+     imageFilename, thresholdingType, expectedThreshold, faultTolerance)
 {
-    ImageT allPixelslValue1Image("test_data/thresholding/test_image_thresholding_all_pixels_value_1_120x120.tif");
-    ImageT allPixelsValue65535Image("test_data/thresholding/test_image_thresholding_all_pixels_value_65535_100x100.tif");
-    ImageT syntheticTestImage("test_data/thresholding/test_image_thresholding_6x6.tif");
+    ImageT image(imageFilename.c_str());
 
     BOOST_CHECK_CLOSE(
-            ThresholdingAlgorithmFactoryT::getInstance(ThresholdingAlgorithmTypeT::OTSU)->calc(allPixelslValue1Image, 16),
-            0.0F    /*expected threshold*/,
-            0.001F  /*fault tolerance*/
-    );
-    BOOST_CHECK_CLOSE(
-            ThresholdingAlgorithmFactoryT::getInstance(ThresholdingAlgorithmTypeT::OTSU)->calc(allPixelsValue65535Image, 16),
-            0.0F    /*expected threshold*/,
-            0.001F  /*fault tolerance*/
-    );
-    BOOST_CHECK_CLOSE(
-            ThresholdingAlgorithmFactoryT::getInstance(ThresholdingAlgorithmTypeT::OTSU)->calc(syntheticTestImage, 8),
-            2.0F /*expected threshold*/,
-            0.001F   /*fault tolerance*/
+            ThresholdingAlgorithmFactoryT::getInstance(thresholdingType)->calc(image, 16),
+            expectedThreshold,
+            faultTolerance
     );
 }
 
