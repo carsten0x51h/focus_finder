@@ -163,7 +163,7 @@ BOOST_DATA_TEST_CASE(star_cluster_algorithm_cluster_radius_test,
  */
 BOOST_AUTO_TEST_CASE(star_cluster_algorithm_no_cluster_test)
 {
-    ImageT binaryImg("test_data/test_image_2.tif"); // black image
+    ImageT binaryImg("test_data/star_cluster/test_image_all_pixels_0_100x100.tif"); // black image
 
     StarClusterAlgorithmT starClusterAlgorithm(
             2 /*defines the allowed number of dark pixels between two white pixels until they form a cluster*/);
@@ -178,32 +178,27 @@ BOOST_AUTO_TEST_CASE(star_cluster_algorithm_no_cluster_test)
  */
 BOOST_AUTO_TEST_CASE(star_cluster_algorithm_corner_test)
 {
-    ImageT binaryImg("test_data/test_image_13.tif");
+    ImageT binaryImg("test_data/star_cluster/test_image_six_segments_close_to_borders_35x35.tif");
 
     StarClusterAlgorithmT starClusterAlgorithm(
             3 /*defines the allowed number of dark pixels between two white pixels until they form a cluster*/);
 
     auto clusters = starClusterAlgorithm.cluster(binaryImg);
 
-    // Expect that no cluster was found
     BOOST_TEST(clusters.size() == 5);
 
     //
     // Check that all expected pixels are in respective segments.
     //
     // Segment 1
-    const auto & pixelCluster1 = clusters.begin();
-
     std::list<PixelPosT> expectedPixelsCluster1 = {
         PixelPosT(0, 0)
     };
 
-    BOOST_TEST(*pixelCluster1 == expectedPixelsCluster1, boost::test_tools::per_element());
+    BOOST_TEST(*clusters.begin() == expectedPixelsCluster1, boost::test_tools::per_element());
 
 
     // Segment 2
-    const auto & pixelCluster2 = std::next(clusters.begin(), 1);
-
     std::list<PixelPosT> expectedPixelsCluster2 = {
             PixelPosT(0, 30), PixelPosT(0, 31), PixelPosT(0, 32), PixelPosT(0, 33), PixelPosT(1, 30), PixelPosT(1, 31),
             PixelPosT(1, 32), PixelPosT(1, 33), PixelPosT(2, 32), PixelPosT(2, 33), PixelPosT(3, 33), PixelPosT(0, 34),
@@ -212,37 +207,31 @@ BOOST_AUTO_TEST_CASE(star_cluster_algorithm_corner_test)
             PixelPosT(9, 34)
     };
 
-    BOOST_TEST(*pixelCluster2 == expectedPixelsCluster2, boost::test_tools::per_element());
+    BOOST_TEST(*std::next(clusters.begin(), 1) == expectedPixelsCluster2, boost::test_tools::per_element());
 
 
     // Segment 3
-    const auto & pixelCluster3 = std::next(clusters.begin(), 2);
-
     std::list<PixelPosT> expectedPixelsCluster3 = {
         PixelPosT(34, 0)
     };
 
-    BOOST_TEST(*pixelCluster3 == expectedPixelsCluster3, boost::test_tools::per_element());
+    BOOST_TEST(*std::next(clusters.begin(), 2) == expectedPixelsCluster3, boost::test_tools::per_element());
 
 
     // Segment 4
-    const auto & pixelCluster4 = std::next(clusters.begin(), 3);
-
     std::list<PixelPosT> expectedPixelsCluster4 = {
             PixelPosT(34, 15), PixelPosT(34, 16), PixelPosT(34, 17)
     };
 
-    BOOST_TEST(*pixelCluster4 == expectedPixelsCluster4, boost::test_tools::per_element());
+    BOOST_TEST(*std::next(clusters.begin(), 3) == expectedPixelsCluster4, boost::test_tools::per_element());
 
 
     // Segment 5
-    const auto & pixelCluster5 = std::next(clusters.begin(), 4);
-
     std::list<PixelPosT> expectedPixelsCluster5 = {
             PixelPosT(34, 33), PixelPosT(34, 34)
     };
 
-    BOOST_TEST(*pixelCluster5 == expectedPixelsCluster5, boost::test_tools::per_element());
+    BOOST_TEST(*std::next(clusters.begin(), 4) == expectedPixelsCluster5, boost::test_tools::per_element());
 }
 
 
@@ -252,7 +241,7 @@ BOOST_AUTO_TEST_CASE(star_cluster_algorithm_corner_test)
  */
 BOOST_AUTO_TEST_CASE(star_cluster_algorithm_big_radius_test)
 {
-    ImageT binaryImg("test_data/test_image_13.tif");
+    ImageT binaryImg("test_data/star_cluster/test_image_six_segments_close_to_borders_35x35.tif");
 
     StarClusterAlgorithmT starClusterAlgorithm(
             40 /*defines the allowed number of dark pixels between two white pixels until they form a cluster*/);
