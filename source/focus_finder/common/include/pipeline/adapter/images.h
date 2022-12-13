@@ -82,7 +82,7 @@ public:
             : boost::range_detail::holder2<T>(from, to) {}
 
 private:
-    void operator=(const images_holder &);
+    void operator=(const images_holder &) = delete;
 };
 
 

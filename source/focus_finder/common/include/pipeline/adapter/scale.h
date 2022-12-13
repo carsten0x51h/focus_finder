@@ -67,12 +67,20 @@ namespace AstroImagePipeline {
                 : m_scale_type(scale_type), m_scale_factor(scale_factor) {
         }
 
-        //const Value &operator()(const Value &x) const {
         std::shared_ptr<ImageT> operator()(const Value &image) const {
 
             const ImageT & inputImageRef = *image;
 
             auto scaledImage = std::make_shared<ImageT>(inputImageRef, "xy");
+
+            // TODO: Pass interpolation types...
+            // https://cimg.eu/reference/structcimg__library_1_1CImg.html
+            //            resize 	( 	const int  	size_x,
+            //            const int  	size_y = -100,
+            //            const int  	size_z = -100,
+            //            const int  	size_c = -100,
+            //            const int  	interpolation_type = 1
+            //              ...
 
             float factor = (m_scale_type == ScaleTypeT::UP ? m_scale_factor : 1.0F / m_scale_factor);
 
@@ -106,37 +114,29 @@ namespace AstroImagePipeline {
         }
     };
 
-    // TODO: Is ist required to implement this holder to use forwarder2TU?
-    template< class T, ScaleTypeT::TypeE u >
-    struct holder2TU
-    {
-        ScaleTypeT::TypeE val1;
-        T val2;
 
-        holder2TU( T t ) : val1(u), val2(t)
-        { }
+
+    template<typename T>
+    class scale_up_holder {
+    public:
+        explicit scale_up_holder(const T &scale_factor) : scale_factor(scale_factor) {}
+
+        T scale_factor;
+
+    private:
+        void operator=(const scale_up_holder &) = delete;
     };
 
 
     template<typename T>
-class scale_up_holder : public holder2TU<T, ScaleTypeT::UP> {
+    class scale_down_holder {
     public:
-        scale_up_holder(const T &scaleFactor)
-                : holder2TU<T,ScaleTypeT::UP>( scaleFactor) {}
+        explicit scale_down_holder(const T &scale_factor) : scale_factor(scale_factor) {}
+
+        T scale_factor;
 
     private:
-        void operator=(const scale_up_holder &);
-    };
-
-
-    template<typename T>
-    class scale_down_holder : public holder2TU<T, ScaleTypeT::DOWN> {
-    public:
-        scale_down_holder(const T &scaleFactor)
-                : holder2TU<T,  ScaleTypeT::DOWN>(scaleFactor) {}
-
-    private:
-        void operator=(const scale_down_holder &);
+        void operator=(const scale_down_holder &) = delete;
     };
 
 
@@ -150,7 +150,7 @@ class scale_up_holder : public holder2TU<T, ScaleTypeT::UP> {
     inline scale_range<SinglePassRange>
     operator|(SinglePassRange &rng,
               scale_up_holder<float> &f) {
-        return scale_range<SinglePassRange>(rng, f.val1, f.val2);
+        return scale_range<SinglePassRange>(rng, ScaleTypeT::UP, f.scale_factor);
     }
 
 
@@ -160,7 +160,7 @@ class scale_up_holder : public holder2TU<T, ScaleTypeT::UP> {
     inline scale_range<const SinglePassRange>
     operator|(const SinglePassRange &rng,
               const scale_up_holder<float> &f) {
-        return scale_range<const SinglePassRange>(rng, f.val1, f.val2);
+        return scale_range<const SinglePassRange>(rng, ScaleTypeT::UP, f.scale_factor);
     }
 
 
@@ -168,7 +168,7 @@ class scale_up_holder : public holder2TU<T, ScaleTypeT::UP> {
     inline scale_range<SinglePassRange>
     operator|(SinglePassRange &rng,
               scale_down_holder<float> &f) {
-        return scale_range<SinglePassRange>(rng, f.val1, f.val2);
+        return scale_range<SinglePassRange>(rng, ScaleTypeT::DOWN, f.scale_factor);
     }
 
 
@@ -178,7 +178,7 @@ class scale_up_holder : public holder2TU<T, ScaleTypeT::UP> {
     inline scale_range<const SinglePassRange>
     operator|(const SinglePassRange &rng,
               const scale_down_holder<float> &f) {
-        return scale_range<const SinglePassRange>(rng, f.val1, f.val2);
+        return scale_range<const SinglePassRange>(rng, ScaleTypeT::DOWN, f.scale_factor);
     }
 
 } // End namespace AstroImagePipeline

@@ -23,20 +23,8 @@
  ****************************************************************************/
 
 #include <vector>
-//#include <ranges>
 #include <boost/test/unit_test.hpp>
-#include <boost/test/data/test_case.hpp>
 #include <boost/test/tools/floating_point_comparison.hpp>
-
-//#include <boost/range/adaptor/transformed.hpp>
-//#include <boost/range/adaptors.hpp>
-#include <boost/range/algorithm.hpp>
-//#include <boost/range/any_range.hpp>
-//
-//#include <boost/range/adaptor/argument_fwd.hpp>
-//#include <boost/range/iterator_range.hpp>
-//#include <boost/iterator/transform_iterator.hpp>
-//#include <boost/range/numeric.hpp>
 
 #include "../../common/include/image.h"
 #include "../../common/include/thresholding_algorithm_factory.h"
@@ -44,8 +32,6 @@
 #include "../../common/include/pipeline/adapter/subtract_background.h"
 #include "../../common/include/pipeline/adapter/scale.h"
 
-
-namespace bdata = boost::unit_test::data;
 
 BOOST_AUTO_TEST_SUITE(astro_image_processing_pipeline_tests)
 
@@ -108,22 +94,6 @@ BOOST_AUTO_TEST_CASE(astro_image_processing_pipeline_test_1)
     }
 
 
-//
-//    auto loadImage = [](const std::string & imageName) -> ImageT { return ImageT(imageName.c_str()); };
-//    auto scaleUp = [](cimg_library::CImg<float> img) { return img.get_resize(img.width() * 2, img.height() * 2); };
-//
-//
-//    copy(
-//        imageNames |
-//        transformed(loadImage) |
-//        transformed([=](const ImageT & img) { return img.get_resize(img.width() * scaleFactor, img.height() * scaleFactor); }) |
-//        filtered(
-//            [](const ImageT & img) { return (img.width() > 2); }
-//        ),
-//        std::back_inserter(resultImages));
-//
-//    std::cerr << "Size: " << resultImages.size() << std::endl;
-//
 //    BOOST_CHECK(resultImages.size() == 11);
 }
 

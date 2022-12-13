@@ -39,7 +39,7 @@ namespace AstroImagePipeline {
         typedef const typename ThresholdingAlgorithmTypeT::TypeE argument_type;
         typedef std::shared_ptr<ImageT> &result_type;
 
-        subtract_background_value(const argument_type & threshold_type) {
+        explicit subtract_background_value(const argument_type & threshold_type) {
             m_thresholding_algorithm = ThresholdingAlgorithmFactoryT::getInstance(threshold_type);
         }
 
@@ -91,11 +91,11 @@ namespace AstroImagePipeline {
 template<typename T>
 class subtract_background_holder : public boost::range_detail::holder<T> {
 public:
-    subtract_background_holder(const T &threshold_type)
+    explicit subtract_background_holder(const T &threshold_type)
             : boost::range_detail::holder<T>(threshold_type) {}
 
 private:
-    void operator=(const subtract_background_holder &);
+    void operator=(const subtract_background_holder &) = delete;
 };
 
 
