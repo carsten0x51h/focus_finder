@@ -100,7 +100,8 @@ BOOST_AUTO_TEST_CASE(astro_image_processing_pipeline_test_1)
     for(auto result : imageNames
                 | images(123, 456)
                 | subtract_background(ThresholdingAlgorithmTypeT::OTSU)
-                | scaleUp(2.0F, 2.0F)
+                | scaleUp(2.0F)
+                | scaleDown(2.0F)
     ) {
 
         std::cerr << "result: " << result->height() << std::endl;

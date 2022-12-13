@@ -28,18 +28,43 @@
 #include <boost/range/adaptors.hpp>
 
 #include "../../image.h"
+#include "../../enum_helper.h"
 
 namespace AstroImagePipeline {
+
+
+    struct ScaleTypeT {
+        enum TypeE {
+            UP,
+            DOWN,
+            _Count
+        };
+
+        static const char *asStr(const TypeE &inType) {
+            switch (inType) {
+                case UP:
+                    return "UP";
+                case DOWN:
+                    return "DOWN";
+                default:
+                    return "<?>";
+            }
+        }
+
+        MAC_AS_TYPE(Type, E, _Count);
+    };
+
 
 
     template<typename Value>
     class scale_value {
     public:
-        typedef const float argument_type;
+        typedef const ScaleTypeT::TypeE argument_type1;
+        typedef const float argument_type2;
         typedef const std::shared_ptr<ImageT> &result_type;
 
-        scale_value(argument_type &scale_factor, argument_type &to)
-                : m_scale_factor(scale_factor), m_to(to) {
+        scale_value(argument_type1 & scale_type, argument_type2 & scale_factor)
+                : m_scale_type(scale_type), m_scale_factor(scale_factor) {
         }
 
         //const Value &operator()(const Value &x) const {
@@ -49,14 +74,16 @@ namespace AstroImagePipeline {
 
             auto scaledImage = std::make_shared<ImageT>(inputImageRef, "xy");
 
-            scaledImage->resize(m_scale_factor * inputImageRef.width(), m_scale_factor * inputImageRef.height());
+            float factor = (m_scale_type == ScaleTypeT::UP ? m_scale_factor : 1.0F / m_scale_factor);
+
+            scaledImage->resize(factor * inputImageRef.width(), factor * inputImageRef.height());
 
             return scaledImage;
         }
 
     private:
-        argument_type m_scale_factor;
-        argument_type m_to;
+        argument_type1 m_scale_type;
+        argument_type2 m_scale_factor;
     };
 
     template<typename Range>
@@ -73,32 +100,56 @@ namespace AstroImagePipeline {
         typedef boost::iterator_range<scale_iterator> base_t;
 
     public:
-        scale_range(Range &rng, float from, float to)
-                : base_t(scale_iterator(boost::begin(rng), Fn(from, to)),
-                         scale_iterator(boost::end(rng), Fn(from, to))) {
+        scale_range(Range &rng, ScaleTypeT::TypeE scaleType, float scaleFactor)
+                : base_t(scale_iterator(boost::begin(rng), Fn(scaleType, scaleFactor)),
+                         scale_iterator(boost::end(rng), Fn(scaleType, scaleFactor))) {
         }
+    };
+
+    // TODO: Is ist required to implement this holder to use forwarder2TU?
+    template< class T, ScaleTypeT::TypeE u >
+    struct holder2TU
+    {
+        ScaleTypeT::TypeE val1;
+        T val2;
+
+        holder2TU( T t ) : val1(u), val2(t)
+        { }
     };
 
 
     template<typename T>
-    class scale_holder : public boost::range_detail::holder2<T> {
+class scale_up_holder : public holder2TU<T, ScaleTypeT::UP> {
     public:
-        scale_holder(const T &from, const T &to)
-                : boost::range_detail::holder2<T>(from, to) {}
+        scale_up_holder(const T &scaleFactor)
+                : holder2TU<T,ScaleTypeT::UP>( scaleFactor) {}
 
     private:
-        void operator=(const scale_holder &);
+        void operator=(const scale_up_holder &);
     };
 
 
-    static boost::range_detail::forwarder2<scale_holder>
-            scaleUp = boost::range_detail::forwarder2<scale_holder>();
+    template<typename T>
+    class scale_down_holder : public holder2TU<T, ScaleTypeT::DOWN> {
+    public:
+        scale_down_holder(const T &scaleFactor)
+                : holder2TU<T,  ScaleTypeT::DOWN>(scaleFactor) {}
 
+    private:
+        void operator=(const scale_down_holder &);
+    };
+
+
+    static boost::range_detail::forwarder<scale_up_holder>
+            scaleUp = boost::range_detail::forwarder<scale_up_holder>();
+
+    static boost::range_detail::forwarder<scale_down_holder>
+            scaleDown = boost::range_detail::forwarder<scale_down_holder>();
 
     template<typename SinglePassRange>
     inline scale_range<SinglePassRange>
     operator|(SinglePassRange &rng,
-              scale_holder<float> &f) {
+              scale_up_holder<float> &f) {
         return scale_range<SinglePassRange>(rng, f.val1, f.val2);
     }
 
@@ -108,7 +159,25 @@ namespace AstroImagePipeline {
     template<typename SinglePassRange>
     inline scale_range<const SinglePassRange>
     operator|(const SinglePassRange &rng,
-              const scale_holder<float> &f) {
+              const scale_up_holder<float> &f) {
+        return scale_range<const SinglePassRange>(rng, f.val1, f.val2);
+    }
+
+
+    template<typename SinglePassRange>
+    inline scale_range<SinglePassRange>
+    operator|(SinglePassRange &rng,
+              scale_down_holder<float> &f) {
+        return scale_range<SinglePassRange>(rng, f.val1, f.val2);
+    }
+
+
+// const variant
+//
+    template<typename SinglePassRange>
+    inline scale_range<const SinglePassRange>
+    operator|(const SinglePassRange &rng,
+              const scale_down_holder<float> &f) {
         return scale_range<const SinglePassRange>(rng, f.val1, f.val2);
     }
 

@@ -116,7 +116,7 @@ operator|(SinglePassRange &rng,
 template<typename SinglePassRange>
 inline subtract_background_range<const SinglePassRange>
 operator|(const SinglePassRange &rng,
-          const subtract_background_holder<typename ThresholdingAlgorithmTypeT::TypeE/*typename boost::range_value<SinglePassRange>::type*/> &f) {
+          const subtract_background_holder<typename ThresholdingAlgorithmTypeT::TypeE> &f) {
 
     return subtract_background_range<const SinglePassRange>(rng, f.val);
 }
