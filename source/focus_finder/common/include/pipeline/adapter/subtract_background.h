@@ -40,8 +40,6 @@ namespace AstroImagePipeline {
         typedef std::shared_ptr<ImageT> &result_type;
 
         subtract_background_value(const argument_type & threshold_type) {
-            std::cerr << "INSTANTIATING THRESHOLD ALGORITHM " << ThresholdingAlgorithmTypeT::asStr(threshold_type) << "..." << std::endl;
-
             m_thresholding_algorithm = ThresholdingAlgorithmFactoryT::getInstance(threshold_type);
         }
 
