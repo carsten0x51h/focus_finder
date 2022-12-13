@@ -80,17 +80,8 @@ namespace AstroImagePipeline {
     }
 };
 
-//template<typename T>
-//class images_holder : public boost::range_detail::holder2<T> {
-//public:
-//    images_holder(const T &from, const T &to)
-//            : boost::range_detail::holder2<T>(from, to) {}
-//
-//private:
-//    void operator=(const images_holder &);
-//};
 
-template<typename T=int>
+template<typename T>
 class images_holder : public boost::range_detail::holder2<T> {
 public:
     images_holder(const T &from, const T &to)
@@ -108,11 +99,13 @@ static boost::range_detail::forwarder2<images_holder>
 template<typename SinglePassRange>
 inline images_range<SinglePassRange>
 operator|(SinglePassRange &rng,
-          const images_holder<int /*typename boost::range_value<SinglePassRange>::type>*/> &f) {
+          images_holder<int /*typename boost::range_value<SinglePassRange>::type>*/> &f) {
     return images_range<SinglePassRange>(rng, f.val1, f.val2);
 }
 
 
+// const variant
+//
 template<typename SinglePassRange>
 inline images_range<const SinglePassRange>
 operator|(const SinglePassRange &rng,

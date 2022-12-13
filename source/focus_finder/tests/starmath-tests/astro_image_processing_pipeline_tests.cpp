@@ -71,18 +71,26 @@ BOOST_AUTO_TEST_CASE(astro_image_processing_pipeline_test_1)
 
     using namespace AstroImagePipeline;
 
-    std::vector<ImageT> res;
+//    std::vector<ImageT> res;
+//
+//    copy(
+//            imageNames
+//                | images(123, 456)
+//                | subtract_background(ThresholdingAlgorithmTypeT::OTSU),
+//            std::back_inserter(res)
+//    );
+//    for(auto & s : res) {
+//        std::cerr << "s: " << s.height() << std::endl;
+//    }
 
-    copy(
-            imageNames
+    for(auto result : imageNames
                 | images(123, 456)
-                | subtract_background(ThresholdingAlgorithmTypeT::OTSU),
-            std::back_inserter(res)
-    );
+                | subtract_background(ThresholdingAlgorithmTypeT::OTSU)) {
 
-    for(auto & s : res) {
-        std::cerr << "s: " << s.height() << std::endl;
+        std::cerr << "result: " << result.height() << std::endl;
     }
+
+
 
 //        images("test_data/image_processing_pipeline/image_set_1/*.tiff") OR imageFileNames
 //            | read()

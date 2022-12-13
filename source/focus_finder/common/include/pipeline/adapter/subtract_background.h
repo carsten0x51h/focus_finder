@@ -37,7 +37,7 @@ namespace AstroImagePipeline {
     class subtract_background_value {
     public:
         typedef const typename ThresholdingAlgorithmTypeT::TypeE argument_type;
-        typedef const ImageT &result_type;
+        typedef ImageT &result_type;
 
         subtract_background_value(const argument_type & threshold_type) {
             std::cerr << "INSTANTIATING THRESHOLD ALGORITHM " << ThresholdingAlgorithmTypeT::asStr(threshold_type) << "..." << std::endl;
@@ -45,9 +45,8 @@ namespace AstroImagePipeline {
             m_thresholding_algorithm = ThresholdingAlgorithmFactoryT::getInstance(threshold_type);
         }
 
-        // TODO: Implement non-const ???
-        // TODO: Then do not return a copy!
-        ImageT operator()(const Value &image) const {
+        // TODO: Then do not return a copy! -> at least return shared_ptr<ImageT> !
+        ImageT operator()(const Value & image) const {
 
             // TODO: Handle bit depth... do not hardcode here...
             float threshold = m_thresholding_algorithm->calc(image, 16);
@@ -89,7 +88,7 @@ namespace AstroImagePipeline {
 };
 
 
-template<typename T=typename ThresholdingAlgorithmTypeT::TypeE>
+template<typename T>
 class subtract_background_holder : public boost::range_detail::holder<T> {
 public:
     subtract_background_holder(const T &threshold_type)
@@ -107,11 +106,13 @@ static boost::range_detail::forwarder<subtract_background_holder>
 template<typename SinglePassRange>
 inline subtract_background_range<SinglePassRange>
 operator|(SinglePassRange &rng,
-          const subtract_background_holder<typename ThresholdingAlgorithmTypeT::TypeE /*typename boost::range_value<SinglePassRange>::type>*/> &f) {
+          subtract_background_holder<typename ThresholdingAlgorithmTypeT::TypeE /*typename boost::range_value<SinglePassRange>::type>*/> &f) {
     return subtract_background_range<SinglePassRange>(rng, f.val);
 }
 
 
+// const variant
+//
 template<typename SinglePassRange>
 inline subtract_background_range<const SinglePassRange>
 operator|(const SinglePassRange &rng,
