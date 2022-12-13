@@ -35,15 +35,17 @@ namespace AstroImagePipeline {
     template<typename Value>
     class images_value {
     public:
+        typedef const int argument_type;
         typedef const ImageT &result_type;
-        typedef const Value &argument_type;
 
-        images_value(const Value &from, const Value &to)
+        images_value(argument_type &from, argument_type &to)
                 : m_from(from), m_to(to) {
         }
 
         //const Value &operator()(const Value &x) const {
         ImageT operator()(const Value &imageFilename) const {
+
+            std::cerr << "from: " << m_from << std::endl;
 
             //return (x == m_from) ? m_to : x;
             std::cerr << "x: " << imageFilename << std::endl;
@@ -51,8 +53,10 @@ namespace AstroImagePipeline {
         }
 
     private:
-        Value m_from;
-        Value m_to;
+//        Value m_from;
+//        Value m_to;
+        argument_type m_from;
+        argument_type m_to;
     };
 
     template<typename Range>
@@ -69,13 +73,24 @@ namespace AstroImagePipeline {
     typedef boost::iterator_range<images_iterator> base_t;
 
     public:
-    images_range(Range &rng, value_type from, value_type to)
+        //images_range(Range &rng, value_type from, value_type to)
+    images_range(Range &rng, int from, int to)
             : base_t(images_iterator(boost::begin(rng), Fn(from, to)),
                      images_iterator(boost::end(rng), Fn(from, to))) {
     }
 };
 
-template<typename T>
+//template<typename T>
+//class images_holder : public boost::range_detail::holder2<T> {
+//public:
+//    images_holder(const T &from, const T &to)
+//            : boost::range_detail::holder2<T>(from, to) {}
+//
+//private:
+//    void operator=(const images_holder &);
+//};
+
+template<typename T=int>
 class images_holder : public boost::range_detail::holder2<T> {
 public:
     images_holder(const T &from, const T &to)
@@ -93,7 +108,7 @@ static boost::range_detail::forwarder2<images_holder>
 template<typename SinglePassRange>
 inline images_range<SinglePassRange>
 operator|(SinglePassRange &rng,
-          const images_holder<typename boost::range_value<SinglePassRange>::type> &f) {
+          const images_holder<int /*typename boost::range_value<SinglePassRange>::type>*/> &f) {
     return images_range<SinglePassRange>(rng, f.val1, f.val2);
 }
 
@@ -101,7 +116,7 @@ operator|(SinglePassRange &rng,
 template<typename SinglePassRange>
 inline images_range<const SinglePassRange>
 operator|(const SinglePassRange &rng,
-          const images_holder<typename boost::range_value<SinglePassRange>::type> &f) {
+          const images_holder<int/*typename boost::range_value<SinglePassRange>::type*/> &f) {
     return images_range<const SinglePassRange>(rng, f.val1, f.val2);
 }
 

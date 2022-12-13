@@ -39,7 +39,9 @@
 //#include <boost/range/numeric.hpp>
 
 #include "../../common/include/image.h"
+#include "../../common/include/thresholding_algorithm_factory.h"
 #include "../../common/include/pipeline/adapter/images.h"
+#include "../../common/include/pipeline/adapter/subtract_background.h"
 
 
 namespace bdata = boost::unit_test::data;
@@ -70,9 +72,11 @@ BOOST_AUTO_TEST_CASE(astro_image_processing_pipeline_test_1)
     using namespace AstroImagePipeline;
 
     std::vector<ImageT> res;
+
     copy(
             imageNames
-                | images(std::string("bla"), std::string("b")),
+                | images(123, 456)
+                | subtract_background(ThresholdingAlgorithmTypeT::OTSU, ThresholdingAlgorithmTypeT::OTSU),
             std::back_inserter(res)
     );
 

@@ -311,7 +311,7 @@ set(sources
         ../common/include/event_bus.h
         ../common/include/events/new_frame_event.h
         ../common/include/single_star_detector_algorithm.h ../common/single_star_detector_algorithm.cpp
-        ../common/include/indi_version_macro.h ../common/include/centroid_algorithm.h ../common/include/intensity_weighted_centroid_algorithm.h ../common/intensity_weighted_centroid_algorithm.cpp ../common/include/centroid_algorithm_factory.h ../common/include/centroid_algorithm_type.h ../common/centroid_algorithm_factory.cpp ../common/include/mean_thresholding_algorithm.h ../common/mean_thresholding_algorithm.cpp ../common/include/center_of_gravity_centroid_algorithm.h ../common/center_of_gravity_centroid_algorithm.cpp ../common/include/pipeline/adapter/images.h)
+        ../common/include/indi_version_macro.h ../common/include/centroid_algorithm.h ../common/include/intensity_weighted_centroid_algorithm.h ../common/intensity_weighted_centroid_algorithm.cpp ../common/include/centroid_algorithm_factory.h ../common/include/centroid_algorithm_type.h ../common/centroid_algorithm_factory.cpp ../common/include/mean_thresholding_algorithm.h ../common/mean_thresholding_algorithm.cpp ../common/include/center_of_gravity_centroid_algorithm.h ../common/center_of_gravity_centroid_algorithm.cpp ../common/include/pipeline/adapter/images.h ../common/include/pipeline/adapter/subtract_background.h)
 
 
 # 
