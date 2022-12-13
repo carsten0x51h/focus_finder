@@ -37,7 +37,7 @@ namespace AstroImagePipeline {
     class subtract_background_value {
     public:
         typedef const typename ThresholdingAlgorithmTypeT::TypeE argument_type;
-        typedef ImageT &result_type;
+        typedef std::shared_ptr<ImageT> &result_type;
 
         subtract_background_value(const argument_type & threshold_type) {
             std::cerr << "INSTANTIATING THRESHOLD ALGORITHM " << ThresholdingAlgorithmTypeT::asStr(threshold_type) << "..." << std::endl;
@@ -46,17 +46,20 @@ namespace AstroImagePipeline {
         }
 
         // TODO: Then do not return a copy! -> at least return shared_ptr<ImageT> !
-        ImageT operator()(const Value & image) const {
+        std::shared_ptr<ImageT> operator()(const Value & image) const {
+
+            const ImageT & inputImageRef = *image;
 
             // TODO: Handle bit depth... do not hardcode here...
-            float threshold = m_thresholding_algorithm->calc(image, 16);
+            float threshold = m_thresholding_algorithm->calc(inputImageRef, 16);
 
             std::cerr << "threshold: " << threshold << std::endl;
 
-            ImageT subImage(image, "xy");
+            auto subImage = std::make_shared<ImageT>(inputImageRef, "xy");
+            ImageT & subImageRef = (*subImage);
 
-            cimg_forXY(image, x, y) {
-                subImage(x, y) = (subImage(x, y) < threshold ? 0 : subImage(x, y) - threshold);
+            cimg_forXY(*image, x, y) {
+                subImageRef(x, y) = (subImageRef(x, y) < threshold ? 0 : subImageRef(x, y) - threshold);
             }
 
             return subImage;

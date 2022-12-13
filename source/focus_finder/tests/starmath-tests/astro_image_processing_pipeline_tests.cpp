@@ -87,7 +87,7 @@ BOOST_AUTO_TEST_CASE(astro_image_processing_pipeline_test_1)
                 | images(123, 456)
                 | subtract_background(ThresholdingAlgorithmTypeT::OTSU)) {
 
-        std::cerr << "result: " << result.height() << std::endl;
+        std::cerr << "result: " << result->height() << std::endl;
     }
 
 

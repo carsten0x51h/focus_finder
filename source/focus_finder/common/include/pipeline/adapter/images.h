@@ -36,20 +36,20 @@ namespace AstroImagePipeline {
     class images_value {
     public:
         typedef const int argument_type;
-        typedef const ImageT &result_type;
+        typedef const std::shared_ptr<ImageT> &result_type;
 
         images_value(argument_type &from, argument_type &to)
                 : m_from(from), m_to(to) {
         }
 
         //const Value &operator()(const Value &x) const {
-        ImageT operator()(const Value &imageFilename) const {
+        std::shared_ptr<ImageT> operator()(const Value &imageFilename) const {
 
             std::cerr << "from: " << m_from << std::endl;
 
-            //return (x == m_from) ? m_to : x;
             std::cerr << "x: " << imageFilename << std::endl;
-            return ImageT(imageFilename.c_str());
+
+            return std::make_shared<ImageT>(imageFilename.c_str());
         }
 
     private:
