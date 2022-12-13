@@ -1,0 +1,223 @@
+NOTES
+=====
+
+boost range adaptors = std views
+
+See https://mariusbancila.ro/blog/2020/06/06/a-custom-cpp20-range-view/
+
+/**
+*  NOTE / IDEA: Instead of passing just one image, a List<img> could be processed?!
+*               Single images could be treated as a list with one entry.
+*
+*  NOTE: "Load / set" of image needs to happen first, then "selection" + "modification" can be used in turn.
+*
+*  NOTE / IDEA:  Load even list of images?
+*
+*  TODO: Create DSL for the steps below! Think about potentially invalid scenarios! -> "Railroad diagram"
+*
+*  TODO / IDEA: The code of the different processing functions (e.g. FWHM, HFD, ...) could be organized similar to
+*               to the unit tests - a sub-folder /package for each of processing function.
+*
+*     AstroImageProcessingPipelineT
+*
+*          Loading
+*          .of(ImageReader::loadFits(...))  <- IDEA: Allow CImg internal TIFF but also FITSIO functionality   -> List<img>
+*          .of(my ImageT / cimg reference / List<img> -> take a copy...)                                 -> List<img>
+*          TODO: Do only allow one of call, but with N parameters / filenames
+*
+*          Selection
+*          List<img> -> .allowMultipleStars(true/false)                                 -> List<img>
+*          List<img> -> .allowSaturation(true/false)                                    -> List<img>
+*
+*          List<img> -> .cluster(method (pass function/lambda -> allow setting parms))  -> List<List<img>> ?  - This would be nice! - flatten()?
+*          List<img> -> .slice(HORZ/VERT, row/col)                                      -> List<img>  -> toList() <- Store all pixels values (in order) in a list -> or more flexible: use Collector pattern like in Java stream()
+*          img ->       .centerOnStar(CentroiderT::iwc(...))                            -> img
+*          img ->       .subimage/subframe(width*height?) / .selectRegion()             -> img
+*
+*
+*          Procesing
+*          img ->       .denoise(function) / blur(function)                             -> img
+*          img ->       .subtractBackground(thresholderType)                            -> img  <- Maybe just use subtract(...) with overloaded parameter
+*          img ->       .scaleUp(10.0F, scale-method)                                   -> img
+*          img ->       .scaleDown(10.0F, scale-method)                                 -> img
+*          img ->       .stack() / .add(image OR scalar)                                -> img
+*          img ->       .subtract(image OR scalar)                                      -> img
+*          img ->       .multiply(image OR scalar)                                      -> img
+*          img ->       .divide(image OR scalar)                                        -> img
+*          img ->       .stretch(curve)                                                 -> img
+*          List<img> -> .average()                                                      -> img
+*          img ->        .clip()? value + region?...
+*
+*          Writing ?
+*
+*
+*
+*          IDEA: Maybe multiple sep. fluent APIs? One for image manipulation and one for analysis?
+*          IDEA: AstroImageAnalysisReportBuilder ? ... e.g.
+*                      .with(snr)
+*                      .with(fwhm)
+*                      .with(hfd)
+*                      .build()     --> ImageAnalysisReportT
+*
+*          img ->      .analyze() ???                                                  -> ResultT  (hfd, fwhm, snr)
+*          img ->      .hfd()                                                          -> float / SnrT
+*          img ->      .fwhm()                                                         -> float / FwhmT
+*          img ->      .snr()                                                          -> float / SnrT
+*          img ->      .max()                                                          -> float
+*          img ->      .min()                                                          -> float
+*
+*          .execute(inImg?) / .build() / .process(inImg?);
+*
+*
+*      Real world workflows
+*      ====================
+*
+*      1. Focus Finder -> Manual focus star selection
+*
+*          img = AstroImageProcessingPipelineT
+*              .of(indiImg)
+*              .allowMultipleStars(false)
+*              .allowSaturatedStars(false)
+*              .subtractBackground(ThresholderT::otsu(...) OR thresholder function)
+*              .scaleUp(10.0F, scale-method)
+*              .centerOnStar(CentroiderT::iwc(...), image size)                            -> img (ref)
+*              .scaleDown(10.0F, scale-method)
+*              .collect(Collector::asList())
+*
+*          OR with range library
+*
+*                  images("test_data/image_processing_pipeline/image_set_1/*.tiff")
+*                     | filtered(! StarAnalysisT::isSaturated())
+*                     | filtered(StarAnalysisT::isSingleStar())
+*                     | subtractBackground(ThresholderT::otsu(...) OR thresholder function)
+*                     | scaleUp(10.0F, scale-method)
+*                     | centerOnStar(CentroiderT::iwc(...), image size)
+*                     | scaleDown(10.0F, scale-method)
+*
+*
+*      2. Astro imaging pipeline
+*
+*          AstroImageProcessingPipelineT
+*              .of("light-frames/*.fits")                                                  -> List<img>
+*              .subtract(ImageProcessingPipelineT.of("dark-frames/*.fits").average())      -> List<img>
+*              .divide(ImageProcessingPipelineT.of("flatfield-frames/*.fits").average())   -> List<img>
+*              .average()                                                                  -> img
+*              .stretch(StretcherT::-...)                                                  -> img
+*              .store/save("my-filename.png")
+*
+*          OR with range library
+*
+*          images("light-frames/*.fits")
+*              | subtract(files("light-frames/*.fits") | read() | average()))
+*              | divide(average/mean(files("flatfield-frames/*.fits") | average())
+*              | average()
+*              | stretch(Stretcher::...)
+*
+*
+*      3. Cluster example (old automatic star analyzer)
+*
+*          List<img> imgs = AstroImageProcessingPipelineT
+*                              .of("my-star-image.fits")
+*                              .denoise(DenoiserT::...)
+*                              .subtractBackground(ThresholderT::otsu(...) OR thresholder function)
+*                              .cluster(ClusterAlgorithmT::...)                                          -> List<List<img>>
+*                              .flatMap()
+*                              .filter(StarDetailsT::isSaturated() == false)
+*                              .centerOnStar(CentroiderT::iwc(...))
+*                              .filter(StarDetailsT::hfd() < 2)   ??
+*                              .filter(StarDetailsT::snr() > 10)  ??
+*                              .collect(Collector::asList())
+*
+*          OR with range library
+*
+*          NOTE: flatmap: https://stackoverflow.com/questions/36051851/how-to-implement-flatmap-using-rangev3-ranges
+*
+*          images("my-star-image.fits")
+*              | denoise(DenoiserT::...())
+*              | subtractBackground(ThresholderT::otsu(...) OR thresholder function)
+*              | cluster(ClusterAlgorithmT::...)
+*              | boost::range::for_each() -> Range of images
+*              | filtered(! StarAnalysisT::isSaturated())
+*              | centerOnStar(CentroiderT::iwc(...))
+*              | filtered(! StarAnalysisT::snr() > 10)
+*              | filtered(! StarAnalysisT::hfd() < 5)
+*
+*
+*      IDEA: images(...)
+*          images("single-image.fits")
+*          images("image1.fits", "image2.tiff")
+*          images("my-path/*.tiff")
+*          images(my-image-ref)
+*          images(my-image-ref-range)
+*
+*      TODO / IDEA: First, model DSL. "Parser layer" (Expression Builders)
+*                  "A fluent interface often needs temporary parsing data."
+*      IDEA: Fluent API for INDI?
+*
+*      See https://medium.com/@martinstm/fluent-builder-pattern-c-4ac39fafcb0b
+*      See https://blog.jooq.org/the-java-fluent-api-designer-crash-course/
+*      See https://stackoverflow.com/questions/41224894/how-to-implement-a-simple-workflow-pipeline-fluent-api-method-chaining
+*      See https://learn.microsoft.com/en-us/archive/msdn-magazine/2010/january/patterns-in-practice-internal-domain-specific-languages
+*      See https://martinfowler.com/bliki/ExpressionBuilder.html
+*      See https://developer.ibm.com/articles/j-java-streams-3-brian-goetz/
+*      See https://theboreddev.com/understanding-java-streams/
+*
+*      Implement a Range Adaptor with arguments
+*      See https://www.boost.org/doc/libs/1_80_0/libs/range/doc/html/range/reference/extending/method_3/method_3_2.html
+*
+*
+*  Properties of a fluent API
+*  ==========================
+*
+*  See https://dzone.com/articles/java-fluent-api (!)
+*  See https://stackoverflow.com/questions/22461333/fluent-builder-dsl-in-java-by-example
+*
+*  Generally speaking, a fluent API is divided into three parts:
+*
+*   1. The final object or result: Overall, the fluent-API resembles the builder pattern,
+*      but the most powerful dynamic is coupled with DSL. In both, the result tends to be
+*      an instance representing the result of a process or a new entity.
+*
+*   2. The options: in this case, are the collections of interfaces or classes that will
+*      serve as "our interactive menu". From an action, the idea is that show only the options
+*      available for the next step, following an intuitive sequence.
+*
+*   3. The result: after all this process, the answer may or may not result in an instance
+*      either for an entity, strategy, etc. The critical point is that the result must be valid.
+*
+*   NOTE: "You might also want to consider returning different object types besides just MathBuilder. That would
+*          let you enforce fixed arity, at least, without resorting to throwing a runtime exception (yuck!).
+*          Also, with fixed arity, you don't really need the end() calls .. they only matter for variable arity."
+*
+*
+*
+*
+*  Expression Builder
+*  ==================
+*
+*  An Expression Builder is a solution to this problem. An expression builder is a separate object on which we
+*  define the fluent interface that then translates the fluent calls to the underlying regular API calls.
+*
+*      "Method Chaining avoids global variables, although you still need some kind of bare function to begin the
+*       chain, once you've started, all parsing data can be held on the Expression Builder object that the chaining
+*       methods are defined on."
+*
+*       "You can avoid all this globalness with Function Sequence by using Object Scoping. In most cases this involves
+*       placing the DSL script in a subclass of an Expression Builder so that bare function calls are resolved against
+*       methods in the Expression Builder superclass. This handles both globalness problems. All the functions in the
+*       DSL are defined only in the builder class, and thus localized. Furthermore, since these are instance methods,
+*       they connect directly to data on the builder instance to store the parsing data. That's a compelling set of
+*       advantages for the cost of placing the DSL script in a builder subclass, so that's my default option."
+*
+*   Building a pipeline
+*   ===================
+*   In the internal representation, each stage of the pipeline is described by a bitmap of stream flags that describe
+*   what's known about the elements at this stage of the stream pipeline.
+*
+*   When the terminal operation is initiated, the stream implementation picks an execution plan. Intermediate
+*   operations are divided into stateless (filter(), map(), flatMap()) and stateful (sorted(), limit(), distinct())
+*   operations. A stateless operation is one that can be performed on an element without knowledge of any of the
+*   other elements. For example, a filtering operation only needs to examine the current element to determine
+*   whether to include or eliminate it, but a sorting operation must see all the elements before it knows which
+*   element to emit first.
+*/
