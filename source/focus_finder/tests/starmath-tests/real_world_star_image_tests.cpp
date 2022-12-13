@@ -30,6 +30,8 @@
 #include "../../common/include/centroid_algorithm_factory.h"
 #include "../../common/include/thresholding_algorithm_factory.h"
 
+// TODO: This "real world" file is a bucket for everything... it should be renamed...
+
 namespace bdata = boost::unit_test::data;
 
 BOOST_AUTO_TEST_SUITE(real_world_star_image_tests)
