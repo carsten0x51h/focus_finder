@@ -39,21 +39,32 @@ namespace AstroImagePipeline {
         typedef const typename ThresholdingAlgorithmTypeT::TypeE argument_type;
         typedef const ImageT &result_type;
 
-        subtract_background_value(argument_type &from)
-                : m_from(from) {
+        subtract_background_value(const argument_type & threshold_type) {
+            std::cerr << "INSTANTIATING THRESHOLD ALGORITHM " << ThresholdingAlgorithmTypeT::asStr(threshold_type) << "..." << std::endl;
+
+            m_thresholding_algorithm = ThresholdingAlgorithmFactoryT::getInstance(threshold_type);
         }
 
-        //const Value &operator()(const Value &x) const {
+        // TODO: Implement non-const ???
+        // TODO: Then do not return a copy!
         ImageT operator()(const Value &image) const {
 
-            std::cerr << "from: " << m_from << std::endl;
+            // TODO: Handle bit depth... do not hardcode here...
+            float threshold = m_thresholding_algorithm->calc(image, 16);
 
-            std::cerr << "x: " << image.width() << std::endl;
-            return image;
+            std::cerr << "threshold: " << threshold << std::endl;
+
+            ImageT subImage(image, "xy");
+
+            cimg_forXY(image, x, y) {
+                subImage(x, y) = (subImage(x, y) < threshold ? 0 : subImage(x, y) - threshold);
+            }
+
+            return subImage;
         }
 
     private:
-        argument_type m_from;
+        std::shared_ptr<ThresholdingAlgorithmT> m_thresholding_algorithm;
     };
 
     template<typename Range>
@@ -81,8 +92,8 @@ namespace AstroImagePipeline {
 template<typename T=typename ThresholdingAlgorithmTypeT::TypeE>
 class subtract_background_holder : public boost::range_detail::holder<T> {
 public:
-    subtract_background_holder(const T &from)
-            : boost::range_detail::holder<T>(from) {}
+    subtract_background_holder(const T &threshold_type)
+            : boost::range_detail::holder<T>(threshold_type) {}
 
 private:
     void operator=(const subtract_background_holder &);
