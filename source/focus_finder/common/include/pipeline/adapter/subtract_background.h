@@ -39,8 +39,8 @@ namespace AstroImagePipeline {
         typedef const typename ThresholdingAlgorithmTypeT::TypeE argument_type;
         typedef const ImageT &result_type;
 
-        subtract_background_value(argument_type &from, argument_type &to)
-                : m_from(from), m_to(to) {
+        subtract_background_value(argument_type &from)
+                : m_from(from) {
         }
 
         //const Value &operator()(const Value &x) const {
@@ -53,10 +53,7 @@ namespace AstroImagePipeline {
         }
 
     private:
-//        Value m_from;
-//        Value m_to;
         argument_type m_from;
-        argument_type m_to;
     };
 
     template<typename Range>
@@ -74,42 +71,33 @@ namespace AstroImagePipeline {
 
     public:
         //subtract_background_range(Range &rng, value_type from, value_type to)
-    subtract_background_range(Range &rng, typename ThresholdingAlgorithmTypeT::TypeE from, typename ThresholdingAlgorithmTypeT::TypeE to)
-            : base_t(subtract_background_iterator(boost::begin(rng), Fn(from, to)),
-                     subtract_background_iterator(boost::end(rng), Fn(from, to))) {
+    subtract_background_range(Range &rng, typename ThresholdingAlgorithmTypeT::TypeE from)
+            : base_t(subtract_background_iterator(boost::begin(rng), Fn(from)),
+                     subtract_background_iterator(boost::end(rng), Fn(from))) {
     }
 };
 
-//template<typename T>
-//class subtract_background_holder : public boost::range_detail::holder2<T> {
-//public:
-//    subtract_background_holder(const T &from, const T &to)
-//            : boost::range_detail::holder2<T>(from, to) {}
-//
-//private:
-//    void operator=(const subtract_background_holder &);
-//};
 
 template<typename T=typename ThresholdingAlgorithmTypeT::TypeE>
-class subtract_background_holder : public boost::range_detail::holder2<T> {
+class subtract_background_holder : public boost::range_detail::holder<T> {
 public:
-    subtract_background_holder(const T &from, const T &to)
-            : boost::range_detail::holder2<T>(from, to) {}
+    subtract_background_holder(const T &from)
+            : boost::range_detail::holder<T>(from) {}
 
 private:
     void operator=(const subtract_background_holder &);
 };
 
 
-static boost::range_detail::forwarder2<subtract_background_holder>
-        subtract_background = boost::range_detail::forwarder2<subtract_background_holder>();
+static boost::range_detail::forwarder<subtract_background_holder>
+        subtract_background = boost::range_detail::forwarder<subtract_background_holder>();
 
 
 template<typename SinglePassRange>
 inline subtract_background_range<SinglePassRange>
 operator|(SinglePassRange &rng,
           const subtract_background_holder<typename ThresholdingAlgorithmTypeT::TypeE /*typename boost::range_value<SinglePassRange>::type>*/> &f) {
-    return subtract_background_range<SinglePassRange>(rng, f.val1, f.val2);
+    return subtract_background_range<SinglePassRange>(rng, f.val);
 }
 
 
@@ -118,7 +106,7 @@ inline subtract_background_range<const SinglePassRange>
 operator|(const SinglePassRange &rng,
           const subtract_background_holder<typename ThresholdingAlgorithmTypeT::TypeE/*typename boost::range_value<SinglePassRange>::type*/> &f) {
 
-    return subtract_background_range<const SinglePassRange>(rng, f.val1, f.val2);
+    return subtract_background_range<const SinglePassRange>(rng, f.val);
 }
 
 } // End namespace AstroImagePipeline

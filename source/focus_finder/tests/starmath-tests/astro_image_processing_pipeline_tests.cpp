@@ -76,7 +76,7 @@ BOOST_AUTO_TEST_CASE(astro_image_processing_pipeline_test_1)
     copy(
             imageNames
                 | images(123, 456)
-                | subtract_background(ThresholdingAlgorithmTypeT::OTSU, ThresholdingAlgorithmTypeT::OTSU),
+                | subtract_background(ThresholdingAlgorithmTypeT::OTSU),
             std::back_inserter(res)
     );
 
