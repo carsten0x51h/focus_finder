@@ -43,15 +43,6 @@
  *    -Remove thresholder - assume that thresholding took place before
  *        --> Separation of concerns
  *
- *  TODO: Can I invent a star-image processing pipeline? Fluent API?
- *     -starImg = ProcessingPipeline(inImg ?)
- *          .chooseMaxInRegion(region: (x1, y1), (x2, y2) or Point: (x, y) - click).
- *          .subimage/subframe(width*height?)
- *          .threshold(MAX_ENTROPY)
- *          .scale(10.0F)
- *          .centroid(IWC)
- *          .execute(inImg?) / .build() / .process(inImg?);
- *
  *      FwhmT fwhm = starImg.fwhm(...)
  *      HfdT hfd = starImg.hfd(...)
  */
