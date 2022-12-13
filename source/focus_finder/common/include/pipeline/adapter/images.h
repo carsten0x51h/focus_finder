@@ -49,8 +49,6 @@ namespace AstroImagePipeline {
         }
 
     private:
-//        Value m_from;
-//        Value m_to;
         argument_type m_from;
         argument_type m_to;
     };

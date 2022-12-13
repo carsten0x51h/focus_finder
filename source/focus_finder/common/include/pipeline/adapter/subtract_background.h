@@ -53,12 +53,11 @@ namespace AstroImagePipeline {
             // TODO: Handle bit depth... do not hardcode here...
             float threshold = m_thresholding_algorithm->calc(inputImageRef, 16);
 
-            std::cerr << "threshold: " << threshold << std::endl;
-
             auto subImage = std::make_shared<ImageT>(inputImageRef, "xy");
+
             ImageT & subImageRef = (*subImage);
 
-            cimg_forXY(*image, x, y) {
+            cimg_forXY(inputImageRef, x, y) {
                 subImageRef(x, y) = (subImageRef(x, y) < threshold ? 0 : subImageRef(x, y) - threshold);
             }
 
