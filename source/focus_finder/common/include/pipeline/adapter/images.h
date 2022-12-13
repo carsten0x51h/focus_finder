@@ -45,10 +45,6 @@ namespace AstroImagePipeline {
         //const Value &operator()(const Value &x) const {
         std::shared_ptr<ImageT> operator()(const Value &imageFilename) const {
 
-            std::cerr << "from: " << m_from << std::endl;
-
-            std::cerr << "x: " << imageFilename << std::endl;
-
             return std::make_shared<ImageT>(imageFilename.c_str());
         }
 

@@ -71,6 +71,19 @@ BOOST_AUTO_TEST_CASE(astro_image_processing_pipeline_test_1)
 
     using namespace AstroImagePipeline;
 
+//        images("test_data/image_processing_pipeline/image_set_1/*.tiff") OR imageFileNames
+//            | read()
+//            | filtered(! StarAnalysisT::isSaturated())
+//            | filtered(StarAnalysisT::isSingleStar())
+//            | subtractBackground(ThresholderT::otsu(...) OR thresholder function)
+//            | scaleUp(10.0F, scale-method)
+//            | centerOnStar(CentroiderT::iwc(...), image size)
+//            | scaleDown(10.0F, scale-method)
+//
+//            // See https://www.caichinger.com/boost-range/boost-accumulate.html
+//            //int sum = boost::accumulate(vec, 0);
+
+
 //    std::vector<ImageT> res;
 //
 //    copy(
@@ -91,38 +104,10 @@ BOOST_AUTO_TEST_CASE(astro_image_processing_pipeline_test_1)
     }
 
 
-
-//        images("test_data/image_processing_pipeline/image_set_1/*.tiff") OR imageFileNames
-//            | read()
-//            | filtered(! StarAnalysisT::isSaturated())
-//            | filtered(StarAnalysisT::isSingleStar())
-//            | subtractBackground(ThresholderT::otsu(...) OR thresholder function)
-//            | scaleUp(10.0F, scale-method)
-//            | centerOnStar(CentroiderT::iwc(...), image size)
-//            | scaleDown(10.0F, scale-method)
-//
-//
-//            // See https://www.caichinger.com/boost-range/boost-accumulate.html
-//            //int sum = boost::accumulate(vec, 0);
-
-
-//    // vs
-//    //ImagePipelineFunctionsT::load(imageNames)
-//
-////    PipelineBuilderT::of(imageNames)
-////                        .scaleUp(2.0F)
-////                        .collect();
-//
 //
 //    auto loadImage = [](const std::string & imageName) -> ImageT { return ImageT(imageName.c_str()); };
 //    auto scaleUp = [](cimg_library::CImg<float> img) { return img.get_resize(img.width() * 2, img.height() * 2); };
 //
-//    std::list<ImageT> resultImages;
-//
-//    float scaleFactor = 2.0F;
-//
-////    template< class SinglePassRange, class UnaryFunction >
-////    transformed_range<UnaryFunction,SinglePassRange> x = transformed(scaleUp);
 //
 //    copy(
 //        imageNames |
