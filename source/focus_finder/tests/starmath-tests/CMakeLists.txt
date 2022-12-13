@@ -39,7 +39,7 @@ set(sources
         ../../common/max_entropy_thresholding_algorithm.cpp
         ../../common/otsu_thresholding_algorithm.cpp
 		../../common/mean_thresholding_algorithm.cpp
-        star_cluster_algorithm_tests.cpp image_slicer_tests.cpp point_tests.cpp hfd_tests.cpp centroid_tests.cpp image_tests.cpp thresholder_tests.cpp real_world_star_image_tests.cpp astro_image_processing_pipeline_tests.cpp ../../common/include/pipeline/adapter/images.h ../../common/include/pipeline/adapter/subtract_background.h)
+        star_cluster_algorithm_tests.cpp image_slicer_tests.cpp point_tests.cpp hfd_tests.cpp centroid_tests.cpp image_tests.cpp thresholder_tests.cpp real_world_star_image_tests.cpp astro_image_processing_pipeline_tests.cpp ../../common/include/pipeline/adapter/images.h ../../common/include/pipeline/adapter/subtract_background.h ../../common/include/pipeline/adapter/scale.h)
 
 # create an executable, which instantiates a runner from
 # GoogleTest, Boost.Test, QtTest or whatever framework you use
