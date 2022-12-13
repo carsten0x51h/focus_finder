@@ -69,12 +69,16 @@ BOOST_AUTO_TEST_CASE(astro_image_processing_pipeline_test_1)
 
     using namespace AstroImagePipeline;
 
-    std::vector<std::string> res;
+    std::vector<ImageT> res;
     copy(
             imageNames
-                | images(std::string("test_data/image_processing_pipeline/image_set_1/newton_focus_star3.tiff"), std::string("b")),
+                | images(std::string("bla"), std::string("b")),
             std::back_inserter(res)
     );
+
+    for(auto & s : res) {
+        std::cerr << "s: " << s.height() << std::endl;
+    }
 
 //        images("test_data/image_processing_pipeline/image_set_1/*.tiff") OR imageFileNames
 //            | read()
@@ -89,9 +93,6 @@ BOOST_AUTO_TEST_CASE(astro_image_processing_pipeline_test_1)
 //            // See https://www.caichinger.com/boost-range/boost-accumulate.html
 //            //int sum = boost::accumulate(vec, 0);
 
-    for(auto & s : res) {
-        std::cerr << "s: " << s << std::endl;
-    }
 
 //    // vs
 //    //ImagePipelineFunctionsT::load(imageNames)
