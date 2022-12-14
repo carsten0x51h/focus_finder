@@ -32,7 +32,7 @@
 #include "../../centroid_algorithm.h"
 #include "../../rect.h"
 
-#define FOFI_CENTER_ON_STAR_DEBUG 1
+#define FOFI_CENTER_ON_STAR_DEBUG 0
 
 namespace AstroImagePipeline {
 
