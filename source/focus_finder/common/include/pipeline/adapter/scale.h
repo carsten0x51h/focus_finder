@@ -30,6 +30,8 @@
 #include "../../image.h"
 #include "../../enum_helper.h"
 
+#define FOFI_SCALE_DEBUG 0
+
 namespace AstroImagePipeline {
 
 
@@ -71,7 +73,9 @@ namespace AstroImagePipeline {
 
             const ImageT & inputImageRef = *image;
 
-            auto scaledImage = std::make_shared<ImageT>(inputImageRef, "xy");
+            DEBUG_IMAGE_DISPLAY(inputImageRef, "scale_in", FOFI_SCALE_DEBUG);
+
+            auto scaledImage = std::make_shared<ImageT>(inputImageRef);
 
             // TODO: Pass interpolation types...
             // https://cimg.eu/reference/structcimg__library_1_1CImg.html
@@ -85,6 +89,8 @@ namespace AstroImagePipeline {
             float factor = (m_scale_type == ScaleTypeT::UP ? m_scale_factor : 1.0F / m_scale_factor);
 
             scaledImage->resize(factor * inputImageRef.width(), factor * inputImageRef.height());
+
+            DEBUG_IMAGE_DISPLAY(inputImageRef, "scale_out", FOFI_SCALE_DEBUG);
 
             return scaledImage;
         }
