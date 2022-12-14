@@ -34,6 +34,7 @@
 #include "../../common/include/pipeline/adapter/scale.h"
 #include "../../common/include/pipeline/adapter/center_on_star.h"
 
+#include "../../common/include/star_analysis.h"
 
 BOOST_AUTO_TEST_SUITE(astro_image_processing_pipeline_tests)
 
@@ -88,11 +89,14 @@ BOOST_AUTO_TEST_CASE(astro_image_processing_pipeline_test_1)
 
     for(auto result : imageNames
                 | images(123, 456) // TODO / IDEA: Use varargs...
+                | filtered(&StarAnalysis::isNotSaturated)
                 | subtract_background(ThresholdingAlgorithmTypeT::OTSU)
-                | scaleUp(3.0F)
-                | centerOnStar(CentroidAlgorithmFactoryT::getInstance(CentroidAlgorithmTypeT::IWC) /*, 123 windowSize*/)
-                | scaleDown(3.0F)
-    ) {
+                | scale_up(3.0F)
+                | center_on_star(CentroidAlgorithmFactoryT::getInstance(CentroidAlgorithmTypeT::IWC))
+                | scale_down(3.0F)
+//                | crop_from_center(size -> 50x50)
+                //| crop(rect) OR
+        ) {
 
         //std::cerr << "result: " << result->height() << std::endl;
     }

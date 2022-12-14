@@ -127,7 +127,7 @@ namespace AstroImagePipeline {
 
 
     static boost::range_detail::forwarder<center_on_star_holder>
-            centerOnStar = boost::range_detail::forwarder<center_on_star_holder>();
+            center_on_star = boost::range_detail::forwarder<center_on_star_holder>();
 
     template<typename SinglePassRange>
     inline center_on_star_range<SinglePassRange>

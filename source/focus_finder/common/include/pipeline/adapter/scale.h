@@ -147,10 +147,10 @@ namespace AstroImagePipeline {
 
 
     static boost::range_detail::forwarder<scale_up_holder>
-            scaleUp = boost::range_detail::forwarder<scale_up_holder>();
+            scale_up = boost::range_detail::forwarder<scale_up_holder>();
 
     static boost::range_detail::forwarder<scale_down_holder>
-            scaleDown = boost::range_detail::forwarder<scale_down_holder>();
+            scale_down = boost::range_detail::forwarder<scale_down_holder>();
 
     template<typename SinglePassRange>
     inline scale_range<SinglePassRange>
