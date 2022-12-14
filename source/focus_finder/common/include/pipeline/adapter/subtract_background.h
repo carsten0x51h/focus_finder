@@ -30,6 +30,8 @@
 #include "../../image.h"
 #include "../../thresholding_algorithm_type.h"
 
+#define FOFI_SUBTRACT_BACKGROUND_DEBUG 0
+
 namespace AstroImagePipeline {
 
 
@@ -48,6 +50,8 @@ namespace AstroImagePipeline {
 
             const ImageT & inputImageRef = *image;
 
+            DEBUG_IMAGE_DISPLAY(inputImageRef, "subtract_background_in", FOFI_SUBTRACT_BACKGROUND_DEBUG);
+
             // TODO: Handle bit depth... do not hardcode here...
             float threshold = m_thresholding_algorithm->calc(inputImageRef, 16);
 
@@ -56,8 +60,10 @@ namespace AstroImagePipeline {
             ImageT & subImageRef = (*subImage);
 
             cimg_forXY(inputImageRef, x, y) {
-                subImageRef(x, y) = (subImageRef(x, y) < threshold ? 0 : subImageRef(x, y) - threshold);
+                subImageRef(x, y) = (inputImageRef(x, y) < threshold ? 0 : inputImageRef(x, y) - threshold);
             }
+
+            DEBUG_IMAGE_DISPLAY(subImageRef, "subtract_background_out", FOFI_SUBTRACT_BACKGROUND_DEBUG);
 
             return subImage;
         }
