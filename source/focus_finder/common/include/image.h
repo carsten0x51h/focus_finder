@@ -27,8 +27,25 @@
 
 /**
  * We do not want an X11 dependency by default.
+ * Use DEFINE_IMAGE_DEBUG to enable CImg debug.
  */
-#define cimg_display 0
+#ifdef DEBUG_IMAGE_DISPLAY_SWITCH
+
+    #define cimg_display 1
+
+    #define DEBUG_IMAGE_DISPLAY(imageRef, title, enable)              \
+      if (enable) {                                                   \
+         cimg_library::CImgDisplay debugImageDisp((imageRef).width(),(imageRef).height(),title, 1); \
+         debugImageDisp.display(imageRef);                            \
+         while (! debugImageDisp.is_closed()) {                       \
+           debugImageDisp.wait();                                     \
+         }                                                            \
+    }
+
+#else
+    #define cimg_display 0
+    #define DEBUG_IMAGE_DISPLAY(Name, ImageRef, Title)  {}
+#endif
 
 /**
  * NOTE: In order to use TIFF, enable the following define. This also requires adding
