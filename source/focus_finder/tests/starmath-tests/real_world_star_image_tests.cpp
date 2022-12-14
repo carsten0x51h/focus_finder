@@ -101,18 +101,13 @@ BOOST_DATA_TEST_CASE(hfd_real_newton_focus_star_no_background_subtraction_test,
     //       is doing a subimage() for a given "outer HFD radius" and then the threshold is calculated
     //       and subtracted. Hence, subtracting the mean here, before doing the subimage(), results in
     //       a different result!
-    auto bgThresholdFunction = [](const ImageT & img, unsigned bitDepth)-> double {
-        return img.mean();
-    };
-
     BOOST_CHECK_CLOSE(
         HfdT::calculate(
                 ImageT(filenameSs.str().c_str()),
                 PointT<unsigned int> (33, 47), // Star center position manually extracted from first image
                 55.0 /*outer diameter*/,
                 1.0F /* scale factor */,
-                nullptr,
-                bgThresholdFunction
+                nullptr
         ),
         expectedFocusStarHfd,
         0.01F
