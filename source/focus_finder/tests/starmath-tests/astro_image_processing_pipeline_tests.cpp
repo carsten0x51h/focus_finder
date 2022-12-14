@@ -33,8 +33,11 @@
 #include "../../common/include/pipeline/adapter/subtract_background.h"
 #include "../../common/include/pipeline/adapter/scale.h"
 #include "../../common/include/pipeline/adapter/center_on_star.h"
+#include "../../common/include/pipeline/adapter/crop.h"
 
 #include "../../common/include/star_analysis.h"
+#include "../../common/include/hfd.h"
+
 
 BOOST_AUTO_TEST_SUITE(astro_image_processing_pipeline_tests)
 
@@ -94,9 +97,13 @@ BOOST_AUTO_TEST_CASE(astro_image_processing_pipeline_test_1)
                 | scale_up(3.0F)
                 | center_on_star(CentroidAlgorithmFactoryT::getInstance(CentroidAlgorithmTypeT::IWC))
                 | scale_down(3.0F)
-//                | crop_from_center(size -> 50x50)
+                | crop_from_center(SizeT<int>(61,61))
                 //| crop(rect) OR
         ) {
+
+        HfdT hfd(*result);
+
+        std::cerr << "HFD: " << hfd.getValue() << std::endl;
 
         //std::cerr << "result: " << result->height() << std::endl;
     }
