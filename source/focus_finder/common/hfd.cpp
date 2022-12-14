@@ -30,9 +30,6 @@
 
 const unsigned int HfdT::outerHfdDiameter = 55; // TODO: Calc?! - depends on pixel size and focal length (and seeing...) WAS 21!!! TODO: At least make this configurable - set from the outside!
 const double HfdT::scaleFactor = 1.0;
-const HfdT::BackgroundThresholdFunctionT HfdT::defaultBgThresholdFunction = [](const ImageT & img, unsigned bitDepth)-> double {
-    return img.mean();
-};
 
 /**
  * TODO: The thresholding function should be removed completely. This processing step should be executed
@@ -53,17 +50,17 @@ const HfdT::BackgroundThresholdFunctionT HfdT::defaultBgThresholdFunction = [](c
  * @return
  */
 double HfdT::calculate(const ImageT &inImage, unsigned int inOuterDiameterPx,
-                       double inScaleFactor, ImageT *outCenteredImg, const BackgroundThresholdFunctionT& inBgThresholdFunction) {
+                       double inScaleFactor, ImageT *outCenteredImg) {
 
     PointT<unsigned int> starCenterPx((inImage.width() % 2 != 0 ? (inImage.width() - 1) : inImage.width())  / 2,
                                       (inImage.height() % 2 != 0 ? (inImage.height() - 1) : inImage.height())  / 2);
 
-    return calculate(inImage, starCenterPx, inOuterDiameterPx, inScaleFactor, outCenteredImg, inBgThresholdFunction);
+    return calculate(inImage, starCenterPx, inOuterDiameterPx, inScaleFactor, outCenteredImg);
 }
 
 // TODO: As template.... float | double...?
 double HfdT::calculate(const ImageT &inImage, const PointT<unsigned int> & starCenterPx, unsigned int inOuterDiameterPx,
-                      double inScaleFactor, ImageT *outCenteredImg, const BackgroundThresholdFunctionT& inBgThresholdFunction) {
+                      double inScaleFactor, ImageT *outCenteredImg) {
 
     if (inImage.is_empty()) {
         throw HfdExceptionT("Empty image supplied.");
@@ -92,15 +89,6 @@ double HfdT::calculate(const ImageT &inImage, const PointT<unsigned int> & starC
                                      (int) subImageRect.y() /*y0*/,
                                      (int) (subImageRect.x() + subImageRect.width() - 1) /*x1*/,
                                      (int) (subImageRect.y() + subImageRect.height() - 1) /*y1*/);
-
-    // Sub background threshold from image if threshold function is given
-    if (inBgThresholdFunction != nullptr) {
-        auto bgTh = (float) inBgThresholdFunction(subImg, 16 /*bit depth - TODO: Do not hardcode...*/);
-
-        cimg_forXY(subImg, x, y) {
-                subImg(x, y) = (subImg(x, y) < bgTh ? 0 : subImg(x, y) - bgTh);
-            }
-    }
 
     /**
      * interpolation_type - see https://cimg.eu/reference/structcimg__library_1_1CImg.html

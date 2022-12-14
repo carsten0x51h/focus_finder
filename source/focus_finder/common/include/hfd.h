@@ -60,14 +60,10 @@
 DEF_Exception(Hfd);
 
 class HfdT {
-public:
-    typedef std::function<double(const ImageT&, unsigned int)> BackgroundThresholdFunctionT;
-
 private:
     ImageT mImg;
     double mHfdValue{};
     unsigned int mOuterDiameter{};
-    static const BackgroundThresholdFunctionT defaultBgThresholdFunction;
 
 public:
     static const unsigned int outerHfdDiameter;
@@ -78,36 +74,32 @@ public:
     }
 
     explicit HfdT(const ImageT &inImage,
-         unsigned int inOuterDiameter = outerHfdDiameter, double inScaleFactor = scaleFactor,
-         const BackgroundThresholdFunctionT& inBgThresholdFunction = defaultBgThresholdFunction) {
-        this->set(inImage, inOuterDiameter, inScaleFactor, inBgThresholdFunction);
+         unsigned int inOuterDiameter = outerHfdDiameter, double inScaleFactor = scaleFactor) {
+        this->set(inImage, inOuterDiameter, inScaleFactor);
     }
 
     explicit HfdT(const ImageT &inImage, const PointT<unsigned int> & starCenterPx,
-                  unsigned int inOuterDiameter = outerHfdDiameter, double inScaleFactor = scaleFactor,
-                  const BackgroundThresholdFunctionT& inBgThresholdFunction = defaultBgThresholdFunction) {
-        this->set(inImage, starCenterPx, inOuterDiameter, inScaleFactor, inBgThresholdFunction);
+                  unsigned int inOuterDiameter = outerHfdDiameter, double inScaleFactor = scaleFactor) {
+        this->set(inImage, starCenterPx, inOuterDiameter, inScaleFactor);
     }
 
     inline void set(const ImageT &inImage, unsigned int inOuterDiameter =
-    outerHfdDiameter, double inScaleFactor = scaleFactor, const BackgroundThresholdFunctionT& inBgThresholdFunction = defaultBgThresholdFunction) {
-        mHfdValue = HfdT::calculate(inImage, inOuterDiameter, inScaleFactor, &mImg, inBgThresholdFunction);
+    outerHfdDiameter, double inScaleFactor = scaleFactor) {
+        mHfdValue = HfdT::calculate(inImage, inOuterDiameter, inScaleFactor, &mImg);
         mOuterDiameter = inOuterDiameter;
     }
 
     inline void set(const ImageT &inImage, const PointT<unsigned int> & starCenterPx, unsigned int inOuterDiameter =
-    outerHfdDiameter, double inScaleFactor = scaleFactor, const BackgroundThresholdFunctionT& inBgThresholdFunction = defaultBgThresholdFunction) {
-        mHfdValue = HfdT::calculate(inImage, starCenterPx, inOuterDiameter, inScaleFactor, &mImg, inBgThresholdFunction);
+    outerHfdDiameter, double inScaleFactor = scaleFactor) {
+        mHfdValue = HfdT::calculate(inImage, starCenterPx, inOuterDiameter, inScaleFactor, &mImg);
         mOuterDiameter = inOuterDiameter;
     }
 
     static double calculate(const ImageT &inImage, unsigned int inOuterDiameter =
-    outerHfdDiameter, double inScaleFactor = scaleFactor, ImageT *outCenteredImg = nullptr,
-                            const BackgroundThresholdFunctionT& inBgThresholdFunction = defaultBgThresholdFunction);
+    outerHfdDiameter, double inScaleFactor = scaleFactor, ImageT *outCenteredImg = nullptr);
 
     static double calculate(const ImageT &inImage, const PointT<unsigned int> & starCenterPx, unsigned int inOuterDiameter =
-    outerHfdDiameter, double inScaleFactor = scaleFactor, ImageT *outCenteredImg = nullptr,
-                            const BackgroundThresholdFunctionT& inBgThresholdFunction = defaultBgThresholdFunction);
+    outerHfdDiameter, double inScaleFactor = scaleFactor, ImageT *outCenteredImg = nullptr);
 
     [[nodiscard]] inline bool valid() const {
         return (mHfdValue > 0 && mImg.width() > 0 && mImg.height() > 0);

@@ -97,8 +97,7 @@ BOOST_DATA_TEST_CASE(hfd_test_all_pixel_values_equal_1_test,
     BOOST_CHECK_CLOSE(HfdT::calculate(image,
                                       outerDiameter,
                                       scaleFactor,
-                                      nullptr,
-                                      nullptr /*no background threshold subtraction*/),
+                                      nullptr),
                       expectedHfd,
                       acceptedError);
 }
@@ -155,8 +154,7 @@ BOOST_DATA_TEST_CASE(hfd_test_ideal_gaussian_sigmaX_test,
             img,
             (double) imageDimension,
             1.0F /* scale factor */,
-            nullptr,
-            nullptr /*no background threshold subtraction*/),
+            nullptr),
             calcExpectedHfd(sigma), maxError);
 }
 
@@ -191,8 +189,7 @@ BOOST_DATA_TEST_CASE(hfd_out_of_bounds_test,
                 starCenter,
                 outerDiameter,
                 scaleFactor,
-                nullptr,
-                nullptr /*no background threshold subtraction*/),
+                nullptr),
                 HfdExceptionT);
 }
 
@@ -221,8 +218,7 @@ BOOST_DATA_TEST_CASE(hfd_out_star_center_and_outer_diameter_corner_cases_test,
                 starCenter,
                 3,
                 scaleFactor,
-                nullptr,
-                nullptr /*no background threshold subtraction*/));
+                nullptr));
 }
 
 BOOST_AUTO_TEST_SUITE_END();
