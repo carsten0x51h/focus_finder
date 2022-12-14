@@ -29,6 +29,8 @@
 
 #include "../../image.h"
 
+#define FOFI_IMAGES_DEBUG 0
+
 namespace AstroImagePipeline {
 
 
@@ -42,10 +44,13 @@ namespace AstroImagePipeline {
                 : m_from(from), m_to(to) {
         }
 
-        //const Value &operator()(const Value &x) const {
         std::shared_ptr<ImageT> operator()(const Value &imageFilename) const {
 
-            return std::make_shared<ImageT>(imageFilename.c_str());
+            auto loadedImage = std::make_shared<ImageT>(imageFilename.c_str());
+
+            DEBUG_IMAGE_DISPLAY(*loadedImage, "images_out", FOFI_IMAGES_DEBUG);
+
+            return loadedImage;
         }
 
     private:
