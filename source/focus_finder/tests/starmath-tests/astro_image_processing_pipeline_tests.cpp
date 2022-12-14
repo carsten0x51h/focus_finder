@@ -28,13 +28,14 @@
 
 #include "../../common/include/image.h"
 #include "../../common/include/thresholding_algorithm_factory.h"
+#include "../../common/include/centroid_algorithm_factory.h"
 #include "../../common/include/pipeline/adapter/images.h"
 #include "../../common/include/pipeline/adapter/subtract_background.h"
 #include "../../common/include/pipeline/adapter/scale.h"
+#include "../../common/include/pipeline/adapter/center_on_star.h"
 
 
 BOOST_AUTO_TEST_SUITE(astro_image_processing_pipeline_tests)
-
 
 
 BOOST_AUTO_TEST_CASE(astro_image_processing_pipeline_test_1)
@@ -83,11 +84,14 @@ BOOST_AUTO_TEST_CASE(astro_image_processing_pipeline_test_1)
 //        std::cerr << "s: " << s.height() << std::endl;
 //    }
 
+// TODO: Try the same thing with C++20... views...
+
     for(auto result : imageNames
-                | images(123, 456)
+                | images(123, 456) // TODO / IDEA: Use varargs...
                 | subtract_background(ThresholdingAlgorithmTypeT::OTSU)
-                | scaleUp(2.0F)
-                | scaleDown(2.0F)
+                | scaleUp(3.0F)
+                | centerOnStar(CentroidAlgorithmFactoryT::getInstance(CentroidAlgorithmTypeT::IWC) /*, 123 windowSize*/)
+                | scaleDown(3.0F)
     ) {
 
         //std::cerr << "result: " << result->height() << std::endl;
