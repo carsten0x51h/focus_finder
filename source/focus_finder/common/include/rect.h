@@ -126,7 +126,7 @@ public:
         }
 
         T deltaW = (inWidth - 1) / 2;
-        T deltaH = (inWidth - 1) / 2;
+        T deltaH = (inHeight - 1) / 2;
 
 //	  T halfWindowWidth = inWidth / 2.0f;
 //	  T halfWindowHeight = inHeight / 2.0f;
