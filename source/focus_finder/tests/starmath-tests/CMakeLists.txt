@@ -5,8 +5,8 @@ message(STATUS "Test ${target}")
 # Comment the following lines to disable CImg image debug display
 # NOTE: Enabling this makes github build fail due to X11 deps.
 # TODO: Make this dependent on general debug switch?
-find_package (X11 REQUIRED)
-add_compile_definitions(DEBUG_IMAGE_DISPLAY_SWITCH)
+#find_package (X11 REQUIRED)
+#add_compile_definitions(DEBUG_IMAGE_DISPLAY_SWITCH)
 
 
 set(sources
