@@ -57,134 +57,49 @@ namespace AstroImagePipeline {
     };
 
 
+    // NOTE: Idea motivated by https://ericniebler.github.io/range-v3/md_examples.html
+    // In:  range<range<range<string>>>
+    // Out: range<range<range<string>>>, transposing months.
+    auto
+    scale(ScaleTypeT::TypeE scaleType, float scaleFactor)
+    {
+        return boost::adaptors::transformed(
+                [=](const std::shared_ptr<ImageT> & image) {
 
-    template<typename Value>
-    class scale_value {
-    public:
-        typedef const ScaleTypeT::TypeE argument_type1;
-        typedef const float argument_type2;
-        typedef const std::shared_ptr<ImageT> &result_type;
+                    const ImageT & inputImageRef = *image;
 
-        scale_value(argument_type1 & scale_type, argument_type2 & scale_factor)
-                : m_scale_type(scale_type), m_scale_factor(scale_factor) {
-        }
+                    DEBUG_IMAGE_DISPLAY(inputImageRef, "scale_in", FOFI_SCALE_DEBUG);
 
-        std::shared_ptr<ImageT> operator()(const Value &image) const {
+                    auto scaledImage = std::make_shared<ImageT>(inputImageRef);
 
-            const ImageT & inputImageRef = *image;
+                    // TODO: Pass interpolation types...
+                    // https://cimg.eu/reference/structcimg__library_1_1CImg.html
+                    //            resize 	( 	const int  	size_x,
+                    //            const int  	size_y = -100,
+                    //            const int  	size_z = -100,
+                    //            const int  	size_c = -100,
+                    //            const int  	interpolation_type = 1
+                    //              ...
 
-            DEBUG_IMAGE_DISPLAY(inputImageRef, "scale_in", FOFI_SCALE_DEBUG);
+                    float factor = (scaleType == ScaleTypeT::UP ? scaleFactor : 1.0F / scaleFactor);
 
-            auto scaledImage = std::make_shared<ImageT>(inputImageRef);
+                    scaledImage->resize(factor * (float) inputImageRef.width(), factor * (float) inputImageRef.height());
 
-            // TODO: Pass interpolation types...
-            // https://cimg.eu/reference/structcimg__library_1_1CImg.html
-            //            resize 	( 	const int  	size_x,
-            //            const int  	size_y = -100,
-            //            const int  	size_z = -100,
-            //            const int  	size_c = -100,
-            //            const int  	interpolation_type = 1
-            //              ...
+                    DEBUG_IMAGE_DISPLAY(inputImageRef, "scale_out", FOFI_SCALE_DEBUG);
 
-            float factor = (m_scale_type == ScaleTypeT::UP ? m_scale_factor : 1.0F / m_scale_factor);
-
-            scaledImage->resize(factor * inputImageRef.width(), factor * inputImageRef.height());
-
-            DEBUG_IMAGE_DISPLAY(inputImageRef, "scale_out", FOFI_SCALE_DEBUG);
-
-            return scaledImage;
-        }
-
-    private:
-        argument_type1 m_scale_type;
-        argument_type2 m_scale_factor;
-    };
-
-    template<typename Range>
-    class scale_range
-            : public boost::iterator_range<
-                    boost::transform_iterator<
-                            scale_value<typename boost::range_value<Range>::type>,
-                            typename boost::range_iterator<Range>::type> > {
-    private:
-        typedef typename boost::range_value<Range>::type value_type;
-        typedef typename boost::range_iterator<Range>::type iterator_base;
-        typedef scale_value<value_type> Fn;
-        typedef boost::transform_iterator<Fn, iterator_base> scale_iterator;
-        typedef boost::iterator_range<scale_iterator> base_t;
-
-    public:
-        scale_range(Range &rng, ScaleTypeT::TypeE scaleType, float scaleFactor)
-                : base_t(scale_iterator(boost::begin(rng), Fn(scaleType, scaleFactor)),
-                         scale_iterator(boost::end(rng), Fn(scaleType, scaleFactor))) {
-        }
-    };
-
-
-
-    template<typename T>
-    class scale_up_holder {
-    public:
-        explicit scale_up_holder(const T &scale_factor) : scale_factor(scale_factor) {}
-
-        T scale_factor;
-
-    private:
-        void operator=(const scale_up_holder &) = delete;
-    };
-
-
-    template<typename T>
-    class scale_down_holder {
-    public:
-        explicit scale_down_holder(const T &scale_factor) : scale_factor(scale_factor) {}
-
-        T scale_factor;
-
-    private:
-        void operator=(const scale_down_holder &) = delete;
-    };
-
-
-    static boost::range_detail::forwarder<scale_up_holder>
-            scale_up = boost::range_detail::forwarder<scale_up_holder>();
-
-    static boost::range_detail::forwarder<scale_down_holder>
-            scale_down = boost::range_detail::forwarder<scale_down_holder>();
-
-    template<typename SinglePassRange>
-    inline scale_range<SinglePassRange>
-    operator|(SinglePassRange &rng,
-              scale_up_holder<float> &f) {
-        return scale_range<SinglePassRange>(rng, ScaleTypeT::UP, f.scale_factor);
+                    return scaledImage;
+                }
+        );
     }
 
-
-// const variant
-//
-    template<typename SinglePassRange>
-    inline scale_range<const SinglePassRange>
-    operator|(const SinglePassRange &rng,
-              const scale_up_holder<float> &f) {
-        return scale_range<const SinglePassRange>(rng, ScaleTypeT::UP, f.scale_factor);
+    auto
+    scale_up(float scaleFactor) {
+        return scale(ScaleTypeT::UP, scaleFactor);
     }
 
-
-    template<typename SinglePassRange>
-    inline scale_range<SinglePassRange>
-    operator|(SinglePassRange &rng,
-              scale_down_holder<float> &f) {
-        return scale_range<SinglePassRange>(rng, ScaleTypeT::DOWN, f.scale_factor);
-    }
-
-
-// const variant
-//
-    template<typename SinglePassRange>
-    inline scale_range<const SinglePassRange>
-    operator|(const SinglePassRange &rng,
-              const scale_down_holder<float> &f) {
-        return scale_range<const SinglePassRange>(rng, ScaleTypeT::DOWN, f.scale_factor);
+    auto
+    scale_down(float scaleFactor) {
+        return scale(ScaleTypeT::DOWN, scaleFactor);
     }
 
 } // End namespace AstroImagePipeline
