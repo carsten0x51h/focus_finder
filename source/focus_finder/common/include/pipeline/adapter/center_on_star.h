@@ -36,114 +36,54 @@
 
 namespace AstroImagePipeline {
 
-    template<typename Value>
-    class center_on_star_value {
-    public:
-        typedef const std::shared_ptr<CentroidAlgorithmT> argument_type1;
-        typedef const std::shared_ptr<ImageT> &result_type;
+    // In:  range<ImageT>
+    // Out: range<ImageT>
+    auto
+    center_on_star(const std::shared_ptr<CentroidAlgorithmT> & centroid_algorithm) {
+        return boost::adaptors::transformed(
+                [=](const std::shared_ptr<ImageT> &image) {
+                    // TODO: How to handle case when no centroid could be determined?
+                    const ImageT & inputImageRef = *image;
 
-        center_on_star_value(argument_type1 & centroid_algoritm)
-                : m_centeroid_algorithm(centroid_algoritm) {
-        }
+                    auto optCentroid = centroid_algorithm->calc(inputImageRef);
 
-        std::shared_ptr<ImageT> operator()(const Value &image) const {
-
-            // TODO: How to handle case when no centroid could be determined?
-            const ImageT & inputImageRef = *image;
-
-            auto optCentroid = m_centeroid_algorithm->calc(inputImageRef);
-
-            DEBUG_IMAGE_DISPLAY(inputImageRef, "center_on_star_in", FOFI_CENTER_ON_STAR_DEBUG);
+                    DEBUG_IMAGE_DISPLAY(inputImageRef, "center_on_star_in", FOFI_CENTER_ON_STAR_DEBUG);
 
 
-            if (optCentroid.has_value()) {
-                auto outerRoi = RectT<float>::fromCenterPoint(optCentroid.value(),
-                                                              inputImageRef.width(),
-                                                              inputImageRef.height()).to<int>();
+                    if (optCentroid.has_value()) {
+                        auto outerRoi = RectT<float>::fromCenterPoint(optCentroid.value(),
+                                                                      (float) inputImageRef.width(),
+                                                                      (float) inputImageRef.height()).to<int>();
 
-                // get_crop() by default applies a dirichlet boundary_condition (=0). There are other
-                // options as well. In this case, the desired behaviour is to assume that all pixel values
-                // where the defined sub-frame exceeds the image boundary are assumed to be 0.
-                //
-                // boundary_conditions	= Can be { 0=dirichlet | 1=neumann | 2=periodic | 3=mirror }
-                //
-                // - Dirichlet means "0 outside image".
-                // - Neumann means "Nearest neighbor outside image" (i.e. null derivative)
-                // - Periodic means "Periodic"
-                // - Mirror means "Mirrored image outside".
-                //
-                // See https://github.com/GreycLab/CImg/issues/110
-                auto centroidSubImg = std::make_shared<ImageT>(
-                        inputImageRef.get_crop(
-                            outerRoi.x() /*x0*/, outerRoi.y() /*y0*/,
-                            outerRoi.x() + outerRoi.width() - 1/*x1*/,
-                            outerRoi.y() + outerRoi.height() - 1/*y1*/)
-                );
+                        // get_crop() by default applies a dirichlet boundary_condition (=0). There are other
+                        // options as well. In this case, the desired behaviour is to assume that all pixel values
+                        // where the defined sub-frame exceeds the image boundary are assumed to be 0.
+                        //
+                        // boundary_conditions	= Can be { 0=dirichlet | 1=neumann | 2=periodic | 3=mirror }
+                        //
+                        // - Dirichlet means "0 outside image".
+                        // - Neumann means "Nearest neighbor outside image" (i.e. null derivative)
+                        // - Periodic means "Periodic"
+                        // - Mirror means "Mirrored image outside".
+                        //
+                        // See https://github.com/GreycLab/CImg/issues/110
+                        auto centroidSubImg = std::make_shared<ImageT>(
+                                inputImageRef.get_crop(
+                                        outerRoi.x() /*x0*/, outerRoi.y() /*y0*/,
+                                        outerRoi.x() + outerRoi.width() - 1/*x1*/,
+                                        outerRoi.y() + outerRoi.height() - 1/*y1*/)
+                        );
 
-                DEBUG_IMAGE_DISPLAY(*centroidSubImg, "center_on_star_out", FOFI_CENTER_ON_STAR_DEBUG);
+                        DEBUG_IMAGE_DISPLAY(*centroidSubImg, "center_on_star_out", FOFI_CENTER_ON_STAR_DEBUG);
 
-                return centroidSubImg;
-            }
-            else {
-                // TODO: Take out the image?! Throw exception?
-                throw CentroidExceptionT("Unable to determine centroid.");
-                //return image;
-            }
-        }
-
-    private:
-        argument_type1 m_centeroid_algorithm;
-    };
-
-
-
-    template<typename Range>
-    class center_on_star_range
-            : public boost::iterator_range<
-                    boost::transform_iterator<
-                            center_on_star_value<typename boost::range_value<Range>::type>,
-                            typename boost::range_iterator<Range>::type> > {
-    private:
-        typedef typename boost::range_value<Range>::type value_type;
-        typedef typename boost::range_iterator<Range>::type iterator_base;
-        typedef center_on_star_value<value_type> Fn;
-        typedef boost::transform_iterator<Fn, iterator_base> center_on_star_iterator;
-        typedef boost::iterator_range<center_on_star_iterator> base_t;
-
-    public:
-        center_on_star_range(Range &rng, const std::shared_ptr<CentroidAlgorithmT> centroid_algorithm)
-                : base_t(center_on_star_iterator(boost::begin(rng), Fn(centroid_algorithm)),
-                         center_on_star_iterator(boost::end(rng), Fn(centroid_algorithm))) {
-        }
-    };
-
-    template <class T>
-    class center_on_star_holder {
-    public:
-        explicit center_on_star_holder(std::shared_ptr<CentroidAlgorithmT> & centroid_algorithm) : centroid_algorithm(centroid_algorithm) {}
-        std::shared_ptr<CentroidAlgorithmT> centroid_algorithm;
-        void operator=(const center_on_star_holder &) = delete;
-    };
-
-
-    static boost::range_detail::forwarder<center_on_star_holder>
-            center_on_star = boost::range_detail::forwarder<center_on_star_holder>();
-
-    template<typename SinglePassRange>
-    inline center_on_star_range<SinglePassRange>
-    operator|(SinglePassRange &rng,
-              center_on_star_holder<std::shared_ptr<CentroidAlgorithmT> > &f) {
-        return center_on_star_range<SinglePassRange>(rng, f.centroid_algorithm);
-    }
-
-
-// const variant
-//
-    template<typename SinglePassRange>
-    inline center_on_star_range<const SinglePassRange>
-    operator|(const SinglePassRange &rng,
-              const center_on_star_holder<std::shared_ptr<CentroidAlgorithmT> > &f) {
-        return center_on_star_range<const SinglePassRange>(rng, f.centroid_algorithm);
+                        return centroidSubImg;
+                    }
+                    else {
+                        // TODO: Take out the image?! Throw exception?
+                        throw CentroidExceptionT("Unable to determine centroid.");
+                    }
+                }
+        );
     }
 
 } // End namespace AstroImagePipeline
