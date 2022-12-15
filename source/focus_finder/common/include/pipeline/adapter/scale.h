@@ -58,8 +58,8 @@ namespace AstroImagePipeline {
 
 
     // NOTE: Idea motivated by https://ericniebler.github.io/range-v3/md_examples.html
-    // In:  range<range<range<string>>>
-    // Out: range<range<range<string>>>, transposing months.
+    // In:  range<ImageT>
+    // Out: range<ImageT>
     auto
     scale(ScaleTypeT::TypeE scaleType, float scaleFactor)
     {
@@ -83,7 +83,8 @@ namespace AstroImagePipeline {
 
                     float factor = (scaleType == ScaleTypeT::UP ? scaleFactor : 1.0F / scaleFactor);
 
-                    scaledImage->resize(factor * (float) inputImageRef.width(), factor * (float) inputImageRef.height());
+                    scaledImage->resize((int) (factor * (float) inputImageRef.width()),
+                                        (int) (factor * (float) inputImageRef.height()));
 
                     DEBUG_IMAGE_DISPLAY(inputImageRef, "scale_out", FOFI_SCALE_DEBUG);
 
