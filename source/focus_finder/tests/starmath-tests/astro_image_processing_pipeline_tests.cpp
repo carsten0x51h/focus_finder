@@ -22,9 +22,12 @@
  *
  ****************************************************************************/
 
-#include <vector>
 #include <boost/test/unit_test.hpp>
 #include <boost/test/tools/floating_point_comparison.hpp>
+
+#include <boost/range/numeric.hpp>
+#include <boost/range/adaptor/filtered.hpp>
+#include <boost/range/adaptor/transformed.hpp>
 
 #include "../../common/include/image.h"
 #include "../../common/include/thresholding_algorithm_factory.h"
@@ -43,25 +46,25 @@ BOOST_AUTO_TEST_SUITE(astro_image_processing_pipeline_tests)
 
 
 BOOST_AUTO_TEST_CASE(astro_image_processing_pipeline_test_1)
-{
-    using namespace boost::range;
-    using namespace boost::adaptors;
+    {
+        using namespace boost::range;
+        using namespace boost::adaptors;
 
-    std::vector<std::string> imageNames = {
-            "test_data/image_processing_pipeline/image_set_1/newton_focus_star1.tiff",
-            "test_data/image_processing_pipeline/image_set_1/newton_focus_star2.tiff",
-            "test_data/image_processing_pipeline/image_set_1/newton_focus_star3.tiff",
-            "test_data/image_processing_pipeline/image_set_1/newton_focus_star4.tiff",
-            "test_data/image_processing_pipeline/image_set_1/newton_focus_star5.tiff",
-            "test_data/image_processing_pipeline/image_set_1/newton_focus_star6.tiff",
-            "test_data/image_processing_pipeline/image_set_1/newton_focus_star7.tiff",
-            "test_data/image_processing_pipeline/image_set_1/newton_focus_star8.tiff",
-            "test_data/image_processing_pipeline/image_set_1/newton_focus_star9.tiff",
-            "test_data/image_processing_pipeline/image_set_1/newton_focus_star10.tiff",
-            "test_data/image_processing_pipeline/image_set_1/newton_focus_star11.tiff"
-    };
+        std::vector<std::string> imageNames = {
+                "test_data/image_processing_pipeline/image_set_1/newton_focus_star1.tiff",
+                "test_data/image_processing_pipeline/image_set_1/newton_focus_star2.tiff",
+                "test_data/image_processing_pipeline/image_set_1/newton_focus_star3.tiff",
+                "test_data/image_processing_pipeline/image_set_1/newton_focus_star4.tiff",
+                "test_data/image_processing_pipeline/image_set_1/newton_focus_star5.tiff",
+                "test_data/image_processing_pipeline/image_set_1/newton_focus_star6.tiff",
+                "test_data/image_processing_pipeline/image_set_1/newton_focus_star7.tiff",
+                "test_data/image_processing_pipeline/image_set_1/newton_focus_star8.tiff",
+                "test_data/image_processing_pipeline/image_set_1/newton_focus_star9.tiff",
+                "test_data/image_processing_pipeline/image_set_1/newton_focus_star10.tiff",
+                "test_data/image_processing_pipeline/image_set_1/newton_focus_star11.tiff"
+        };
 
-    using namespace AstroImagePipeline;
+        using namespace AstroImagePipeline;
 
 //        images("test_data/image_processing_pipeline/image_set_1/*.tiff") OR imageFileNames
 //            | read()
@@ -76,38 +79,45 @@ BOOST_AUTO_TEST_CASE(astro_image_processing_pipeline_test_1)
 //            //int sum = boost::accumulate(vec, 0);
 
 
-//    std::vector<ImageT> res;
-//
-//    copy(
-//            imageNames
-//                | images(123, 456)
-//                | subtract_background(ThresholdingAlgorithmTypeT::OTSU),
-//            std::back_inserter(res)
-//    );
-//    for(auto & s : res) {
-//        std::cerr << "s: " << s.height() << std::endl;
-//    }
+/**
+ *         AstroImageProcessingPipelineT
+ *              .of("light-frames/*.fits")                                                  -> List<img>
+ *              .subtract(ImageProcessingPipelineT.of("dark-frames/*.fits").average())      -> List<img>
+ *              .divide(ImageProcessingPipelineT.of("flatfield-frames/*.fits").average())   -> List<img>
+ *              .average()                                                                  -> img
+ *              .stretch(StretcherT::-...)                                                  -> img
+ *              .store/save("my-filename.png")
+ */
 
 // TODO: Try the same thing with C++20... views...
+//        boost::accumulators::accumulator_set<int, boost::accumulators::stats<boost::accumulators::tag::rolling_mean> >
+//                acc2(boost::accumulators::tag::rolling_window::window_size = 5);
+
+//        imageNames
+//            | images(123, 456) // TODO / IDEA: Use varargs...
+//            | for_each([](const auto & img) {});
+//
+//        TODO: How to "average()"? -> use reduce() to accumulate...
 
     for(auto result : imageNames
-                | images(123, 456) // TODO / IDEA: Use varargs...
+                | images() // TODO / IDEA: Use varargs...
                 | filtered(&StarAnalysis::isNotSaturated)
-                | subtract_background(ThresholdingAlgorithmTypeT::OTSU)
+                | subtract_background(ThresholdingAlgorithmFactoryT::getInstance(ThresholdingAlgorithmTypeT::OTSU))
                 | scale_up(3.0F)
                 | center_on_star(CentroidAlgorithmFactoryT::getInstance(CentroidAlgorithmTypeT::IWC))
                 | scale_down(3.0F)
                 | crop_from_center(SizeT<int>(61,61))
                 //| crop(rect) OR
         ) {
-
-        HfdT hfd(*result);
-
-        std::cerr << "HFD: " << hfd.getValue() << std::endl;
-
-        //std::cerr << "result: " << result->height() << std::endl;
+//        HfdT hfd(*result);
+//        std::cerr << "HFD: " << hfd.getValue() << std::endl;
     }
 
+    //TODO: Resulting image is empty...
+    // TODO: Maybe there is a better way to dereference the shared_ptr<ImageT> or maybe it is not even required...
+    auto averageImg = boost::accumulate(imageNames | images() | boost::adaptors::transformed([](const auto &r) { return *r; } ), ImageT(65, 85, 0, 0, 0));
+
+    DEBUG_IMAGE_DISPLAY(averageImg,"average", 1);
 
 //    BOOST_CHECK(resultImages.size() == 11);
 }
