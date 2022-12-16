@@ -31,6 +31,7 @@
 #include "../../common/include/thresholding_algorithm_factory.h"
 
 // TODO: This "real world" file is a bucket for everything... it should be renamed...
+//          -> change to pipeline tests
 
 namespace bdata = boost::unit_test::data;
 
@@ -67,51 +68,51 @@ BOOST_AUTO_TEST_CASE(intensity_weighted_centroid_max_entropy_threshold_real_nois
 }
 
 
-/**
- * The HFD algorithm is executed on a set of real star images recorded with a Newtonian
- * telescope. The telescope focus is moved from "far out of focus" to "in focus". In sum
- * 11 images were recorded. The focus distance is equal between the images. The star
- * image never reaches saturation. The star center slightly moves what is ignored in this
- * test.
- */
-BOOST_DATA_TEST_CASE(hfd_real_newton_focus_star_no_background_subtraction_test,
-        bdata::make(
-        std::vector< std::tuple<int, double> >{
-                { 1, 27.456088096660295 },
-                { 2, 26.039354380832002 },
-                { 3, 24.798843695746001 },
-                { 4, 22.743999207494756 },
-                { 5, 19.926210044511915 },
-                { 6, 17.341647262965008 },
-                { 7, 14.616004395669748 },
-                { 8, 12.516580080411764 },
-                { 9, 10.090836864932291 },
-                { 10, 7.0064759328706696 },
-                { 11, 6.3337311227004358 }
-        }),
-        focusStarNumber, expectedFocusStarHfd)
-{
-    std::stringstream filenameSs;
-    filenameSs << "test_data/hfd/newton_focus_star/newton_focus_star" << focusStarNumber << ".tiff";
-
-    // For the unit-tests a very simple background threshold function is used - the mean() function.
-    // NOTE: Instead the "Max entropy" or "Otsu" thresholding algorithm can be used.
-    //
-    // TODO: Change this by using a ThresholderAlgorithmT::... MEAN -> problem currently is, that HFD
-    //       is doing a subimage() for a given "outer HFD radius" and then the threshold is calculated
-    //       and subtracted. Hence, subtracting the mean here, before doing the subimage(), results in
-    //       a different result!
-    BOOST_CHECK_CLOSE(
-        HfdT::calculate(
-                ImageT(filenameSs.str().c_str()),
-                PointT<unsigned int> (33, 47), // Star center position manually extracted from first image
-                55.0 /*outer diameter*/,
-                1.0F /* scale factor */,
-                nullptr
-        ),
-        expectedFocusStarHfd,
-        0.01F
-);
-}
+///**
+// * The HFD algorithm is executed on a set of real star images recorded with a Newtonian
+// * telescope. The telescope focus is moved from "far out of focus" to "in focus". In sum
+// * 11 images were recorded. The focus distance is equal between the images. The star
+// * image never reaches saturation. The star center slightly moves what is ignored in this
+// * test.
+// */
+//BOOST_DATA_TEST_CASE(hfd_real_newton_focus_star_no_background_subtraction_test,
+//        bdata::make(
+//        std::vector< std::tuple<int, double> >{
+//                { 1, 27.456088096660295 },
+//                { 2, 26.039354380832002 },
+//                { 3, 24.798843695746001 },
+//                { 4, 22.743999207494756 },
+//                { 5, 19.926210044511915 },
+//                { 6, 17.341647262965008 },
+//                { 7, 14.616004395669748 },
+//                { 8, 12.516580080411764 },
+//                { 9, 10.090836864932291 },
+//                { 10, 7.0064759328706696 },
+//                { 11, 6.3337311227004358 }
+//        }),
+//        focusStarNumber, expectedFocusStarHfd)
+//{
+//    std::stringstream filenameSs;
+//    filenameSs << "test_data/hfd/newton_focus_star/newton_focus_star" << focusStarNumber << ".tiff";
+//
+//    // For the unit-tests a very simple background threshold function is used - the mean() function.
+//    // NOTE: Instead the "Max entropy" or "Otsu" thresholding algorithm can be used.
+//    //
+//    // TODO: Change this by using a ThresholderAlgorithmT::... MEAN -> problem currently is, that HFD
+//    //       is doing a subimage() for a given "outer HFD radius" and then the threshold is calculated
+//    //       and subtracted. Hence, subtracting the mean here, before doing the subimage(), results in
+//    //       a different result!
+//    BOOST_CHECK_CLOSE(
+//        HfdT::calculate(
+//                ImageT(filenameSs.str().c_str()),
+//                PointT<unsigned int> (33, 47), // Star center position manually extracted from first image
+//                55.0 /*outer diameter*/,
+//                1.0F /* scale factor */,
+//                nullptr
+//        ),
+//        expectedFocusStarHfd,
+//        0.01F
+//);
+//}
 
 BOOST_AUTO_TEST_SUITE_END();
