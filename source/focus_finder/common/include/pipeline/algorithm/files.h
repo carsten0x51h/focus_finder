@@ -41,7 +41,7 @@ namespace fs = std::filesystem;
 namespace AstroImagePipeline {
 
     auto
-    files(const std::string & extensionRegex) {
+    files(const std::string & extensionRegex = "") {
         return ranges::views::transform(
             [=](const std::string & rootPath) {
                 std::vector<std::string> paths;
