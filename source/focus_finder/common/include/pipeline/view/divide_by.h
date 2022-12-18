@@ -22,8 +22,8 @@
  *
  ****************************************************************************/
 
-#ifndef FOFI_DIVIDE_H
-#define FOFI_DIVIDE_H
+#ifndef FOFI_DIVIDE_BY_H
+#define FOFI_DIVIDE_BY_H
 
 #include <range/v3/view/transform.hpp>
 
@@ -43,7 +43,7 @@ namespace AstroImagePipeline {
      */
     template<typename ImageType=float>
     auto
-    divide(const std::shared_ptr<ImageT> & divisorImagePtr) {
+    divide_by(const std::shared_ptr<ImageT> & divisorImagePtr) {
         return ranges::views::transform(
                 [=](const std::shared_ptr<cimg_library::CImg<ImageType> > & image) {
                     const cimg_library::CImg<ImageType> & inputImageRef = *image;
@@ -75,13 +75,14 @@ namespace AstroImagePipeline {
      */
     template<typename ImageType=float>
     auto
-    divide(ImageType scalarDivisor) {
+    divide_by(ImageType scalarDivisor) {
         return ranges::views::transform(
                 [=](const std::shared_ptr<cimg_library::CImg<ImageType> > & image) {
                     const cimg_library::CImg<ImageType> & inputImageRef = *image;
 
                     DEBUG_IMAGE_DISPLAY(inputImageRef, "divide_scalar_in", FOFI_DIVIDE_DEBUG);
 
+                    // TODO: FIXME! see above...
                     auto result_image = std::make_shared<cimg_library::CImg<ImageType>>(inputImageRef / scalarDivisor);
 
                     DEBUG_IMAGE_DISPLAY(*result_image, "divide_scalar_out", FOFI_DIVIDE_DEBUG);
@@ -92,4 +93,4 @@ namespace AstroImagePipeline {
     }
 } // End namespace AstroImagePipeline
 
-#endif //FOFI_DIVIDE_H
+#endif //FOFI_DIVIDE_BY_H

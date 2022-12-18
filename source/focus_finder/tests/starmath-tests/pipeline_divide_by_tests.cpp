@@ -27,9 +27,9 @@
 #include <boost/test/unit_test.hpp>
 
 #include "../../common/include/pipeline/view/images.h"
-#include "../../common/include/pipeline/view/divide.h"
+#include "../../common/include/pipeline/view/divide_by.h"
 
-BOOST_AUTO_TEST_SUITE(pipeline_divide_tests)
+BOOST_AUTO_TEST_SUITE(pipeline_divide_by_tests)
 
 using namespace AstroImagePipeline;
 using namespace ranges;
@@ -41,7 +41,7 @@ using namespace ranges;
  * pixel will have the value 500 while all other pixels will still
  * have the pixel value 1000.
  */
-BOOST_AUTO_TEST_CASE(pipeline_divide_image_test)
+BOOST_AUTO_TEST_CASE(pipeline_divide_by_image_test)
 {
     ImageT expectedResultImage(5,5,1,1,1000); // 5x5 - bg value 1000
     expectedResultImage(2,2) = 500.0F;
@@ -54,7 +54,7 @@ BOOST_AUTO_TEST_CASE(pipeline_divide_image_test)
 
     auto resultImagePtr = imageFilenames
                           | images()
-                          | divide(divisorImagePtr)
+                          | divide_by(divisorImagePtr)
                           | to<std::vector>();
 
     // NOTE: Exactly one image is expected
@@ -62,5 +62,7 @@ BOOST_AUTO_TEST_CASE(pipeline_divide_image_test)
 
     BOOST_TEST(resultImage == expectedResultImage);
 }
+
+// TODO: Add divide_by(scalar) !
 
 BOOST_AUTO_TEST_SUITE_END();
