@@ -61,6 +61,93 @@ namespace AstroImagePipeline {
 
 
     /**
+     * InterpolationTypeT specifies the method which should be used to
+     * interpolate during the scaling process.
+     *
+     *  https://cimg.eu/reference/structcimg__library_1_1CImg.html
+     *       resize 	( 	const int  	size_x,
+     *       const int  	size_y = -100,
+     *       const int  	size_z = -100,
+     *       const int  	size_c = -100,
+     *       const int  	interpolation_type = 1
+     *         ...
+     *
+     * interpolation_type	Method of interpolation:
+     *
+     *  -1 = no interpolation: raw memory resizing.
+     *   0 = no interpolation: additional space is filled according to boundary_conditions.
+     *   1 = nearest-neighbor interpolation.
+     *   2 = moving average interpolation.
+     *   3 = linear interpolation.
+     *   4 = grid interpolation.
+     *   5 = cubic interpolation.
+     *   6 = lanczos interpolation.
+     */
+    struct InterpolationTypeT {
+        enum TypeE {
+            RAW,
+            NO_INTERPOLATION,
+            NEAREST_NEIGHBOR,
+            MOVING_AVERAGE,
+            LINEAR,
+            GRID,
+            CUBIC,
+            LANCZOS,
+            _Count
+        };
+
+        static const char *asStr(const TypeE &inType) {
+            switch (inType) {
+                case RAW:
+                    return "RAW";
+                case NO_INTERPOLATION:
+                    return "NO_INTERPOLATION";
+                case NEAREST_NEIGHBOR:
+                    return "NEAREST_NEIGHBOR";
+                case MOVING_AVERAGE:
+                    return "MOVING_AVERAGE";
+                case LINEAR:
+                    return "LINEAR";
+                case GRID:
+                    return "GRID";
+                case CUBIC:
+                    return "CUBIC";
+                case LANCZOS:
+                    return "LANCZOS";
+                default:
+                    return "<?>";
+            }
+        }
+
+        static const int asInt(const TypeE &inType) {
+            switch (inType) {
+                case RAW:
+                    return -1;
+                case NO_INTERPOLATION:
+                    return 0;
+                case NEAREST_NEIGHBOR:
+                    return 1;
+                case MOVING_AVERAGE:
+                    return 2;
+                case LINEAR:
+                    return 3;
+                case GRID:
+                    return 4;
+                case CUBIC:
+                    return 5;
+                case LANCZOS:
+                    return 6;
+                default:
+                    return 1;
+            }
+        }
+
+        MAC_AS_TYPE(Type, E, _Count);
+    };
+
+
+
+    /**
      *
      * @tparam ImageType
      * @param scaleType
@@ -69,7 +156,7 @@ namespace AstroImagePipeline {
      */
     template<typename ImageType=float>
     auto
-    scale(ScaleTypeT::TypeE scaleType, float scaleFactor)
+    scale(ScaleTypeT::TypeE scaleType, float scaleFactor, InterpolationTypeT::TypeE interpolation_type)
     {
         return ranges::views::transform(
                 [=](const std::shared_ptr<cimg_library::CImg<ImageType> > & image) {
@@ -80,19 +167,13 @@ namespace AstroImagePipeline {
 
                     auto scaledImage = std::make_shared<cimg_library::CImg<ImageType> >(inputImageRef);
 
-                    // TODO: Pass interpolation types...
-                    // https://cimg.eu/reference/structcimg__library_1_1CImg.html
-                    //            resize 	( 	const int  	size_x,
-                    //            const int  	size_y = -100,
-                    //            const int  	size_z = -100,
-                    //            const int  	size_c = -100,
-                    //            const int  	interpolation_type = 1
-                    //              ...
-
                     float factor = (scaleType == ScaleTypeT::UP ? scaleFactor : 1.0F / scaleFactor);
 
                     scaledImage->resize((int) (factor * (float) inputImageRef.width()),
-                                        (int) (factor * (float) inputImageRef.height()));
+                                        (int) (factor * (float) inputImageRef.height()),
+                                        -100,
+                                        -100,
+                                        InterpolationTypeT::asInt(interpolation_type));
 
                     DEBUG_IMAGE_DISPLAY(inputImageRef, "scale_out", FOFI_SCALE_DEBUG);
 
@@ -105,24 +186,27 @@ namespace AstroImagePipeline {
      *
      * @tparam ImageType
      * @param scaleFactor
+     * @param interpolation_type
      * @return
      */
     template<typename ImageType=float>
     auto
-    scale_up(float scaleFactor) {
-        return scale<ImageType>(ScaleTypeT::UP, scaleFactor);
+    scale_up(float scaleFactor, InterpolationTypeT::TypeE interpolation_type = InterpolationTypeT::NEAREST_NEIGHBOR) {
+        return scale<ImageType>(ScaleTypeT::UP, scaleFactor, interpolation_type);
     }
+
 
     /**
      *
      * @tparam ImageType
      * @param scaleFactor
+     * @param interpolation_type
      * @return
      */
     template<typename ImageType=float>
     auto
-    scale_down(float scaleFactor) {
-        return scale<ImageType>(ScaleTypeT::DOWN, scaleFactor);
+    scale_down(float scaleFactor, InterpolationTypeT::TypeE interpolation_type = InterpolationTypeT::NEAREST_NEIGHBOR) {
+        return scale<ImageType>(ScaleTypeT::DOWN, scaleFactor, interpolation_type);
     }
 
 } // End namespace AstroImagePipeline
