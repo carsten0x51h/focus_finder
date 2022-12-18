@@ -29,7 +29,7 @@
 
 #include "../../image.h"
 
-#define FOFI_IMAGES_DEBUG 1
+#define FOFI_IMAGES_DEBUG 0
 
 namespace AstroImagePipeline {
 
