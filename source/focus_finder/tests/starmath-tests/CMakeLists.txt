@@ -8,7 +8,6 @@ message(STATUS "Test ${target}")
 #find_package (X11 REQUIRED)
 #add_compile_definitions(DEBUG_IMAGE_DISPLAY_SWITCH)
 
-
 set(sources
         starmath_test_module.cpp
 		point_tests.cpp
@@ -46,7 +45,7 @@ set(sources
         ../../common/max_entropy_thresholding_algorithm.cpp
         ../../common/otsu_thresholding_algorithm.cpp
 		../../common/mean_thresholding_algorithm.cpp
-        star_cluster_algorithm_tests.cpp image_slicer_tests.cpp point_tests.cpp hfd_tests.cpp centroid_tests.cpp image_tests.cpp thresholder_tests.cpp real_world_star_image_tests.cpp astro_image_processing_pipeline_tests.cpp ../../common/include/pipeline/adapter/images.h ../../common/include/pipeline/adapter/subtract_background.h ../../common/include/pipeline/adapter/scale.h ../../common/include/pipeline/adapter/center_on_star.h ../../common/include/pipeline/adapter/crop.h)
+        star_cluster_algorithm_tests.cpp image_slicer_tests.cpp point_tests.cpp hfd_tests.cpp centroid_tests.cpp image_tests.cpp thresholder_tests.cpp real_world_star_image_tests.cpp astro_image_processing_pipeline_tests.cpp ../../common/include/pipeline/adapter/images.h ../../common/include/pipeline/adapter/subtract_background.h ../../common/include/pipeline/adapter/scale.h ../../common/include/pipeline/adapter/center_on_star.h ../../common/include/pipeline/adapter/crop.h ../../common/include/pipeline/algorithm/average.h ../../common/include/pipeline/adapter/subtract.h ../../common/include/pipeline/algorithm/files.h pipeline_files_tests.cpp pipeline_images_tests.cpp pipeline_subtract_background_tests.cpp pipeline_crop_tests.cpp pipeline_center_on_star_tests.cpp pipeline_scale_tests.cpp pipeline_average_tests.cpp pipeline_subtract_tests.cpp)
 
 # create an executable, which instantiates a runner from
 # GoogleTest, Boost.Test, QtTest or whatever framework you use
