@@ -25,7 +25,7 @@
 #ifndef FOFI_CENTER_ON_STAR_H
 #define FOFI_CENTER_ON_STAR_H
 
-#include <boost/range/adaptors.hpp>
+#include <range/v3/view/transform.hpp>
 
 #include "../../image.h"
 #include "../../enum_helper.h"
@@ -36,14 +36,13 @@
 
 namespace AstroImagePipeline {
 
-    // In:  range<ImageT>
-    // Out: range<ImageT>
+    template<typename ImageType=float>
     auto
     center_on_star(const std::shared_ptr<CentroidAlgorithmT> & centroid_algorithm) {
-        return boost::adaptors::transformed(
-                [=](const std::shared_ptr<ImageT> &image) {
+        return ranges::views::transform(
+                [=](const std::shared_ptr<cimg_library::CImg<ImageType>> &image) {
                     // TODO: How to handle case when no centroid could be determined?
-                    const ImageT & inputImageRef = *image;
+                    const cimg_library::CImg<ImageType> & inputImageRef = *image;
 
                     auto optCentroid = centroid_algorithm->calc(inputImageRef);
 
@@ -67,7 +66,7 @@ namespace AstroImagePipeline {
                         // - Mirror means "Mirrored image outside".
                         //
                         // See https://github.com/GreycLab/CImg/issues/110
-                        auto centroidSubImg = std::make_shared<ImageT>(
+                        auto centroidSubImg = std::make_shared<cimg_library::CImg<ImageType>>(
                                 inputImageRef.get_crop(
                                         outerRoi.x() /*x0*/, outerRoi.y() /*y0*/,
                                         outerRoi.x() + outerRoi.width() - 1/*x1*/,
