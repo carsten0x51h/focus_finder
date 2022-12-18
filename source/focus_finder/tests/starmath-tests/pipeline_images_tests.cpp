@@ -22,31 +22,32 @@
  *
  ****************************************************************************/
 
-#ifndef FOFI_IMAGES_H
-#define FOFI_IMAGES_H
+//#include <range/v3/view/all.hpp>
+#include <boost/test/unit_test.hpp>
 
-#include <range/v3/view/transform.hpp>
-#include "../../image.h"
+#include "../../common/include/pipeline/adapter/images.h"
 
-#define FOFI_IMAGES_DEBUG 1
+BOOST_AUTO_TEST_SUITE(pipeline_images_tests)
 
-namespace AstroImagePipeline {
+using namespace AstroImagePipeline;
+using namespace ranges;
 
-    // In:  range<std::string>  <- image filenames
-    // Out: range<ImageT>
-    auto
-    images() {
-        return ranges::views::transform(
-                [=](const std::string & imageFilename) {
-                    auto loadedImage = std::make_shared<ImageT>(imageFilename.c_str());
 
-                    DEBUG_IMAGE_DISPLAY(*loadedImage, "images_out", FOFI_IMAGES_DEBUG);
+BOOST_AUTO_TEST_CASE(pipeline_images_tiff_test)
+{
+    const std::vector<std::string> imageFilenames {
+            "test_data/image_processing_pipeline/images/test_image_tiff_1_65x85.tiff",
+            "test_data/image_processing_pipeline/images/test_image_tiff_2_65x85.tiff",
+    };
 
-                    return loadedImage;
-                }
-        );
+    for (const auto & img : imageFilenames | images()) {
+        BOOST_TEST(img->width() == 65);
+        BOOST_TEST(img->height() == 85);
     }
+}
 
-} // End namespace AstroImagePipeline
+// TODO: fits...
+//{ "test_data/image_processing_pipeline/images/test_image_fits_1_45x47.fits", 45, 47 },
+//{ "test_data/image_processing_pipeline/images/test_image_fits_2_45x47.fits", 45, 47 }
 
-#endif //FOFI_IMAGES_H
+BOOST_AUTO_TEST_SUITE_END();
