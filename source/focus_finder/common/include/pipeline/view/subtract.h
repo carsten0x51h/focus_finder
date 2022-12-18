@@ -28,7 +28,6 @@
 #include <range/v3/view/transform.hpp>
 
 #include "../../image.h"
-#include "../../thresholding_algorithm_type.h"
 
 #define FOFI_SUBTRACT_DEBUG 1
 
@@ -61,6 +60,12 @@ namespace AstroImagePipeline {
     }
 
 
+    /**
+     *
+     * @tparam ImageType
+     * @param scalarValueToSubtract
+     * @return
+     */
     template<typename ImageType=float>
     auto
     subtract(ImageType scalarValueToSubtract) {
