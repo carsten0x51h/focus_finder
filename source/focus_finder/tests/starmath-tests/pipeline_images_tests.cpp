@@ -22,7 +22,6 @@
  *
  ****************************************************************************/
 
-//#include <range/v3/view/all.hpp>
 #include <boost/test/unit_test.hpp>
 
 #include "../../common/include/pipeline/adapter/images.h"
