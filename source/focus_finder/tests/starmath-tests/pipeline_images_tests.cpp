@@ -36,7 +36,7 @@ BOOST_AUTO_TEST_CASE(pipeline_images_tiff_test)
 {
     const std::vector<std::string> imageFilenames {
             "test_data/image_processing_pipeline/images/test_image_tiff_1_65x85.tiff",
-            "test_data/image_processing_pipeline/images/test_image_tiff_2_65x85.tiff",
+            "test_data/image_processing_pipeline/images/test_image_tiff_2_65x85.tiff"
     };
 
     for (const auto & img : imageFilenames | images()) {
