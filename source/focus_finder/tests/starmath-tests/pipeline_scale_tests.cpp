@@ -26,8 +26,8 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "../../common/include/pipeline/adapter/images.h"
-#include "../../common/include/pipeline/adapter/scale.h"
+#include "../../common/include/pipeline/view/images.h"
+#include "../../common/include/pipeline/view/scale.h"
 
 BOOST_AUTO_TEST_SUITE(pipeline_scale_tests)
 

@@ -26,7 +26,7 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "../../common/include/pipeline/algorithm/files.h"
+#include "../../common/include/pipeline/action/files.h"
 
 BOOST_AUTO_TEST_SUITE(pipeline_files_tests)
 

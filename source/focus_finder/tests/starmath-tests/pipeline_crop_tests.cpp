@@ -26,8 +26,8 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "../../common/include/pipeline/adapter/images.h"
-#include "../../common/include/pipeline/adapter/crop.h"
+#include "../../common/include/pipeline/view/images.h"
+#include "../../common/include/pipeline/view/crop.h"
 
 BOOST_AUTO_TEST_SUITE(pipeline_crop_tests)
 

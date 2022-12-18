@@ -26,8 +26,8 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "../../common/include/pipeline/adapter/center_on_star.h"
-#include "../../common/include/pipeline/adapter/images.h"
+#include "../../common/include/pipeline/view/center_on_star.h"
+#include "../../common/include/pipeline/view/images.h"
 
 #include "../../common/include/centroid_algorithm_factory.h"
 

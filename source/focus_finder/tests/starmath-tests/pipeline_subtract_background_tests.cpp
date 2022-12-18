@@ -26,8 +26,8 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "../../common/include/pipeline/adapter/images.h"
-#include "../../common/include/pipeline/adapter/subtract_background.h"
+#include "../../common/include/pipeline/view/images.h"
+#include "../../common/include/pipeline/view/subtract_background.h"
 #include "../../common/include/thresholding_algorithm_factory.h"
 
 BOOST_AUTO_TEST_SUITE(pipeline_subtract_background_tests)
