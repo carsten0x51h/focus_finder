@@ -22,7 +22,8 @@
  *
  ****************************************************************************/
 
-#include <range/v3/view/all.hpp>
+#include <range/v3/range/conversion.hpp>
+
 #include <boost/test/unit_test.hpp>
 
 #include "../../common/include/pipeline/algorithm/files.h"
