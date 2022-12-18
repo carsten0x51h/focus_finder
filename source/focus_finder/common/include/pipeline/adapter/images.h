@@ -26,19 +26,19 @@
 #define FOFI_IMAGES_H
 
 #include <range/v3/view/transform.hpp>
+
 #include "../../image.h"
 
 #define FOFI_IMAGES_DEBUG 1
 
 namespace AstroImagePipeline {
 
-    // In:  range<std::string>  <- image filenames
-    // Out: range<ImageT>
+    template<typename ImageType=float>
     auto
     images() {
         return ranges::views::transform(
-                [=](const std::string & imageFilename) {
-                    auto loadedImage = std::make_shared<ImageT>(imageFilename.c_str());
+                [=](const std::string &imageFilename) {
+                    auto loadedImage = std::make_shared<cimg_library::CImg<ImageType> >(imageFilename.c_str());
 
                     DEBUG_IMAGE_DISPLAY(*loadedImage, "images_out", FOFI_IMAGES_DEBUG);
 
@@ -46,7 +46,6 @@ namespace AstroImagePipeline {
                 }
         );
     }
-
 } // End namespace AstroImagePipeline
 
 #endif //FOFI_IMAGES_H
