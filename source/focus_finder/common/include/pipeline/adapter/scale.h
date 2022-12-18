@@ -25,7 +25,7 @@
 #ifndef FOFI_SCALE_H
 #define FOFI_SCALE_H
 
-#include <boost/range/adaptors.hpp>
+#include <range/v3/view/transform.hpp>
 
 #include "../../image.h"
 #include "../../enum_helper.h"
@@ -35,6 +35,9 @@
 namespace AstroImagePipeline {
 
 
+    /**
+     *
+     */
     struct ScaleTypeT {
         enum TypeE {
             UP,
@@ -57,20 +60,25 @@ namespace AstroImagePipeline {
     };
 
 
-    // NOTE: Idea motivated by https://ericniebler.github.io/range-v3/md_examples.html
-    // In:  range<ImageT>
-    // Out: range<ImageT>
+    /**
+     *
+     * @tparam ImageType
+     * @param scaleType
+     * @param scaleFactor
+     * @return
+     */
+    template<typename ImageType=float>
     auto
     scale(ScaleTypeT::TypeE scaleType, float scaleFactor)
     {
-        return boost::adaptors::transformed(
-                [=](const std::shared_ptr<ImageT> & image) {
+        return ranges::views::transform(
+                [=](const std::shared_ptr<cimg_library::CImg<ImageType> > & image) {
 
-                    const ImageT & inputImageRef = *image;
+                    const cimg_library::CImg<ImageType> & inputImageRef = *image;
 
                     DEBUG_IMAGE_DISPLAY(inputImageRef, "scale_in", FOFI_SCALE_DEBUG);
 
-                    auto scaledImage = std::make_shared<ImageT>(inputImageRef);
+                    auto scaledImage = std::make_shared<cimg_library::CImg<ImageType> >(inputImageRef);
 
                     // TODO: Pass interpolation types...
                     // https://cimg.eu/reference/structcimg__library_1_1CImg.html
@@ -93,14 +101,28 @@ namespace AstroImagePipeline {
         );
     }
 
+    /**
+     *
+     * @tparam ImageType
+     * @param scaleFactor
+     * @return
+     */
+    template<typename ImageType=float>
     auto
     scale_up(float scaleFactor) {
-        return scale(ScaleTypeT::UP, scaleFactor);
+        return scale<ImageType>(ScaleTypeT::UP, scaleFactor);
     }
 
+    /**
+     *
+     * @tparam ImageType
+     * @param scaleFactor
+     * @return
+     */
+    template<typename ImageType=float>
     auto
     scale_down(float scaleFactor) {
-        return scale(ScaleTypeT::DOWN, scaleFactor);
+        return scale<ImageType>(ScaleTypeT::DOWN, scaleFactor);
     }
 
 } // End namespace AstroImagePipeline
