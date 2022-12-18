@@ -27,6 +27,7 @@
 #include <boost/test/unit_test.hpp>
 
 #include "../../common/include/pipeline/adapter/images.h"
+#include "../../common/include/pipeline/algorithm/average.h"
 
 BOOST_AUTO_TEST_SUITE(pipeline_average_tests)
 
@@ -41,7 +42,7 @@ BOOST_AUTO_TEST_CASE(pipeline_average_1_test)
     ImageT expectedResultImage(5,5,1,1,250); // 5x5 - bg value 250
     expectedResultImage(2,2) = 16571.25F;
     expectedResultImage(0,4) = 8187.5F;
-    expectedResultImage(2,2) = 8187.5F;
+    expectedResultImage(4,0) = 8187.5F;
 
     const std::vector<std::string> imageFilenames {
             "test_data/image_processing_pipeline/average/test_image_average_1_5x5.tiff",
@@ -50,15 +51,7 @@ BOOST_AUTO_TEST_CASE(pipeline_average_1_test)
             "test_data/image_processing_pipeline/average/test_image_average_4_5x5.tiff"
     };
 
-//    auto resultImagePtr = imageFilenames
-//                          | images()
-//                          | center_on_star(CentroidAlgorithmFactoryT::getInstance(CentroidAlgorithmTypeT::IWC))
-//                          | to<std::vector>();
-//
-//    // NOTE: Exactly one image is expected
-//    const ImageT & resultImage = *(resultImagePtr.at(0));
-//
-//    BOOST_TEST(resultImage.width() == 73);
+    BOOST_TEST(*average(imageFilenames | images()) == expectedResultImage);
 }
 
 BOOST_AUTO_TEST_SUITE_END();
