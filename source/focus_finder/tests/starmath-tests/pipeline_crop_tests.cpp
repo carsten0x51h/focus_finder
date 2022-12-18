@@ -36,10 +36,11 @@ using namespace ranges;
 
 /**
  * Test cropping a 3x3 rectangle from a 5x5 image with a
+ * brihgt bixel in the center.
  */
-BOOST_AUTO_TEST_CASE(pipeline_crop_from_center_test)
+BOOST_AUTO_TEST_CASE(pipeline_crop_from_center_sub_region_test)
 {
-    ImageT expectedResultImage(3,3,1,1,250); // 3x3 - black
+    ImageT expectedResultImage(3,3,1,1,250); // 3x3 - bg value 250
     expectedResultImage(1,1) = 65535.0F;   // Bright pixel at the center
 
     const std::vector<std::string> imageFilenames {
@@ -55,7 +56,29 @@ BOOST_AUTO_TEST_CASE(pipeline_crop_from_center_test)
     BOOST_TEST(*(resultImagePtr.at(0)) == expectedResultImage);
 }
 
-// TODO: Test full image size crop
+
+/**
+ * Test cropping a 5x5 rectangle from a 5x5 image with a
+ * bright pixel in the center.
+ */
+BOOST_AUTO_TEST_CASE(pipeline_crop_from_center_full_image_test)
+{
+    ImageT expectedResultImage(5,5,1,1,250); // 5x5 - bg value 250
+    expectedResultImage(2,2) = 65535.0F;   // Bright pixel at the center
+
+    const std::vector<std::string> imageFilenames {
+            "test_data/image_processing_pipeline/crop/test_image_crop_from_center_5x5.tiff",
+    };
+
+    auto resultImagePtr = imageFilenames
+                          | images()
+                          | crop_from_center(SizeT<int>(5,5))
+                          | to<std::vector>();
+
+    // NOTE: Exactly one image is expected
+    BOOST_TEST(*(resultImagePtr.at(0)) == expectedResultImage);
+}
+
 // TODO: Add crop_from_center test for even sized regions.
 // TODO: Test specified region exceeding the image dimensions.
 
