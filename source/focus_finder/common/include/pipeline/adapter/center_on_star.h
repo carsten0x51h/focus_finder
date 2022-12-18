@@ -52,7 +52,7 @@ namespace AstroImagePipeline {
                     if (optCentroid.has_value()) {
                         auto outerRoi = RectT<float>::fromCenterPoint(optCentroid.value(),
                                                                       (float) inputImageRef.width(),
-                                                                      (float) inputImageRef.height()).to<int>();
+                                                                      (float) inputImageRef.height()).template to<int>();
 
                         // get_crop() by default applies a dirichlet boundary_condition (=0). There are other
                         // options as well. In this case, the desired behaviour is to assume that all pixel values
