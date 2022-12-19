@@ -40,6 +40,7 @@ namespace AstroImagePipeline {
      * @return
      *
      * TODO: Check that all images have the same dimension? Could be configured by parameter...
+     * TODO / IDEA: -> to basic_arithmetic template?
      */
     template<typename ImageType=float>
     auto
