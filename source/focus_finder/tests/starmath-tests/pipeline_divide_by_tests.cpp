@@ -63,6 +63,27 @@ BOOST_AUTO_TEST_CASE(pipeline_divide_by_image_test)
     BOOST_TEST(resultImage == expectedResultImage);
 }
 
-// TODO: Add divide_by(scalar) !
+/**
+ * Divide image with all pixel values set to 1000 by scalar 2.
+ * Expected is an image  with all values set to 500.
+ */
+BOOST_AUTO_TEST_CASE(pipeline_divide_by_scalar_test)
+{
+    ImageT expectedResultImage(5,5,1,1,500); // 5x5 - bg value 500
+
+    const std::vector<std::string> imageFilenames {
+            "test_data/image_processing_pipeline/divide/test_image_all_pixels_1000_5x5.tiff",
+    };
+
+    auto resultImagePtr = imageFilenames
+                          | images()
+                          | divide_by(2.0F)
+                          | to<std::vector>();
+
+    // NOTE: Exactly one image is expected
+    const ImageT & resultImage = *(resultImagePtr.at(0));
+
+    BOOST_TEST(resultImage == expectedResultImage);
+}
 
 BOOST_AUTO_TEST_SUITE_END();
