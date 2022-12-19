@@ -46,10 +46,10 @@ BOOST_AUTO_TEST_CASE(pipeline_divide_by_image_test)
     ImageT expectedResultImage(5,5,1,1,1000); // 5x5 - bg value 1000
     expectedResultImage(2,2) = 500.0F;
 
-    auto divisorImagePtr = std::make_shared<ImageT>("test_data/image_processing_pipeline/divide/test_image_divisor_5x5.tiff");
+    auto divisorImagePtr = std::make_shared<ImageT>("test_data/image_processing_pipeline/divide_by/test_image_divisor_5x5.tiff");
 
     const std::vector<std::string> imageFilenames {
-            "test_data/image_processing_pipeline/divide/test_image_all_pixels_1000_5x5.tiff",
+            "test_data/image_processing_pipeline/divide_by/test_image_all_pixels_1000_5x5.tiff",
     };
 
     auto resultImagePtr = imageFilenames
@@ -72,7 +72,7 @@ BOOST_AUTO_TEST_CASE(pipeline_divide_by_scalar_test)
     ImageT expectedResultImage(5,5,1,1,500); // 5x5 - bg value 500
 
     const std::vector<std::string> imageFilenames {
-            "test_data/image_processing_pipeline/divide/test_image_all_pixels_1000_5x5.tiff",
+            "test_data/image_processing_pipeline/divide_by/test_image_all_pixels_1000_5x5.tiff",
     };
 
     auto resultImagePtr = imageFilenames
