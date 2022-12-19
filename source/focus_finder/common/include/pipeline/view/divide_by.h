@@ -50,14 +50,7 @@ namespace AstroImagePipeline {
 
                     DEBUG_IMAGE_DISPLAY(inputImageRef, "divide_image_in", FOFI_DIVIDE_DEBUG);
 
-                    // NOTE: operator/  (i.e. call to inputImageRef / (*divisorImagePtr))
-                    //       of CImg returns strange results (image inversion).
-                    //       Therefore, computation happens here "manually".
-                    auto result_image = std::make_shared<cimg_library::CImg<ImageType>>(inputImageRef);
-
-                    cimg_forXY(inputImageRef, x, y) {
-                            (*result_image)(x,y) /= (*divisorImagePtr)(x,y);
-                    }
+                    auto result_image = std::make_shared<cimg_library::CImg<ImageType>>(inputImageRef.get_div(*divisorImagePtr));
 
                     DEBUG_IMAGE_DISPLAY(*result_image, "divide_image_out", FOFI_DIVIDE_DEBUG);
 
