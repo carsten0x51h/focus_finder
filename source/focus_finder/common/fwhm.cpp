@@ -117,6 +117,7 @@ FwhmT::fitValues(const std::vector<PointFT> &imgValues, FwhmFitParmsT fwhmFitPar
     return curveParms;
 }
 
+// TODO: Change to starmath::metrics::fwhm() -> FwhmResultT
 float FwhmT::getValue(bool inThrowIfNotValid) const {
     if (inThrowIfNotValid) {
         throwIfNotValid();
