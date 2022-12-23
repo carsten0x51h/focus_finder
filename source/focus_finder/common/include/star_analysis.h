@@ -29,27 +29,28 @@
 
 #include <memory>
 
-namespace StarAnalysis {
-    /**
-     *
-     * See discussion at https://www.cloudynights.com/topic/698887-how-can-i-tell-if-i-am-saturating-pixels/
-     *
-     * @return
-     */
-    static bool isSaturated(const std::shared_ptr<ImageT> & image) {
+namespace starmath {
+    namespace metrics {
+        /**
+         *
+         * See discussion at https://www.cloudynights.com/topic/698887-how-can-i-tell-if-i-am-saturating-pixels/
+         *
+         * @return
+         */
+        static bool is_saturated(const std::shared_ptr<ImageT> &image) {
 
-        float bitDepth = 16.0F; // TODO: Handle bit depth!
+            float bitDepth = 16.0F; // TODO: Handle bit depth!
 
-        float minVal;
-        float maxVal = image->max_min(minVal);
+            float minVal;
+            float maxVal = image->max_min(minVal);
 
-        return (maxVal >= std::pow(2.0F, bitDepth));
-    }
+            return (maxVal >= std::pow(2.0F, bitDepth));
+        }
 
-    static bool isNotSaturated(const std::shared_ptr<ImageT> & image) {
-        return ! isSaturated(image);
-    }
-
-};
+        static bool is_not_saturated(const std::shared_ptr<ImageT> &image) {
+            return !is_saturated(image);
+        }
+    };
+}
 
 #endif //FOFI_STAR_ANALYSIS_H
