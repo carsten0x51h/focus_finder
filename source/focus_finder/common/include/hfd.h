@@ -39,9 +39,7 @@
  * TODO: Change HFD so that:
  *    -Only quadratic images are accepted
  *    -Always set outerRadius to given image dimensions -> no subimage() call anymore
- *    -Assume that sar centroid is in the center of the image
- *    -Remove thresholder - assume that thresholding took place before
- *        --> Separation of concerns
+ *    -Assume that the centroid is in the center of the image
  *
  *      FwhmT fwhm = starImg.fwhm(...)
  *      HfdT hfd = starImg.hfd(...)
