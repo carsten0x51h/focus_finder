@@ -23,8 +23,12 @@
  ****************************************************************************/
 
 #include <range/v3/range/conversion.hpp>
+#include <range/v3/view/join.hpp>
+#include <range/v3/view/filter.hpp>
+#include <range/v3/algorithm/set_algorithm.hpp>
 
 #include <boost/test/unit_test.hpp>
+#include <set>
 
 #include "../../common/include/pipeline/action/files.h"
 
@@ -32,7 +36,6 @@ BOOST_AUTO_TEST_SUITE(pipeline_files_tests)
 
 using namespace AstroImagePipeline;
 using namespace ranges;
-
 
 /**
  * NOTE: A Data-testcase was not possible here because having a nested container inside the bdata spec.
@@ -44,43 +47,58 @@ using namespace ranges;
 BOOST_AUTO_TEST_CASE(pipeline_files_filenames_with_no_spaces_test)
 {
     const std::vector<std::string> filePaths { "test_data/image_processing_pipeline/files" };
-    const std::vector<std::string> expectedFilenames { "test_data/image_processing_pipeline/files/tiff_file_1.tiff",
-                                                       "test_data/image_processing_pipeline/files/tiff_file_2.tiff" };
+    const std::set<std::string> expectedFilenames {
+                    "test_data/image_processing_pipeline/files/tiff_file_2.tiff",
+                    "test_data/image_processing_pipeline/files/tiff_file_1.tiff",
+    };
 
-    auto result = filePaths | files("(.*\\.tiff)") | actions::join | actions::sort | to<std::vector>();
+    auto results = filePaths | files("(.*\\.tiff)") | view::join | to<std::set>();
 
-    BOOST_TEST(result == expectedFilenames);
+    // NOTE: The order of the contained elements does not matter (the order of elements
+    //       returned by files() is undefined).
+    std::vector<std::string> diff;
+    ranges::set_difference(expectedFilenames, results, diff.begin());
+
+    BOOST_TEST(diff.empty());
 }
-
 
 BOOST_AUTO_TEST_CASE(pipeline_files_filenames_with_spaces_test)
 {
     const std::vector<std::string> filePaths { "test_data/image_processing_pipeline/files" };
-    const std::vector<std::string> expectedFilenames { "test_data/image_processing_pipeline/files/fits file with spaces 1.fits",
-                                                       "test_data/image_processing_pipeline/files/fits file with spaces 2.fits",
-                                                       "test_data/image_processing_pipeline/files/fits_file_1.fits",
-                                                       "test_data/image_processing_pipeline/files/fits_file_2.fits" };
+    const std::set<std::string> expectedFilenames { "test_data/image_processing_pipeline/files/fits file with spaces 1.fits",
+                                                    "test_data/image_processing_pipeline/files/fits file with spaces 2.fits",
+                                                    "test_data/image_processing_pipeline/files/fits_file_1.fits",
+                                                    "test_data/image_processing_pipeline/files/fits_file_2.fits" };
 
-    auto result = filePaths | files("(.*\\.fits)") | actions::join | actions::sort | to<std::vector>();
+    auto results = filePaths | files("(.*\\.fits)") | view::join| to<std::set>();
 
-    BOOST_TEST(result == expectedFilenames);
+    // NOTE: The order of the contained elements does not matter (the order of elements
+    //       returned by files() is undefined).
+    std::vector<std::string> diff;
+    ranges::set_difference(expectedFilenames, results, diff.begin());
+
+    BOOST_TEST(diff.empty());
 }
-
 
 BOOST_AUTO_TEST_CASE(pipeline_files_non_exising_extension_test)
 {
     const std::vector<std::string> filePaths { "test_data/image_processing_pipeline/files" };
-    const std::vector<std::string> expectedFilenames { };
+    const std::set<std::string> expectedFilenames { };
 
-    auto result = filePaths | files("(.*\\.xyz)") | actions::join | actions::sort | to<std::vector>();
+    auto results = filePaths | files("(.*\\.xyz)") | view::join | to<std::set>();
 
-    BOOST_TEST(result == expectedFilenames);
+    // NOTE: The order of the contained elements does not matter (the order of elements
+    //       returned by files() is undefined).
+    std::vector<std::string> diff;
+    ranges::set_difference(expectedFilenames, results, diff.begin());
+
+    BOOST_TEST(diff.empty());
 }
 
 BOOST_AUTO_TEST_CASE(pipeline_files_no_extension_filter_test)
 {
     const std::vector<std::string> filePaths { "test_data/image_processing_pipeline/files" };
-    const std::vector<std::string> expectedFilenames {
+    const std::set<std::string> expectedFilenames {
             "test_data/image_processing_pipeline/files/fits file with spaces 1.fits",
             "test_data/image_processing_pipeline/files/fits file with spaces 2.fits",
             "test_data/image_processing_pipeline/files/fits_file_1.fits",
@@ -93,9 +111,14 @@ BOOST_AUTO_TEST_CASE(pipeline_files_no_extension_filter_test)
             "test_data/image_processing_pipeline/files/txt_file_2.txt"
     };
 
-    auto result = filePaths | files() | actions::join | actions::sort | to<std::vector>();
+    auto results = filePaths | files() | view::join | to<std::set>();
 
-    BOOST_TEST(result == expectedFilenames);
+    // NOTE: The order of the contained elements does not matter (the order of elements
+    //       returned by files() is undefined).
+    std::vector<std::string> diff;
+    ranges::set_difference(expectedFilenames, results, diff.begin());
+
+    BOOST_TEST(diff.empty());
 }
 
 BOOST_AUTO_TEST_SUITE_END();
