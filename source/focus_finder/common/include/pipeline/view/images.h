@@ -31,21 +31,21 @@
 
 #define FOFI_IMAGES_DEBUG 0
 
-namespace AstroImagePipeline {
+namespace starmath::pipeline {
 
     template<typename ImageType=float>
     auto
     images() {
         return ranges::views::transform(
-                [=](const std::string &imageFilename) {
-                    auto loadedImage = std::make_shared<cimg_library::CImg<ImageType> >(imageFilename.c_str());
+            [=](const std::string &imageFilename) {
+                auto loadedImage = std::make_shared<cimg_library::CImg<ImageType> >(imageFilename.c_str());
 
-                    DEBUG_IMAGE_DISPLAY(*loadedImage, "images_out", FOFI_IMAGES_DEBUG);
+                DEBUG_IMAGE_DISPLAY(*loadedImage, "images_out", FOFI_IMAGES_DEBUG);
 
-                    return loadedImage;
-                }
+                return loadedImage;
+            }
         );
     }
-} // End namespace AstroImagePipeline
+}
 
 #endif //FOFI_IMAGES_H

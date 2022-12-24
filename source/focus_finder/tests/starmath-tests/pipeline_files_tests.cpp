@@ -30,11 +30,12 @@
 #include <boost/test/unit_test.hpp>
 #include <set>
 
-#include "../../common/include/pipeline/action/files.h"
+#include "../../common/include/pipeline/view/files.h"
 
 BOOST_AUTO_TEST_SUITE(pipeline_files_tests)
 
-using namespace AstroImagePipeline;
+using namespace starmath::pipeline;
+using namespace starmath;
 using namespace ranges;
 
 /**

@@ -31,7 +31,7 @@
 
 #define FOFI_DIVIDE_DEBUG 0
 
-namespace AstroImagePipeline {
+namespace starmath::pipeline {
 
     /**
      *
@@ -43,19 +43,20 @@ namespace AstroImagePipeline {
      */
     template<typename ImageType=float>
     auto
-    divide_by(const std::shared_ptr<ImageT> & divisorImagePtr) {
+    divide_by(const std::shared_ptr<ImageT> &divisorImagePtr) {
         return ranges::views::transform(
-                [=](const std::shared_ptr<cimg_library::CImg<ImageType> > & image) {
-                    const cimg_library::CImg<ImageType> & inputImageRef = *image;
+            [=](const std::shared_ptr<cimg_library::CImg<ImageType> > &image) {
+                const cimg_library::CImg<ImageType> &inputImageRef = *image;
 
-                    DEBUG_IMAGE_DISPLAY(inputImageRef, "divide_image_in", FOFI_DIVIDE_DEBUG);
+                DEBUG_IMAGE_DISPLAY(inputImageRef, "divide_image_in", FOFI_DIVIDE_DEBUG);
 
-                    auto result_image = std::make_shared<cimg_library::CImg<ImageType>>(inputImageRef.get_div(*divisorImagePtr));
+                auto result_image = std::make_shared<cimg_library::CImg<ImageType>>(
+                        inputImageRef.get_div(*divisorImagePtr));
 
-                    DEBUG_IMAGE_DISPLAY(*result_image, "divide_image_out", FOFI_DIVIDE_DEBUG);
+                DEBUG_IMAGE_DISPLAY(*result_image, "divide_image_out", FOFI_DIVIDE_DEBUG);
 
-                    return result_image;
-                }
+                return result_image;
+            }
         );
     }
 
@@ -70,20 +71,21 @@ namespace AstroImagePipeline {
     auto
     divide_by(ImageType scalarDivisor) {
         return ranges::views::transform(
-                [=](const std::shared_ptr<cimg_library::CImg<ImageType> > & image) {
-                    const cimg_library::CImg<ImageType> & inputImageRef = *image;
+            [=](const std::shared_ptr<cimg_library::CImg<ImageType> > &image) {
+                const cimg_library::CImg<ImageType> &inputImageRef = *image;
 
-                    DEBUG_IMAGE_DISPLAY(inputImageRef, "divide_scalar_in", FOFI_DIVIDE_DEBUG);
+                DEBUG_IMAGE_DISPLAY(inputImageRef, "divide_scalar_in", FOFI_DIVIDE_DEBUG);
 
-                    // TODO: FIXME! see above...
-                    auto result_image = std::make_shared<cimg_library::CImg<ImageType>>(inputImageRef / scalarDivisor);
+                // TODO: FIXME! see above...
+                auto result_image = std::make_shared<cimg_library::CImg<ImageType>>(
+                        inputImageRef / scalarDivisor);
 
-                    DEBUG_IMAGE_DISPLAY(*result_image, "divide_scalar_out", FOFI_DIVIDE_DEBUG);
+                DEBUG_IMAGE_DISPLAY(*result_image, "divide_scalar_out", FOFI_DIVIDE_DEBUG);
 
-                    return result_image;
-                }
+                return result_image;
+            }
         );
     }
-} // End namespace AstroImagePipeline
+}
 
 #endif //FOFI_DIVIDE_BY_H

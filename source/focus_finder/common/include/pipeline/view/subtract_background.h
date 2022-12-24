@@ -35,35 +35,36 @@
 
 // IDEA: Maybe this can be split into a normal subtract and value_clip ?
 //       -> No, because to calculate the threshold the actual image from the range is needed.
-namespace AstroImagePipeline {
+
+namespace starmath::pipeline {
 
     template<typename ImageType=float>
     auto
-    subtract_background(const std::shared_ptr<ThresholdingAlgorithmT> & thresholding_algorithm) {
+    subtract_background(const std::shared_ptr<ThresholdingAlgorithmT> &thresholding_algorithm) {
         return ranges::views::transform(
-            [=](const std::shared_ptr<ImageT> &image) {
-                const ImageT & inputImageRef = *image;
+                [=](const std::shared_ptr<ImageT> &image) {
+                    const ImageT &inputImageRef = *image;
 
-                DEBUG_IMAGE_DISPLAY(inputImageRef, "subtract_background_in", FOFI_SUBTRACT_BACKGROUND_DEBUG);
+                    DEBUG_IMAGE_DISPLAY(inputImageRef, "subtract_background_in", FOFI_SUBTRACT_BACKGROUND_DEBUG);
 
-                // TODO: Handle bit depth... do not hardcode here...
-                float threshold = thresholding_algorithm->calc(inputImageRef, 16);
+                    // TODO: Handle bit depth... do not hardcode here...
+                    float threshold = thresholding_algorithm->calc(inputImageRef, 16);
 
-                auto subImage = std::make_shared<cimg_library::CImg<ImageType> >(inputImageRef, "xy");
+                    auto subImage = std::make_shared<cimg_library::CImg<ImageType> >(inputImageRef, "xy");
 
-                ImageT & subImageRef = (*subImage);
+                    ImageT &subImageRef = (*subImage);
 
-                cimg_forXY(inputImageRef, x, y) {
-                    subImageRef(x, y) = (inputImageRef(x, y) < threshold ? 0 : inputImageRef(x, y) - threshold);
+                    cimg_forXY(inputImageRef, x, y) {
+                            subImageRef(x, y) = (inputImageRef(x, y) < threshold ? 0 : inputImageRef(x, y) -
+                                                                                       threshold);
+                        }
+
+                    DEBUG_IMAGE_DISPLAY(subImageRef, "subtract_background_out", FOFI_SUBTRACT_BACKGROUND_DEBUG);
+
+                    return subImage;
                 }
-
-                DEBUG_IMAGE_DISPLAY(subImageRef, "subtract_background_out", FOFI_SUBTRACT_BACKGROUND_DEBUG);
-
-                return subImage;
-            }
         );
     }
-
-} // End namespace AstroImagePipeline
+}
 
 #endif //FOFI_SUBTRACT_BACKGROUND_H

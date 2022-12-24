@@ -31,7 +31,7 @@
 
 #define FOFI_ADD_DEBUG 0
 
-namespace AstroImagePipeline {
+namespace starmath::pipeline {
 
     /**
      *
@@ -44,19 +44,20 @@ namespace AstroImagePipeline {
      */
     template<typename ImageType=float>
     auto
-    add(const std::shared_ptr<ImageT> & imageToAddPtr) {
+    add(const std::shared_ptr<ImageT> &imageToAddPtr) {
         return ranges::views::transform(
-                [=](const std::shared_ptr<cimg_library::CImg<ImageType> > & image) {
-                    const cimg_library::CImg<ImageType> & inputImageRef = *image;
+            [=](const std::shared_ptr<cimg_library::CImg<ImageType> > &image) {
+                const cimg_library::CImg<ImageType> &inputImageRef = *image;
 
-                    DEBUG_IMAGE_DISPLAY(inputImageRef, "add_image_in", FOFI_ADD_DEBUG);
+                DEBUG_IMAGE_DISPLAY(inputImageRef, "add_image_in", FOFI_ADD_DEBUG);
 
-                    auto result_image = std::make_shared<cimg_library::CImg<ImageType>>(inputImageRef + *imageToAddPtr);
+                auto result_image = std::make_shared<cimg_library::CImg<ImageType>>(
+                        inputImageRef + *imageToAddPtr);
 
-                    DEBUG_IMAGE_DISPLAY(*result_image, "add_image_out", FOFI_ADD_DEBUG);
+                DEBUG_IMAGE_DISPLAY(*result_image, "add_image_out", FOFI_ADD_DEBUG);
 
-                    return result_image;
-                }
+                return result_image;
+            }
         );
     }
 
@@ -71,19 +72,20 @@ namespace AstroImagePipeline {
     auto
     add(ImageType scalarValueToAdd) {
         return ranges::views::transform(
-                [=](const std::shared_ptr<cimg_library::CImg<ImageType> > & image) {
-                    const cimg_library::CImg<ImageType> & inputImageRef = *image;
+            [=](const std::shared_ptr<cimg_library::CImg<ImageType> > &image) {
+                const cimg_library::CImg<ImageType> &inputImageRef = *image;
 
-                    DEBUG_IMAGE_DISPLAY(inputImageRef, "add_scalar_in", FOFI_ADD_DEBUG);
+                DEBUG_IMAGE_DISPLAY(inputImageRef, "add_scalar_in", FOFI_ADD_DEBUG);
 
-                    auto result_image = std::make_shared<cimg_library::CImg<ImageType>>(inputImageRef + scalarValueToAdd);
+                auto result_image = std::make_shared<cimg_library::CImg<ImageType>>(
+                        inputImageRef + scalarValueToAdd);
 
-                    DEBUG_IMAGE_DISPLAY(*result_image, "add_scalar_out", FOFI_ADD_DEBUG);
+                DEBUG_IMAGE_DISPLAY(*result_image, "add_scalar_out", FOFI_ADD_DEBUG);
 
-                    return result_image;
-                }
+                return result_image;
+            }
         );
     }
-} // End namespace AstroImagePipeline
+}
 
 #endif //FOFI_ADD_H

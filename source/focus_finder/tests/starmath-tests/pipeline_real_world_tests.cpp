@@ -29,7 +29,7 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "../../common/include/pipeline/action/files.h"
+#include "../../common/include/pipeline/view/files.h"
 #include "../../common/include/pipeline/view/images.h"
 #include "../../common/include/pipeline/view/crop.h"
 #include "../../common/include/pipeline/view/scale.h"
@@ -45,12 +45,12 @@
 #include "../../common/include/hfd.h"
 #include "../../common/include/fwhm.h"
 #include "../../common/include/image_slicer.h"
-#include "../../common/include/tuple_printer.h"
 
 
 BOOST_AUTO_TEST_SUITE(pipeline_combination_tests)
 
-using namespace AstroImagePipeline;
+using namespace starmath::pipeline;
+using namespace starmath;
 using namespace ranges;
 
 
@@ -107,7 +107,7 @@ BOOST_AUTO_TEST_CASE(pipeline_star_metrics_test, * boost::unit_test::tolerance(0
     auto star_metrics =
         imagePaths
             | images()
-            | view::filter(& StarAnalysis::isNotSaturated) // TODO: Better name for StarAnalysis? filter::?
+            | view::filter(& metrics::is_not_saturated) // TODO: Better name for StarAnalysis? filter::? metrics?
             | subtract_background(ThresholdingAlgorithmFactoryT::getInstance(ThresholdingAlgorithmTypeT::OTSU))
             | scale_up(3.0F)
             | center_on_star(CentroidAlgorithmFactoryT::getInstance(CentroidAlgorithmTypeT::IWC))

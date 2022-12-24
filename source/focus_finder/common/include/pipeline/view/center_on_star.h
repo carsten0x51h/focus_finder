@@ -34,58 +34,54 @@
 
 #define FOFI_CENTER_ON_STAR_DEBUG 0
 
-namespace AstroImagePipeline {
+namespace starmath::pipeline {
 
     template<typename ImageType=float>
     auto
-    center_on_star(const std::shared_ptr<CentroidAlgorithmT> & centroid_algorithm) {
+    center_on_star(const std::shared_ptr<CentroidAlgorithmT> &centroid_algorithm) {
         return ranges::views::transform(
-                [=](const std::shared_ptr<cimg_library::CImg<ImageType>> &image) {
-                    // TODO: How to handle case when no centroid could be determined?
-                    const cimg_library::CImg<ImageType> & inputImageRef = *image;
+            [=](const std::shared_ptr<cimg_library::CImg<ImageType>> &image) {
+                // TODO: How to handle case when no centroid could be determined?
+                const cimg_library::CImg<ImageType> &inputImageRef = *image;
 
-                    auto optCentroid = centroid_algorithm->calc(inputImageRef);
+                auto optCentroid = centroid_algorithm->calc(inputImageRef);
 
-                    DEBUG_IMAGE_DISPLAY(inputImageRef, "center_on_star_in", FOFI_CENTER_ON_STAR_DEBUG);
+                DEBUG_IMAGE_DISPLAY(inputImageRef, "center_on_star_in", FOFI_CENTER_ON_STAR_DEBUG);
 
+                if (optCentroid.has_value()) {
+                    auto outerRoi = RectT<float>::fromCenterPoint(optCentroid.value(),
+                                                                  (float) inputImageRef.width(),
+                                                                  (float) inputImageRef.height()).template to<int>();
 
-                    if (optCentroid.has_value()) {
-                        auto outerRoi = RectT<float>::fromCenterPoint(optCentroid.value(),
-                                                                      (float) inputImageRef.width(),
-                                                                      (float) inputImageRef.height()).template to<int>();
+                    // get_crop() by default applies a dirichlet boundary_condition (=0). There are other
+                    // options as well. In this case, the desired behaviour is to assume that all pixel values
+                    // where the defined sub-frame exceeds the image boundary are assumed to be 0.
+                    //
+                    // boundary_conditions	= Can be { 0=dirichlet | 1=neumann | 2=periodic | 3=mirror }
+                    //
+                    // - Dirichlet means "0 outside image".
+                    // - Neumann means "Nearest neighbor outside image" (i.e. null derivative)
+                    // - Periodic means "Periodic"
+                    // - Mirror means "Mirrored image outside".
+                    //
+                    // See https://github.com/GreycLab/CImg/issues/110
+                    auto centroidSubImg = std::make_shared<cimg_library::CImg<ImageType>>(
+                            inputImageRef.get_crop(
+                                    outerRoi.x() /*x0*/, outerRoi.y() /*y0*/,
+                                    outerRoi.x() + outerRoi.width() - 1/*x1*/,
+                                    outerRoi.y() + outerRoi.height() - 1/*y1*/)
+                    );
 
-                        // get_crop() by default applies a dirichlet boundary_condition (=0). There are other
-                        // options as well. In this case, the desired behaviour is to assume that all pixel values
-                        // where the defined sub-frame exceeds the image boundary are assumed to be 0.
-                        //
-                        // boundary_conditions	= Can be { 0=dirichlet | 1=neumann | 2=periodic | 3=mirror }
-                        //
-                        // - Dirichlet means "0 outside image".
-                        // - Neumann means "Nearest neighbor outside image" (i.e. null derivative)
-                        // - Periodic means "Periodic"
-                        // - Mirror means "Mirrored image outside".
-                        //
-                        // See https://github.com/GreycLab/CImg/issues/110
-                        auto centroidSubImg = std::make_shared<cimg_library::CImg<ImageType>>(
-                                inputImageRef.get_crop(
-                                        outerRoi.x() /*x0*/, outerRoi.y() /*y0*/,
-                                        outerRoi.x() + outerRoi.width() - 1/*x1*/,
-                                        outerRoi.y() + outerRoi.height() - 1/*y1*/)
-                        );
+                    DEBUG_IMAGE_DISPLAY(*centroidSubImg, "center_on_star_out", FOFI_CENTER_ON_STAR_DEBUG);
 
-                        DEBUG_IMAGE_DISPLAY(*centroidSubImg, "center_on_star_out", FOFI_CENTER_ON_STAR_DEBUG);
-
-                        return centroidSubImg;
-                    }
-                    else {
-                        // TODO: Take out the image?! Throw exception?
-                        throw CentroidExceptionT("Unable to determine centroid.");
-                    }
+                    return centroidSubImg;
+                } else {
+                    // TODO: Take out the image?! Throw exception?
+                    throw CentroidExceptionT("Unable to determine centroid.");
                 }
+            }
         );
     }
-
-} // End namespace AstroImagePipeline
-
+}
 
 #endif //FOFI_CENTER_ON_STAR_H

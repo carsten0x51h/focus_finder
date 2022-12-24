@@ -31,8 +31,9 @@
 
 BOOST_AUTO_TEST_SUITE(pipeline_add_tests)
 
-    using namespace AstroImagePipeline;
-    using namespace ranges;
+using namespace starmath::pipeline;
+using namespace starmath;
+using namespace ranges;
 
 /**
  * Test if subtraction of an image from another image results in the

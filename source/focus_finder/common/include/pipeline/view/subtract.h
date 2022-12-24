@@ -29,9 +29,9 @@
 
 #include "../../image.h"
 
-#define FOFI_SUBTRACT_DEBUG 1
+#define FOFI_SUBTRACT_DEBUG 0
 
-namespace AstroImagePipeline {
+namespace starmath::pipeline {
 
     /**
      *
@@ -43,19 +43,20 @@ namespace AstroImagePipeline {
      */
     template<typename ImageType=float>
     auto
-    subtract(const std::shared_ptr<ImageT> & imageToSubtractPtr) {
+    subtract(const std::shared_ptr<ImageT> &imageToSubtractPtr) {
         return ranges::views::transform(
-            [=](const std::shared_ptr<cimg_library::CImg<ImageType> > & image) {
-                const cimg_library::CImg<ImageType> & inputImageRef = *image;
+                [=](const std::shared_ptr<cimg_library::CImg<ImageType> > &image) {
+                    const cimg_library::CImg<ImageType> &inputImageRef = *image;
 
-                DEBUG_IMAGE_DISPLAY(inputImageRef, "subtract_image_in", FOFI_SUBTRACT_DEBUG);
+                    DEBUG_IMAGE_DISPLAY(inputImageRef, "subtract_image_in", FOFI_SUBTRACT_DEBUG);
 
-                auto result_image = std::make_shared<cimg_library::CImg<ImageType>>(inputImageRef - *imageToSubtractPtr);
+                    auto result_image = std::make_shared<cimg_library::CImg<ImageType>>(
+                            inputImageRef - *imageToSubtractPtr);
 
-                DEBUG_IMAGE_DISPLAY(*result_image, "subtract_image_out", FOFI_SUBTRACT_DEBUG);
+                    DEBUG_IMAGE_DISPLAY(*result_image, "subtract_image_out", FOFI_SUBTRACT_DEBUG);
 
-                return result_image;
-            }
+                    return result_image;
+                }
         );
     }
 
@@ -70,12 +71,13 @@ namespace AstroImagePipeline {
     auto
     subtract(ImageType scalarValueToSubtract) {
         return ranges::views::transform(
-                [=](const std::shared_ptr<cimg_library::CImg<ImageType> > & image) {
-                    const cimg_library::CImg<ImageType> & inputImageRef = *image;
+                [=](const std::shared_ptr<cimg_library::CImg<ImageType> > &image) {
+                    const cimg_library::CImg<ImageType> &inputImageRef = *image;
 
                     DEBUG_IMAGE_DISPLAY(inputImageRef, "subtract_scalar_in", FOFI_SUBTRACT_DEBUG);
 
-                    auto result_image = std::make_shared<cimg_library::CImg<ImageType>>(inputImageRef - scalarValueToSubtract);
+                    auto result_image = std::make_shared<cimg_library::CImg<ImageType>>(
+                            inputImageRef - scalarValueToSubtract);
 
                     DEBUG_IMAGE_DISPLAY(*result_image, "subtract_scalar_out", FOFI_SUBTRACT_DEBUG);
 
@@ -83,6 +85,6 @@ namespace AstroImagePipeline {
                 }
         );
     }
-} // End namespace AstroImagePipeline
+}
 
 #endif //FOFI_SUBTRACT_H

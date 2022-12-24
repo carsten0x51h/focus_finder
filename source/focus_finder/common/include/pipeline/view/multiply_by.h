@@ -31,7 +31,7 @@
 
 #define FOFI_MULTIPLY_BY_DEBUG 0
 
-namespace AstroImagePipeline {
+namespace starmath::pipeline {
 
     /**
      *
@@ -43,14 +43,15 @@ namespace AstroImagePipeline {
      */
     template<typename ImageType=float>
     auto
-    multiply_by(const std::shared_ptr<ImageT> & imageToMultiplyByPtr) {
+    multiply_by(const std::shared_ptr<ImageT> &imageToMultiplyByPtr) {
         return ranges::views::transform(
-                [=](const std::shared_ptr<cimg_library::CImg<ImageType> > & image) {
-                    const cimg_library::CImg<ImageType> & inputImageRef = *image;
+                [=](const std::shared_ptr<cimg_library::CImg<ImageType> > &image) {
+                    const cimg_library::CImg<ImageType> &inputImageRef = *image;
 
                     DEBUG_IMAGE_DISPLAY(inputImageRef, "multiply_by_image_in", FOFI_MULTIPLY_BY_DEBUG);
 
-                    auto result_image = std::make_shared<cimg_library::CImg<ImageType>>(inputImageRef.get_mul(*imageToMultiplyByPtr));
+                    auto result_image = std::make_shared<cimg_library::CImg<ImageType>>(
+                            inputImageRef.get_mul(*imageToMultiplyByPtr));
 
                     DEBUG_IMAGE_DISPLAY(*result_image, "multiply_by_image_out", FOFI_MULTIPLY_BY_DEBUG);
 
@@ -70,12 +71,13 @@ namespace AstroImagePipeline {
     auto
     multiply_by(ImageType scalarToMultiplyBy) {
         return ranges::views::transform(
-                [=](const std::shared_ptr<cimg_library::CImg<ImageType> > & image) {
-                    const cimg_library::CImg<ImageType> & inputImageRef = *image;
+                [=](const std::shared_ptr<cimg_library::CImg<ImageType> > &image) {
+                    const cimg_library::CImg<ImageType> &inputImageRef = *image;
 
                     DEBUG_IMAGE_DISPLAY(inputImageRef, "multiply_by_scalar_in", FOFI_MULTIPLY_BY_DEBUG);
 
-                    auto result_image = std::make_shared<cimg_library::CImg<ImageType>>(inputImageRef * scalarToMultiplyBy);
+                    auto result_image = std::make_shared<cimg_library::CImg<ImageType>>(
+                            inputImageRef * scalarToMultiplyBy);
 
                     DEBUG_IMAGE_DISPLAY(*result_image, "multiply_by_out", FOFI_MULTIPLY_BY_DEBUG);
 
@@ -83,6 +85,6 @@ namespace AstroImagePipeline {
                 }
         );
     }
-} // End namespace AstroImagePipeline
+}
 
 #endif //FOFI_MULTIPLY_BY_H

@@ -40,7 +40,7 @@ namespace fs = std::filesystem;
  *
  * See https://stackoverflow.com/questions/11140483/how-to-get-list-of-files-with-a-specific-extension-in-a-given-folder
  */
-namespace AstroImagePipeline {
+namespace starmath::pipeline {
 
     // TODO / FIXME / HACK! Template is actually not needed here...
     //                      it only helps to remove "multiple definition" errors..,
@@ -48,9 +48,9 @@ namespace AstroImagePipeline {
 
     template<typename MyType=std::string>
     auto
-    files(const std::string & extensionRegex = "") {
+    files(const std::string &extensionRegex = "") {
         return ranges::views::transform(
-            [=](const std::string & rootPath) {
+            [=](const std::string &rootPath) {
                 const std::regex e(extensionRegex);
                 const fs::path root(rootPath);
 
@@ -63,14 +63,16 @@ namespace AstroImagePipeline {
                 // first make it an object to prevent dangling.
                 // However, ranges::make_iterator_range() works for now, but is it a good idea?
 
-                return ranges::make_iterator_range(begin(fs::directory_iterator(root)),end(fs::directory_iterator(root)))
-                        | ranges::views::filter([](const auto & entry) { return fs::is_regular_file(entry); })
-                        | ranges::views::filter([=](const auto & entry) { return (extensionRegex.empty() || std::regex_match(entry.path().string(), e)); })
-                        | ranges::views::transform([](const auto & entry) { return entry.path().string(); });
+                return ranges::make_iterator_range(begin(fs::directory_iterator(root)),
+                                                   end(fs::directory_iterator(root)))
+                       | ranges::views::filter([](const auto &entry) { return fs::is_regular_file(entry); })
+                       | ranges::views::filter([=](const auto &entry) {
+                    return (extensionRegex.empty() || std::regex_match(entry.path().string(), e));
+                })
+                       | ranges::views::transform([](const auto &entry) { return entry.path().string(); });
             }
         );
     }
-
-} // End namespace AstroImagePipeline
+}
 
 #endif //FOFI_FILES_H

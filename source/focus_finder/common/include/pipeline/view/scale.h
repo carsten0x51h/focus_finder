@@ -32,8 +32,7 @@
 
 #define FOFI_SCALE_DEBUG 0
 
-namespace AstroImagePipeline {
-
+namespace starmath::pipeline {
 
     /**
      *
@@ -146,7 +145,6 @@ namespace AstroImagePipeline {
     };
 
 
-
     /**
      *
      * @tparam ImageType
@@ -156,12 +154,11 @@ namespace AstroImagePipeline {
      */
     template<typename ImageType=float>
     auto
-    scale(ScaleTypeT::TypeE scaleType, float scaleFactor, InterpolationTypeT::TypeE interpolation_type)
-    {
+    scale(ScaleTypeT::TypeE scaleType, float scaleFactor, InterpolationTypeT::TypeE interpolation_type) {
         return ranges::views::transform(
-                [=](const std::shared_ptr<cimg_library::CImg<ImageType> > & image) {
+                [=](const std::shared_ptr<cimg_library::CImg<ImageType> > &image) {
 
-                    const cimg_library::CImg<ImageType> & inputImageRef = *image;
+                    const cimg_library::CImg<ImageType> &inputImageRef = *image;
 
                     DEBUG_IMAGE_DISPLAY(inputImageRef, "scale_in", FOFI_SCALE_DEBUG);
 
@@ -191,7 +188,8 @@ namespace AstroImagePipeline {
      */
     template<typename ImageType=float>
     auto
-    scale_up(float scaleFactor, InterpolationTypeT::TypeE interpolation_type = InterpolationTypeT::NEAREST_NEIGHBOR) {
+    scale_up(float scaleFactor,
+             InterpolationTypeT::TypeE interpolation_type = InterpolationTypeT::NEAREST_NEIGHBOR) {
         return scale<ImageType>(ScaleTypeT::UP, scaleFactor, interpolation_type);
     }
 
@@ -205,10 +203,10 @@ namespace AstroImagePipeline {
      */
     template<typename ImageType=float>
     auto
-    scale_down(float scaleFactor, InterpolationTypeT::TypeE interpolation_type = InterpolationTypeT::NEAREST_NEIGHBOR) {
+    scale_down(float scaleFactor,
+               InterpolationTypeT::TypeE interpolation_type = InterpolationTypeT::NEAREST_NEIGHBOR) {
         return scale<ImageType>(ScaleTypeT::DOWN, scaleFactor, interpolation_type);
     }
-
-} // End namespace AstroImagePipeline
+}
 
 #endif //FOFI_SCALE_H

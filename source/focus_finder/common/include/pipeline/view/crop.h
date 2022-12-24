@@ -34,50 +34,50 @@
 
 #define FOFI_CROP_DEBUG 0
 
-namespace AstroImagePipeline {
+namespace starmath::pipeline {
 
     template<typename ImageType=float>
     auto
-    crop_from_center(const SizeT<int> & crop_region)
-    {
+    crop_from_center(const SizeT<int> &crop_region) {
         return ranges::views::transform(
-            [=](const std::shared_ptr<cimg_library::CImg<ImageType> > & image) {
+                [=](const std::shared_ptr<cimg_library::CImg<ImageType> > &image) {
 
-                const cimg_library::CImg<ImageType> & inputImageRef = *image;
+                    const cimg_library::CImg<ImageType> &inputImageRef = *image;
 
-                DEBUG_IMAGE_DISPLAY(inputImageRef, "crop_from_center_in", FOFI_CROP_DEBUG);
+                    DEBUG_IMAGE_DISPLAY(inputImageRef, "crop_from_center_in", FOFI_CROP_DEBUG);
 
-                // TODO: Maybe this calculation can be simplified...
-                PointT<float> imageCenter((float) inputImageRef.width() / 2.0F, (float) inputImageRef.height() / 2.0F);
+                    // TODO: Maybe this calculation can be simplified...
+                    PointT<float> imageCenter((float) inputImageRef.width() / 2.0F,
+                                              (float) inputImageRef.height() / 2.0F);
 
-                RectT<float> rect = RectT<float>::fromCenterPoint(imageCenter, crop_region.to<float>());
+                    RectT<float> rect = RectT<float>::fromCenterPoint(imageCenter, crop_region.to<float>());
 
 
-                // get_crop() by default applies a dirichlet boundary_condition (=0). There are other
-                // options as well. In this case, the desired behaviour is to assume that all pixel values
-                // where the defined sub-frame exceeds the image boundary are assumed to be 0.
-                //
-                // boundary_conditions	= Can be { 0=dirichlet | 1=neumann | 2=periodic | 3=mirror }
-                //
-                // - Dirichlet means "0 outside image".
-                // - Neumann means "Nearest neighbor outside image" (i.e. null derivative)
-                // - Periodic means "Periodic"
-                // - Mirror means "Mirrored image outside".
-                //
-                // See https://github.com/GreycLab/CImg/issues/110
-                auto croppedImg = std::make_shared<cimg_library::CImg<ImageType>>(
-                        inputImageRef.get_crop(
-                                rect.x() /*x0*/, rect.y() /*y0*/,
-                                rect.x() + rect.width() - 1/*x1*/,
-                                rect.y() + rect.height() - 1/*y1*/)
-                );
+                    // get_crop() by default applies a dirichlet boundary_condition (=0). There are other
+                    // options as well. In this case, the desired behaviour is to assume that all pixel values
+                    // where the defined sub-frame exceeds the image boundary are assumed to be 0.
+                    //
+                    // boundary_conditions	= Can be { 0=dirichlet | 1=neumann | 2=periodic | 3=mirror }
+                    //
+                    // - Dirichlet means "0 outside image".
+                    // - Neumann means "Nearest neighbor outside image" (i.e. null derivative)
+                    // - Periodic means "Periodic"
+                    // - Mirror means "Mirrored image outside".
+                    //
+                    // See https://github.com/GreycLab/CImg/issues/110
+                    auto croppedImg = std::make_shared<cimg_library::CImg<ImageType>>(
+                            inputImageRef.get_crop(
+                                    rect.x() /*x0*/, rect.y() /*y0*/,
+                                    rect.x() + rect.width() - 1/*x1*/,
+                                    rect.y() + rect.height() - 1/*y1*/)
+                    );
 
-                DEBUG_IMAGE_DISPLAY(*croppedImg, "crop_from_center_out", FOFI_CROP_DEBUG);
+                    DEBUG_IMAGE_DISPLAY(*croppedImg, "crop_from_center_out", FOFI_CROP_DEBUG);
 
-                return croppedImg;
-            }
+                    return croppedImg;
+                }
         );
     }
-} // End namespace AstroImagePipeline
+}
 
 #endif //FOFI_CROP_H
