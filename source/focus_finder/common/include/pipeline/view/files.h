@@ -42,37 +42,37 @@ namespace fs = std::filesystem;
  */
 namespace starmath::pipeline {
 
-    // TODO / FIXME / HACK! Template is actually not needed here...
-    //                      it only helps to remove "multiple definition" errors..,
-    //     ranges::any_view<int> ???
+        // TODO / FIXME / HACK! Template is actually not needed here...
+        //                      it only helps to remove "multiple definition" errors..,
+        //     ranges::any_view<int> ???
 
-    template<typename MyType=std::string>
-    auto
-    files(const std::string &extensionRegex = "") {
-        return ranges::views::transform(
-            [=](const std::string &rootPath) {
-                const std::regex e(extensionRegex);
-                const fs::path root(rootPath);
+        template<typename MyType=std::string>
+        auto
+        files(const std::string &extensionRegex = "") {
+            return ranges::views::transform(
+                [=](const std::string &rootPath) {
+                    const std::regex e(extensionRegex);
+                    const fs::path root(rootPath);
 
-                // See https://en.cppreference.com/w/cpp/filesystem/directory_iterator
-                // ... These specializations for directory_iterator make it a borrowed_range and a view.
-                //
-                // NOTE: https://github.com/ericniebler/range-v3/issues/1400
-                // See https://godbolt.org/z/-Vu-Md.
-                // std::filesystem::iterator is not a std::safe_range, so you must
-                // first make it an object to prevent dangling.
-                // However, ranges::make_iterator_range() works for now, but is it a good idea?
+                    // See https://en.cppreference.com/w/cpp/filesystem/directory_iterator
+                    // ... These specializations for directory_iterator make it a borrowed_range and a view.
+                    //
+                    // NOTE: https://github.com/ericniebler/range-v3/issues/1400
+                    // See https://godbolt.org/z/-Vu-Md.
+                    // std::filesystem::iterator is not a std::safe_range, so you must
+                    // first make it an object to prevent dangling.
+                    // However, ranges::make_iterator_range() works for now, but is it a good idea?
 
-                return ranges::make_iterator_range(begin(fs::directory_iterator(root)),
-                                                   end(fs::directory_iterator(root)))
-                       | ranges::views::filter([](const auto &entry) { return fs::is_regular_file(entry); })
-                       | ranges::views::filter([=](const auto &entry) {
-                    return (extensionRegex.empty() || std::regex_match(entry.path().string(), e));
-                })
-                       | ranges::views::transform([](const auto &entry) { return entry.path().string(); });
-            }
-        );
+                    return ranges::make_iterator_range(begin(fs::directory_iterator(root)),
+                                                       end(fs::directory_iterator(root)))
+                           | ranges::views::filter([](const auto &entry) { return fs::is_regular_file(entry); })
+                           | ranges::views::filter([=](const auto &entry) {
+                                return (extensionRegex.empty() || std::regex_match(entry.path().string(), e));
+                            })
+                           | ranges::views::transform([](const auto &entry) { return entry.path().string(); });
+                }
+            );
+        }
     }
-}
 
 #endif //FOFI_FILES_H

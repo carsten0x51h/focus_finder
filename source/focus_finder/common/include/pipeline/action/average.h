@@ -31,10 +31,14 @@
 
 #include "../../image.h"
 
+
+// TODO: Move to correct namespace...
+
 template <class Rng>
 std::shared_ptr<ImageT>
 average(const Rng & rng) {
 
+    // TODO: Causes compile error
     if (ranges::empty(rng)) {
         return nullptr ; // TODO: Ok to return nullptr? Or throw?
     }

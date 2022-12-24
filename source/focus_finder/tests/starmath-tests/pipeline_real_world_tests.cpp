@@ -25,7 +25,6 @@
 #include <range/v3/range/conversion.hpp>
 #include <range/v3/view/join.hpp>
 #include <range/v3/view/filter.hpp>
-#include <range/v3/action/sort.hpp>
 
 #include <boost/test/unit_test.hpp>
 
@@ -33,8 +32,11 @@
 #include "../../common/include/pipeline/view/images.h"
 #include "../../common/include/pipeline/view/crop.h"
 #include "../../common/include/pipeline/view/scale.h"
+#include "../../common/include/pipeline/view/subtract.h"
+#include "../../common/include/pipeline/view/divide_by.h"
 #include "../../common/include/pipeline/view/subtract_background.h"
 #include "../../common/include/pipeline/view/center_on_star.h"
+#include "../../common/include/pipeline/action/average.h"
 
 
 #include "../../common/include/thresholding_algorithm_factory.h"
@@ -124,27 +126,62 @@ BOOST_AUTO_TEST_CASE(pipeline_star_metrics_test, * boost::unit_test::tolerance(0
 
 
 /**
+ * IDEA:
+ *         AstroImageProcessingPipelineT
+ *              .of("light-frames/*.fits")                                                  -> List<img>
+ *              .subtract(ImageProcessingPipelineT.of("dark-frames/*.fits").average())      -> List<img>
+ *              .divide(ImageProcessingPipelineT.of("flatfield-frames/*.fits").average())   -> List<img>
+ *              .average()                                                                  -> img
+ *              .stretch(StretcherT::-...)                                                  -> img
+ *              .store/save("my-filename.png")
  *
+ * NOTE: This does no alignment!
  */
 BOOST_AUTO_TEST_CASE(pipeline_astrophotography_image_development_test)
 {
-//// *         AstroImageProcessingPipelineT
-//// *              .of("light-frames/*.fits")                                                  -> List<img>
-//// *              .subtract(ImageProcessingPipelineT.of("dark-frames/*.fits").average())      -> List<img>
-//// *              .divide(ImageProcessingPipelineT.of("flatfield-frames/*.fits").average())   -> List<img>
-//// *              .average()                                                                  -> img
-//// *              .stretch(StretcherT::-...)                                                  -> img
-//// *              .store/save("my-filename.png")
-//// */
-////
-////
-//// TODO: average() may be changed to | average() using actions of ranges-v3!
-//////    std::shared_ptr<ImageT> averageImg = average(imageNames | images());
-//////
-//////    for(auto result : imageNames
-//////                | images()
-//////                | subtract(img...)
-//////                | value_clip(ClippingAlgorithmT)
+//    std::vector<std::string> imageDirectoriesByFilter {
+//        "test_data/image_processing_pipeline/real_world/astrophotography/ir",
+//        "test_data/image_processing_pipeline/real_world/astrophotography/red",
+//        "test_data/image_processing_pipeline/real_world/astrophotography/green",
+//        "test_data/image_processing_pipeline/real_world/astrophotography/blue"
+//    };
+    const std::string base_path = "test_data/image_processing_pipeline/real_world/astrophotography/ir/";
+
+    auto dark_files = view::single(base_path + "dark")
+                              | files("(.*\\.fit)") | view::join | to<std::vector>();
+
+    auto dark_flat_files = view::single(base_path + "dark_flat")
+                              | files("(.*\\.fit)") | view::join | to<std::vector>();
+
+    auto flat_files = view::single(base_path + "flat")
+                              | files("(.*\\.fit)") | view::join | to<std::vector>();
+
+    auto lightFrameFiles = view::single(base_path + "light")
+                              | files("(.*\\.fit)") | view::join | to<std::vector>();
+
+    auto light_average =
+            average(
+                lightFrameFiles
+                    | images()
+                    | subtract(
+                        average(dark_files | images())
+                      )
+                    | divide_by(
+                        average(
+                            flat_files
+                                | images()
+                                | subtract(
+                                     average(dark_flat_files | images())
+                                  )
+                        )
+                     )
+    );
+
+    DEBUG_IMAGE_DISPLAY(*light_average, "light_average", 1);
+
+    light_average->save_tiff("test_data/image_processing_pipeline/real_world/astrophotography/ir/result.tiff");
+
+//                | value_clip(ClippingAlgorithmT)
 }
 
 
@@ -153,6 +190,7 @@ BOOST_AUTO_TEST_CASE(pipeline_astrophotography_image_development_test)
  */
 BOOST_AUTO_TEST_CASE(pipeline_star_recognizer_test)
 {
+    // Star clustering....
 }
 
 BOOST_AUTO_TEST_SUITE_END();
