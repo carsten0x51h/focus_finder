@@ -107,7 +107,7 @@ BOOST_AUTO_TEST_CASE(pipeline_star_metrics_test, * boost::unit_test::tolerance(0
     auto star_metrics =
         imagePaths
             | images()
-            | view::filter(& metrics::is_not_saturated) // TODO: Better name for StarAnalysis? filter::? metrics?
+            | view::filter(& metrics::is_not_saturated)
             | subtract_background(ThresholdingAlgorithmFactoryT::getInstance(ThresholdingAlgorithmTypeT::OTSU))
             | scale_up(3.0F)
             | center_on_star(CentroidAlgorithmFactoryT::getInstance(CentroidAlgorithmTypeT::IWC))
