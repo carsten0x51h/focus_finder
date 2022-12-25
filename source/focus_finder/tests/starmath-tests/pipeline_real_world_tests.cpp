@@ -128,28 +128,24 @@ BOOST_AUTO_TEST_CASE(pipeline_star_metrics_test, * boost::unit_test::tolerance(0
  *              .store/save("my-filename.png")
  *
  * NOTE: This does no alignment!
+ *
+ * TODO: Add     | value_clip(ClippingAlgorithmT) after subtract?
  */
 BOOST_AUTO_TEST_CASE(pipeline_astrophotography_image_development_test)
 {
-//    std::vector<std::string> imageDirectoriesByFilter {
-//        "test_data/image_processing_pipeline/real_world/astrophotography/ir",
-//        "test_data/image_processing_pipeline/real_world/astrophotography/red",
-//        "test_data/image_processing_pipeline/real_world/astrophotography/green",
-//        "test_data/image_processing_pipeline/real_world/astrophotography/blue"
-//    };
     const std::string base_path = "test_data/image_processing_pipeline/real_world/astrophotography/ir/";
 
     auto dark_files = view::single(base_path + "dark")
-                              | files("(.*\\.fit)") | view::join | to<std::vector>();
+                              | files("(.*\\.fit\\.gz)") | view::join | to<std::vector>();
 
     auto dark_flat_files = view::single(base_path + "dark_flat")
-                              | files("(.*\\.fit)") | view::join | to<std::vector>();
+                              | files("(.*\\.fit\\.gz)") | view::join | to<std::vector>();
 
     auto flat_files = view::single(base_path + "flat")
-                              | files("(.*\\.fit)") | view::join | to<std::vector>();
+                              | files("(.*\\.fit\\.gz)") | view::join | to<std::vector>();
 
     auto lightFrameFiles = view::single(base_path + "light")
-                              | files("(.*\\.fit)") | view::join | to<std::vector>();
+                              | files("(.*\\.fit\\.gz)") | view::join | to<std::vector>();
 
     auto light_average =
             average(
@@ -169,11 +165,22 @@ BOOST_AUTO_TEST_CASE(pipeline_astrophotography_image_development_test)
                      )
     );
 
-    DEBUG_IMAGE_DISPLAY(*light_average, "light_average", 1);
+//    light_average->save("test_data/image_processing_pipeline/real_world/astrophotography/ir/expected_result.tiff");
+//    DEBUG_IMAGE_DISPLAY(*light_average, "light_average", 1);
 
-    light_average->save_tiff("test_data/image_processing_pipeline/real_world/astrophotography/ir/result.tiff");
+//    ImageT expected_result("test_data/image_processing_pipeline/real_world/astrophotography/ir/result.tiff");
 
-// TODO:       Add        | value_clip(ClippingAlgorithmT) after subtract?
+    // FIXME: Replace by BOOST_TEST(img1 == img2)
+    // TODO: Problem here: One pixel has value -nan. -> Probably div by 0? Dead pixel in flats?
+//    cimg_forXY(expected_result, x, y) {
+//        if ( (*light_average)(x,y) != expected_result(x, y)) {
+//            std::cerr << "Pixel x=" << x << ", y=" << y << " --> value is: "
+//                      << (*light_average)(x,y) << ", exp. value " << expected_result(x, y) << std::endl;
+//            break;
+//        }
+//    }
+
+    // TODO: BOOST_TEST...
 }
 
 
