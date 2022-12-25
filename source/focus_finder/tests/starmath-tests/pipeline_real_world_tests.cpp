@@ -59,15 +59,7 @@ using namespace ranges;
 /**
  *
  */
-//    std::vector<std::string> filePaths {
-//      "test_data/image_processing_pipeline/real_world/star_metrics"
-//    };
-//    | files("(.*\\.tiff)")
-//      | view::join
-// TODO / IDEA: Move "own" views to namespace "view" - a sub-namespace to "starmath".
-//              -> Then starmath::view::center_on_star().... can be written - or, if
-//                 "using namespace starmath" is used, simply view::center_on_star().
-//// TODO: Implement simple crop().
+// TODO: Implement simple crop().
 // TODO / PROBLEM: This way we lose the info which image we talk about... -> include path into ImageT structure...?!
 //                 -> This would also be helpful with a "store()/save()" function.
 //
@@ -181,16 +173,45 @@ BOOST_AUTO_TEST_CASE(pipeline_astrophotography_image_development_test)
 
     light_average->save_tiff("test_data/image_processing_pipeline/real_world/astrophotography/ir/result.tiff");
 
-//                | value_clip(ClippingAlgorithmT)
+// TODO:       Add        | value_clip(ClippingAlgorithmT) after subtract?
 }
 
 
 /**
+ *      3. Cluster example (old automatic star analyzer)
  *
+ *          List<img> imgs = AstroImageProcessingPipelineT
+ *                              .of("my-star-image.fits")
+ *                              .denoise(DenoiserT::...)
+ *                              .subtractBackground(ThresholderT::otsu(...) OR thresholder function)
+ *                              .cluster(ClusterAlgorithmT::...)                                          -> List<List<img>>
+ *                              .flatMap()
+ *                              .filter(StarDetailsT::isSaturated() == false)
+ *                              .centerOnStar(CentroiderT::iwc(...))
+ *                              .filter(StarDetailsT::hfd() < 2)   ??
+ *                              .filter(StarDetailsT::snr() > 10)  ??
+ *                              .collect(Collector::asList())
+ *
+ *          OR with range library
+ *
+ *          NOTE: flatmap: https://stackoverflow.com/questions/36051851/how-to-implement-flatmap-using-rangev3-ranges
+ *
+ *          images("my-star-image.fits")
+ *              | denoise(DenoiserT::...())
+ *              | subtractBackground(ThresholderT::otsu(...) OR thresholder function)
+ *              | cluster(ClusterAlgorithmT::...)
+ *              | boost::range::for_each() -> Range of images
+ *              | filtered(! StarAnalysisT::isSaturated())
+ *              | centerOnStar(CentroiderT::iwc(...))
+ *              | filtered(! StarAnalysisT::snr() > 10)
+ *              | filtered(! StarAnalysisT::hfd() < 5)
  */
 BOOST_AUTO_TEST_CASE(pipeline_star_recognizer_test)
 {
-    // Star clustering....
+//    auto x =
+//            view::single("test_data/image_processing_pipeline/real_world/star_recognizer/test_image_star_recognizer_1.fit")
+//              | images()
+//              | star_cluster();
 }
 
 BOOST_AUTO_TEST_SUITE_END();
