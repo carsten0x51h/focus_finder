@@ -1,7 +1,8 @@
 TODO
 ----
 -Next steps
--TODO: Build error?
+-Change project structure as proposed by https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2018/p1204r0.html
+
 -TODO: Deprecated cmake message?
 -TODO: mIcon... missing (mail...)?
 -TODO: Dep. to QGIS required?
