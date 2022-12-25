@@ -22,29 +22,19 @@
  *
  ****************************************************************************/
 
-#include <boost/test/unit_test.hpp>
-#include <boost/test/tools/floating_point_comparison.hpp>
+#ifndef FOFI_IMAGE_READER_H
+#define FOFI_IMAGE_READER_H
 
-#include "../../common/include/image.h"
+#include <memory>
+#include <filesystem>
 
-/**
- * This image is expected to have 16 bit, each pixel is supposed to have
- * the pixel value 65535.
- */
-BOOST_AUTO_TEST_CASE(tiff_16_bit_image_test)
-{
-    const float expectedPixelValue = 65535.0F;
-    ImageT tiffFloatImage("test_data/image/test_image_16bit_100x100.tif");
-    BOOST_CHECK_CLOSE(tiffFloatImage(0,0), expectedPixelValue, 0.001F);
+#include "image.h"
+#include "exception.h"
+
+DEF_Exception(ImageReader);
+
+namespace starmath::io {
+    std::shared_ptr<ImageT> read(const std::filesystem::path & filepath);
 }
 
-/**
- * This image is expected to have 32 bit, each pixel is supposed to have
- * the pixel value 0.5.
- */
-BOOST_AUTO_TEST_CASE(tiff_32_bit_float_image_test)
-{
-    const float expectedPixelValue = 0.5F;
-    ImageT tiffFloatImage("test_data/image/test_image_32bit_120x120.tif");
-    BOOST_CHECK_CLOSE(tiffFloatImage(0,0), expectedPixelValue, 0.001F);
-}
+#endif //FOFI_IMAGE_READER_H

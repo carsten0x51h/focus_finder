@@ -24,6 +24,8 @@
 
 #include <boost/test/unit_test.hpp>
 
+#include <range/v3/range/conversion.hpp>
+
 #include "../../common/include/pipeline/view/images.h"
 
 BOOST_AUTO_TEST_SUITE(pipeline_images_tests)
@@ -35,19 +37,29 @@ using namespace ranges;
 
 BOOST_AUTO_TEST_CASE(pipeline_images_tiff_test)
 {
-    const std::vector<std::string> imageFilenames {
-            "test_data/image_processing_pipeline/images/test_image_tiff_1_65x85.tiff",
-            "test_data/image_processing_pipeline/images/test_image_tiff_2_65x85.tiff"
+    const std::vector<std::string> image_filenames {
+        "test_data/image_processing_pipeline/images/test_image_tiff_1_65x85.tiff",
+        "test_data/image_processing_pipeline/images/test_image_tiff_2_65x85.tiff",
+        "test_data/image_processing_pipeline/images/test_image_fits_1_45x47.fits",
+        "test_data/image_processing_pipeline/images/test_image_fits_2_45x47.fits"
     };
 
-    for (const auto & img : imageFilenames | images()) {
-        BOOST_TEST(img->width() == 65);
-        BOOST_TEST(img->height() == 85);
-    }
-}
+    const std::vector< std::pair<int, int> > expected_image_dimensions {
+            std::make_pair(65, 85),
+            std::make_pair(65, 85),
+            std::make_pair(45, 47),
+            std::make_pair(45, 47)
+    };
 
-// TODO: fits...
-//{ "test_data/image_processing_pipeline/images/test_image_fits_1_45x47.fits", 45, 47 },
-//{ "test_data/image_processing_pipeline/images/test_image_fits_2_45x47.fits", 45, 47 }
+    auto img_dimensions = image_filenames
+                            | images()
+                            | view::transform(
+                                    [](const auto & img_ptr) {
+                                        return std::make_pair(img_ptr->width(), img_ptr->height());
+                                    })
+                            | to<std::vector>();
+
+    BOOST_TEST(img_dimensions == expected_image_dimensions);
+}
 
 BOOST_AUTO_TEST_SUITE_END();

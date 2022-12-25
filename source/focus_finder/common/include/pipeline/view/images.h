@@ -27,7 +27,7 @@
 
 #include <range/v3/view/transform.hpp>
 
-#include "../../image.h"
+#include "../../image_reader.h"
 
 #define FOFI_IMAGES_DEBUG 0
 
@@ -38,7 +38,10 @@ namespace starmath::pipeline {
     images() {
         return ranges::views::transform(
             [=](const std::string &imageFilename) {
-                auto loadedImage = std::make_shared<cimg_library::CImg<ImageType> >(imageFilename.c_str());
+
+                // TODO: Change to
+                // #include "image_reader.h"
+                auto loadedImage = starmath::io::read(imageFilename);
 
                 DEBUG_IMAGE_DISPLAY(*loadedImage, "images_out", FOFI_IMAGES_DEBUG);
 

@@ -37,7 +37,6 @@ void CImgFitsIOHelperT::readFits(ImageT *outImg,
 
     THROW_IF(FitsIO, outImg == nullptr, "outImg expected to be set.")
 
-    // TODO: Is it possible to pass a stream?
     CCfits::FITS::setVerboseMode(ss != nullptr);
 
     try {
@@ -49,7 +48,7 @@ void CImgFitsIOHelperT::readFits(ImageT *outImg,
             *outBitPix = image.bitpix();
         }
 
-        // read all user-specifed, coordinate, and checksum keys in the image
+        // read all user-specific, coordinate, and checksum keys in the image
         image.readAllKeys();
 
         if (ss != nullptr) {
@@ -57,8 +56,8 @@ void CImgFitsIOHelperT::readFits(ImageT *outImg,
         }
 
         // Set image dimensions
-        outImg->resize((size_t) image.axis(0) /*x*/, (size_t) image.axis(1) /*y*/, 1/*z - HACK*/,
-                       1 /*1 color*/);
+        outImg->resize((int) image.axis(0) /*x*/, (int) image.axis(1) /*y*/, 1/*z - TODO: HACK*/,
+                       1 /*1 color - TODO: HACK*/);
 
         // HACK / FIXME: At this point we assume that there is only 1 layer!
         std::valarray<typename ImageT::value_type> imgData;
@@ -68,10 +67,12 @@ void CImgFitsIOHelperT::readFits(ImageT *outImg,
         cimg_forXY(*outImg, x, y) {
                 // TODO: Should this be parameterized? Or is it possible to find out automatically?
                 // Correct, when reading old, existing FITS files
-                //(*outImg)(x, outImg->height() - 1 - y) = imgData[outImg->offset(x, y)];
+                // NOTE: ImageJ and Gimp both work this way for normal files.
+                //       -> For INDI/BLOB there must be a different solution.
+                (*outImg)(x, outImg->height() - 1 - y) = imgData[outImg->offset(x, y)];
 
                 // Correct when reading the image directly after storing the BLOB file with INDI.
-                (*outImg)(x, y) = imgData[outImg->offset(x, y)];
+                //(*outImg)(x, y) = imgData[outImg->offset(x, y)];
             }
 
     } catch (CCfits::FitsException &exc) {
