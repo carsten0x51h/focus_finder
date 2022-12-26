@@ -25,7 +25,7 @@ jobs:
 
     - name: Install dependencies
       shell: bash
-      run: sudo apt-get update ; sudo apt-get install librange-v3-dev zlib1g-dev cimg-dev libindi-dev libnova-dev libgsl-dev libccfits-dev qtbase5-dev libboost-dev libboost-log-dev libboost-system-dev libboost-regex-dev libboost-thread-dev libboost-program-options-dev libboost-test-dev clang-tidy
+      run: sudo apt-get update ; sudo apt-get install librange-v3-dev zlib1g-dev cimg-dev libindi-dev libtiff-dev libnova-dev libgsl-dev libccfits-dev qtbase5-dev libboost-dev libboost-log-dev libboost-system-dev libboost-regex-dev libboost-thread-dev libboost-program-options-dev libboost-test-dev clang-tidy
 
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
