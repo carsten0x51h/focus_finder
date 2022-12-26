@@ -374,7 +374,7 @@ target_link_libraries(${target}
         ${ZLIB_LIBRARIES}
         ${DEFAULT_LINKER_OPTIONS}
         ${Boost_REGEX_LIBRARY}
-        #    ${TIFF_LIBRARIES}
+        ${TIFF_LIBRARIES}
         )
 
 #

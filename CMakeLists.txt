@@ -125,6 +125,11 @@ include(cmake/FindCCFits.cmake)
 include(cmake/FindGSL.cmake)
 
 #
+# Look for FindTIFF script which is part of the cmake-modules.
+#
+include(FindTIFF)
+
+#
 # C++ std filesystem library
 #
 include(cmake/FindFilesystem.cmake)
