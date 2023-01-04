@@ -40,4 +40,4 @@ void StarInfoT::setValidStarDetected(bool validStarDetected) {
 bool StarInfoT::isValidStarDetected() const {
     return mValidStarDetected;
 }
-//TEST4
+//TEST5
