@@ -26,6 +26,28 @@
 #include <range/v3/view/join.hpp>
 #include <range/v3/view/filter.hpp>
 
+
+
+#include <range/v3/action/join.hpp>
+#include <range/v3/algorithm/copy.hpp>
+#include <range/v3/algorithm/for_each.hpp>
+#include <range/v3/algorithm/mismatch.hpp>
+#include <range/v3/core.hpp>
+#include <range/v3/iterator/stream_iterators.hpp>
+#include <range/v3/view/all.hpp>
+#include <range/v3/view/chunk.hpp>
+#include <range/v3/view/chunk_by.hpp>
+#include <range/v3/view/concat.hpp>
+#include <range/v3/view/iota.hpp>
+#include <range/v3/view/join.hpp>
+#include <range/v3/view/repeat_n.hpp>
+#include <range/v3/view/single.hpp>
+#include <range/v3/view/take.hpp>
+#include <range/v3/view/transform.hpp>
+
+
+
+
 #include <boost/test/unit_test.hpp>
 
 #include "../../common/include/pipeline/view/files.h"
@@ -36,6 +58,8 @@
 #include "../../common/include/pipeline/view/divide_by.h"
 #include "../../common/include/pipeline/view/subtract_background.h"
 #include "../../common/include/pipeline/view/center_on_star.h"
+#include "../../common/include/pipeline/view/remove_nans.h"
+
 #include "../../common/include/pipeline/action/average.h"
 
 
@@ -130,10 +154,13 @@ BOOST_AUTO_TEST_CASE(pipeline_star_metrics_test, * boost::unit_test::tolerance(0
  * NOTE: This does no alignment!
  *
  * TODO: Add     | value_clip(ClippingAlgorithmT) after subtract?
+ *
+ * TODO: Instead of removing NANs at the end, better use deadpixel filter before division...
+ * TODO: Smaller input and example images for this unit test! -> faster excution, less space in git!
  */
 BOOST_AUTO_TEST_CASE(pipeline_astrophotography_image_development_test)
 {
-    const std::string base_path = "test_data/image_processing_pipeline/real_world/astrophotography/ir/";
+    const std::string base_path = "test_data/image_processing_pipeline/real_world/astrophotography/image_development/";
 
     auto dark_files = view::single(base_path + "dark")
                               | files("(.*\\.fit\\.gz)") | view::join | to<std::vector>();
@@ -144,12 +171,19 @@ BOOST_AUTO_TEST_CASE(pipeline_astrophotography_image_development_test)
     auto flat_files = view::single(base_path + "flat")
                               | files("(.*\\.fit\\.gz)") | view::join | to<std::vector>();
 
-    auto lightFrameFiles = view::single(base_path + "light")
+    auto light_frame_files = view::single(base_path + "light")
                               | files("(.*\\.fit\\.gz)") | view::join | to<std::vector>();
 
-    auto light_average =
-            average(
-                lightFrameFiles
+    // NOTE: If just one pixel has a NAN value (e.g. div by 0), BOOST_TEST() fails when comparing two
+    // images, even if both images have a "NAN value" at the same pixel position. The reason is that
+    // NAN == NAN is false. Therefore, remove_nans() is the last step which uses a median blur filter
+    // to interpolate all NAN values using their surrounding neighbours.
+    //
+    // TODO: Should fail if e.g. dimension of dark files is different from dimension of light frames!
+    auto light_average_no_nans_range =
+             view::single(
+	      average(
+                light_frame_files
                     | images()
                     | subtract(
                         average(dark_files | images())
@@ -163,24 +197,23 @@ BOOST_AUTO_TEST_CASE(pipeline_astrophotography_image_development_test)
                                   )
                         )
                      )
-    );
+	      )
+	     )
+             | remove_nans();
 
-//    light_average->save("test_data/image_processing_pipeline/real_world/astrophotography/ir/expected_result.tiff");
-//    DEBUG_IMAGE_DISPLAY(*light_average, "light_average", 1);
+    
+    // This line initially generated the expected result.
+    std::string expected_image_filename = base_path + "expected_result.tiff";
+    
+    //ranges::front(light_average_no_nans_range)->save(expected_image_filename.c_str());
+    ImageT expected_result(expected_image_filename.c_str());
+    
 
-//    ImageT expected_result("test_data/image_processing_pipeline/real_world/astrophotography/ir/result.tiff");
-
-    // FIXME: Replace by BOOST_TEST(img1 == img2)
-    // TODO: Problem here: One pixel has value -nan. -> Probably div by 0? Dead pixel in flats?
-//    cimg_forXY(expected_result, x, y) {
-//        if ( (*light_average)(x,y) != expected_result(x, y)) {
-//            std::cerr << "Pixel x=" << x << ", y=" << y << " --> value is: "
-//                      << (*light_average)(x,y) << ", exp. value " << expected_result(x, y) << std::endl;
-//            break;
-//        }
-//    }
-
-    // TODO: BOOST_TEST...
+    // Just one image is expected as result from the prociessing pipeline
+    BOOST_TEST(size(light_average_no_nans_range) == 1);
+    
+    // The ranges::front() call extracts the only image from the range (here a std::shared_ptr<ImageT>). 
+    BOOST_TEST(*ranges::front(light_average_no_nans_range) == expected_result);
 }
 
 
@@ -207,7 +240,7 @@ BOOST_AUTO_TEST_CASE(pipeline_astrophotography_image_development_test)
  *              | denoise(DenoiserT::...())
  *              | subtractBackground(ThresholderT::otsu(...) OR thresholder function)
  *              | cluster(ClusterAlgorithmT::...)
- *              | boost::range::for_each() -> Range of images
+ *              | boost::range::for_each() -> Range of images (NOTE: Images can have different sizes)
  *              | filtered(! StarAnalysisT::isSaturated())
  *              | centerOnStar(CentroiderT::iwc(...))
  *              | filtered(! StarAnalysisT::snr() > 10)

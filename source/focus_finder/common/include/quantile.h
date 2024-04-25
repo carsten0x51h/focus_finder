@@ -32,6 +32,10 @@
 
 #include "lerp.h"       // lerp
 
+/**
+ * TODO: std::nth_element is potentially faster
+ *       -> See https://stackoverflow.com/questions/11964552/finding-quartiles
+ */
 class QuantileT {
 
 public:

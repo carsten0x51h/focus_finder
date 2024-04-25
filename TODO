@@ -1,5 +1,17 @@
 TODO
 ----
+-Add test for remove_nans() - add parameter to allow specifying size of filter matrix
+-Add hfd() to "actions"
+-Add fwhm() to "actions" 
+-Add bad pixel remover/interpolator (hot- and cold pixel algorithm removal by specifying a threshold? Or only for hot a threshold and for dead pixels a 0)
+-Add fits image writer?
+-Real workd example 3 with clustering?
+-Extract starmath library
+-...
+
+
+
+
 -Next steps
 -Change project structure as proposed by https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2018/p1204r0.html
 

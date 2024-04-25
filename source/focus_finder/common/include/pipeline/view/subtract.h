@@ -39,7 +39,7 @@ namespace starmath::pipeline {
      * @param imageToSubtractPtr
      * @return
      *
-     * TODO: Check that all images have the same dimension? Could be configured by parameter...
+     * TODO: Check that all images have the same dimension! Throw if not... Could be configured by parameter...
      */
     template<typename ImageType=float>
     auto
