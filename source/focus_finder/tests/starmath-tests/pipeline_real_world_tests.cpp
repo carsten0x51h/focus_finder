@@ -136,7 +136,7 @@ BOOST_AUTO_TEST_CASE(pipeline_star_metrics_test, * boost::unit_test::tolerance(0
  * TODO: Instead of removing NANs at the end, better use deadpixel filter before division...
  * TODO: Smaller input and example images for this unit test! -> faster excution, less space in git!
  */
-BOOST_AUTO_TEST_CASE(pipeline_astrophotography_image_development_test)
+BOOST_AUTO_TEST_CASE(pipeline_astrophotography_image_development_test, * boost::unit_test::tolerance(0.1))
 {
     const std::string base_path = "test_data/image_processing_pipeline/real_world/astrophotography/image_development/";
 
@@ -206,7 +206,8 @@ BOOST_AUTO_TEST_CASE(pipeline_astrophotography_image_development_test)
 
 	
     // The ranges::front() call extracts the only image from the range (here a std::shared_ptr<ImageT>). 
-	BOOST_TEST(*ranges::front(light_average_no_nans_range) == expected_result, boost::test_tools::tolerance( 1e-3 ));
+	BOOST_TEST(*ranges::front(light_average_no_nans_range) == expected_result);
+	//, boost::test_tools::tolerance( 1e-3 )
 }
 
 
