@@ -189,7 +189,22 @@ BOOST_AUTO_TEST_CASE(pipeline_astrophotography_image_development_test)
 
     // Just one image is expected as result from the prociessing pipeline
     BOOST_TEST(size(light_average_no_nans_range) == 1);
-    
+
+
+	// DEBUG START
+	auto calculated_img = *ranges::front(light_average_no_nans_range);
+	
+	cimg_forXY(, x, y) {
+	  if ( calculated_img(x,y) != expected_result(x, y)) {
+		std::cerr << "Pixel x=" << x << ", y=" << y << " --> value is: "
+				  << calculated_img(x,y) << ", exp. value " << expected_result(x, y) << std::endl;
+		break;
+	  }
+	}
+	// DEBUG END
+	
+
+	
     // The ranges::front() call extracts the only image from the range (here a std::shared_ptr<ImageT>). 
     BOOST_TEST(*ranges::front(light_average_no_nans_range) == expected_result);
 }
