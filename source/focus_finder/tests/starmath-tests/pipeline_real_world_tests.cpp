@@ -194,7 +194,7 @@ BOOST_AUTO_TEST_CASE(pipeline_astrophotography_image_development_test)
 	// DEBUG START
 	auto calculated_img = *ranges::front(light_average_no_nans_range);
 	
-	cimg_forXY(, x, y) {
+	cimg_forXY(calculated_img, x, y) {
 	  if ( calculated_img(x,y) != expected_result(x, y)) {
 		std::cerr << "Pixel x=" << x << ", y=" << y << " --> value is: "
 				  << calculated_img(x,y) << ", exp. value " << expected_result(x, y) << std::endl;
