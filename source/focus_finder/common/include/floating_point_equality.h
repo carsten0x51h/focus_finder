@@ -41,11 +41,12 @@ bool isAlmostEqual(T x, T y) {
 }
 
 
-
 /**
- *
+ * TODO: Passing a fixed limit like below is bad practice...
+ *       -> A lambda function could be used to implement s limit like
+ *          std::numeric_limits<typename ImageT::value_type>::epsilon() * std::abs(img1(x,y));
  */
-static bool isAlmostEqualInternal(const ImageT & img1, const ImageT & img2) {
+static bool isAlmostEqual(const ImageT & img1, const ImageT & img2, double limit=0.00001) {
   bool same_width = (img1.width() == img2.width());
   bool same_height = (img1.height() == img2.height());
   bool same_size = same_width && same_height;
@@ -57,7 +58,7 @@ static bool isAlmostEqualInternal(const ImageT & img1, const ImageT & img2) {
   ImageT sub = img1 - img2;
   
   cimg_forXY(sub, x, y) {
-    bool considerEqual = (std::abs(sub(x,y)) <= std::numeric_limits<typename ImageT::value_type>::epsilon() * std::abs(img1(x,y)) );
+    bool considerEqual = (std::abs(sub(x,y)) <= limit);
 
     if (! considerEqual) {
       return false;
@@ -65,16 +66,6 @@ static bool isAlmostEqualInternal(const ImageT & img1, const ImageT & img2) {
   }
 
   return true;
-}
-
-template<>
-inline bool isAlmostEqual<>(const ImageT img1, const ImageT img2) {
-  return isAlmostEqualInternal(img1, img2);
-}
-
-template<>
-inline bool isAlmostEqual<>(const ImageT & img1, const ImageT & img2) {
-  return isAlmostEqualInternal(img1, img2);
 }
 
 

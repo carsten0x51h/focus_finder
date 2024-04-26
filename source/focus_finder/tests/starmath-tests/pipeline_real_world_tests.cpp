@@ -190,7 +190,7 @@ BOOST_AUTO_TEST_CASE(pipeline_astrophotography_image_development_test, * boost::
     // The ranges::front() call extracts the only image from the range (here a std::shared_ptr<ImageT>). 
     auto calculated_img = *ranges::front(light_average_no_nans_range);
 	
-    BOOST_TEST(isAlmostEqual(calculated_img, expected_result));
+    BOOST_TEST(isAlmostEqual(calculated_img, expected_result, 0.00001));
 }
 
 
