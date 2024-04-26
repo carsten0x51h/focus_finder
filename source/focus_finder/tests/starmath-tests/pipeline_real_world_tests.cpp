@@ -182,39 +182,15 @@ BOOST_AUTO_TEST_CASE(pipeline_astrophotography_image_development_test, * boost::
     
     // This line initially generated the expected result.
     std::string expected_image_filename = base_path + "expected_result.tiff";
-    
-    //ranges::front(light_average_no_nans_range)->save(expected_image_filename.c_str());
     ImageT expected_result(expected_image_filename.c_str());
-    
 
     // Just one image is expected as result from the prociessing pipeline
     BOOST_TEST(size(light_average_no_nans_range) == 1);
 
-    
-    auto calculated_img = *ranges::front(light_average_no_nans_range);
-
-	// DEBUG START
-	// cimg_forXY(calculated_img, x, y) {
-	//   if ( calculated_img(x,y) != expected_result(x, y)) {
-	// 	std::cerr << "Pixel x=" << x << ", y=" << y << " --> value is: "
-	// 			  << calculated_img(x,y) << ", exp. value " << expected_result(x, y) << std::endl;
-	// 	break;
-	//   }
-	// }
-	// // DEBUG END
-	
-	
-	bool eq = isAlmostEqual(calculated_img, expected_result);
-	//bool eq = isAlmostEqual(calculated_img, expected_result);
-	std::cerr << "eq: " << eq << std::endl;
-	
     // The ranges::front() call extracts the only image from the range (here a std::shared_ptr<ImageT>). 
-	BOOST_TEST(eq);
-	//, boost::test_tools::tolerance( 1e-3 )
-
-
-	//BOOST_CHECK_CLOSE( calculated_img, expected_result, 0.1 );
-  
+    auto calculated_img = *ranges::front(light_average_no_nans_range);
+	
+    BOOST_TEST(isAlmostEqual(calculated_img, expected_result));
 }
 
 
