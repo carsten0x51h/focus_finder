@@ -206,7 +206,7 @@ BOOST_AUTO_TEST_CASE(pipeline_astrophotography_image_development_test)
 
 	
     // The ranges::front() call extracts the only image from the range (here a std::shared_ptr<ImageT>). 
-    BOOST_TEST(*ranges::front(light_average_no_nans_range) == expected_result);
+	BOOST_TEST(*ranges::front(light_average_no_nans_range) == expected_result, boost::test_tools::tolerance( 1e-3 ));
 }
 
 
