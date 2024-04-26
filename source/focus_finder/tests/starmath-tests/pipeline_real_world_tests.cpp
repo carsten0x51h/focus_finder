@@ -245,6 +245,35 @@ BOOST_AUTO_TEST_CASE(pipeline_star_recognizer_test)
 //            view::single("test_data/image_processing_pipeline/real_world/star_recognizer/test_image_star_recognizer_1.fit")
 //              | images()
 //              | star_cluster();
+  
+  // const std::string base_path = "test_data/image_processing_pipeline/real_world/star_recognizer/";
+  
+  // auto light_frames = view::single(base_path + "light")
+  //                             | files("(.*\\.fit\\.gz)") | view::join | to<std::vector>();
+
+  // auto star_images = light_frames
+  //   | images()
+  //   //    | denoise(DenoiserT::...())
+  //   | subtract_background(ThresholdingAlgorithmFactoryT::getInstance(ThresholdingAlgorithmTypeT::MEAN))
+  //   | cluster(ClusterAlgorithmT::...)
+  //   | 
+    
+  //   --> What is the result, if a range of astro-images with a lot of stars is given.... and each astro-image is clustered into multiple star images...? n*m star images?
+  // 				   -> How to correlate list of star images to the respective source astro-image? via filename?
+
+				   
+          // images("my-star-image.fits")
+          //     | denoise(DenoiserT::...())
+          //     | subtractBackground(ThresholderT::otsu(...) OR thresholder function)
+          //     | cluster(ClusterAlgorithmT::...)
+          //     | boost::range::for_each() -> Range of images (NOTE: Images can have different sizes)
+          //     | filtered(! StarAnalysisT::isSaturated())
+          //     | centerOnStar(CentroiderT::iwc(...))
+          //     | filtered(! StarAnalysisT::snr() > 10)
+          //     | filtered(! StarAnalysisT::hfd() < 5)    <-- Rename StarAnalysisT to some namespace...
+
+
+
 }
 
 BOOST_AUTO_TEST_SUITE_END();
