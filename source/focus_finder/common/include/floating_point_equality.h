@@ -25,14 +25,44 @@
 #ifndef SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FLOATING_POINT_EQUALITY_H_
 #define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FLOATING_POINT_EQUALITY_H_ SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FLOATING_POINT_EQUALITY_H_
 
+#pragma once    
+
 #include <limits>
 #include <cmath>  /* for std::abs(double) */
+
+#include "image.h"
+
 
 // https://stackoverflow.com/questions/19837576/comparing-floating-point-number-to-zero
 // see Knuth section 4.2.2 pages 217-218
 template<typename T>
-static bool isAlmostEqual(T x, T y) {
+bool isAlmostEqual(T x, T y) {
     return std::abs(x - y) <= std::numeric_limits<T>::epsilon() * std::abs(x);
 }
+
+// template<>
+// inline bool isImgAlmostEqual<>(const ImageT & img1, const ImageT & img2) {
+static bool isImgAlmostEqual(const ImageT & img1, const ImageT & img2) {
+  bool same_width = (img1.width() == img2.width());
+  bool same_height = (img1.height() == img2.height());
+  bool same_size = same_width && same_height;
+
+  if (!same_size) {
+    return false;
+  }
+
+  ImageT sub = img1 - img2;
+  cimg_forXY(sub, x, y) {
+    bool considerEqual = (std::abs(sub(x,y)) <= std::numeric_limits<typename ImageT::value_type>::epsilon() * std::abs(x) );
+
+    if (! considerEqual) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+
 
 #endif /*SOURCE_FOCUS_FINDER_COMMON_INCLUDE_FLOATING_POINT_EQUALITY_H_*/

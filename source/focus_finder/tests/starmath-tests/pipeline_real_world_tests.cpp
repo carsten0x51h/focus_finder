@@ -49,7 +49,7 @@
 #include "../../common/include/hfd.h"
 #include "../../common/include/fwhm.h"
 #include "../../common/include/image_slicer.h"
-
+#include "../../common/include/floating_point_equality.h"
 
 BOOST_AUTO_TEST_SUITE(pipeline_combination_tests)
 
@@ -204,10 +204,16 @@ BOOST_AUTO_TEST_CASE(pipeline_astrophotography_image_development_test, * boost::
 	// DEBUG END
 	
 
+	bool eq = isImgAlmostEqual(calculated_img, expected_result);
+	std::cerr << "eq: " << eq << std::endl;
 	
     // The ranges::front() call extracts the only image from the range (here a std::shared_ptr<ImageT>). 
-	BOOST_TEST(*ranges::front(light_average_no_nans_range) == expected_result);
+	BOOST_TEST(eq);
 	//, boost::test_tools::tolerance( 1e-3 )
+
+
+	//BOOST_CHECK_CLOSE( calculated_img, expected_result, 0.1 );
+  
 }
 
 

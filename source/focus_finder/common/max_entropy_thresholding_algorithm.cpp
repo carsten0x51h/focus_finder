@@ -89,7 +89,7 @@ float MaxEntropyThresholdingAlgorithmT::calc(const ImageT &inImg, long bitDepth)
     size_t first_bin_idx = 0;
 
     for (size_t idx = 0; idx < numBins; ++idx) {
-        if (!isAlmostEqual(accumulatedHistBlack[idx], 0.0F)) {
+      if (!isAlmostEqual(accumulatedHistBlack[idx], 0.0F)) {
             first_bin_idx = idx;
             break;
         }
