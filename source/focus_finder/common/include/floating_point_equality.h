@@ -40,9 +40,11 @@ bool isAlmostEqual(T x, T y) {
     return std::abs(x - y) <= std::numeric_limits<T>::epsilon() * std::abs(x);
 }
 
-// template<>
-// inline bool isImgAlmostEqual<>(const ImageT & img1, const ImageT & img2) {
-static bool isImgAlmostEqual(const ImageT & img1, const ImageT & img2) {
+
+
+
+
+static bool isAlmostEqualInternal(const ImageT & img1, const ImageT & img2) {
   bool same_width = (img1.width() == img2.width());
   bool same_height = (img1.height() == img2.height());
   bool same_size = same_width && same_height;
@@ -52,16 +54,32 @@ static bool isImgAlmostEqual(const ImageT & img1, const ImageT & img2) {
   }
 
   ImageT sub = img1 - img2;
+  
   cimg_forXY(sub, x, y) {
-    bool considerEqual = (std::abs(sub(x,y)) <= std::numeric_limits<typename ImageT::value_type>::epsilon() * std::abs(x) );
+    const ImageT::value_type c = sub(x,y);
+    bool considerEqual = (std::abs(c) <= std::numeric_limits<typename ImageT::value_type>::epsilon() * std::abs(c) );
 
     if (! considerEqual) {
+      std::cerr << "Not equal - x:" << x << ", y:" << y << " -> c: " << c << ", img1(x,y): " << img1(x,y)  << ", img2(x,y): " << img2(x,y) << std::endl;
       return false;
     }
   }
 
   return true;
 }
+
+template<>
+inline bool isAlmostEqual<>(const ImageT img1, const ImageT img2) {
+  return isAlmostEqualInternal(img1, img2);
+}
+
+template<>
+inline bool isAlmostEqual<>(const ImageT & img1, const ImageT & img2) {
+//static bool isImgAlmostEqual(const ImageT & img1, const ImageT & img2) {
+  return isAlmostEqualInternal(img1, img2);
+}
+
+
 
 
 
