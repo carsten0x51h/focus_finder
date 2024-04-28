@@ -230,26 +230,28 @@ BOOST_AUTO_TEST_CASE(pipeline_star_recognizer_test)
 //              | images()
 //              | star_cluster();
   
-  // const std::string base_path = "test_data/image_processing_pipeline/real_world/star_recognizer/";
-  
-  // auto light_frames = view::single(base_path + "light")
-  //                             | files("(.*\\.fit\\.gz)") | view::join | to<std::vector>();
+//  const std::string base_path = "test_data/image_processing_pipeline/real_world/star_recognizer/";
+//
+//  auto astro_images = view::single(base_path)
+//                              | files("(.*\\.fit\\.gz)") | view::join | to<std::vector>();
 
-  // auto star_images = light_frames
+  // auto star_images = astro_images
   //   | images()
-  //   //    | denoise(DenoiserT::...())
-  //   | subtract_background(ThresholdingAlgorithmFactoryT::getInstance(ThresholdingAlgorithmTypeT::MEAN))
-  //   | cluster(ClusterAlgorithmT::...)
-  //   | 
-    
+  //     | denoise(DenoiserT::...())
+  //     | subtract_background(ThresholdingAlgorithmFactoryT::getInstance(ThresholdingAlgorithmTypeT::OTSU/MEAN))
+  //     | cluster(ClusterAlgorithmT::...) // <- Not sure if "cluster" is the right "level" in this pipeline... maybe detect/extract_stars() -> range of StarT/RegionT/? (shared_ptr<ImageT>, FrameT? (abs pos x,y of top, left corner), list of pixel positions (points))
+  //     | transform(StarT -> rectify?, sub-image (get_crop)) <- maybe sub-image is already part of StarT...
+  //     | scale_up(3.0F)
+  //     | center_on_star(CentroidAlgorithmFactoryT::getInstance(CentroidAlgorithmTypeT::IWC))
+  //     | scale_down(3.0F)
+  //     | crop_from_center(SizeT<int>(61,61))
+
+
   //   --> What is the result, if a range of astro-images with a lot of stars is given.... and each astro-image is clustered into multiple star images...? n*m star images?
   // 				   -> How to correlate list of star images to the respective source astro-image? via filename?
 
-				   
-          // images("my-star-image.fits")
-          //     | denoise(DenoiserT::...())
-          //     | subtractBackground(ThresholderT::otsu(...) OR thresholder function)
-          //     | cluster(ClusterAlgorithmT::...)
+//XXX
+  
           //     | boost::range::for_each() -> Range of images (NOTE: Images can have different sizes)
           //     | filtered(! StarAnalysisT::isSaturated())
           //     | centerOnStar(CentroiderT::iwc(...))
