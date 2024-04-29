@@ -27,13 +27,32 @@
 #include <set>
 #include <algorithm>
 
+#include <range/v3/view/transform.hpp>
+#include <range/v3/algorithm/minmax.hpp>
+
 #include "point.h"
+#include "rect.h"
 #include "image.h"
 
 // TODO: Should this be here?
 typedef PointT<int> PixelPosT;
+typedef std::list<PixelPosT> PixelPosListT;
 typedef std::set<PixelPosT> PixelPosSetT;
-typedef std::list<PixelPosT> PixelClusterT;
+
+
+/**
+ *
+ */
+class PixelClusterT {
+private:
+	PixelPosListT mPixelPositions;
+
+public:
+	PixelClusterT(const PixelPosListT & pixelPositions) : mPixelPositions(pixelPositions) {}
+	const PixelPosListT & getPixelPositions() const { return mPixelPositions; }
+	RectT<int> getBounds() const;
+};
+
 
 /**
  * Usage:
@@ -52,14 +71,14 @@ private:
     void initOffsetPattern(int n);
 
     /**
-     * Removes all white neighbours arond pixel from whitePixels
+     * Removes all white neighbours around pixel from whitePixels
      * if they exist and adds them to pixelsToBeProcessed and to
      * pixelsinCluster.
      */
     void
     getAndRemoveNeighbours(const PixelPosT &inCurPixelPos, PixelPosSetT *inoutWhitePixels,
-                           PixelClusterT *inoutPixelsToBeProcessed,
-                           PixelClusterT *outPixelCluster);
+    		PixelPosListT *inoutPixelsToBeProcessed,
+			PixelPosListT *outPixelCluster);
 
 public:
     explicit StarClusterAlgorithmT(size_t clusterRadius);

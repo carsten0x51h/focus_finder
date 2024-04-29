@@ -26,6 +26,24 @@
 #include "include/logging.h"
 
 
+
+RectT<int> PixelClusterT::getBounds() const {
+
+	auto xCoordinateRange = mPixelPositions | ranges::views::transform([] (auto const pixelPos) { return pixelPos.x(); });
+	auto yCoordinateRange = mPixelPositions | ranges::views::transform([] (auto const pixelPos) { return pixelPos.y(); });
+
+	// Find top-left and bottom right pixel...
+	auto [xmin, xmax] = ranges::minmax(xCoordinateRange);
+	auto [ymin, ymax] = ranges::minmax(yCoordinateRange);
+
+	return RectT<int>(xmin, ymin, xmax - xmin, ymax - ymin);
+}
+
+
+
+
+
+
 StarClusterAlgorithmT::StarClusterAlgorithmT(size_t clusterRadius) {
     initOffsetPattern((int) clusterRadius);
 }
@@ -46,8 +64,8 @@ void StarClusterAlgorithmT::initOffsetPattern(int n) {
 
 void
 StarClusterAlgorithmT::getAndRemoveNeighbours(const PixelPosT &inCurPixelPos, PixelPosSetT *inoutWhitePixels,
-                                              PixelClusterT *inoutPixelsToBeProcessed,
-                                              PixelClusterT *outPixelCluster) {
+		PixelPosListT *inoutPixelsToBeProcessed,
+		PixelPosListT *outPixelCluster) {
 
     for (const PixelPosT &offset : mOffsets) {
         PixelPosT curPixPos(inCurPixelPos.x() + offset.x(), inCurPixelPos.y() + offset.y());
@@ -65,6 +83,7 @@ StarClusterAlgorithmT::getAndRemoveNeighbours(const PixelPosT &inCurPixelPos, Pi
 
 
 std::list<PixelClusterT> StarClusterAlgorithmT::cluster(const ImageT &inImg) {
+
     std::list<PixelClusterT> recognizedClusters;
     PixelPosSetT whitePixels;
 
@@ -76,8 +95,8 @@ std::list<PixelClusterT> StarClusterAlgorithmT::cluster(const ImageT &inImg) {
 
     // Iterate over white pixels as long as set is not empty
     while (!whitePixels.empty()) {
-        PixelClusterT pixelCluster;
-        PixelClusterT pixelsToBeProcessed;
+        PixelPosListT pixelPosList;
+        PixelPosListT pixelsToBeProcessed;
 
         auto itWhitePixPos = whitePixels.begin();
 
@@ -86,13 +105,13 @@ std::list<PixelClusterT> StarClusterAlgorithmT::cluster(const ImageT &inImg) {
         while (!pixelsToBeProcessed.empty()) {
             PixelPosT curPixelPos = pixelsToBeProcessed.front();
 
-            getAndRemoveNeighbours(curPixelPos, &whitePixels, &pixelsToBeProcessed, &pixelCluster);
+            getAndRemoveNeighbours(curPixelPos, &whitePixels, &pixelsToBeProcessed, & pixelPosList);
             pixelsToBeProcessed.pop_front();
         }
 
         // Finally, append the cluster
-        if (! pixelCluster.empty()) {
-            recognizedClusters.push_back(pixelCluster);
+        if (! pixelPosList.empty()) {
+            recognizedClusters.push_back(PixelClusterT(pixelPosList));
         }
     }
 

@@ -28,12 +28,10 @@
 #include <range/v3/view/transform.hpp>
 
 #include "../../image.h"
-#include "../../point.h"
-#include "../../rect.h"
-#include "../../size.h"
 
-// TODO: Better pass star cluster algorithm type  (like for thresholding alogrithm) instead of including it directly here...
 #include "../../star_cluster_algorithm.h"
+#include "../../thresholding_algorithm.h"
+
 
 #define FOFI_STAR_CLUSTER_DEBUG 0
 
@@ -64,22 +62,50 @@ namespace starmath::pipeline {
 //                                    end(starmath::star_cluster_iterator(img))) | ...
 
 
+	// TODO: Set defaults: clusterRadius=2, thresholding_algorithm=OTSU?
     template<typename ImageType=float>
     auto
-    star_cluster(int x) {
+    star_cluster(int clusterRadius, const std::shared_ptr<ThresholdingAlgorithmT> &thresholding_algorithm) {
         return ranges::views::transform(
-                [=](const std::shared_ptr<cimg_library::CImg<ImageType> > &binaryImage) {
+                [=](const std::shared_ptr<cimg_library::CImg<ImageType> > &image) {
 
-                    const cimg_library::CImg<ImageType> &binaryImageRef = *binaryImage;
+                    const cimg_library::CImg<ImageType> &imageRef = *image;
 
-                    DEBUG_IMAGE_DISPLAY(binaryImageRef, "star_cluster_in", FOFI_STAR_CLUSTER_DEBUG);
+                    DEBUG_IMAGE_DISPLAY(imageRef, "star_cluster_in", FOFI_STAR_CLUSTER_DEBUG);
 
-                    //StarClusterAlgorithmT starClusterAlgorithm(2); // TODO: Do not hardcode
+                    // TODO: Do not hardcode bit depth 16.... make it part of ImageT?
+                    float threshold = std::ceil(thresholding_algorithm->calc(imageRef, 16));
 
-                    //auto clusterRes = starClusterAlgorithm.cluster(binaryImageRef);
+                    // NOTE: CImg threshold function uses >=
+                    auto binaryImg = imageRef.get_threshold(threshold + 1.0F);
+
+                    StarClusterAlgorithmT starClusterAlgorithm(clusterRadius);
+                    auto pixelClusters = starClusterAlgorithm.cluster(binaryImg);
+
+                    auto rectRange = pixelClusters | ranges::views::transform([=](const auto & pixelCluster) {
+
+                    	// TODO: unsigned int?
+                    	RectT<int> starBounds = pixelCluster.getBounds()
+                    										.expand_to_square()
+															.grow(3);
+
+	                    auto croppedImg = std::make_shared<cimg_library::CImg<ImageType>>(
+	                    		imageRef.get_crop(
+	                    				starBounds.x() /*x0*/, starBounds.y() /*y0*/,
+										starBounds.x() + starBounds.width() - 1/*x1*/,
+										starBounds.y() + starBounds.height() - 1/*y1*/)
+	                    );
+
+                    	return croppedImg;
+                    });
+
+
                     //DEBUG_IMAGE_DISPLAY(*croppedImg, "star_cluster_out", FOFI_STAR_CLUSTER_DEBUG);
 
-                    return binaryImage;
+                    //return std::make_tuple(imageRef, clusterRes);
+                    //return ranges::make_iterator_range(rectRange.begin(), rectRange.end());
+
+                    return rectRange;
                 }
         );
     }

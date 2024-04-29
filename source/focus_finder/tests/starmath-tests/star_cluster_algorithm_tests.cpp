@@ -51,14 +51,14 @@ BOOST_AUTO_TEST_CASE(star_cluster_algorithm_two_pixels_test_image)
     const auto & pixelCluster1 = clusters.begin();
     const auto & pixelCluster2 = std::next(clusters.begin());
 
-    BOOST_TEST(pixelCluster1->size() == 1);
-    BOOST_TEST(pixelCluster2->size() == 1);
+    BOOST_TEST(pixelCluster1->getPixelPositions().size() == 1);
+    BOOST_TEST(pixelCluster2->getPixelPositions().size() == 1);
 
-    PixelPosT c1p1 = *pixelCluster1->begin();
+    PixelPosT c1p1 = *pixelCluster1->getPixelPositions().begin();
     BOOST_TEST(c1p1.x() == 12);
     BOOST_TEST(c1p1.y() == 23);
 
-    PixelPosT c2p1 = *pixelCluster2->begin();
+    PixelPosT c2p1 = *pixelCluster2->getPixelPositions().begin();
     BOOST_TEST(c2p1.x() == 23);
     BOOST_TEST(c2p1.y() == 9);
 }
@@ -96,7 +96,7 @@ BOOST_AUTO_TEST_CASE(star_cluster_algorithm_single_segment_test_image)
             PixelPosT(18, 11), PixelPosT(18, 12), PixelPosT(18, 13), PixelPosT(18, 14), PixelPosT(19, 15)
     };
 
-    BOOST_TEST(*clusters.begin() == expectedPixels, boost::test_tools::per_element());
+    BOOST_TEST(clusters.begin()->getPixelPositions() == expectedPixels, boost::test_tools::per_element());
 }
 
 
@@ -121,21 +121,21 @@ BOOST_AUTO_TEST_CASE(star_cluster_algorithm_three_segments_test)
             PixelPosT(8, 8), PixelPosT(8, 9), PixelPosT(9, 8), PixelPosT(9, 9), PixelPosT(9, 10), PixelPosT(10, 8),
             PixelPosT(10, 9), PixelPosT(10, 10), PixelPosT(11, 7), PixelPosT(11, 8), PixelPosT(12, 6), PixelPosT(13, 5)
     };
-    BOOST_TEST(*clusters.begin() == expectedPixelsCluster1, boost::test_tools::per_element());
+    BOOST_TEST(clusters.begin()->getPixelPositions() == expectedPixelsCluster1, boost::test_tools::per_element());
 
     // Segment 2
     std::list<PixelPosT> expectedPixelsCluster2 = {
             PixelPosT(11, 23), PixelPosT(11, 25), PixelPosT(12, 22), PixelPosT(12, 23), PixelPosT(12, 24),
             PixelPosT(13, 22), PixelPosT(13, 23), PixelPosT(14, 24)
     };
-    BOOST_TEST(*std::next(clusters.begin()) == expectedPixelsCluster2, boost::test_tools::per_element());
+    BOOST_TEST(std::next(clusters.begin())->getPixelPositions() == expectedPixelsCluster2, boost::test_tools::per_element());
 
     // Segment 3
     std::list<PixelPosT> expectedPixelsCluster3 = {
             PixelPosT(22, 9), PixelPosT(22, 10), PixelPosT(23, 9), PixelPosT(23, 10), PixelPosT(23, 11),
             PixelPosT(24, 8), PixelPosT(24, 10), PixelPosT(24, 12), PixelPosT(25, 13)
     };
-    BOOST_TEST(*std::next(clusters.begin(), 2) == expectedPixelsCluster3, boost::test_tools::per_element());
+    BOOST_TEST(std::next(clusters.begin(), 2)->getPixelPositions() == expectedPixelsCluster3, boost::test_tools::per_element());
 }
 
 
@@ -195,7 +195,7 @@ BOOST_AUTO_TEST_CASE(star_cluster_algorithm_corner_test)
         PixelPosT(0, 0)
     };
 
-    BOOST_TEST(*clusters.begin() == expectedPixelsCluster1, boost::test_tools::per_element());
+    BOOST_TEST(clusters.begin()->getPixelPositions() == expectedPixelsCluster1, boost::test_tools::per_element());
 
 
     // Segment 2
@@ -207,7 +207,7 @@ BOOST_AUTO_TEST_CASE(star_cluster_algorithm_corner_test)
             PixelPosT(9, 34)
     };
 
-    BOOST_TEST(*std::next(clusters.begin(), 1) == expectedPixelsCluster2, boost::test_tools::per_element());
+    BOOST_TEST(std::next(clusters.begin(), 1)->getPixelPositions() == expectedPixelsCluster2, boost::test_tools::per_element());
 
 
     // Segment 3
@@ -215,7 +215,7 @@ BOOST_AUTO_TEST_CASE(star_cluster_algorithm_corner_test)
         PixelPosT(34, 0)
     };
 
-    BOOST_TEST(*std::next(clusters.begin(), 2) == expectedPixelsCluster3, boost::test_tools::per_element());
+    BOOST_TEST(std::next(clusters.begin(), 2)->getPixelPositions() == expectedPixelsCluster3, boost::test_tools::per_element());
 
 
     // Segment 4
@@ -223,7 +223,7 @@ BOOST_AUTO_TEST_CASE(star_cluster_algorithm_corner_test)
             PixelPosT(34, 15), PixelPosT(34, 16), PixelPosT(34, 17)
     };
 
-    BOOST_TEST(*std::next(clusters.begin(), 3) == expectedPixelsCluster4, boost::test_tools::per_element());
+    BOOST_TEST(std::next(clusters.begin(), 3)->getPixelPositions() == expectedPixelsCluster4, boost::test_tools::per_element());
 
 
     // Segment 5
@@ -231,7 +231,7 @@ BOOST_AUTO_TEST_CASE(star_cluster_algorithm_corner_test)
             PixelPosT(34, 33), PixelPosT(34, 34)
     };
 
-    BOOST_TEST(*std::next(clusters.begin(), 4) == expectedPixelsCluster5, boost::test_tools::per_element());
+    BOOST_TEST(std::next(clusters.begin(), 4)->getPixelPositions() == expectedPixelsCluster5, boost::test_tools::per_element());
 }
 
 

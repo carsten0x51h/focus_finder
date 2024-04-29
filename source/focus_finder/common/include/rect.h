@@ -38,7 +38,10 @@ DEF_Exception(Rect);
 /**
  * RectT structure (X x Y x W x H).
  *
+ * TODO: Put this fully under unit tests for different data types!
+ * TODO: Restrict this to data types which make sense!
  * TODO / IDEA: Make w & h as unsigned for fixed point types and x & y as signed.
+ * TODO: Is there any reason why this is inherited from tuple?
  */
 template<class T>
 class RectT : public std::tuple<T, T, T, T> {
@@ -94,6 +97,7 @@ public:
         return mIsSet;
     }
 
+    // TODO: mIsSet should be checked in all functions. If not set, and e.g. contains() is called, an exception should be thrown.
     void clear() {
         mIsSet = false;
         *this = {};
@@ -109,9 +113,46 @@ public:
 
     // Is this rect completely inside the passed rect?
     // Of course both coordinates need to be in the same coordinate system.
+    // TODO: Maybe rename to isInside()?
     bool inside(const RectT<T> &rect) {
         return rect1ContainsRect2(rect, *this);
     }
+
+
+    PointT<T> center() const {
+    	return calcCenterFromRectInternal(*this);
+    }
+
+    /**
+     * IDEA: Alternate name: make_square
+     */
+    RectT<T> expand_to_square() const {
+    	auto center = calcCenterFromRectInternal(*this);
+    	T sideLength = std::max(std::get<2>(*this), std::get<3>(*this));
+
+    	return fromCenterPoint(center, sideLength);
+    }
+
+    /**
+     * Grow rectangle by growBy in each direction.
+     * TODO: A negative value should throw an exception...
+     */
+    RectT<T> grow(T growBy) const {
+    	return changeRectSizeInternal(*this, growBy, true /*hrow*/);
+    }
+
+    /**
+     * Shrink rectangle by shrinkBy in each direction.
+     * TODO: A negative value should throw an exception...
+     */
+    RectT<T> shrink(T shrinkBy) const {
+    	return changeRectSizeInternal(*this, shrinkBy, false /*shrink*/);
+    }
+
+    // TODO: Idea: Add
+    // 2. RectT::grow(3)
+    // 3. RectT::shrink(3)
+
 
     static RectT<T> fromCenterPoint(const PointT<T> &inCenter, T inWidth, T inHeight) {
         // TODO: Or should we round here to int? Check if -1 is correct...
@@ -148,7 +189,28 @@ public:
         return fromCenterPoint(inCenter, inWindowSizeSquareEdge, inWindowSizeSquareEdge);
     }
 
+
+
 private:
+    // TODO: If increaseBy is negative, check that overall width & height cannot get negative.
+    //        -> Limit values... 0? Or exception...
+    static RectT<T> changeRectSizeInternal(RectT<T> rect, T changeBy, bool grow) {
+    	auto center = calcCenterFromRectInternal(rect);
+
+    	T newWidth = (grow ? std::get<2>(rect) + changeBy : std::get<2>(rect) - changeBy);
+    	T newHeight = (grow ? std::get<3>(rect) + changeBy : std::get<3>(rect) - changeBy);
+
+    	return fromCenterPoint(center, newWidth, newHeight);
+    }
+
+
+    static PointT<T> calcCenterFromRectInternal(const RectT<T> & rect) {
+    	T xcenter = std::get<0>(rect) + std::get<2>(rect) / 2.0;
+    	T ycenter = std::get<1>(rect) + std::get<3>(rect) / 2.0;
+
+    	return PointT<T>(xcenter, ycenter);
+    }
+
     // TODO: Does not work in case of float!!!
     static bool isEven(int n) {
         return (n % 2 == 0);

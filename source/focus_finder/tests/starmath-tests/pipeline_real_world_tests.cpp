@@ -37,6 +37,7 @@
 #include "../../common/include/pipeline/view/divide_by.h"
 #include "../../common/include/pipeline/view/subtract_background.h"
 #include "../../common/include/pipeline/view/center_on_star.h"
+#include "../../common/include/pipeline/view/star_cluster.h"
 #include "../../common/include/pipeline/view/remove_nans.h"
 
 #include "../../common/include/pipeline/action/average.h"
@@ -104,7 +105,7 @@ BOOST_AUTO_TEST_CASE(pipeline_star_metrics_test, * boost::unit_test::tolerance(0
         imagePaths
             | images()
             | view::filter(& metrics::is_not_saturated)
-            | subtract_background(ThresholdingAlgorithmFactoryT::getInstance(ThresholdingAlgorithmTypeT::OTSU))
+            | subtract_background(ThresholdingAlgorithmFactoryT::getInstance(ThresholdingAlgorithmTypeT::OTSU)) // TODO: Why not just passing in ThresholdingAlgorithmTypeT::OTSU?
             | scale_up(3.0F)
             | center_on_star(CentroidAlgorithmFactoryT::getInstance(CentroidAlgorithmTypeT::IWC))
             | scale_down(3.0F)
@@ -225,11 +226,16 @@ BOOST_AUTO_TEST_CASE(pipeline_astrophotography_image_development_test, * boost::
  */
 BOOST_AUTO_TEST_CASE(pipeline_star_recognizer_test)
 {
-//    auto x =
-//            view::single("test_data/image_processing_pipeline/real_world/star_recognizer/test_image_star_recognizer_1.fit")
-//              | images()
+    auto res =
+            view::single("test_data/image_processing_pipeline/real_world/star_recognizer/test_image_star_recognizer_1.fit")
+              | images()
+			  | star_cluster(2 /*cluster radius*/,
+					        ThresholdingAlgorithmFactoryT::getInstance(ThresholdingAlgorithmTypeT::OTSU)
+				); // TODO: Maybe rename to detect_stars()
+//    		  | subtract_background(ThresholdingAlgorithmFactoryT::getInstance(ThresholdingAlgorithmTypeT::OTSU));
 //              | star_cluster();
-  
+
+
 //  const std::string base_path = "test_data/image_processing_pipeline/real_world/star_recognizer/";
 //
 //  auto astro_images = view::single(base_path)
