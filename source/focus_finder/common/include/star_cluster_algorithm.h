@@ -27,9 +27,6 @@
 #include <set>
 #include <algorithm>
 
-#include <range/v3/view/transform.hpp>
-#include <range/v3/algorithm/minmax.hpp>
-
 #include "point.h"
 #include "rect.h"
 #include "image.h"

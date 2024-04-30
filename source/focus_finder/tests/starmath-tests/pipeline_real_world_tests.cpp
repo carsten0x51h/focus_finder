@@ -227,14 +227,17 @@ BOOST_AUTO_TEST_CASE(pipeline_astrophotography_image_development_test, * boost::
 BOOST_AUTO_TEST_CASE(pipeline_star_recognizer_test)
 {
     auto res =
-            view::single("test_data/image_processing_pipeline/real_world/star_recognizer/test_image_star_recognizer_1.fit")
+            view::single("test_data/image_processing_pipeline/real_world/star_recognizer/test_image_star_recognizer_1.fit.gz")
               | images()
 			  | star_cluster(2 /*cluster radius*/,
 					        ThresholdingAlgorithmFactoryT::getInstance(ThresholdingAlgorithmTypeT::OTSU)
-				); // TODO: Maybe rename to detect_stars()
+				) // TODO: Maybe rename to detect_stars()
 //    		  | subtract_background(ThresholdingAlgorithmFactoryT::getInstance(ThresholdingAlgorithmTypeT::OTSU));
 //              | star_cluster();
+			  |	view::join
+			  | to<std::vector>();
 
+    std::cerr << "Found " << res.size() << " stars." << std::endl;
 
 //  const std::string base_path = "test_data/image_processing_pipeline/real_world/star_recognizer/";
 //

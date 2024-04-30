@@ -22,6 +22,9 @@
  *
  ****************************************************************************/
 
+#include <range/v3/view/transform.hpp>
+#include <range/v3/algorithm/minmax.hpp>
+
 #include "include/star_cluster_algorithm.h"
 #include "include/logging.h"
 
@@ -29,14 +32,21 @@
 
 RectT<int> PixelClusterT::getBounds() const {
 
+	std::cerr << "PixelClusterT::getBounds()... 1" << std::endl;
 	auto xCoordinateRange = mPixelPositions | ranges::views::transform([] (auto const pixelPos) { return pixelPos.x(); });
+	std::cerr << "PixelClusterT::getBounds()... 2" << std::endl;
 	auto yCoordinateRange = mPixelPositions | ranges::views::transform([] (auto const pixelPos) { return pixelPos.y(); });
+	std::cerr << "PixelClusterT::getBounds()... 3" << std::endl;
+
+	std::cerr << "#pixels: " << mPixelPositions.size() << std::endl;
 
 	// Find top-left and bottom right pixel...
 	auto [xmin, xmax] = ranges::minmax(xCoordinateRange);
+	std::cerr << "PixelClusterT::getBounds()... xmin: " << xmin << ", xmax: " << xmax << std::endl;
 	auto [ymin, ymax] = ranges::minmax(yCoordinateRange);
+	std::cerr << "PixelClusterT::getBounds()... 5 ymin: " << ymin << ", ymax: " << ymax << std::endl;
 
-	return RectT<int>(xmin, ymin, xmax - xmin, ymax - ymin);
+	return RectT<int>(xmin, ymin, xmax - xmin + 1, ymax - ymin + 1);
 }
 
 

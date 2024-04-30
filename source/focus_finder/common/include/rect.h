@@ -162,9 +162,9 @@ public:
         // TODO: Does not work in case of float!!!
         //            -> Implement for RectT and not for RectF... or tmpl specialization!
         //            -> Easiest: Only permit odd value!
-        if (isEven(inWidth) || isEven(inHeight)) {
-            throw RectExceptionT("Window width and height expected to be odd values.");
-        }
+//        if (isEven(inWidth) || isEven(inHeight)) {
+ //           throw RectExceptionT("Window width and height expected to be odd values.");
+ //       }
 
         T deltaW = (inWidth - 1) / 2;
         T deltaH = (inHeight - 1) / 2;
