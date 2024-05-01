@@ -66,12 +66,13 @@ namespace starmath::pipeline {
     template<typename ImageType=float>
     auto
     star_cluster(int clusterRadius, const std::shared_ptr<ThresholdingAlgorithmT> &thresholding_algorithm) {
-        return ranges::views::transform(
-                [=](const std::shared_ptr<cimg_library::CImg<ImageType> > &image) {
 
-                    const cimg_library::CImg<ImageType> &imageRef = *image;
+        using SharedImageT = std::shared_ptr<cimg_library::CImg<ImageType>>;
 
-                    std::cerr << "XXXXXXXXXXXXXXXXXXXXXXXXXX imageRef width: " << imageRef.width() << ", height: " << imageRef.height() << std::endl;
+    	return ranges::views::transform(
+                [=](const SharedImageT &image) {
+
+                    const auto &imageRef = *image;
 
                     DEBUG_IMAGE_DISPLAY(imageRef, "star_cluster_in", FOFI_STAR_CLUSTER_DEBUG);
 
@@ -86,20 +87,13 @@ namespace starmath::pipeline {
                     StarClusterAlgorithmT starClusterAlgorithm(clusterRadius);
                     auto pixelClusters = starClusterAlgorithm.cluster(binaryImg);
 
-                    std::cerr << "Num pixelClusters: " << pixelClusters.size() << std::endl;
-
                     auto starImageRange = pixelClusters | ranges::views::transform([=](const auto & pixelCluster) {
 
-                    	std::cerr << "TTTT" << std::endl;
-
                     	// TODO: unsigned int?
+                    	// TODO: Pass numPixelsGrow instead of hardcoding it to 3...
                     	RectT<int> starBounds = pixelCluster.getBounds()
                     										.expand_to_square()
-															.grow(3);
-
-                    	std::cout << "starBounds: " << starBounds << std::endl;
-
-
+															.grow(8);
 
 	                    auto croppedImgPtr = std::make_shared<cimg_library::CImg<ImageType>>(
 	                    		imageRef.get_crop(
@@ -108,22 +102,26 @@ namespace starmath::pipeline {
 										starBounds.y() + starBounds.height() - 1/*y1*/)
 	                    );
 
+
                     	return croppedImgPtr;
                     });
 
 
-                    using SharedImageT = std::shared_ptr<cimg_library::CImg<ImageType>>;
-                    using SharedImageVecT = std::vector<SharedImageT>;
+                    //using SharedImageVecT = std::vector<SharedImageT>;
 
                 	// -> return iterator range to this shared vector... maybe not best practice.... but for now it will work
-                    auto results = std::make_shared<SharedImageVecT>(starImageRange | ranges::to<std::vector<SharedImageT>>());
+                    //auto results = std::make_shared<SharedImageVecT>(starImageRange | ranges::to<std::vector<SharedImageT>>());
+                    //auto results = starImageRange | ranges::to<std::vector<SharedImageT>>();
 
                     //DEBUG_IMAGE_DISPLAY(*croppedImg, "star_cluster_out", FOFI_STAR_CLUSTER_DEBUG);
 
                     //return std::make_tuple(imageRef, clusterRes);
-                    //return ranges::make_iterator_range(rectRange.begin(), rectRange.end());
-                    return ranges::make_iterator_range(results->begin(), results->end());
+                    //return ranges::make_iterator_range(starImageRange.begin(), starImageRange.end());
+                    //return ranges::make_iterator_range(results->begin(), results->end());
                     //return starImageRange;
+                    //return results;
+                    return starImageRange | ranges::to<std::vector<SharedImageT>>();
+
                 }
         );
     }

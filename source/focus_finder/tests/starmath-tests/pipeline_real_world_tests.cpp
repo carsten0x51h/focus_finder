@@ -24,6 +24,7 @@
 
 #include <range/v3/range/conversion.hpp>
 #include <range/v3/view/join.hpp>
+#include <range/v3/action/join.hpp>
 #include <range/v3/view/filter.hpp>
 #include <range/v3/core.hpp>   // ranges::front()
 
@@ -234,10 +235,26 @@ BOOST_AUTO_TEST_CASE(pipeline_star_recognizer_test)
 				) // TODO: Maybe rename to detect_stars()
 //    		  | subtract_background(ThresholdingAlgorithmFactoryT::getInstance(ThresholdingAlgorithmTypeT::OTSU));
 //              | star_cluster();
-			  |	view::join
+//			  |	actions::join
 			  | to<std::vector>();
 
-    std::cerr << "Found " << res.size() << " stars." << std::endl;
+    std::cerr << "Processed " << res.size() << " images." << std::endl;
+    auto subvec = res.at(0);
+    std::cerr << "Found " << subvec.size() << " stars in first image." << std::endl;
+
+
+/*
+    int counter = 0;
+
+    for(const auto & starImg : subvec) {
+    	std::stringstream ss;
+    	ss << "star_img" << counter++ << ".tiff";
+    	std::cerr << "Storing " << ss.str() << "..." << std::endl;
+
+    	starImg->save(ss.str().c_str());
+    }
+*/
+
 
 //  const std::string base_path = "test_data/image_processing_pipeline/real_world/star_recognizer/";
 //

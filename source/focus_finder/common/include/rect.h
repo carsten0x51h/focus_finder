@@ -166,15 +166,15 @@ public:
  //           throw RectExceptionT("Window width and height expected to be odd values.");
  //       }
 
-        T deltaW = (inWidth - 1) / 2;
-        T deltaH = (inHeight - 1) / 2;
+        float deltaW = ((float)inWidth - 1.0F) / 2.0F;
+        float deltaH = ((float)inHeight - 1.0F) / 2.0F;
 
 //	  T halfWindowWidth = inWidth / 2.0f;
 //	  T halfWindowHeight = inHeight / 2.0f;
 //	  return RectT<T>(std::get<0>(inCenter) /*cx*/ - halfWindowWidth, std::get<1>(inCenter) /*cy*/ - halfWindowHeight, inWidth, inHeight);
 
-        return RectT<T>(inCenter.x() - deltaW,
-                        inCenter.y() - deltaH,
+        return RectT<T>((T)((float) inCenter.x() - deltaW),
+        				(T)((float) inCenter.y() - deltaH),
                         inWidth,
                         inHeight);
     }
@@ -196,9 +196,10 @@ private:
     //        -> Limit values... 0? Or exception...
     static RectT<T> changeRectSizeInternal(RectT<T> rect, T changeBy, bool grow) {
     	auto center = calcCenterFromRectInternal(rect);
+    	T borderBothSides = 2 * changeBy;
 
-    	T newWidth = (grow ? std::get<2>(rect) + changeBy : std::get<2>(rect) - changeBy);
-    	T newHeight = (grow ? std::get<3>(rect) + changeBy : std::get<3>(rect) - changeBy);
+    	T newWidth = (grow ? std::get<2>(rect) + borderBothSides: std::get<2>(rect) - borderBothSides);
+    	T newHeight = (grow ? std::get<3>(rect) + borderBothSides: std::get<3>(rect) - borderBothSides);
 
     	return fromCenterPoint(center, newWidth, newHeight);
     }

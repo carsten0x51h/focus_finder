@@ -326,7 +326,7 @@ set(CMAKE_CXX_FLAGS_DEBUG
 
   
 IF(NOT CMAKE_BUILD_TYPE)
-  SET(CMAKE_BUILD_TYPE Release
+  SET(CMAKE_BUILD_TYPE Debug
     CACHE STRING "Choose the type of build : None Debug Release RelWithDebInfo MinSizeRel Coverage Perf."
     FORCE)
 ENDIF(NOT CMAKE_BUILD_TYPE)
