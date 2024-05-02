@@ -238,12 +238,15 @@ BOOST_AUTO_TEST_CASE(pipeline_star_recognizer_test)
 //			  |	actions::join
 			  | to<std::vector>();
 
+	// TODO: Remove crop from star_cluster... instead return rects...Then use crop in a second step... 
+	
     std::cerr << "Processed " << res.size() << " images." << std::endl;
     auto subvec = res.at(0);
     std::cerr << "Found " << subvec.size() << " stars in first image." << std::endl;
 
-
-/*
+	// TODO: Add boost tests ...
+	
+	/*
     int counter = 0;
 
     for(const auto & starImg : subvec) {

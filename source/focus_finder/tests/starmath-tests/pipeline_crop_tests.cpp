@@ -80,6 +80,55 @@ BOOST_AUTO_TEST_CASE(pipeline_crop_from_center_full_image_test)
     BOOST_TEST(*(resultImagePtr.at(0)) == expectedResultImage);
 }
 
+
+/**
+ * range<image>   -->  crop(rects)  --> range < range <image> >
+ *       ^                                          ^
+ *       |                                          |
+ *  input image                         range of cropped images
+ *
+ *  Per input image, N cropped images (one per rect).
+ */
+BOOST_AUTO_TEST_CASE(pipeline_multi_crop_on_image_test)
+{
+	std::vector<RectT<int>> rects = { RectT<int>(0,0,10,10), RectT<int>(11,11,10,10) };
+
+	// TODO: Choose an input image from the crop test folder!
+    auto croppedImages =
+	  view::single("test_data/image_processing_pipeline/real_world/star_recognizer/test_image_star_recognizer_1.fit.gz")
+	  | images()
+	  | crop(rects)
+	  | to<std::vector>();
+
+    BOOST_TEST(croppedImages.size() == 1);       // One image goes in, one result is produced (which wraps a vector)
+    BOOST_TEST(croppedImages.at(0).size() == 2); // Two rects as input produce two output images
+}
+
+/** 
+ * range<image>   -->  crop(rect)  --> range <image>
+ *        ^                                     ^
+ *        |                                     |
+ *   input image                          cropped image
+ *
+ * Per input image, one cropped image.
+ */
+BOOST_AUTO_TEST_CASE(pipeline_crop_on_image_test)
+{
+	RectT<int> rect1(0,0,10,10);
+	
+	// TODO: Choose an input image from the crop test folder! Choose 2 images ... at least...
+    auto croppedImages =
+	  view::single("test_data/image_processing_pipeline/real_world/star_recognizer/test_image_star_recognizer_1.fit.gz")
+	  | images()
+	  | crop1(rect1)
+	  | to<std::vector>();
+	
+	std::cerr << "N crops from N images... N=" << croppedImages.size() << std::endl;
+
+	BOOST_TEST(croppedImages.size() == 1); // One image goes in, one result is produced
+}
+
+
 // TODO: Add crop_from_center test for even sized regions.
 // TODO: Test specified region exceeding the image dimensions.
 
