@@ -125,6 +125,44 @@ namespace starmath::pipeline {
                 }
         );
     }
+
+
+
+
+
+    template<typename ImageType=float>
+    auto
+    star_cluster2(int clusterRadius, const std::shared_ptr<ThresholdingAlgorithmT> &thresholding_algorithm) {
+
+        using SharedImageT = std::shared_ptr<cimg_library::CImg<ImageType>>;
+
+    	return ranges::views::transform(
+                [=](const SharedImageT &image) {
+
+                    const auto &imageRef = *image;
+
+                    DEBUG_IMAGE_DISPLAY(imageRef, "star_cluster_in", FOFI_STAR_CLUSTER_DEBUG);
+
+                    // TODO: Do not hardcode bit depth 16.... make it part of ImageT?
+                    float threshold = std::ceil(thresholding_algorithm->calc(imageRef, 16));
+
+                    // NOTE: CImg threshold function uses >=
+                    auto binaryImg = imageRef.get_threshold(threshold + 1.0F);
+
+                    DEBUG_IMAGE_DISPLAY(binaryImg, "star_cluster_binary_image", FOFI_STAR_CLUSTER_DEBUG);
+
+                    StarClusterAlgorithmT starClusterAlgorithm(clusterRadius);
+                    auto pixelClusters = starClusterAlgorithm.cluster(binaryImg);
+
+                    auto rectsVec =
+                    		pixelClusters
+							| ranges::views::transform([=](const auto & pixelCluster) { return pixelCluster.getBounds(); })
+							| ranges::to<std::vector>();
+
+                    return std::make_pair(image, rectsVec);
+                }
+        );
+    }
 }
 
 #endif //FOFI_STAR_CLUSTER_H

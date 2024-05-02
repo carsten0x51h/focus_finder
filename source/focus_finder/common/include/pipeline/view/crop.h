@@ -62,6 +62,18 @@ namespace starmath::pipeline {
   }
 
 
+  // TODO: Better name...
+  template<typename ImageType=float>
+  auto
+  crop() {
+	  return ranges::view::transform(
+	  					  [=](const auto & imageRectsPair) {
+	      				auto img = imageRectsPair.first;
+	      				std::vector<RectT<int>> cropRects = imageRectsPair.second;
+
+	      				return cropInternal(cropRects, img);
+	  			  });
+  }
   
   
   template<typename CropRegionRngT, typename ImageType=float>
@@ -74,9 +86,10 @@ namespace starmath::pipeline {
   }
 
   
+  // TODO: Rename to crop()
   template<typename ImageType=float>
   auto
-  crop1(const RectT<int> &crop_region) {
+  crop(const RectT<int> &crop_region) {
 	return ranges::view::transform(
 								   [=](const std::shared_ptr<cimg_library::CImg<ImageType> > &image) {
 									 return cropInternal(ranges::view::single(crop_region), image);

@@ -120,7 +120,7 @@ BOOST_AUTO_TEST_CASE(pipeline_crop_on_image_test)
     auto croppedImages =
 	  view::single("test_data/image_processing_pipeline/real_world/star_recognizer/test_image_star_recognizer_1.fit.gz")
 	  | images()
-	  | crop1(rect1)
+	  | crop(rect1)
 	  | to<std::vector>();
 	
 	std::cerr << "N crops from N images... N=" << croppedImages.size() << std::endl;

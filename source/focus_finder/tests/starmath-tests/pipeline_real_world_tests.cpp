@@ -230,13 +230,15 @@ BOOST_AUTO_TEST_CASE(pipeline_star_recognizer_test)
     auto res =
             view::single("test_data/image_processing_pipeline/real_world/star_recognizer/test_image_star_recognizer_1.fit.gz")
               | images()
-			  | star_cluster(2 /*cluster radius*/,
+			  | star_cluster2(2 /*cluster radius*/,
 					        ThresholdingAlgorithmFactoryT::getInstance(ThresholdingAlgorithmTypeT::OTSU)
 				) // TODO: Maybe rename to detect_stars()
+              | crop()
+			  | to<std::vector>();
 //    		  | subtract_background(ThresholdingAlgorithmFactoryT::getInstance(ThresholdingAlgorithmTypeT::OTSU));
 //              | star_cluster();
 //			  |	actions::join
-			  | to<std::vector>();
+//			  | to<std::vector>();
 
 	// TODO: Remove crop from star_cluster... instead return rects...Then use crop in a second step... 
 	
