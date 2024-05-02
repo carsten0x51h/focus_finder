@@ -224,13 +224,15 @@ BOOST_AUTO_TEST_CASE(pipeline_astrophotography_image_development_test, * boost::
  *              | centerOnStar(CentroiderT::iwc(...))
  *              | filtered(! StarAnalysisT::snr() > 10)
  *              | filtered(! StarAnalysisT::hfd() < 5)
+ *
+ *
+ * TODO: Smaller input images with only 2-3 stars... but multiple ones...
+ * TODO: Add hot-pixel removal before detection,,,, maybe also denoise()...
+ * TODO / IDEA: Add example-program which generates an image where the detected stars are marked ... + HFD - like the original star-recognizer...
+ * TODO: Add center_on_star() for each detected star image... then calc SnrT, HfdT and FwhmT....
  */
 BOOST_AUTO_TEST_CASE(pipeline_star_recognizer_test)
 {
-	// TODO: Smaller input images with only 2-3 stars... but multiple ones...
-	// TODO: Add hot-pixel removal before detection,,,, maybe also denoise()...
-	// TODO / IDEA: Add example-program which generates an image where the detected stars are marked ... + HFD - like the original star-recognizer...
-	// TODO: Add center_on_star() for each detected star image... then calc SnrT, HfdT and FwhmT....
     auto clusteredImagesRanges =
             view::single("test_data/image_processing_pipeline/real_world/star_recognizer/test_image_star_recognizer_1.fit.gz")
               | images()
@@ -245,47 +247,18 @@ BOOST_AUTO_TEST_CASE(pipeline_star_recognizer_test)
     BOOST_TEST(clusteredImagesRanges.at(0).size() == 216); // 216 detected stars (without hot-pixel removal)
 
 
-    int counter = 0;
-
-    for(const auto & starImg : clusteredImagesRanges.at(0)) {
-    	std::stringstream ss;
-    	ss << "star_img" << counter++ << ".tiff";
-    	std::cerr << "Storing " << ss.str() << "..." << std::endl;
-
-    	starImg->save(ss.str().c_str());
-    }
-
-
-//  const std::string base_path = "test_data/image_processing_pipeline/real_world/star_recognizer/";
+    // DEBUG START
+    // Write result images...
+//    int counter = 0;
 //
-//  auto astro_images = view::single(base_path)
-//                              | files("(.*\\.fit\\.gz)") | view::join | to<std::vector>();
-
-  // auto star_images = astro_images
-  //   | images()
-  //     | denoise(DenoiserT::...())
-  //     | subtract_background(ThresholdingAlgorithmFactoryT::getInstance(ThresholdingAlgorithmTypeT::OTSU/MEAN))
-  //     | cluster(ClusterAlgorithmT::...) // <- Not sure if "cluster" is the right "level" in this pipeline... maybe detect/extract_stars() -> range of StarT/RegionT/? (shared_ptr<ImageT>, FrameT? (abs pos x,y of top, left corner), list of pixel positions (points))
-  //     | transform(StarT -> rectify?, sub-image (get_crop)) <- maybe sub-image is already part of StarT...
-  //     | scale_up(3.0F)
-  //     | center_on_star(CentroidAlgorithmFactoryT::getInstance(CentroidAlgorithmTypeT::IWC))
-  //     | scale_down(3.0F)
-  //     | crop_from_center(SizeT<int>(61,61))
-
-
-  //   --> What is the result, if a range of astro-images with a lot of stars is given.... and each astro-image is clustered into multiple star images...? n*m star images?
-  // 				   -> How to correlate list of star images to the respective source astro-image? via filename?
-
-//XXX
-  
-          //     | boost::range::for_each() -> Range of images (NOTE: Images can have different sizes)
-          //     | filtered(! StarAnalysisT::isSaturated())
-          //     | centerOnStar(CentroiderT::iwc(...))
-          //     | filtered(! StarAnalysisT::snr() > 10)
-          //     | filtered(! StarAnalysisT::hfd() < 5)    <-- Rename StarAnalysisT to some namespace...
-
-
-
+//    for(const auto & starImg : clusteredImagesRanges.at(0)) {
+//    	std::stringstream ss;
+//    	ss << "star_img" << counter++ << ".tiff";
+//    	std::cerr << "Storing " << ss.str() << "..." << std::endl;
+//
+//    	starImg->save(ss.str().c_str());
+//    }
+    // DEBUG END
 }
 
 BOOST_AUTO_TEST_SUITE_END();
