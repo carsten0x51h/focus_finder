@@ -38,9 +38,6 @@
 #include "../../common/include/pipeline/view/divide_by.h"
 #include "../../common/include/pipeline/view/subtract_background.h"
 #include "../../common/include/pipeline/view/center_on_star.h"
-#include "../../common/include/pipeline/view/star_cluster.h"
-#include "../../common/include/pipeline/view/remove_nans.h"
-
 #include "../../common/include/pipeline/action/average.h"
 
 #include "../../common/include/thresholding_algorithm_factory.h"
@@ -52,6 +49,9 @@
 #include "../../common/include/fwhm.h"
 #include "../../common/include/image_slicer.h"
 #include "../../common/include/floating_point_equality.h"
+#include "../../common/include/pipeline/view/detect_stars.h"
+#include "../../common/include/pipeline/view/remove_nans.h"
+
 
 BOOST_AUTO_TEST_SUITE(pipeline_combination_tests)
 
@@ -227,38 +227,33 @@ BOOST_AUTO_TEST_CASE(pipeline_astrophotography_image_development_test, * boost::
  */
 BOOST_AUTO_TEST_CASE(pipeline_star_recognizer_test)
 {
-    auto res =
+	// TODO: Smaller input images with only 2-3 stars... but multiple ones...
+	// TODO: Add hot-pixel removal before detection,,,, maybe also denoise()...
+	// TODO / IDEA: Add example-program which generates an image where the detected stars are marked ... + HFD - like the original star-recognizer...
+	// TODO: Add center_on_star() for each detected star image... then calc SnrT, HfdT and FwhmT....
+    auto clusteredImagesRanges =
             view::single("test_data/image_processing_pipeline/real_world/star_recognizer/test_image_star_recognizer_1.fit.gz")
               | images()
-			  | star_cluster2(2 /*cluster radius*/,
+			  | detect_stars(2 /*cluster radius*/,
 					        ThresholdingAlgorithmFactoryT::getInstance(ThresholdingAlgorithmTypeT::OTSU)
-				) // TODO: Maybe rename to detect_stars()
+				)
               | crop()
 			  | to<std::vector>();
-//    		  | subtract_background(ThresholdingAlgorithmFactoryT::getInstance(ThresholdingAlgorithmTypeT::OTSU));
-//              | star_cluster();
-//			  |	actions::join
-//			  | to<std::vector>();
 
-	// TODO: Remove crop from star_cluster... instead return rects...Then use crop in a second step... 
-	
-    std::cerr << "Processed " << res.size() << " images." << std::endl;
-    auto subvec = res.at(0);
-    std::cerr << "Found " << subvec.size() << " stars in first image." << std::endl;
 
-	// TODO: Add boost tests ...
-	
-	/*
+    BOOST_TEST(clusteredImagesRanges.size() == 1); // Should correspond to the number of input images
+    BOOST_TEST(clusteredImagesRanges.at(0).size() == 216); // 216 detected stars (without hot-pixel removal)
+
+
     int counter = 0;
 
-    for(const auto & starImg : subvec) {
+    for(const auto & starImg : clusteredImagesRanges.at(0)) {
     	std::stringstream ss;
     	ss << "star_img" << counter++ << ".tiff";
     	std::cerr << "Storing " << ss.str() << "..." << std::endl;
 
     	starImg->save(ss.str().c_str());
     }
-*/
 
 
 //  const std::string base_path = "test_data/image_processing_pipeline/real_world/star_recognizer/";
