@@ -38,6 +38,8 @@
 #include "../../common/include/pipeline/view/divide_by.h"
 #include "../../common/include/pipeline/view/subtract_background.h"
 #include "../../common/include/pipeline/view/center_on_star.h"
+#include "../../common/include/pipeline/view/interpolate_bad_pixels.h"
+
 #include "../../common/include/pipeline/action/average.h"
 
 #include "../../common/include/thresholding_algorithm_factory.h"
@@ -236,6 +238,7 @@ BOOST_AUTO_TEST_CASE(pipeline_star_recognizer_test)
     auto clusteredImagesRanges =
             view::single("test_data/image_processing_pipeline/real_world/star_recognizer/test_image_star_recognizer_1.fit.gz")
               | images()
+              | interpolate_bad_pixels(500 /*threshold*/, 3 /*filter size*/)
 			  | detect_stars(2 /*cluster radius*/,
 					        ThresholdingAlgorithmFactoryT::getInstance(ThresholdingAlgorithmTypeT::OTSU)
 				)
@@ -244,20 +247,20 @@ BOOST_AUTO_TEST_CASE(pipeline_star_recognizer_test)
 
 
     BOOST_TEST(clusteredImagesRanges.size() == 1); // Should correspond to the number of input images
-    BOOST_TEST(clusteredImagesRanges.at(0).size() == 216); // 216 detected stars (without hot-pixel removal)
+    BOOST_TEST(clusteredImagesRanges.at(0).size() == 92); // 216 detected stars (without hot-pixel removal)
 
 
     // DEBUG START
     // Write result images...
-//    int counter = 0;
-//
-//    for(const auto & starImg : clusteredImagesRanges.at(0)) {
-//    	std::stringstream ss;
-//    	ss << "star_img" << counter++ << ".tiff";
-//    	std::cerr << "Storing " << ss.str() << "..." << std::endl;
-//
-//    	starImg->save(ss.str().c_str());
-//    }
+   // int counter = 0;
+
+   // for(const auto & starImg : clusteredImagesRanges.at(0)) {
+   // 	std::stringstream ss;
+   // 	ss << "star_img" << counter++ << ".tiff";
+   // 	std::cerr << "Storing " << ss.str() << "..." << std::endl;
+
+   // 	starImg->save(ss.str().c_str());
+   // }
     // DEBUG END
 }
 

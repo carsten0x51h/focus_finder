@@ -71,7 +71,7 @@ BOOST_DATA_TEST_CASE(fits_image_reader_test,
 {
     auto img_ptr = starmath::io::read(image_filename);
 
-    DEBUG_IMAGE_DISPLAY(*img_ptr, "image_reader_test", 1);
+    DEBUG_IMAGE_DISPLAY(*img_ptr, "image_reader_test", 0);
 
     BOOST_TEST(img_ptr->width() == image_width);
     BOOST_TEST(img_ptr->height() == image_height);
