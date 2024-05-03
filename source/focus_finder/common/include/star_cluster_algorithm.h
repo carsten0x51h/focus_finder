@@ -22,6 +22,9 @@
  *
  ****************************************************************************/
 
+#ifndef STARMATH_STAR_CLUSTER_ALGORITHM_H
+#define STARMATH_STAR_CLUSTER_ALGORITHM_H STARMATH_STAR_CLUSTER_ALGORITHM_H
+
 #include <list>
 #include <vector>
 #include <set>
@@ -82,3 +85,5 @@ public:
 
     std::list<PixelClusterT> cluster(const ImageT &inImg);
 };
+
+#endif /*STARMATH_STAR_CLUSTER_ALGORITHM_H*/

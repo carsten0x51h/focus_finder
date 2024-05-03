@@ -28,67 +28,12 @@
 #include <range/v3/view/transform.hpp>
 
 #include "../../image.h"
+#include "../../bad_pixel_median_interpolator.h"
 
 #define STARMATH_INTERPOLATE_BAD_PIXELS_DEBUG 1
 
 namespace starmath::pipeline {
-
-  /**
-   * TODO: Should this be here?
-   */
-  struct ThresholdDirectionT {
-    enum TypeE {
-	  POSITIVE, // Hot pixels
-	  NEGATIVE, // Cold pixels
-	  BOTH,     // Hot- and cold pixels
-	  _Count
-    };
-
-    static const char *asStr(const TypeE &inType) {
-	  switch (inType) {
-	  case POSITIVE:
-		return "POSITIVE";
-	  case NEGATIVE:
-		return "NEGATIVE";
-	  case BOTH:
-		return "BOTH";
-	  default:
-		return "<?>";
-	  }
-    }
-
-    MAC_AS_TYPE(Type, E, _Count);
-  };
-
   
-  
-  /**
-   * TODO: Move to .cpp file? Or solve it via a #define?
-   */
-  template<typename ImageType>
-  ImageType interpolateInternal(ImageType pixelValue, const cimg_library::CImg<ImageType> & neighbourhood, float threshold, ThresholdDirectionT::TypeE thresholdDirection) {
-	ImageType med = neighbourhood.median();
-
-	bool wantInterpolation = false;
-	
-	switch(thresholdDirection) {
-	case ThresholdDirectionT::POSITIVE:
-	  wantInterpolation = ((pixelValue - med) > threshold);
-	  break;
-	  
-	case ThresholdDirectionT::NEGATIVE:
-	  wantInterpolation = ((med - pixelValue) > threshold);
-	  break;
-	  
-	case ThresholdDirectionT::BOTH:
-	  wantInterpolation = (std::abs(pixelValue - med) > threshold);
-	  break;
-	  
-	  //default:
-	  // TODO: throw...
-	}
-	return (wantInterpolation ? med : pixelValue);
-  }
   
     /**
      * If the potential "bad" pixel value deviates more than this "factor" from the mean
@@ -110,47 +55,16 @@ namespace starmath::pipeline {
      */
     template<typename ImageType=float>
     auto
-	interpolate_bad_pixels(float absoluteDetectionThreshold = 500, unsigned int filterCoreSize = 3, ThresholdDirectionT::TypeE thresholdDirection = ThresholdDirectionT::BOTH) {
+	interpolate_bad_pixels(float absoluteDetectionThreshold = 500, unsigned int filterCoreSize = 3, BadPixelMedianInterpolatorT::ThresholdDirectionT::TypeE thresholdDirection = BadPixelMedianInterpolatorT::ThresholdDirectionT::BOTH) {
 	  return ranges::views::transform(
             [=](const std::shared_ptr<cimg_library::CImg<ImageType> > &image) {
                 const cimg_library::CImg<ImageType> &inputImageRef = *image;
 
                 DEBUG_IMAGE_DISPLAY(inputImageRef, "interpolate_bad_pixels_in", STARMATH_INTERPOLATE_BAD_PIXELS_DEBUG);
 
-                auto result_image = std::make_shared<cimg_library::CImg<ImageType>>(inputImageRef);
+				BadPixelMedianInterpolatorT badPixelMedianInterpolator(absoluteDetectionThreshold, filterCoreSize, thresholdDirection);
 
-				// See https://cimg.eu/reference/loops_Using.html
-				cimg_library::CImg<ImageType> neighbourhood(filterCoreSize, filterCoreSize);
-
-				switch (filterCoreSize) {
-				case 3: {
-				  cimg_for3x3(inputImageRef, x, y, 0, 0, neighbourhood, ImageType) {
-					(*result_image)(x,y) = interpolateInternal(inputImageRef(x,y), neighbourhood, absoluteDetectionThreshold, thresholdDirection);
-				  }
-				  break;
-				}
-				case 5: {
-				  cimg_for5x5(inputImageRef, x, y, 0, 0, neighbourhood, ImageType) {
-					(*result_image)(x,y) = interpolateInternal(inputImageRef(x,y), neighbourhood, absoluteDetectionThreshold, thresholdDirection);
-				  }
-				  break;
-				}
-				case 7: {
-				  cimg_for7x7(inputImageRef, x, y, 0, 0, neighbourhood, ImageType) {
-					(*result_image)(x,y) = interpolateInternal(inputImageRef(x,y), neighbourhood, absoluteDetectionThreshold, thresholdDirection);
-				  }
-				  break;
-				}
-				case 9: {
-				  cimg_for9x9(inputImageRef, x, y, 0, 0, neighbourhood, ImageType) {
-					(*result_image)(x,y) = interpolateInternal(inputImageRef(x,y), neighbourhood, absoluteDetectionThreshold, thresholdDirection);
-				  }
-				  break;
-				}
-				  //default:
-				  // TODO: throw...
-				  
-				}
+				auto result_image = badPixelMedianInterpolator.interpolate(inputImageRef);
 				
                 DEBUG_IMAGE_DISPLAY(*result_image, "interpolate_bad_pixels_out", STARMATH_INTERPOLATE_BAD_PIXELS_DEBUG);
 
