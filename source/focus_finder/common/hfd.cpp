@@ -68,7 +68,7 @@ double HfdT::calculate(const ImageT &inImage, const PointT<unsigned int> & starC
 
     // Crop the part from the supplied image which is needed to calculate the HFD value.
     // A boundary check is performed.
-    RectT<int> imageBounds (0,0,inImage.width(), inImage.height());
+    RectT<int> imageBounds (0, 0, inImage.width(), inImage.height());
     SizeT<unsigned int> subImageSize(inOuterDiameterPx, inOuterDiameterPx);
 
     // NOTE: Needs to be int because subImageRect x and/or y may be negative

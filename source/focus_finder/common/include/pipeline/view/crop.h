@@ -47,6 +47,7 @@ namespace starmath::pipeline {
 	return crop_regions
 	  | ranges::view::transform(
 								[=](const auto & crop_region) {
+
 								  // See https://github.com/GreycLab/CImg/issues/110
 								  return std::make_shared<cimg_library::CImg<ImageType>>(
 																						 image->get_crop(
@@ -62,7 +63,6 @@ namespace starmath::pipeline {
   }
 
 
-  // TODO: Better name...
   template<typename ImageType=float>
   auto
   crop() {
@@ -85,7 +85,7 @@ namespace starmath::pipeline {
 								   });
   }
 
-  
+
   // TODO: Rename to crop()
   template<typename ImageType=float>
   auto

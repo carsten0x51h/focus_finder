@@ -29,7 +29,6 @@
  * We do not want an X11 dependency by default.
  * Use DEFINE_IMAGE_DEBUG to enable CImg debug.
  */
-#define DEBUG_IMAGE_DISPLAY_SWITCH 1
 #ifdef DEBUG_IMAGE_DISPLAY_SWITCH
 
     #define cimg_display 1

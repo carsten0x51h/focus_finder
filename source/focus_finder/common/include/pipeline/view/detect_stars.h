@@ -39,7 +39,7 @@ namespace starmath::pipeline {
 
     template<typename ImageType=float>
     auto
-    detect_stars(int clusterRadius, const std::shared_ptr<ThresholdingAlgorithmT> &thresholding_algorithm) {
+    detect_stars(int clusterRadius, const std::shared_ptr<ThresholdingAlgorithmT> &thresholding_algorithm, unsigned int border) {
 
         using SharedImageT = std::shared_ptr<cimg_library::CImg<ImageType>>;
 
@@ -61,9 +61,10 @@ namespace starmath::pipeline {
                     StarClusterAlgorithmT starClusterAlgorithm(clusterRadius);
                     auto pixelClusters = starClusterAlgorithm.cluster(binaryImg);
 
+                    // TODO: Do not hardcode broder = 8
                     auto rectsVec =
                     		pixelClusters
-							| ranges::views::transform([=](const auto & pixelCluster) { return pixelCluster.getBounds(); })
+							| ranges::views::transform([=](const auto & pixelCluster) { return pixelCluster.getBounds().expand_to_square().grow(border); })
 							| ranges::to<std::vector>();
 
                     return std::make_pair(image, rectsVec);

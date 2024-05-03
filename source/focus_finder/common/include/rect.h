@@ -198,8 +198,8 @@ private:
     	auto center = calcCenterFromRectInternal(rect);
     	T borderBothSides = 2 * changeBy;
 
-    	T newWidth = (grow ? std::get<2>(rect) + borderBothSides: std::get<2>(rect) - borderBothSides);
-    	T newHeight = (grow ? std::get<3>(rect) + borderBothSides: std::get<3>(rect) - borderBothSides);
+    	T newWidth = (grow ? std::get<2>(rect) + borderBothSides : std::get<2>(rect) - borderBothSides);
+    	T newHeight = (grow ? std::get<3>(rect) + borderBothSides : std::get<3>(rect) - borderBothSides);
 
     	return fromCenterPoint(center, newWidth, newHeight);
     }

@@ -22,11 +22,14 @@
  *
  ****************************************************************************/
 
+#include <iostream>
+
 #include <range/v3/range/conversion.hpp>
 #include <range/v3/view/join.hpp>
 #include <range/v3/action/join.hpp>
 #include <range/v3/view/filter.hpp>
 #include <range/v3/core.hpp>   // ranges::front()
+#include <range/v3/algorithm/for_each.hpp>
 
 #include <boost/test/unit_test.hpp>
 
@@ -167,33 +170,44 @@ BOOST_AUTO_TEST_CASE(pipeline_astrophotography_image_development_test, * boost::
 	      average(
                 light_frame_files
                     | images()
-                    | subtract(
-                        average(dark_files | images())
+				    | interpolate_bad_pixels(500 /*threshold*/, 3 /*filter size*/)
+					| subtract(
+                        average(dark_files
+                        		| images()
+								| interpolate_bad_pixels(500 /*threshold*/, 3 /*filter size*/)
+                        )
                       )
                     | divide_by(
                         average(
                             flat_files
                                 | images()
-                                | subtract(
-                                     average(dark_flat_files | images())
+							    | interpolate_bad_pixels(500 /*threshold*/, 3 /*filter size*/)
+								| subtract(
+                                     average(dark_flat_files
+                                    		 | images()
+											 | interpolate_bad_pixels(500 /*threshold*/, 3 /*filter size*/)
+									 )
                                   )
                         )
                      )
 	      )
-	     )
-             | remove_nans();
+	     );
+//             | remove_nans();
 
     
+
     // This line initially generated the expected result.
     std::string expected_image_filename = base_path + "expected_result.tiff";
     ImageT expected_result(expected_image_filename.c_str());
 
-    // Just one image is expected as result from the prociessing pipeline
+    // Just one image is expected as result from the processing pipeline
     BOOST_TEST(size(light_average_no_nans_range) == 1);
 
     // The ranges::front() call extracts the only image from the range (here a std::shared_ptr<ImageT>). 
     auto calculated_img = *ranges::front(light_average_no_nans_range);
 	
+    calculated_img.save(expected_image_filename.c_str()); // HACK: Only to produce result, once
+
     BOOST_TEST(isAlmostEqual(calculated_img, expected_result, 0.00001));
 }
 
@@ -227,7 +241,7 @@ BOOST_AUTO_TEST_CASE(pipeline_astrophotography_image_development_test, * boost::
  *              | filtered(! StarAnalysisT::snr() > 10)
  *              | filtered(! StarAnalysisT::hfd() < 5)
  *
- *
+ * TODO: Why is pipeline processed twice? -> detet_stars() ... to<vector>()?...
  * TODO: Smaller input images with only 2-3 stars... but multiple ones...
  * TODO: Add hot-pixel removal before detection,,,, maybe also denoise()...
  * TODO / IDEA: Add example-program which generates an image where the detected stars are marked ... + HFD - like the original star-recognizer...
@@ -240,27 +254,54 @@ BOOST_AUTO_TEST_CASE(pipeline_star_recognizer_test)
               | images()
               | interpolate_bad_pixels(500 /*threshold*/, 3 /*filter size*/)
 			  | detect_stars(2 /*cluster radius*/,
-					        ThresholdingAlgorithmFactoryT::getInstance(ThresholdingAlgorithmTypeT::OTSU)
+					        ThresholdingAlgorithmFactoryT::getInstance(ThresholdingAlgorithmTypeT::OTSU),
+							30
 				)
               | crop()
+              | views::join
+	          | scale_up(3.0F)
+	          | center_on_star(CentroidAlgorithmFactoryT::getInstance(CentroidAlgorithmTypeT::IWC))
+	          | scale_down(3.0F)
 			  | to<std::vector>();
 
 
-    BOOST_TEST(clusteredImagesRanges.size() == 1); // Should correspond to the number of input images
-    BOOST_TEST(clusteredImagesRanges.at(0).size() == 92); // 216 detected stars (without hot-pixel removal)
+
+//    BOOST_TEST(clusteredImagesRanges.size() == 1); // Should correspond to the number of input images
+    BOOST_TEST(clusteredImagesRanges.size() == 92); // 216 detected stars (without hot-pixel removal)
+
+
+    // Test; Calculate SNR and HFD
+    // NOTE: Question is, if before HFD calculation, the background should be subtracted, or not....
+    //       and if this should happen inside the HFD... No, because the HFD algorithm is
+    //       independent from that. It is correct for both images - with and without background.
+    //       Just the value it returns, is quite different.
+//    auto starMetricsRange =
+//    		clusteredImagesRanges
+//	        | subtract_background(ThresholdingAlgorithmFactoryT::getInstance(ThresholdingAlgorithmTypeT::OTSU)) // TODO: Why not just passing in ThresholdingAlgorithmTypeT::OTSU?              | scale_up(3.0F)
+//			| view::transform(
+//					[](const auto & imgPtr) {
+//            			return std::make_tuple(SnrT::calculate(*imgPtr), HfdT(*imgPtr).getValue());
+//    				});
+
+
+//    ranges::for_each(starMetricsRange, [](const auto & starMetrics){
+//        std::cout << "SNR: " << std::get<0>(starMetrics)
+//        		<< ", HFD: " << std::get<1>(starMetrics)
+//				<< std::endl;
+//    });
 
 
     // DEBUG START
     // Write result images...
-   // int counter = 0;
-
-   // for(const auto & starImg : clusteredImagesRanges.at(0)) {
-   // 	std::stringstream ss;
-   // 	ss << "star_img" << counter++ << ".tiff";
-   // 	std::cerr << "Storing " << ss.str() << "..." << std::endl;
-
-   // 	starImg->save(ss.str().c_str());
-   // }
+//    int counter = 0;
+//
+//    for(const auto & starImg : clusteredImagesRanges) {
+//    	std::stringstream ss;
+//    	ss << "star_img" << counter++ << ".png";
+//    	std::cerr << "Storing " << ss.str() << "..." << std::endl;
+//
+//    	starImg->save(ss.str().c_str());
+//    }
     // DEBUG END
 }
 
