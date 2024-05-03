@@ -33,77 +33,124 @@
 
 namespace starmath::pipeline {
 
+  /**
+   * TODO: Should this be here?
+   */
+  struct ThresholdDirectionT {
+    enum TypeE {
+	  POSITIVE, // Hot pixels
+	  NEGATIVE, // Cold pixels
+	  BOTH,     // Hot- and cold pixels
+	  _Count
+    };
+
+    static const char *asStr(const TypeE &inType) {
+	  switch (inType) {
+	  case POSITIVE:
+		return "POSITIVE";
+	  case NEGATIVE:
+		return "NEGATIVE";
+	  case BOTH:
+		return "BOTH";
+	  default:
+		return "<?>";
+	  }
+    }
+
+    MAC_AS_TYPE(Type, E, _Count);
+  };
+
+  
+  
+  /**
+   * TODO: Move to .cpp file? Or solve it via a #define?
+   */
+  template<typename ImageType>
+  ImageType interpolateInternal(ImageType pixelValue, const cimg_library::CImg<ImageType> & neighbourhood, float threshold, ThresholdDirectionT::TypeE thresholdDirection) {
+	ImageType med = neighbourhood.median();
+
+	bool wantInterpolation = false;
+	
+	switch(thresholdDirection) {
+	case ThresholdDirectionT::POSITIVE:
+	  wantInterpolation = ((pixelValue - med) > threshold);
+	  break;
+	  
+	case ThresholdDirectionT::NEGATIVE:
+	  wantInterpolation = ((med - pixelValue) > threshold);
+	  break;
+	  
+	case ThresholdDirectionT::BOTH:
+	  wantInterpolation = (std::abs(pixelValue - med) > threshold);
+	  break;
+	  
+	  //default:
+	  // TODO: throw...
+	}
+	return (wantInterpolation ? med : pixelValue);
+  }
+  
     /**
      * If the potential "bad" pixel value deviates more than this "factor" from the mean
 	 * of the surrounding pixels, then the pixel is removed, i.e. interpolated by the mean
 	 * value of the surrounding pixels.
 	 *
      * @param ImageType
-	 * @param Filter core size (N x N), odd number > 1
+	 * @param Filter core size (N x N), odd number > 1, allowed values are 3,5,7,9
      * @param absoluteDetectionThreshold
-	 *
-	 *		  From the CImg documentation it is not clear if the "threshold" which can be passed
-	 *		  optionally to the blur_median function works in both drections. It is also not clear
-	 *		  if it is a relative or an absolute value with respect to the mean of the surrounding
-	 *		  pixels. However, the code shows the following condition:
-	 *
-	 *        if (cimg::abs((*this)(p,q,c) - val0)<=threshold) ...
-	 *
-	 *        val0 is the pixel value That means, it is an absolute value which works in both directions. That means, the
-	 *        function can only be used in that particular case.
 	 *
      * @return Image with interpolated bad pixels (shared_ptr<cimg_library::CImg<ImageType>>)
 	 *
 	 *
-	 * TODO: Check that filterCoreSize is odd and > 1...
 	 * TODO: Move the actual algorithm out of this pipeline function to the "algorithms" and also write
 	 *       unit tests for this filter independent from this pipeline functionality.
 	 *
-	 * TODO: Later, add:
+	 * TODO: Add:
 	 *      - relativeDetectionThreshold
-	 *      - direction: POSITIVE (hot pixels), NEGATIVE (cold pixels), BOTH (hot- and cold pixels)
      */
     template<typename ImageType=float>
     auto
-	  interpolate_bad_pixels(float absoluteDetectionThreshold = 500, unsigned int filterCoreSize = 3) {
-        return ranges::views::transform(
+	interpolate_bad_pixels(float absoluteDetectionThreshold = 500, unsigned int filterCoreSize = 3, ThresholdDirectionT::TypeE thresholdDirection = ThresholdDirectionT::BOTH) {
+	  return ranges::views::transform(
             [=](const std::shared_ptr<cimg_library::CImg<ImageType> > &image) {
                 const cimg_library::CImg<ImageType> &inputImageRef = *image;
 
                 DEBUG_IMAGE_DISPLAY(inputImageRef, "interpolate_bad_pixels_in", STARMATH_INTERPOLATE_BAD_PIXELS_DEBUG);
 
                 auto result_image = std::make_shared<cimg_library::CImg<ImageType>>(inputImageRef);
-				using namespace cimg_library;
-				// See https://cimg.eu/reference/loops_Using.html
-				//CImg_3x3(I,ImageType);
-				CImg<ImageType> I(3,3);  
-				cimg_for3x3(inputImageRef,x,y,0,0,I,ImageType) {
-				  //T sum = Ipp + Icp + Inp + Ipc + Inc + Ipn + Icn + Inn;
-				  //T mean = sum / 8.0F;
-				  //if (std::abs(Icc - mean) > absoluteDetectionThreshold) {
-				  //}
-				  ImageType med = I.median();
-				  
-				  if (std::abs(inputImageRef(x,y) - med) > absoluteDetectionThreshold) {
-					(*result_image)(x,y) = med;
-				  }
-				}
 
-				// Size of the border which will not be looped over by the next command
-				// is half of the filter core size. This is to avoid the filter core
-				// accessing pixels outside the image.
-				//const unsigned int border = std::ceil((float)filterCoreSize / 2.0F);
-				
 				// See https://cimg.eu/reference/loops_Using.html
-				// Loop along the (x,y)-axes, excepted for pixels inside a border of n pixels wide.
-				/* cimg_for_insideXY(result_image,x,y,border) { */
+				cimg_library::CImg<ImageType> neighbourhood(filterCoreSize, filterCoreSize);
+
+				switch (filterCoreSize) {
+				case 3: {
+				  cimg_for3x3(inputImageRef, x, y, 0, 0, neighbourhood, ImageType) {
+					(*result_image)(x,y) = interpolateInternal(inputImageRef(x,y), neighbourhood, absoluteDetectionThreshold, thresholdDirection);
+				  }
+				  break;
+				}
+				case 5: {
+				  cimg_for5x5(inputImageRef, x, y, 0, 0, neighbourhood, ImageType) {
+					(*result_image)(x,y) = interpolateInternal(inputImageRef(x,y), neighbourhood, absoluteDetectionThreshold, thresholdDirection);
+				  }
+				  break;
+				}
+				case 7: {
+				  cimg_for7x7(inputImageRef, x, y, 0, 0, neighbourhood, ImageType) {
+					(*result_image)(x,y) = interpolateInternal(inputImageRef(x,y), neighbourhood, absoluteDetectionThreshold, thresholdDirection);
+				  }
+				  break;
+				}
+				case 9: {
+				  cimg_for9x9(inputImageRef, x, y, 0, 0, neighbourhood, ImageType) {
+					(*result_image)(x,y) = interpolateInternal(inputImageRef(x,y), neighbourhood, absoluteDetectionThreshold, thresholdDirection);
+				  }
+				  break;
+				}
+				  //default:
+				  // TODO: throw...
 				  
-				/* } */
-				
-                /* auto result_image = */
-				/*   std::make_shared<cimg_library::CImg<ImageType>>( */
-				/* 												  inputImageRef.get_blur_median (filterCoreSize, absoluteDetectionThreshold) */
-				/* 												  ); */
+				}
 				
                 DEBUG_IMAGE_DISPLAY(*result_image, "interpolate_bad_pixels_out", STARMATH_INTERPOLATE_BAD_PIXELS_DEBUG);
 
