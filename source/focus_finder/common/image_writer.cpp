@@ -22,11 +22,11 @@
  *
  ****************************************************************************/
 
+#include <memory>
 #include <boost/algorithm/string.hpp>
 #include <boost/algorithm/string/predicate.hpp>
 
-#include "include/image_reader.h"
-
+#include "include/image_writer.h"
 #include "include/cimg_fits_io.h"
 
 
@@ -57,18 +57,23 @@ namespace starmath::io {
 
 
     /**
+     * TODO: What to specify? -> A concrete filename!
+     * TODO: Change logic... check if directory exists..., check if file exists, is override set? -> Exception, or not...
      *
      * @param filepath
      */
     void check_filepath(const std::filesystem::path & filepath) {
+
+    	TODO: Fixme.... wrong logic here...
+
         if (is_empty(filepath)) {
-            throw ImageReaderExceptionT("Empty file path specified.");
+            throw ImageWriterExceptionT("Empty file path specified.");
         }
         else if (! is_regular_file(filepath) || is_directory(filepath)) {
-            throw ImageReaderExceptionT("Specified file path is not a regular file.");
+            throw ImageWriterExceptionT("Specified file path is not a regular file.");
         }
         else if (! filepath.has_extension()) {
-            throw ImageReaderExceptionT("Unable to determine file extension.");
+            throw ImageWriterExceptionT("Unable to determine file extension.");
         }
     }
 
@@ -76,41 +81,39 @@ namespace starmath::io {
     /**
      *
      * @param filepath
-     * @return
+     * @param image
      */
-    auto read_fits(const std::string & filepath) {
+    void write_fits(const std::string & filepath, const ImageT & img) {
 
         std::stringstream debugSs;
 
         try {
-            // NOTE: Throws FitsIOExceptionT
-        	return starmath::io::fits::read(filepath, & debugSs);
-
-        } catch (fits::FitsIOExceptionT &exc) {
+        	// NOTE: Throws FitsIOExceptionT
+        	starmath::io::fits::write(img, filepath, & debugSs);
+        } catch (FitsIOExceptionT &exc) {
             std::stringstream ss;
-            ss << "FitsIO exception occurred: " << exc.what();
+            ss << "Error writing image to '" << filepath << "'. FitsIO exception occurred: " << exc.what();
             ss << "Details: " << debugSs.str();
-            throw ImageReaderExceptionT(ss.str());
+
+            throw ImageWriterExceptionT(ss.str());
         }
     }
+
 
     /**
      *
      */
-    std::shared_ptr<ImageT> read(const std::filesystem::path & filepath) {
-
-        check_filepath(filepath);
+    void write(const ImageT & img, const std::filesystem::path & filepath) {
+		check_filepath(filepath);
 
         const std::string filepath_lower = boost::algorithm::to_lower_copy(filepath.string());
 
-        // TODO: This code may be moved to a sep. "factory", later.
         if (is_fits(filepath_lower) || is_fits_gz(filepath_lower)) {
-
-            return read_fits(filepath.string());
+            write_fits(filepath.string(), img);
         }
         else {
-        	// TODO: Catch CImg exception and convert to ImageReaderExceptionT... -> Unit tests
-            return std::make_shared<ImageT>(filepath.string().c_str());
+        	img.save(filepath.string().c_str());
         }
-    }
+	}
+
 }

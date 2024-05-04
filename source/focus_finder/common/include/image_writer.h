@@ -22,43 +22,30 @@
  *
  ****************************************************************************/
 
-#ifndef STARMATH_CIMG_FITS_IO_H
-#define STARMATH_CIMG_FITS_IO_H STARMATH_CIMG_FITS_IO_H
+#ifndef STARMATH_IMAGE_WRITER_H
+#define STARMATH_IMAGE_WRITER_H STARMATH_IMAGE_WRITER_H
 
-#include <memory>
-#include <sstream>
 
-#include "exception.h"
+#include <filesystem>
+
 #include "image.h"
+#include "exception.h"
 
 
-namespace starmath::io::fits {
+namespace starmath::io {
 
-	DEF_Exception(FitsIO);
+	/**
+	 * Define ImageWriterExceptionT
+	 */
+	DEF_Exception(ImageWriter);
 
-    /**
-     * CCfits helper function
-     * See http://heasarc.gsfc.nasa.gov/fitsio/ccfits/html/cookbook.html
-     *
-     * TODO: Add/adapt unit tests? -> Load, save and load -> compare...
-     * TODO: Improve error handling?
-     */
-    std::shared_ptr<ImageT>
-    read(const std::string &inFilename, std::stringstream *ss = nullptr);
 
-    /**
-     * CCfits helper function
-     * See http://heasarc.gsfc.nasa.gov/fitsio/ccfits/html/cookbook.html
-     *
-     * TODO: Add/adapt unit tests? -> Load, save and load -> compare...
-     * TODO: Improve error handling?
-     * TODO: Add write(const std::shared_ptr<ImageT> ...) ?
-     *
-     */
-    void
-	write(const ImageT &inImg, const std::string &inFilename, std::stringstream *ss = nullptr);
+	/**
+	 * TODO: Document...
+	 */
+    void write(const ImageT & img, const std::filesystem::path & filepath);
 
-}; // end namespace starmath::io::fits
+}
 
-#endif // STARMATH_CIMG_FITS_IO_H
 
+#endif // STARMATH_IMAGE_WRITER_H

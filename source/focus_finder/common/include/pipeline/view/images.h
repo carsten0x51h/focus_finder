@@ -22,8 +22,8 @@
  *
  ****************************************************************************/
 
-#ifndef FOFI_IMAGES_H
-#define FOFI_IMAGES_H
+#ifndef STARMATH_IMAGES_H
+#define STARMATH_IMAGES_H STARMATH_IMAGES_H
 
 #include <range/v3/view/transform.hpp>
 
@@ -33,6 +33,10 @@
 
 namespace starmath::pipeline {
 
+	/**
+	 * TODO: Rename to read()
+	 * TODO: Idea... maybe rename to starmath::pipeline::io ?
+	 */
     template<typename ImageType=float>
     auto
     images() {
@@ -51,4 +55,5 @@ namespace starmath::pipeline {
     }
 }
 
-#endif //FOFI_IMAGES_H
+#endif // STARMATH_IMAGES_H
+

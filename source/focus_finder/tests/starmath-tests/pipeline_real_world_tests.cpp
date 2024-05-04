@@ -139,9 +139,6 @@ BOOST_AUTO_TEST_CASE(pipeline_star_metrics_test, * boost::unit_test::tolerance(0
  * NOTE: This does no alignment!
  *
  * TODO: Add     | value_clip(ClippingAlgorithmT) after subtract?
- *
- * TODO: Instead of removing NANs at the end, better use deadpixel filter before division...
- * TODO: Smaller input and example images for this unit test! -> faster excution, less space in git!
  */
 BOOST_AUTO_TEST_CASE(pipeline_astrophotography_image_development_test, * boost::unit_test::tolerance(0.1))
 {
@@ -206,7 +203,7 @@ BOOST_AUTO_TEST_CASE(pipeline_astrophotography_image_development_test, * boost::
     // The ranges::front() call extracts the only image from the range (here a std::shared_ptr<ImageT>). 
     auto calculated_img = *ranges::front(light_average_no_nans_range);
 	
-    calculated_img.save(expected_image_filename.c_str()); // HACK: Only to produce result, once
+    //calculated_img.save(expected_image_filename.c_str()); // HACK: Only to produce result, once
 
     BOOST_TEST(isAlmostEqual(calculated_img, expected_result, 0.00001));
 }

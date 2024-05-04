@@ -1,5 +1,11 @@
 TODO
 ----
+
+-IDEA: Fits writer --> write(path, filenamePattern) as pipeline!, Rename images() to read() ?
+-Replace test image since reduced image leads to bad pixel-filter remove the stars...
+-IDEA: stretch(curve) funcrtion
+-Smaller input and example images for this unit test! -> faster excution, less space in git!
+
 -Add test for remove_nans() - add parameter to allow specifying size of filter matrix
 -Add hfd() to "actions"
 -Add fwhm() to "actions" 

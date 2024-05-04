@@ -25,6 +25,8 @@
 #ifndef SOURCE_FOCUS_FINDER_COMMON_INCLUDE_IMAGE_H_
 #define SOURCE_FOCUS_FINDER_COMMON_INCLUDE_IMAGE_H_ SOURCE_FOCUS_FINDER_COMMON_INCLUDE_IMAGE_H_
 
+#include <string>
+
 /**
  * We do not want an X11 dependency by default.
  * Use DEFINE_IMAGE_DEBUG to enable CImg debug.
@@ -76,9 +78,47 @@
 //Image8T
 //Image16T
 //ImageFT
-// TODO: Introduce bit depth? -> problematic for float type...
-using ImageT = cimg_library::CImg<float>;
 
+
+/**
+ * The template mechanism of the CImg class does not help here, since
+ * the required bit depth of the image depends on the file to be loaded.
+ * This happens at runtime and not at compile time. Therefore, for the
+ * moment, the image type is fixed to float to support all possible
+ * bit depths. In addition, the bit depth of the loaded image is stored
+ * as part of the image,
+ *
+ *
+ * Two options to potentially reduce memory usage are:
+ *
+ * Boost any: https://www.boost.org/doc/libs/1_54_0/doc/html/any/s02.html
+ * Boost variant: https://www.boost.org/doc/libs/1_54_0/doc/html/variant.html
+ */
+
+using ImageT = cimg_library::CImg<float>;
+//class ImageT : public cimg_library::CImg<float> {
+//private:
+//	unsigned int bitDepth_;
+//
+//public:
+//	// See https://stackoverflow.com/questions/3119929/forwarding-all-constructors-in-c0x
+//	using cimg_library::CImg<float>::CImg;
+//
+//	unsigned int getBitDepth() const { return bitDepth_; }
+//	void setBitDepth(unsigned int bitDepth) { bitDepth_ = bitDepth; }
+//
+//	// copy assignment
+//	ImageT& operator=(const cimg_library::CImg<float>& other)
+//	{
+//	    // Guard self assignment
+//	    if (((cimg_library::CImg<float>*) this) == &other)
+//	        return *this;
+//
+//	    *((cimg_library::CImg<float>*) this) = other;
+//
+//	    return *this;
+//	}
+//};
 
 #endif /* SOURCE_FOCUS_FINDER_COMMON_INCLUDE_IMAGE_H_ */
 

@@ -22,97 +22,100 @@
  *
  ****************************************************************************/
 
-#include "include/cimg_fits_io.h"
-#include "include/throw_if.h"
-
 #include <CCfits/CCfits>
 #include <memory>
-#include <sstream>
 
-// TODO: As template...???
-// TODO: Improve error handling...
-void CImgFitsIOHelperT::readFits(ImageT *outImg,
-                                 const std::string &inFilename, long *outBitPix,
-                                 std::stringstream *ss) {
+#include "include/cimg_fits_io.h"
 
-    THROW_IF(FitsIO, outImg == nullptr, "outImg expected to be set.")
 
-    CCfits::FITS::setVerboseMode(ss != nullptr);
+namespace starmath::io::fits {
 
-    try {
-        std::unique_ptr<CCfits::FITS
-        > pInfile(new CCfits::FITS(inFilename, CCfits::Read, true));
-        CCfits::PHDU &image = pInfile->pHDU();
+	std::shared_ptr<ImageT>
+    read(const std::string &inFilename, std::stringstream *ss) {
 
-        if (outBitPix != nullptr) {
-            *outBitPix = image.bitpix();
-        }
+		CCfits::FITS::setVerboseMode(ss != nullptr);
 
-        // read all user-specific, coordinate, and checksum keys in the image
-        image.readAllKeys();
+		try {
+			// TODO: Memory leak? new....
+			std::unique_ptr<CCfits::FITS
+			> pInfile(new CCfits::FITS(inFilename, CCfits::Read, true));
+			CCfits::PHDU &fitsImg = pInfile->pHDU();
 
-        if (ss != nullptr) {
-            *ss << image << std::endl;
-        }
+			// read all user-specific, coordinate, and checksum keys in the image
+			fitsImg.readAllKeys();
 
-        // Set image dimensions
-        outImg->resize((int) image.axis(0) /*x*/, (int) image.axis(1) /*y*/, 1/*z - TODO: HACK*/,
-                       1 /*1 color - TODO: HACK*/);
+			if (ss != nullptr) {
+				*ss << fitsImg << std::endl;
+			}
 
-        // HACK / FIXME: At this point we assume that there is only 1 layer!
-        std::valarray<typename ImageT::value_type> imgData;
-        image.read(imgData);
+			auto img = std::make_shared<ImageT>((int) fitsImg.axis(0), (int) fitsImg.axis(1));
+			//TODO: img->setBitDepth(fitsImg.bitpix());
 
-        // For now we create a copy... maybe there is a better way to directly read data into CImg, later...
-        cimg_forXY(*outImg, x, y) {
-                // TODO: Should this be parameterized? Or is it possible to find out automatically?
-                // Correct, when reading old, existing FITS files
-                // NOTE: ImageJ and Gimp both work this way for normal files.
-                //       -> For INDI/BLOB there must be a different solution.
-                (*outImg)(x, outImg->height() - 1 - y) = imgData[outImg->offset(x, y)];
 
-                // Correct when reading the image directly after storing the BLOB file with INDI.
-                //(*outImg)(x, y) = imgData[outImg->offset(x, y)];
-            }
+			// TODO: Put a check here:   fitsImg.bitpix() <= sizeof(ImageT)
+			std::cerr << "fitsImg.bitpix(): " << fitsImg.bitpix() << std::endl;
+			std::cerr << "sizeof(ImageT): " << 8*sizeof(typename ImageT::value_type) << std::endl;
 
-    } catch (CCfits::FitsException &exc) {
-        throw FitsIOExceptionT(exc.message());
+
+
+			// HACK / FIXME: At this point we assume that there is only 1 layer!
+			std::valarray<typename ImageT::value_type> imgData;
+			fitsImg.read(imgData);
+
+			// For now we create a copy... maybe there is a better way to directly read data into CImg, later...
+			cimg_forXY(*img, x, y) {
+					// TODO: Should this be parameterized? Or is it possible to find out automatically?
+					// Correct, when reading old, existing FITS files
+					// NOTE: ImageJ and Gimp both work this way for normal files.
+					//       -> For INDI/BLOB there must be a different solution.
+					(*img)(x, img->height() - 1 - y) = imgData[img->offset(x, y)];
+
+					// Correct when reading the image directly after storing the BLOB file with INDI.
+					//(*outImg)(x, y) = imgData[outImg->offset(x, y)];
+				}
+
+			return img;
+
+		} catch (CCfits::FitsException &exc) {
+			throw FitsIOExceptionT(exc.message());
+		}
+
+		return nullptr;
     }
-}
 
-// TODO: As template...
-// TODO: more generic..?
-// TODO: error handling?
-void CImgFitsIOHelperT::writeFits(const ImageT &inImg,
-                                  const std::string &inFilename, std::stringstream *ss) {
 
-    // TODO: Is it possible to pass a stream?
-    CCfits::FITS::setVerboseMode(ss != nullptr);
 
-    try {
-        long naxis = 2;
-        long naxes[2] = {inImg.width(), inImg.height()};
+    void
+	write(const std::shared_ptr<ImageT> &inImg, const std::string &inFilename, std::stringstream *ss) {
+        // TODO: Is it possible to pass a stream?
+        CCfits::FITS::setVerboseMode(ss != nullptr);
 
-        std::unique_ptr<CCfits::FITS> pFits;
+        try {
+            long naxis = 2;
+            long naxes[2] = {inImg->width(), inImg->height()};
 
-        pFits = std::make_unique<CCfits::FITS>(
-                std::string("!") + inFilename, USHORT_IMG,
-                                 naxis, naxes);
+            std::unique_ptr<CCfits::FITS> pFits;
 
-        // NOTE: At this point we assume that there is only 1 layer.
-        long nelements = std::accumulate(&naxes[0], &naxes[naxis], 1,
-                                             std::multiplies<>());
+            pFits = std::make_unique<CCfits::FITS>(
+                    std::string("!") + inFilename, USHORT_IMG,
+                                     naxis, naxes);
 
-        std::valarray<typename ImageT::value_type> array(nelements);
+            // NOTE: At this point we assume that there is only 1 layer.
+            long nelements = std::accumulate(&naxes[0], &naxes[naxis], 1,
+                                                 std::multiplies<>());
 
-        cimg_forXY(inImg, x, y) {
-                array[inImg.offset(x, y)] = inImg(x, inImg.height() - y - 1);
-            }
+            std::valarray<typename ImageT::value_type> array(nelements);
 
-        long fpixel(1);
-        pFits->pHDU().write(fpixel, nelements, array);
-    } catch (CCfits::FitsException &exc) {
-        throw FitsIOExceptionT(exc.message());
+            cimg_forXY(*inImg, x, y) {
+                    array[inImg->offset(x, y)] = (*inImg)(x, inImg->height() - y - 1);
+                }
+
+            long fpixel(1);
+            pFits->pHDU().write(fpixel, nelements, array);
+        } catch (CCfits::FitsException &exc) {
+            throw FitsIOExceptionT(exc.message());
+        }
     }
-}
+
+}; // end namespace starmath::io::fits
 

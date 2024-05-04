@@ -22,8 +22,8 @@
  *
  ****************************************************************************/
 
-#ifndef FOFI_IMAGE_READER_H
-#define FOFI_IMAGE_READER_H
+#ifndef STARMATH_IMAGE_READER_H
+#define STARMATH_IMAGE_READER_H STARMATH_IMAGE_READER_H
 
 #include <memory>
 #include <filesystem>
@@ -31,10 +31,21 @@
 #include "image.h"
 #include "exception.h"
 
-DEF_Exception(ImageReader);
 
 namespace starmath::io {
+	/**
+	 * Define ImageReaderExceptionT
+	 */
+	DEF_Exception(ImageReader);
+
+
+    /**
+	 * TODO: Document...
+     *
+     * @param filepath
+     * @return
+     */
     std::shared_ptr<ImageT> read(const std::filesystem::path & filepath);
 }
 
-#endif //FOFI_IMAGE_READER_H
+#endif // STARMATH_IMAGE_READER_H
