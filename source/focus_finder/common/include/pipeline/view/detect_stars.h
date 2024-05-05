@@ -25,6 +25,7 @@
 #ifndef STARMATH_DETECT_STARS_H
 #define STARMATH_DETECT_STARS_H STARMATH_DETECT_STARS_H
 
+#include <memory>
 #include <range/v3/view/transform.hpp>
 
 #include "../../image.h"
@@ -61,13 +62,12 @@ namespace starmath::pipeline {
                     StarClusterAlgorithmT starClusterAlgorithm(clusterRadius);
                     auto pixelClusters = starClusterAlgorithm.cluster(binaryImg);
 
-                    // TODO: Do not hardcode broder = 8
                     auto rectsVec =
                     		pixelClusters
 							| ranges::views::transform([=](const auto & pixelCluster) { return pixelCluster.getBounds().expand_to_square().grow(border); })
-							| ranges::to<std::vector>();
+							| ranges::to<std::vector<RectT<int>>>();
 
-                    return std::make_pair(image, rectsVec);
+                    return std::make_shared<std::pair<const SharedImageT, std::vector<RectT<int>>>>(std::make_pair(image, rectsVec));
                 }
         );
     }
