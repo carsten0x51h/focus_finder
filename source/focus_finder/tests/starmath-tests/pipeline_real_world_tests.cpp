@@ -249,7 +249,8 @@ BOOST_AUTO_TEST_CASE(pipeline_astrophotography_image_development_test, * boost::
  */
 BOOST_AUTO_TEST_CASE(pipeline_star_recognizer_test)
 {
-    auto clusteredImagesRanges =
+	// TODO: At least two files...
+    auto detectedStarImages =
             view::single("test_data/image_processing_pipeline/real_world/star_recognizer/test_image_star_recognizer_1.fit.gz")
               | read()
               | interpolate_bad_pixels(500 /*threshold*/, 3 /*filter size*/)
@@ -258,18 +259,22 @@ BOOST_AUTO_TEST_CASE(pipeline_star_recognizer_test)
 							30
 				)
               | crop()
-              | view::join
-	          | scale_up(3.0F)
-	          | center_on_star(CentroidAlgorithmFactoryT::getInstance(CentroidAlgorithmTypeT::IWC))
-	          | scale_down(3.0F)
-			  | write(std::filesystem::current_path(), "img_%04d.fit") // NOTE; path must exist
+//			  | views::join // crop() gives range<vector<img>, vector<img>, ...> This does not work with ubuntu 22.04 (older version of ranges v3),therefore, transform below...
+			  | view::transform([](const auto & detectedStars /*std::vector<cimg_library::CImg<ImageType>> */){
+    	    		return detectedStars
+    		          | scale_up(3.0F)
+    		          | center_on_star(CentroidAlgorithmFactoryT::getInstance(CentroidAlgorithmTypeT::IWC))
+    		          | scale_down(3.0F)
+    				  | write(std::filesystem::current_path(), "img_%04d.fit") // NOTE; path must exist, TODO: directory should change for each input image...
+    	    		  | to<std::vector>();
+    		    })
+			  | actions::join
 			  | to<std::vector>();
 
 
 
-
 //    BOOST_TEST(clusteredImagesRanges.size() == 1); // Should correspond to the number of input images
-    BOOST_TEST(clusteredImagesRanges.size() == 92); // 216 detected stars (without hot-pixel removal)
+    BOOST_TEST(detectedStarImages.size() == 92); // 216 detected stars (without hot-pixel removal)
 
 
     // Test; Calculate SNR and HFD

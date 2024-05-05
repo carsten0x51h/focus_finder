@@ -30,6 +30,7 @@
 #include <range/v3/view/join.hpp>
 
 
+#include "../../logging.h"
 #include "../../image.h"
 #include "../../point.h"
 #include "../../rect.h"
@@ -93,7 +94,7 @@ namespace starmath::pipeline {
 	    	      		   | ranges::view::transform(
 	      								[=](const auto & crop_region) {
 
-	      								  std::cerr << "Cropping region " << crop_region << std::endl;
+	      								  LOG(debug) << "Cropping region " << crop_region << std::endl;
 
 	      								  // See https://github.com/GreycLab/CImg/issues/110
 	      								  return std::make_shared<cimg_library::CImg<ImageType>>(

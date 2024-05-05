@@ -102,6 +102,9 @@ namespace starmath::io::fits {
     }
 
 
+	/**
+	 *
+	 */
     void
 	write(const ImageT &inImg, const std::string &inFilename, bool override, std::stringstream *ss) {
         // TODO: Is it possible to pass a stream?

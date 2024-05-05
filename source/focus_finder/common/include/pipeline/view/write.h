@@ -68,8 +68,13 @@ namespace starmath::pipeline::io {
 	}
 
 	/**
-	 * TODO: Rename to read()
-	 * TODO: Idea... maybe rename to starmath::pipeline::io ?
+	 * TODO: write is not a view! It is an action! It must not be lazy!
+	 *       -> Using transform() here is potentially wrong... because if we call write() as last step
+	 *          of a processing pipeline, nothing will happen, if there is no final "to<vector>()" or
+	 *          similar....
+	 *          --> write() can be designed as view AND as action -> depending on what is desired. The
+	 *              views::write() call can be useful to store a copy to a file in the middle of a pipeline.
+	 *              actions::write() must be used, as a final step to finish a pipeline.
 	 */
     template<typename ImageType=float>
     auto
