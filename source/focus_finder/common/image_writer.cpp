@@ -47,10 +47,10 @@ namespace starmath::io {
     	else if (! filepath.has_extension()) {
     		throw ImageWriterExceptionT("Unable to determine file extension.");
     	}
-    	//else if () {
-    		// TODO: Check that the specified directory where the file is supposed to be written to, exists
-    		//       -> Is this needed? Or will the folders be created automatically?
-    	//}
+    	else if (! std::filesystem::exists(filepath.parent_path())) {
+    		// TODO: Maybe sub-folders are automatically created and this check is not required.
+    		throw ImageWriterExceptionT("Specified directory does not exist.");
+    	}
     	else if (is_regular_file(filepath) && ! override) {
     		std::stringstream ss;
     		ss << "File '" << filepath << "' already exists and override is disabled.";

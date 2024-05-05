@@ -41,11 +41,6 @@ namespace starmath::io::fits {
 
 
     /**
-     * NOTE:
-     * ends_with() is defined in C++20 and may be used here once all supported OS versions have C++20 support.
-     *
-     * See https://en.cppreference.com/w/cpp/string/basic_string/ends_with
-     *
      * @param filepath_lower
      * @return
      */

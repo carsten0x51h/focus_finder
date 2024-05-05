@@ -25,11 +25,21 @@
 #ifndef STARMATH_INCLUDE_PIPELINE_VIEW_WRITE_H_
 #define STARMATH_INCLUDE_PIPELINE_VIEW_WRITE_H_ STARMATH_INCLUDE_PIPELINE_VIEW_WRITE_H_
 
+#include <cstdio>
+#include <filesystem>
+
+/**
+ * NOTE: With C++20, the filename can be easily composed like:
+ * std::string filename = std::format(imageFilenamePattern, counter++);
+ * The template looks slightly different: "img_{:03}.fit"
+ */
+//#include <format>
 
 #include <range/v3/view/transform.hpp>
 
 #include "../../image.h"
 #include "../../image_writer.h"
+#include "../../logging.h"
 
 #define STARMATH_PIPELINE_WRITE_DEBUG 0
 
@@ -37,24 +47,41 @@
 //       the pipeline workflow?
 namespace starmath::pipeline::io {
 
+
+	/**
+	 * NOTE: With C++20, the filename can be easily composed like:
+	 * std::string filename = std::format(imageFilenamePattern, counter++);
+	 * The template looks slightly different: "img_{:03}.fit"
+	 *
+	 * TODO: Compose filename from internal, static counter... ? Better idea? How to reset?
+	 */
+	static std::string compose_filename_from_pattern(const std::string & pattern) {
+	    char buffer[100];
+
+		static unsigned int counter = 0;
+
+	    std::snprintf(buffer, sizeof(buffer), pattern.c_str(), counter++);
+
+	    return std::string(buffer);
+	}
+
 	/**
 	 * TODO: Rename to read()
 	 * TODO: Idea... maybe rename to starmath::pipeline::io ?
 	 */
     template<typename ImageType=float>
     auto
-    write(const std::string &imageFilenamePattern, bool allowOverride = true) {
+    write(const std::filesystem::path & directory, const std::string &imageFilenamePattern = "img_%03d.fit", bool allowOverride = true) {
         return ranges::views::transform(
             [=](const std::shared_ptr<ImageT> & image) {
 
-        		static unsigned int counter = 0;
-
         		DEBUG_IMAGE_DISPLAY(*image, "pipeline_write_in", STARMATH_PIPELINE_WRITE_DEBUG );
 
-        		// TODO: Compose filename from internal, static counter... ? Better idea? Reset?
-        		std::string filename = imageFilenamePattern; // .... TODO ... generate filename from pattern
+        		std::filesystem::path filepath = directory / compose_filename_from_pattern(imageFilenamePattern);
 
-                starmath::io::write(*image, filename, allowOverride);
+        		LOG(debug) << "starmath::pipeline::io::write() - filepath to store image to: " << filepath << std::endl;
+
+                starmath::io::write(*image, filepath, allowOverride);
 
                 return image;
             }
