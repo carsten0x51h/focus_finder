@@ -23,6 +23,7 @@
  ****************************************************************************/
 
 #include <iostream>
+#include <filesystem>
 
 #include <range/v3/range/conversion.hpp>
 #include <range/v3/view/join.hpp>
@@ -261,8 +262,9 @@ BOOST_AUTO_TEST_CASE(pipeline_star_recognizer_test)
 	          | scale_up(3.0F)
 	          | center_on_star(CentroidAlgorithmFactoryT::getInstance(CentroidAlgorithmTypeT::IWC))
 	          | scale_down(3.0F)
-			  | write("img_%4d.fit")
+			  | write(std::filesystem::current_path(), "img_%04d.fit") // NOTE; oath must exist
 			  | to<std::vector>();
+
 
 
 

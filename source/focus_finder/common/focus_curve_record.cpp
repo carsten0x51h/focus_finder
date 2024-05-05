@@ -164,7 +164,7 @@ void FocusCurveRecordT::save(boost::property_tree::ptree &pt, const FocusCurveRe
     std::stringstream debugSs;
 
     // NOTE: Throws FitsIOExceptionT... TODO: Handle here?
-    starmath::io::fits::write(focusCurveRecord.getCorrectedStarImage(), imgFilePath.string(), &debugSs);
+    starmath::io::fits::write(focusCurveRecord.getCorrectedStarImage(), imgFilePath.string(), true /*override*/, &debugSs);
 
     LOG(debug) << "FITS storing details: " << debugSs.str() << std::endl;
 }

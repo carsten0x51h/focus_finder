@@ -75,7 +75,7 @@ namespace starmath::io::fits {
      *
      */
     void
-	write(const ImageT &inImg, const std::string &inFilename, std::stringstream *ss = nullptr);
+	write(const ImageT &inImg, const std::string &inFilename, bool override = false, std::stringstream *ss = nullptr);
 
 }; // end namespace starmath::io::fits
 

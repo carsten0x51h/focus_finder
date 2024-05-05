@@ -1,6 +1,7 @@
 TODO
 ----
 
+-Make fits writer create specified directories if they do not exist
 -Replace "star recognizer" test images -> instead of one big, multiple small ones with only 2-5 stars.
 -Extract starmath library! -> Need a concept of namespaces, overall structure etc. - First plan!
 

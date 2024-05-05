@@ -103,7 +103,7 @@ namespace starmath::io::fits {
 
 
     void
-	write(const ImageT &inImg, const std::string &inFilename, std::stringstream *ss) {
+	write(const ImageT &inImg, const std::string &inFilename, bool override, std::stringstream *ss) {
         // TODO: Is it possible to pass a stream?
         CCfits::FITS::setVerboseMode(ss != nullptr);
 
@@ -113,9 +113,18 @@ namespace starmath::io::fits {
 
             std::unique_ptr<CCfits::FITS> pFits;
 
-            pFits = std::make_unique<CCfits::FITS>(
-                    std::string("!") + inFilename, USHORT_IMG,
-                                     naxis, naxes);
+            // NOTE: The "!" should automatically override an existing file...
+            //       See https://heasarc.gsfc.nasa.gov/fitsio/ccfits/html/writeimage.html
+            std::string filepath = (override ? "!" : "") + inFilename;
+
+            if (ss != nullptr) {
+            	*ss << "starmath::io::fits::write() writes to file '" << filepath << "'." << std::endl;
+            }
+
+            pFits = std::make_unique<CCfits::FITS>(filepath,
+												   USHORT_IMG,
+												   naxis,
+												   naxes);
 
             // NOTE: At this point we assume that there is only 1 layer.
             long nelements = std::accumulate(&naxes[0], &naxes[naxis], 1,

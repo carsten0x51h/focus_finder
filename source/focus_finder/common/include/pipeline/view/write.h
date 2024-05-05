@@ -32,6 +32,7 @@
  * NOTE: With C++20, the filename can be easily composed like:
  * std::string filename = std::format(imageFilenamePattern, counter++);
  * The template looks slightly different: "img_{:03}.fit"
+ * See https://stackoverflow.com/questions/2342162/stdstring-formatting-like-sprintf
  */
 //#include <format>
 
@@ -52,6 +53,7 @@ namespace starmath::pipeline::io {
 	 * NOTE: With C++20, the filename can be easily composed like:
 	 * std::string filename = std::format(imageFilenamePattern, counter++);
 	 * The template looks slightly different: "img_{:03}.fit"
+	 * See https://stackoverflow.com/questions/2342162/stdstring-formatting-like-sprintf
 	 *
 	 * TODO: Compose filename from internal, static counter... ? Better idea? How to reset?
 	 */

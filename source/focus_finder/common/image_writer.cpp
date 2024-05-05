@@ -23,6 +23,7 @@
  ****************************************************************************/
 
 #include <memory>
+#include <filesystem>
 
 #include "include/image_writer.h"
 #include "include/cimg_fits_io.h"
@@ -47,10 +48,12 @@ namespace starmath::io {
     	else if (! filepath.has_extension()) {
     		throw ImageWriterExceptionT("Unable to determine file extension.");
     	}
-    	else if (! std::filesystem::exists(filepath.parent_path())) {
-    		// TODO: Maybe sub-folders are automatically created and this check is not required.
-    		throw ImageWriterExceptionT("Specified directory does not exist.");
-    	}
+//    	else if (! std::filesystem::exists(filepath.parent_path())) {
+//    		// TODO: Maybe sub-folders are automatically created and this check is not required.
+//    	    std::stringstream ss;
+//    	    ss << "Specified directory '" << filepath.parent_path() << "' does not exist.";
+//    		throw ImageWriterExceptionT(ss.str());
+//    	}
     	else if (is_regular_file(filepath) && ! override) {
     		std::stringstream ss;
     		ss << "File '" << filepath << "' already exists and override is disabled.";
@@ -64,16 +67,16 @@ namespace starmath::io {
      * @param filepath
      * @param image
      */
-    void write_fits(const std::string & filepath, const ImageT & img) {
+    void write_fits(const std::string & filepath, const ImageT & img, bool override) {
 
         std::stringstream debugSs;
 
         try {
         	// NOTE: Throws FitsIOExceptionT
-        	starmath::io::fits::write(img, filepath, & debugSs);
+        	starmath::io::fits::write(img, filepath, override, & debugSs);
         } catch (starmath::io::fits::FitsIOExceptionT &exc) {
             std::stringstream ss;
-            ss << "Error writing image to '" << filepath << "'. FitsIO exception occurred: " << exc.what();
+            ss << "Error writing image to '" << filepath << "'. FitsIO exception occurred: " << exc.what() << ", ";
             ss << "Details: " << debugSs.str();
 
             throw ImageWriterExceptionT(ss.str());
@@ -90,7 +93,7 @@ namespace starmath::io {
         const std::string filepath_lower = boost::algorithm::to_lower_copy(filepath.string());
 
         if (starmath::io::fits::is_fits(filepath_lower) || starmath::io::fits::is_fits_gz(filepath_lower)) {
-            write_fits(filepath.string(), img);
+            write_fits(filepath.string(), img, override);
         }
         else {
         	img.save(filepath.string().c_str());
