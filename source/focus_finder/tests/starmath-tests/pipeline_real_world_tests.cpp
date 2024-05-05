@@ -26,7 +26,7 @@
 #include <filesystem>
 
 #include <range/v3/range/conversion.hpp>
-#include <range/v3/view/join.hpp>
+//#include <range/v3/view/join.hpp>
 #include <range/v3/action/join.hpp>
 #include <range/v3/view/filter.hpp>
 #include <range/v3/core.hpp>   // ranges::front()
@@ -258,7 +258,7 @@ BOOST_AUTO_TEST_CASE(pipeline_star_recognizer_test)
 							30
 				)
               | crop()
-              | view::join
+              | action::join
 //	          | scale_up(3.0F)
 //	          | center_on_star(CentroidAlgorithmFactoryT::getInstance(CentroidAlgorithmTypeT::IWC))
 //	          | scale_down(3.0F)
