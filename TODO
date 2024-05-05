@@ -1,19 +1,23 @@
 TODO
 ----
 
--IDEA: Fits writer --> write(path, filenamePattern) as pipeline!, Rename images() to read() ?
--Replace test image since reduced image leads to bad pixel-filter remove the stars...
--IDEA: stretch(curve) funcrtion
--Smaller input and example images for this unit test! -> faster excution, less space in git!
+-Replace "star recognizer" test images -> instead of one big, multiple small ones with only 2-5 stars.
+-Extract starmath library! -> Need a concept of namespaces, overall structure etc. - First plan!
 
 -Add test for remove_nans() - add parameter to allow specifying size of filter matrix
+-Add unit tests for pipeline::io::write()
 -Add hfd() to "actions"
 -Add fwhm() to "actions" 
--Add bad pixel remover/interpolator (hot- and cold pixel algorithm removal by specifying a threshold? Or only for hot a threshold and for dead pixels a 0)
--Add fits image writer?
--Real workd example 3 with clustering?
--Extract starmath library
+-IDEA: stretch(curve) funcrtion
 -...
+
+
+DONE
+----
+-IDEA: Fits writer --> write(path, filenamePattern) as pipeline!, Rename images() to read()
+-Replace test image since reduced image leads to bad pixel-filter remove the stars...
+-Real workd example 3 with clustering?
+-Add bad pixel remover/interpolator (hot- and cold pixel algorithm removal by specifying a threshold? Or only for hot a threshold and for dead pixels a 0)
 
 
 

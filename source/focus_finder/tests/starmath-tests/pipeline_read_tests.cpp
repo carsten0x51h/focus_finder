@@ -26,12 +26,13 @@
 
 #include <range/v3/range/conversion.hpp>
 
-#include "../../common/include/pipeline/view/images.h"
+#include "../../common/include/pipeline/view/read.h"
 
 BOOST_AUTO_TEST_SUITE(pipeline_images_tests)
 
-using namespace starmath::pipeline;
 using namespace starmath;
+using namespace starmath::pipeline;
+using namespace starmath::pipeline::io;
 using namespace ranges;
 
 
@@ -52,7 +53,7 @@ BOOST_AUTO_TEST_CASE(pipeline_images_tiff_test)
     };
 
     auto img_dimensions = image_filenames
-                            | images()
+                            | read()
                             | view::transform(
                                     [](const auto & img_ptr) {
                                         return std::make_pair(img_ptr->width(), img_ptr->height());

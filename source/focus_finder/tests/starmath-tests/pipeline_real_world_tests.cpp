@@ -34,7 +34,8 @@
 #include <boost/test/unit_test.hpp>
 
 #include "../../common/include/pipeline/view/files.h"
-#include "../../common/include/pipeline/view/images.h"
+#include "../../common/include/pipeline/view/read.h"
+#include "../../common/include/pipeline/view/write.h"
 #include "../../common/include/pipeline/view/crop.h"
 #include "../../common/include/pipeline/view/scale.h"
 #include "../../common/include/pipeline/view/subtract.h"
@@ -60,8 +61,9 @@
 
 BOOST_AUTO_TEST_SUITE(pipeline_combination_tests)
 
-using namespace starmath::pipeline;
 using namespace starmath;
+using namespace starmath::pipeline;
+using namespace starmath::pipeline::io;
 using namespace ranges;
 
 
@@ -109,7 +111,7 @@ BOOST_AUTO_TEST_CASE(pipeline_star_metrics_test, * boost::unit_test::tolerance(0
 
     auto star_metrics =
         imagePaths
-            | images()
+            | read()
             | view::filter(& metrics::is_not_saturated)
             | subtract_background(ThresholdingAlgorithmFactoryT::getInstance(ThresholdingAlgorithmTypeT::OTSU)) // TODO: Why not just passing in ThresholdingAlgorithmTypeT::OTSU?
             | scale_up(3.0F)
@@ -166,22 +168,22 @@ BOOST_AUTO_TEST_CASE(pipeline_astrophotography_image_development_test, * boost::
              view::single(
 	      average(
                 light_frame_files
-                    | images()
+                    | read()
 				    | interpolate_bad_pixels(500 /*threshold*/, 3 /*filter size*/)
 					| subtract(
                         average(dark_files
-                        		| images()
+                        		| read()
 								| interpolate_bad_pixels(500 /*threshold*/, 3 /*filter size*/)
                         )
                       )
                     | divide_by(
                         average(
                             flat_files
-                                | images()
+                                | read()
 							    | interpolate_bad_pixels(500 /*threshold*/, 3 /*filter size*/)
 								| subtract(
                                      average(dark_flat_files
-                                    		 | images()
+                                    		 | read()
 											 | interpolate_bad_pixels(500 /*threshold*/, 3 /*filter size*/)
 									 )
                                   )
@@ -248,7 +250,7 @@ BOOST_AUTO_TEST_CASE(pipeline_star_recognizer_test)
 {
     auto clusteredImagesRanges =
             view::single("test_data/image_processing_pipeline/real_world/star_recognizer/test_image_star_recognizer_1.fit.gz")
-              | images()
+              | read()
               | interpolate_bad_pixels(500 /*threshold*/, 3 /*filter size*/)
 			  | detect_stars(2 /*cluster radius*/,
 					        ThresholdingAlgorithmFactoryT::getInstance(ThresholdingAlgorithmTypeT::OTSU),
@@ -259,6 +261,7 @@ BOOST_AUTO_TEST_CASE(pipeline_star_recognizer_test)
 	          | scale_up(3.0F)
 	          | center_on_star(CentroidAlgorithmFactoryT::getInstance(CentroidAlgorithmTypeT::IWC))
 	          | scale_down(3.0F)
+			  | write("img_%4d.fit")
 			  | to<std::vector>();
 
 

@@ -26,13 +26,14 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "../../common/include/pipeline/view/images.h"
 #include "../../common/include/pipeline/view/crop.h"
+#include "../../common/include/pipeline/view/read.h"
 
 BOOST_AUTO_TEST_SUITE(pipeline_crop_tests)
 
-using namespace starmath::pipeline;
 using namespace starmath;
+using namespace starmath::pipeline;
+using namespace starmath::pipeline::io;
 using namespace ranges;
 
 /**
@@ -49,7 +50,7 @@ BOOST_AUTO_TEST_CASE(pipeline_crop_from_center_sub_region_test)
     };
 
     auto resultImagePtr = imageFilenames
-                          | images()
+                          | read()
                           | crop_from_center(SizeT<int>(3,3))
                           | to<std::vector>();
 
@@ -72,7 +73,7 @@ BOOST_AUTO_TEST_CASE(pipeline_crop_from_center_full_image_test)
     };
 
     auto resultImagePtr = imageFilenames
-                          | images()
+                          | read()
                           | crop_from_center(SizeT<int>(5,5))
                           | to<std::vector>();
 
@@ -96,7 +97,7 @@ BOOST_AUTO_TEST_CASE(pipeline_multi_crop_on_image_test)
 	// TODO: Choose an input image from the crop test folder!
     auto croppedImages =
 	  view::single("test_data/image_processing_pipeline/real_world/star_recognizer/test_image_star_recognizer_1.fit.gz")
-	  | images()
+	  | read()
 	  | crop(rects)
 	  | to<std::vector>();
 
@@ -119,7 +120,7 @@ BOOST_AUTO_TEST_CASE(pipeline_crop_on_image_test)
 	// TODO: Choose an input image from the crop test folder! Choose 2 images ... at least...
     auto croppedImages =
 	  view::single("test_data/image_processing_pipeline/real_world/star_recognizer/test_image_star_recognizer_1.fit.gz")
-	  | images()
+	  | read()
 	  | crop(rect1)
 	  | to<std::vector>();
 	

@@ -27,14 +27,14 @@
 #include <boost/test/unit_test.hpp>
 
 #include "../../common/include/pipeline/view/center_on_star.h"
-#include "../../common/include/pipeline/view/images.h"
-
 #include "../../common/include/centroid_algorithm_factory.h"
+#include "../../common/include/pipeline/view/read.h"
 
 BOOST_AUTO_TEST_SUITE(pipeline_center_on_star_tests)
 
-using namespace starmath::pipeline;
 using namespace starmath;
+using namespace starmath::pipeline;
+using namespace starmath::pipeline::io;
 using namespace ranges;
 
 /**
@@ -51,7 +51,7 @@ BOOST_AUTO_TEST_CASE(pipeline_center_on_star_test)
     };
 
     auto resultImagePtr = imageFilenames
-                          | images()
+                          | read()
                           | center_on_star(CentroidAlgorithmFactoryT::getInstance(CentroidAlgorithmTypeT::IWC))
                           | to<std::vector>();
 

@@ -26,14 +26,15 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "../../common/include/pipeline/view/images.h"
+#include "../../common/include/pipeline/view/read.h"
 #include "../../common/include/pipeline/view/subtract_background.h"
 #include "../../common/include/thresholding_algorithm_factory.h"
 
 BOOST_AUTO_TEST_SUITE(pipeline_subtract_background_tests)
 
-using namespace starmath::pipeline;
 using namespace starmath;
+using namespace starmath::pipeline;
+using namespace starmath::pipeline::io;
 using namespace ranges;
 
 /**
@@ -54,7 +55,7 @@ BOOST_AUTO_TEST_CASE(pipeline_subtract_background_1_test)
     };
 
     auto resultImagePtr = imageFilenames
-            | images()
+            | read()
             | subtract_background(ThresholdingAlgorithmFactoryT::getInstance(ThresholdingAlgorithmTypeT::MEAN))
             | to<std::vector>();
 

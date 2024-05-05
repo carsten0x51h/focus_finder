@@ -30,6 +30,17 @@
 
 namespace starmath::io::fits {
 
+    bool
+	is_fits(const std::string & filepath_lower) {
+        return (boost::algorithm::ends_with(filepath_lower, "fit") || boost::algorithm::ends_with(filepath_lower, "fits"));
+    }
+
+    bool
+	is_fits_gz(const std::string & filepath_lower) {
+        return (boost::algorithm::ends_with(filepath_lower, "fit.gz") || boost::algorithm::ends_with(filepath_lower, "fits.gz"));
+    }
+
+
 	std::shared_ptr<ImageT>
     read(const std::string &inFilename, std::stringstream *ss) {
 
@@ -84,15 +95,14 @@ namespace starmath::io::fits {
     }
 
 
-
     void
-	write(const std::shared_ptr<ImageT> &inImg, const std::string &inFilename, std::stringstream *ss) {
+	write(const ImageT &inImg, const std::string &inFilename, std::stringstream *ss) {
         // TODO: Is it possible to pass a stream?
         CCfits::FITS::setVerboseMode(ss != nullptr);
 
         try {
             long naxis = 2;
-            long naxes[2] = {inImg->width(), inImg->height()};
+            long naxes[2] = {inImg.width(), inImg.height()};
 
             std::unique_ptr<CCfits::FITS> pFits;
 
@@ -106,8 +116,8 @@ namespace starmath::io::fits {
 
             std::valarray<typename ImageT::value_type> array(nelements);
 
-            cimg_forXY(*inImg, x, y) {
-                    array[inImg->offset(x, y)] = (*inImg)(x, inImg->height() - y - 1);
+            cimg_forXY(inImg, x, y) {
+                    array[inImg.offset(x, y)] = inImg(x, inImg.height() - y - 1);
                 }
 
             long fpixel(1);

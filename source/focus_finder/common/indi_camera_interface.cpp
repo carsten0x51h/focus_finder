@@ -130,7 +130,7 @@ std::shared_ptr<ImageT> IndiCameraInterfaceT::convertIndiBlobToCImg(IBLOB *iblob
         notifyFrameTransferUpd(50);
 
         // Read file
-        std::shared_ptr<ImageT> resultImage = std::make_shared<ImageT>();
+        std::shared_ptr<ImageT> resultImage;
 
         LOG(debug)
             << "IndiCameraInterfaceT::convertIndiBlobToCImg... reading FITS file '"
@@ -138,16 +138,13 @@ std::shared_ptr<ImageT> IndiCameraInterfaceT::convertIndiBlobToCImg(IBLOB *iblob
 
         try {
             std::stringstream ss;
-            long bitsPerPixel;
-            CImgFitsIOHelperT::readFits(resultImage.get(), sfn, &bitsPerPixel,
-                                        &ss);
+            resultImage = starmath::io::fits::read(sfn, &ss);
 
             LOG(debug)
                 << "IndiCameraInterfaceT::convertIndiBlobToCImg... FITS file '"
-                << sfn << "' read, bitsPerPixel=" << bitsPerPixel
-                << ", details: " << ss.str() << std::endl;
+                << sfn << "' read, details: " << ss.str() << std::endl;
 
-        } catch (FitsIOExceptionT &exc) {
+        } catch (starmath::io::fits::FitsIOExceptionT &exc) {
             LOG(fatal) << "Reading FITS file failed: " << exc.what()
                        << std::endl;
 

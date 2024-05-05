@@ -33,30 +33,6 @@
 namespace starmath::io {
 
     /**
-     * NOTE:
-     * ends_with() is defined in C++20 and may be used here once all supported OS versions have C++20 support.
-     *
-     * See https://en.cppreference.com/w/cpp/string/basic_string/ends_with
-     *
-     * @param filepath_lower
-     * @return
-     */
-    bool is_fits(const std::string & filepath_lower) {
-        return (boost::algorithm::ends_with(filepath_lower, "fit") || boost::algorithm::ends_with(filepath_lower, "fits"));
-    }
-
-
-    /**
-     *
-     * @param filepath_lower
-     * @return
-     */
-    bool is_fits_gz(const std::string & filepath_lower) {
-        return (boost::algorithm::ends_with(filepath_lower, "fit.gz") || boost::algorithm::ends_with(filepath_lower, "fits.gz"));
-    }
-
-
-    /**
      *
      * @param filepath
      */
@@ -104,7 +80,7 @@ namespace starmath::io {
         const std::string filepath_lower = boost::algorithm::to_lower_copy(filepath.string());
 
         // TODO: This code may be moved to a sep. "factory", later.
-        if (is_fits(filepath_lower) || is_fits_gz(filepath_lower)) {
+        if (starmath::io::fits::is_fits(filepath_lower) || starmath::io::fits::is_fits_gz(filepath_lower)) {
 
             return read_fits(filepath.string());
         }

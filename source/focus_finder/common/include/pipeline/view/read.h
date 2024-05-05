@@ -31,7 +31,7 @@
 
 #define FOFI_IMAGES_DEBUG 0
 
-namespace starmath::pipeline {
+namespace starmath::pipeline::io {
 
 	/**
 	 * TODO: Rename to read()
@@ -39,7 +39,7 @@ namespace starmath::pipeline {
 	 */
     template<typename ImageType=float>
     auto
-    images() {
+    read() {
         return ranges::views::transform(
             [=](const std::string &imageFilename) {
 

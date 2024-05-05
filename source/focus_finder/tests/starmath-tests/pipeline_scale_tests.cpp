@@ -26,13 +26,14 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "../../common/include/pipeline/view/images.h"
+#include "../../common/include/pipeline/view/read.h"
 #include "../../common/include/pipeline/view/scale.h"
 
 BOOST_AUTO_TEST_SUITE(pipeline_scale_tests)
 
-using namespace starmath::pipeline;
 using namespace starmath;
+using namespace starmath::pipeline;
+using namespace starmath::pipeline::io;
 using namespace ranges;
 
 /**
@@ -51,7 +52,7 @@ BOOST_AUTO_TEST_CASE(pipeline_scale_up_test)
     };
 
     auto resultImagePtr = imageFilenames
-                          | images()
+                          | read()
                           | scale_up(2.0F)
                           | to<std::vector>();
 
@@ -76,7 +77,7 @@ BOOST_AUTO_TEST_CASE(pipeline_scale_down_test)
     };
 
     auto resultImagePtr = imageFilenames
-                          | images()
+                          | read()
                           | scale_down(2.0F)
                           | to<std::vector>();
 

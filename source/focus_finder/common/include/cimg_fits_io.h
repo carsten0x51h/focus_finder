@@ -28,6 +28,9 @@
 #include <memory>
 #include <sstream>
 
+#include <boost/algorithm/string.hpp>
+#include <boost/algorithm/string/predicate.hpp>
+
 #include "exception.h"
 #include "image.h"
 
@@ -35,6 +38,27 @@
 namespace starmath::io::fits {
 
 	DEF_Exception(FitsIO);
+
+
+    /**
+     * NOTE:
+     * ends_with() is defined in C++20 and may be used here once all supported OS versions have C++20 support.
+     *
+     * See https://en.cppreference.com/w/cpp/string/basic_string/ends_with
+     *
+     * @param filepath_lower
+     * @return
+     */
+    bool is_fits(const std::string & filepath_lower);
+
+
+    /**
+     *
+     * @param filepath_lower
+     * @return
+     */
+    bool is_fits_gz(const std::string & filepath_lower);
+
 
     /**
      * CCfits helper function

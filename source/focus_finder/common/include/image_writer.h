@@ -43,8 +43,7 @@ namespace starmath::io {
 	/**
 	 * TODO: Document...
 	 */
-    void write(const ImageT & img, const std::filesystem::path & filepath);
-
+    void write(const ImageT & img, const std::filesystem::path & filepath, bool override = true);
 }
 
 

@@ -164,7 +164,7 @@ void FocusCurveRecordT::save(boost::property_tree::ptree &pt, const FocusCurveRe
     std::stringstream debugSs;
 
     // NOTE: Throws FitsIOExceptionT... TODO: Handle here?
-    CImgFitsIOHelperT::writeFits(focusCurveRecord.getCorrectedStarImage(), imgFilePath.string(), &debugSs);
+    starmath::io::fits::write(focusCurveRecord.getCorrectedStarImage(), imgFilePath.string(), &debugSs);
 
     LOG(debug) << "FITS storing details: " << debugSs.str() << std::endl;
 }
@@ -194,15 +194,15 @@ FocusCurveRecordT::load(const boost::property_tree::ptree &pt, const fs::path &l
     LOG(debug) << "Loading FocusCurveRecordT image from '" << imgFilePath << "'..." << std::endl;
 
     // Load the star image
-    ImageT img;
+    std::shared_ptr<ImageT> img;
+
     try {
         std::stringstream debugSs;
-        long bitPix; // TODO: Add to CImg somehow? Or is it contained already?
 
         // NOTE: Throws FitsIOExceptionT
-        CImgFitsIOHelperT::readFits(&img, imgFilePath.string(), &bitPix, &debugSs);
+        img = starmath::io::fits::read(imgFilePath.string(), &debugSs);
         LOG(debug) << "FITS loading details: " << debugSs.str() << std::endl;
-    } catch (FitsIOExceptionT &exc) {
+    } catch (starmath::io::fits::FitsIOExceptionT &exc) {
         LOG(error) << "Could not load star image " << imgFilePath.string() << ", problem message: " << exc.what()
                    << std::endl;
         // TODO: Error reporting.... ReportingT...
@@ -210,12 +210,12 @@ FocusCurveRecordT::load(const boost::property_tree::ptree &pt, const fs::path &l
 
     // Calc FWHMs
     // NOTE / TODO: This only works if height() is odd
-    size_t centerIdxHorz = std::floor(img.height() / 2);
-    FwhmT fwhmHorz(ImageSlicerT::slice<SliceDirectionT::HORZ>(img, centerIdxHorz));
+    size_t centerIdxHorz = std::floor(img->height() / 2);
+    FwhmT fwhmHorz(ImageSlicerT::slice<SliceDirectionT::HORZ>(*img, centerIdxHorz));
 
     // NOTE / TODO: This only works if width() is odd
-    size_t centerIdxVert = std::floor(img.width() / 2);
-    FwhmT fwhmVert(ImageSlicerT::slice<SliceDirectionT::VERT>(img, centerIdxVert));
+    size_t centerIdxVert = std::floor(img->width() / 2);
+    FwhmT fwhmVert(ImageSlicerT::slice<SliceDirectionT::VERT>(*img, centerIdxVert));
 
     auto record = FocusCurveRecordBuilderT()
             .setCreationTimestamp(creationTimestamp)
@@ -226,11 +226,11 @@ FocusCurveRecordT::load(const boost::property_tree::ptree &pt, const fs::path &l
                     // TODO: Is this even required / should this be stored?
             .setExposureTime(pt.get<std::chrono::duration<float> >("<xmlattr>.exposure_time"))
 
-            .setCorrectedStarImage(img)
+            .setCorrectedStarImage(*img)
                     // .setSnr(snr)
             .setHorzFwhm(fwhmHorz)
             .setVertFwhm(fwhmVert)
-            .setHfd(HfdT(img))
+            .setHfd(HfdT(*img))
             .build();
 
     // DEBUG START

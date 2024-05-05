@@ -26,13 +26,14 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "../../common/include/pipeline/view/images.h"
+#include "../../common/include/pipeline/view/read.h"
 #include "../../common/include/pipeline/view/subtract.h"
 
 BOOST_AUTO_TEST_SUITE(pipeline_subtract_tests)
 
-using namespace starmath::pipeline;
 using namespace starmath;
+using namespace starmath::pipeline;
+using namespace starmath::pipeline::io;
 using namespace ranges;
 
 /**
@@ -51,7 +52,7 @@ BOOST_AUTO_TEST_CASE(pipeline_subtract_image_positive_result_test)
     };
 
     auto resultImagePtr = imageFilenames
-                          | images()
+                          | read()
                           | subtract(imageToSubtractPtr)
                           | to<std::vector>();
 
@@ -79,7 +80,7 @@ BOOST_AUTO_TEST_CASE(pipeline_subtract_image_negaive_result_test)
     };
 
     auto resultImagePtr = imageFilenames
-                          | images()
+                          | read()
                           | subtract(imageToSubtractPtr)
                           | to<std::vector>();
 
@@ -103,7 +104,7 @@ BOOST_AUTO_TEST_CASE(pipeline_subtract_scalar_test)
     };
 
     auto resultImagePtr = imageFilenames
-                          | images()
+                          | read()
                           | subtract(10.0F)
                           | to<std::vector>();
 

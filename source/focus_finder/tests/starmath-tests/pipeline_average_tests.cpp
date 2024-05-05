@@ -26,13 +26,14 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "../../common/include/pipeline/view/images.h"
 #include "../../common/include/pipeline/action/average.h"
+#include "../../common/include/pipeline/view/read.h"
 
 BOOST_AUTO_TEST_SUITE(pipeline_average_tests)
 
-using namespace starmath::pipeline;
 using namespace starmath;
+using namespace starmath::pipeline;
+using namespace starmath::pipeline::io;
 using namespace ranges;
 
 /**
@@ -52,7 +53,7 @@ BOOST_AUTO_TEST_CASE(pipeline_average_1_test)
             "test_data/image_processing_pipeline/average/test_image_average_4_5x5.tiff"
     };
 
-    BOOST_TEST(*average(imageFilenames | images()) == expectedResultImage);
+    BOOST_TEST(*average(imageFilenames | read()) == expectedResultImage);
 }
 
 BOOST_AUTO_TEST_SUITE_END();
