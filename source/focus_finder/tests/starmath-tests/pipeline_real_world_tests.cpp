@@ -259,10 +259,10 @@ BOOST_AUTO_TEST_CASE(pipeline_star_recognizer_test)
 				)
               | crop()
               | views::join
-	          | scale_up(3.0F)
-	          | center_on_star(CentroidAlgorithmFactoryT::getInstance(CentroidAlgorithmTypeT::IWC))
-	          | scale_down(3.0F)
-			  | write(std::filesystem::current_path(), "img_%04d.fit") // NOTE; oath must exist
+//	          | scale_up(3.0F)
+//	          | center_on_star(CentroidAlgorithmFactoryT::getInstance(CentroidAlgorithmTypeT::IWC))
+//	          | scale_down(3.0F)
+//			  | write(std::filesystem::current_path(), "img_%04d.fit") // NOTE; path must exist
 			  | to<std::vector>();
 
 
